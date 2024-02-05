@@ -83,14 +83,6 @@ public class ArrayLong {
         return false;
     }
 
-    public long pop() {
-        return items[--size];
-    }
-
-    public long peek() {
-        return items[size - 1];
-    }
-
     public long first() {
         if (size == 0) throw new IllegalStateException("Empty array cannot access index 0.");
         return items[0];
@@ -161,6 +153,21 @@ public class ArrayLong {
         for (int i = 0; i < n; i++)
             if (items1[i] != items2[i]) return false;
         return true;
+    }
+
+    @Override
+    public String toString () {
+        if (size == 0) return "[]";
+        long[] items = this.items;
+        StringBuilder buffer = new StringBuilder(32);
+        buffer.append('[');
+        buffer.append(items[0]);
+        for (int i = 1; i < size; i++) {
+            buffer.append(", ");
+            buffer.append(items[i]);
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
 }

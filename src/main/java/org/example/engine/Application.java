@@ -304,6 +304,9 @@ public class Application {
             swapChainImageFormat = surfaceFormat.format();
             swapChainExtent = VkExtent2D.create().set(extent);
         }
+
+        // create image views for the images in the swapchain
+
     }
 
     private VkSurfaceFormatKHR chooseSwapSurfaceFormat(VkSurfaceFormatKHR.Buffer availableFormats) {

@@ -22,7 +22,7 @@ public class Main {
 
 
 
-        Application application = new Application("My Game", true);
+        Application application = new Application("My Game", false);
         application.launch();
     }
 }
