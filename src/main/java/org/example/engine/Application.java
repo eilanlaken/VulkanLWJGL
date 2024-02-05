@@ -107,6 +107,8 @@ public class Application {
     private int swapChainImageFormat;
     private VkExtent2D swapChainExtent;
 
+    private long pipelineLayout;
+
     public Application(final String title, final boolean debugMode) {
         this.title = title == null ? "Engine Application" : title;
         this.windowWidth = DEFAULT_WINDOW_WIDTH;
@@ -363,6 +365,65 @@ public class Application {
             fragShaderStageCreateInfo.module(fragShaderModule);
             fragShaderStageCreateInfo.pName(entryPoint);
 
+            // VERTEX STAGE
+            VkPipelineVertexInputStateCreateInfo vertexInputInfo = VkPipelineVertexInputStateCreateInfo.calloc(stack);
+            vertexInputInfo.sType(VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO);
+
+            // ASSEMBLY STAGE
+            VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo = VkPipelineInputAssemblyStateCreateInfo.calloc(stack);
+            inputAssemblyInfo.sType(VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO);
+            inputAssemblyInfo.topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+            inputAssemblyInfo.primitiveRestartEnable(false);
+
+            // VIEWPORT
+            VkViewport.Buffer viewport = VkViewport.calloc(1, stack);
+            viewport.x(0.0f);
+            viewport.y(0.0f);
+            viewport.width(swapChainExtent.width());
+            viewport.height(swapChainExtent.height());
+            viewport.minDepth(0.0f);
+            viewport.maxDepth(1.0f);
+            VkRect2D.Buffer scissor = VkRect2D.calloc(1, stack);
+            scissor.offset(VkOffset2D.calloc(stack).set(0,0));
+            scissor.extent(swapChainExtent);
+            VkPipelineViewportStateCreateInfo viewportCreateInfo = VkPipelineViewportStateCreateInfo.calloc(stack);
+            viewportCreateInfo.sType(VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO);
+            viewportCreateInfo.pViewports(viewport);
+            viewportCreateInfo.pScissors(scissor);
+
+            // MULTISAMPLING
+            VkPipelineMultisampleStateCreateInfo multisampleInfo = VkPipelineMultisampleStateCreateInfo.calloc(stack);
+            multisampleInfo.sType(VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO);
+            multisampleInfo.sampleShadingEnable(false);
+            multisampleInfo.rasterizationSamples(VK_SAMPLE_COUNT_1_BIT);
+
+            // COLOR BLENDING
+            VkPipelineColorBlendAttachmentState.Buffer colorBlendAttachment = VkPipelineColorBlendAttachmentState.calloc(1, stack);
+            colorBlendAttachment.colorWriteMask(VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT);
+            // TODO: optional. Modify and see
+            // alpha blending -->
+            colorBlendAttachment.blendEnable(true);
+            colorBlendAttachment.srcColorBlendFactor(VK_BLEND_FACTOR_SRC_ALPHA);
+            colorBlendAttachment.dstColorBlendFactor(VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA);
+            colorBlendAttachment.colorBlendOp(VK_BLEND_OP_ADD);
+            colorBlendAttachment.srcAlphaBlendFactor(VK_BLEND_FACTOR_ONE);
+            colorBlendAttachment.dstAlphaBlendFactor(VK_BLEND_FACTOR_ZERO);
+            colorBlendAttachment.alphaBlendOp(VK_BLEND_OP_ADD);
+            // <-- alpha blending
+            VkPipelineColorBlendStateCreateInfo colorBlending = VkPipelineColorBlendStateCreateInfo.calloc(stack);
+            colorBlending.sType(VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO);
+            colorBlending.logicOpEnable(false);
+            colorBlending.logicOp(VK_LOGIC_OP_COPY);
+            colorBlending.pAttachments(colorBlendAttachment);
+            colorBlending.blendConstants(stack.floats(0.0f, 0.0f, 0.0f, 0.0f));
+
+            // finally: PIPELINE LAYOUT CREATION
+            VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = VkPipelineLayoutCreateInfo.calloc(stack);
+            pipelineLayoutCreateInfo.sType(VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO);
+            LongBuffer pPipelineLayout = stack.longs(VK_NULL_HANDLE);
+            if (vkCreatePipelineLayout(logicalDevice, pipelineLayoutCreateInfo, null, pPipelineLayout) != VK_SUCCESS) throw new RuntimeException("Could not create rendering pipeline layout.");
+
+            // RELEASE RESOURCES
             vkDestroyShaderModule(logicalDevice, vertShaderModule, null);
             vkDestroyShaderModule(logicalDevice, fragShaderModule, null);
 
@@ -524,6 +585,7 @@ public class Application {
     }
 
     private void clean() {
+        vkDestroyPipelineLayout(logicalDevice, pipelineLayout, null);
         for (int i = 0; i < swapChainImageViews.size; i++) {
             vkDestroyImageView(logicalDevice, swapChainImageViews.items[i], null);
         }
