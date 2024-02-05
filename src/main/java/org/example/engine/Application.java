@@ -1,8 +1,7 @@
 package org.example.engine;
 
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayLong;
-import org.example.engine.core.files.UtilsFiles;
+import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.math.MathUtils;
 import org.lwjgl.PointerBuffer;
@@ -14,7 +13,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -342,8 +340,8 @@ public class Application {
 
         // create rendering pipelines
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            final String vertexShaderGlsl = UtilsFiles.getFileContent("shaders/shader.vert");
-            final String fragmentShaderGlsl = UtilsFiles.getFileContent("shaders/shader.frag");
+            final String vertexShaderGlsl = FileUtils.getFileContent("shaders/shader.vert");
+            final String fragmentShaderGlsl = FileUtils.getFileContent("shaders/shader.frag");
 
             ShaderProgram shaderProgram = new ShaderProgram(vertexShaderGlsl, fragmentShaderGlsl);
 

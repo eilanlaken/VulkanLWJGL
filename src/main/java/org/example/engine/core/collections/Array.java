@@ -1,9 +1,7 @@
 package org.example.engine.core.collections;
 
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.utils.Reflections;
 
-import java.util.Iterator;
 public class Array<T> {
 
     public T[] items;
@@ -194,7 +192,7 @@ public class Array<T> {
 
     private T[] resize(int newSize) {
         T[] items = this.items;
-        T[] newItems = (T[]) Reflections.createArray(items.getClass().getComponentType(), newSize);
+        T[] newItems = (T[]) CollectionsUtils.createArray(items.getClass().getComponentType(), newSize);
         System.arraycopy(items, 0, newItems, 0, Math.min(size, newItems.length));
         this.items = newItems;
         return newItems;
