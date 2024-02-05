@@ -25,14 +25,14 @@ public class Array<T> {
 
     public void add(final T value) {
         T[] items = this.items;
-        if (size == items.length) items = grow(size);
+        if (size == items.length) items = resize(size * 2);
         items[size] = value;
         size++;
     }
 
     public void add(final T v1, final T v2) {
         T[] items = this.items;
-        if (size + 1 >= items.length) items = grow(size);
+        if (size + 1 >= items.length) items = resize(size * 2);
         items[size] = v1;
         items[size + 1] = v2;
         size += 2;
@@ -40,7 +40,7 @@ public class Array<T> {
 
     public void add(final T v1, final T v2, final T v3) {
         T[] items = this.items;
-        if (size + 3 >= items.length) items = grow(size);
+        if (size + 3 >= items.length) items = resize(size * 2);
         items[size] = v1;
         items[size + 1] = v2;
         items[size + 1] = v3;
@@ -70,21 +70,21 @@ public class Array<T> {
         return false;
     }
 
-    public boolean containsAll (Array<? extends T> values, boolean identity) {
+    public boolean containsAll(Array<? extends T> values, boolean identity) {
         T[] items = values.items;
         for (int i = 0, n = values.size; i < n; i++)
             if (!contains(items[i], identity)) return false;
         return true;
     }
 
-    public boolean containsAny (Array<? extends T> values, boolean identity) {
+    public boolean containsAny(Array<? extends T> values, boolean identity) {
         T[] items = values.items;
         for (int i = 0, n = values.size; i < n; i++)
             if (contains(items[i], identity)) return true;
         return false;
     }
 
-    public int indexOf (final T value, boolean identity) {
+    public int indexOf(final T value, boolean identity) {
         T[] items = this.items;
         if (identity || value == null) {
             for (int i = 0, n = size; i < n; i++)
@@ -134,15 +134,15 @@ public class Array<T> {
         return items[0];
     }
 
-    public boolean notEmpty () {
+    public boolean notEmpty() {
         return size > 0;
     }
 
-    public boolean isEmpty () {
+    public boolean isEmpty() {
         return size == 0;
     }
 
-    public void clear () {
+    public void clear() {
         size = 0;
     }
 
@@ -152,7 +152,7 @@ public class Array<T> {
         if (items.length != size) resize(size);
     }
 
-    public void shuffle () {
+    public void shuffle() {
         T[] items = this.items;
         for (int i = size - 1; i >= 0; i--) {
             int ii = MathUtils.random(i);
@@ -163,7 +163,7 @@ public class Array<T> {
     }
 
     @Override
-    public int hashCode () {
+    public int hashCode() {
         if (!ordered) return super.hashCode();
         T[] items = this.items;
         int h = 1;
@@ -176,7 +176,7 @@ public class Array<T> {
         return h;
     }
     @Override
-    public boolean equals (Object object) {
+    public boolean equals(Object object) {
         if (object == this) return true;
         if (!ordered) return false;
         if (!(object instanceof Array)) return false;
@@ -193,16 +193,6 @@ public class Array<T> {
     }
 
     private T[] resize(int newSize) {
-        T[] items = this.items;
-        T[] newItems = (T[]) Reflections.createArray(items.getClass().getComponentType(), newSize);
-        System.arraycopy(items, 0, newItems, 0, Math.min(size, newItems.length));
-        this.items = newItems;
-        return newItems;
-    }
-    private final T[] grow(int delta) {
-        if (delta < 0) throw new RuntimeException("Array.grow() expected of non-negative value, got " + delta);
-        if (delta == 0) return this.items;
-        final int newSize = this.size + delta;
         T[] items = this.items;
         T[] newItems = (T[]) Reflections.createArray(items.getClass().getComponentType(), newSize);
         System.arraycopy(items, 0, newItems, 0, Math.min(size, newItems.length));

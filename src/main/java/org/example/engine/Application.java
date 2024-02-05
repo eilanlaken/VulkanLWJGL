@@ -1,5 +1,6 @@
 package org.example.engine;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayLong;
 import org.example.engine.core.math.MathUtils;
 import org.lwjgl.PointerBuffer;
@@ -99,6 +100,7 @@ public class Application {
     // swap chain
     private long swapChain;
     private ArrayLong swapChainImages;
+    private ArrayLong swapChainImageViews;
     private int swapChainImageFormat;
     private VkExtent2D swapChainExtent;
 
@@ -212,7 +214,7 @@ public class Application {
             if (this.physicalDevice == null) throw new RuntimeException("Failed to find a suitable GPU");
         }
 
-        // create logical device TODO
+        // create logical device
         try (MemoryStack stack = MemoryStack.stackPush()) {
             QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
             int[] uniqueQueueFamilies = indices.unique();
@@ -306,7 +308,32 @@ public class Application {
         }
 
         // create image views for the images in the swapchain
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            swapChainImageViews = new ArrayLong();
+            LongBuffer pImageView = stack.mallocLong(1);
+            for (int i = 0; i < swapChainImages.size; i++) {
+                VkImageViewCreateInfo createInfo = VkImageViewCreateInfo.calloc(stack);
 
+                createInfo.sType(VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO);
+                createInfo.image(swapChainImages.items[i]);
+                createInfo.viewType(VK_IMAGE_VIEW_TYPE_2D);
+                createInfo.format(swapChainImageFormat);
+
+                createInfo.components().r(VK_COMPONENT_SWIZZLE_IDENTITY);
+                createInfo.components().g(VK_COMPONENT_SWIZZLE_IDENTITY);
+                createInfo.components().b(VK_COMPONENT_SWIZZLE_IDENTITY);
+                createInfo.components().a(VK_COMPONENT_SWIZZLE_IDENTITY);
+
+                createInfo.subresourceRange().aspectMask(VK_IMAGE_ASPECT_COLOR_BIT);
+                createInfo.subresourceRange().baseMipLevel(0);
+                createInfo.subresourceRange().levelCount(1);
+                createInfo.subresourceRange().baseMipLevel(0);
+                createInfo.subresourceRange().layerCount(1);
+
+                if (vkCreateImageView(logicalDevice, createInfo, null, pImageView) != VK_SUCCESS) throw new RuntimeException("Could not create image view.");
+                swapChainImageViews.add(pImageView.get(0));
+            }
+        }
     }
 
     private VkSurfaceFormatKHR chooseSwapSurfaceFormat(VkSurfaceFormatKHR.Buffer availableFormats) {
@@ -448,6 +475,9 @@ public class Application {
     }
 
     private void clean() {
+        for (int i = 0; i < swapChainImageViews.size; i++) {
+            vkDestroyImageView(logicalDevice, swapChainImageViews.items[i], null);
+        }
         vkDestroySwapchainKHR(this.logicalDevice, swapChain, null);
         vkDestroyDevice(this.logicalDevice, null);
         if (this.debugMode) {
