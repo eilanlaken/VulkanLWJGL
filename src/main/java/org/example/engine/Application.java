@@ -2,12 +2,15 @@ package org.example.engine;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayLong;
+import org.example.engine.core.files.UtilsFiles;
+import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.math.MathUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.*;
 
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.Collection;
@@ -333,6 +336,52 @@ public class Application {
                 if (vkCreateImageView(logicalDevice, createInfo, null, pImageView) != VK_SUCCESS) throw new RuntimeException("Could not create image view.");
                 swapChainImageViews.add(pImageView.get(0));
             }
+        }
+
+        // create rendering pipelines
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            final String vertexShaderGlsl = UtilsFiles.getFileContent("shaders/shader.vert");
+            final String fragmentShaderGlsl = UtilsFiles.getFileContent("shaders/shader.frag");
+
+            ShaderProgram shaderProgram = new ShaderProgram(vertexShaderGlsl, fragmentShaderGlsl);
+
+            long vertShaderModule = createShaderModule(shaderProgram.vertexShaderBytecode);
+            long fragShaderModule = createShaderModule(shaderProgram.fragmentShaderBytecode);
+
+            ByteBuffer entryPoint = stack.UTF8("main");
+            VkPipelineShaderStageCreateInfo.Buffer shaderStages = VkPipelineShaderStageCreateInfo.calloc(2, stack);
+
+            VkPipelineShaderStageCreateInfo vertShaderStageCreateInfo = shaderStages.get(0);
+            vertShaderStageCreateInfo.sType(VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
+            vertShaderStageCreateInfo.stage(VK_SHADER_STAGE_VERTEX_BIT);
+            vertShaderStageCreateInfo.module(vertShaderModule);
+            vertShaderStageCreateInfo.pName(entryPoint);
+
+            VkPipelineShaderStageCreateInfo fragShaderStageCreateInfo = shaderStages.get(1);
+            fragShaderStageCreateInfo.sType(VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
+            fragShaderStageCreateInfo.stage(VK_SHADER_STAGE_FRAGMENT_BIT);
+            fragShaderStageCreateInfo.module(fragShaderModule);
+            fragShaderStageCreateInfo.pName(entryPoint);
+
+            vkDestroyShaderModule(logicalDevice, vertShaderModule, null);
+            vkDestroyShaderModule(logicalDevice, fragShaderModule, null);
+
+            shaderProgram.free();
+        }
+    }
+
+    private long createShaderModule(ByteBuffer spirvCode) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkShaderModuleCreateInfo createInfo = VkShaderModuleCreateInfo.calloc(stack);
+
+            createInfo.sType(VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO);
+            createInfo.pCode(spirvCode);
+            LongBuffer pShaderModule = stack.mallocLong(1);
+            if (vkCreateShaderModule(logicalDevice, createInfo, null, pShaderModule) != VK_SUCCESS) {
+                throw new RuntimeException("Failed to create shader module");
+            }
+
+            return pShaderModule.get(0);
         }
     }
 
