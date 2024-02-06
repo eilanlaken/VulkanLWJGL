@@ -1,4 +1,4 @@
 package org.example.engine.core.graphics;
 
-public class ModelMesh {
+public class ModelPartMaterial {
 }
