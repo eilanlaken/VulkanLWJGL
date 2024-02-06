@@ -1,16 +1,18 @@
 package org.example;
 
-import org.example.engine.Application;
+import org.example.engine.core.graphics.Vulkan_tmp;
+import org.example.engine.core.graphics.Window;
 
 public class Main {
+
     public static void main(String[] args) throws Exception {
+        Window window = new Window("he", 1600, 900, false, false);
+        window.init();
 
-        //String x = UtilsFiles.getFileContent("shaders/shader.vert");
-        //System.out.println(x);
+        while (!window.windowShouldClose()) {
+            window.update();
+        }
 
-
-
-        Application application = new Application("My Game", false);
-        application.launch();
+        window.cleanup();
     }
 }
