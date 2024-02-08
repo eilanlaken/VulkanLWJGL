@@ -1,6 +1,5 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.memory.MemoryUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -12,13 +11,14 @@ import java.nio.IntBuffer;
 
 public class ModelBuilder {
 
-    public Model build(float[] data, int[] indices) {
+    public Model build(float[] positions, float[] textureCoordinates, int[] indices) {
         int id = GL30.glGenVertexArrays();
         storeIndicesBuffer(indices);
         GL30.glBindVertexArray(id);
-        int vbo = createVbo(0, 3, data);
+        int vboPositions = storeDataInAttributeList(0, 3, positions);
+        int vboTextureCoordinates = storeDataInAttributeList(1, 2, textureCoordinates);
         GL30.glBindVertexArray(0);
-        return new Model(id, data.length / 3, vbo);
+        return new Model(id, indices.length, vboPositions, vboTextureCoordinates);
     }
 
     private void storeIndicesBuffer(int[] indices) {
@@ -28,7 +28,7 @@ public class ModelBuilder {
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
     }
 
-    private int createVbo(int attributeNumber, int vertexSize, float[] data) {
+    private int storeDataInAttributeList(int attributeNumber, int vertexSize, float[] data) {
         int vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo); // bind
         FloatBuffer buffer = MemoryUtils.store(data);

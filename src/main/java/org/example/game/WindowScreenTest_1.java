@@ -34,12 +34,19 @@ public class WindowScreenTest_1 implements WindowScreen {
                 -0.5f, 0.5f, 0f
         };
 
+        float[] textureCoordinates = {
+                0,0,
+                0,1,
+                1,1,
+                1,0
+        };
+
         int[] indices = {
                 0,1,3,
                 3,1,2
         };
 
-        model = modelBuilder.build(data, indices);
+        model = modelBuilder.build(data, textureCoordinates, indices);
     }
 
     @Override
