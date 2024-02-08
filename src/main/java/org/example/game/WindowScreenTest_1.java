@@ -7,7 +7,7 @@ public class WindowScreenTest_1 implements WindowScreen {
 
     private Renderer3D renderer3D;
     private ModelBuilder modelBuilder;
-    private ModelInstance modelInstance;
+    private Model model;
 
     public WindowScreenTest_1() {
         this.renderer3D = new Renderer3D();
@@ -26,8 +26,7 @@ public class WindowScreenTest_1 implements WindowScreen {
                 0.5f, 0.5f, 0f,
                 -0.5f, 0.5f, 0f
         };
-        Model model = modelBuilder.build(data);
-        modelInstance = new ModelInstance(model);
+        model = modelBuilder.build(data);
     }
 
     @Override
@@ -36,7 +35,7 @@ public class WindowScreenTest_1 implements WindowScreen {
         GL11.glClearColor(1,0,0,1);
 
         renderer3D.begin();
-        renderer3D.render(modelInstance);
+        renderer3D.render(model, null);
         renderer3D.end();
     }
 
