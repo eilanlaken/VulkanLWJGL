@@ -42,6 +42,7 @@ public class ShaderProgram implements Resource {
             throw new RuntimeException("Could not create shader");
         this.vertexShaderId = createVertexShader(vertexShaderSource);
         this.fragmentShaderId = createFragmentShader(fragmentShaderSource);
+        link();
     }
 
     public int createVertexShader(final String shaderCode) {
@@ -68,7 +69,7 @@ public class ShaderProgram implements Resource {
         return shaderId;
     }
 
-    private void link() throws Exception {
+    private void link() throws RuntimeException {
         GL20.glLinkProgram(program);
         if (GL20.glGetProgrami(program, GL20.GL_LINK_STATUS) == 0)
             throw new RuntimeException("Error linking shader code: " + GL20.glGetProgramInfoLog(program, 1024));
@@ -81,7 +82,7 @@ public class ShaderProgram implements Resource {
 
         GL20.glValidateProgram(program);
         if (GL20.glGetProgrami(program, GL20.GL_VALIDATE_STATUS) == 0)
-            throw new Exception("Could not validate shader code: " + GL20.glGetProgramInfoLog(program, 1024));
+            throw new RuntimeException("Could not validate shader code: " + GL20.glGetProgramInfoLog(program, 1024));
     }
 
     public void bind() {
