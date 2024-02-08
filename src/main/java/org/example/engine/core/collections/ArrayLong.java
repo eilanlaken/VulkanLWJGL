@@ -88,15 +88,15 @@ public class ArrayLong {
         return items[0];
     }
 
-    public boolean notEmpty () {
+    public boolean notEmpty() {
         return size > 0;
     }
 
-    public boolean isEmpty () {
+    public boolean isEmpty() {
         return size == 0;
     }
 
-    public void clear () {
+    public void clear() {
         size = 0;
     }
 

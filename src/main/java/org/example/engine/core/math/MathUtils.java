@@ -16,4 +16,13 @@ public final class MathUtils {
         return Math.max(min, Math.min(max, value));
     }
 
+    public static int nextPowerOfTwo(int x) {
+        int counter = 0;
+        while (x > 0) {
+            counter++;
+            x = x >> 1;
+        }
+        return 1 << counter;
+    }
+
 }

@@ -1,59 +1,100 @@
 package org.example.engine.core.graphics;
 
-import org.lwjgl.system.MemoryUtil;
-import org.lwjgl.system.NativeResource;
-import org.lwjgl.util.shaderc.Shaderc;
+import org.example.engine.core.collections.MapObjectInt;
+import org.example.engine.core.memory.Resource;
+import org.lwjgl.opengl.GL20;
 
-import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
-public class ShaderProgram implements NativeResource {
+public class ShaderProgram implements Resource {
 
-    public final String vertexShaderCode;
-    public long vertexShaderHandle;
-    public ByteBuffer vertexShaderBytecode;
+    public final int program;
+    protected final int vertexShaderId;
+    protected final int fragmentShaderId;
+    private String log;
+    private boolean isCompiled;
+    private final MapObjectInt<String> uniforms;
+    private final MapObjectInt<String> uniformTypes;
+    private final MapObjectInt<String> uniformSizes;
+    private String[] uniformNames;
+    private final MapObjectInt<String> attributes;
+    private final MapObjectInt<String> attributeTypes;
+    private final MapObjectInt<String> attributeSizes;
+    private String[] attributeNames;
+    private final String vertexShaderSource;
+    private final String fragmentShaderSource;
 
-    public final String fragmentShaderCode;
-    public long fragmentShaderHandle;
-    public ByteBuffer fragmentShaderBytecode;
-
-    public ShaderProgram(final String vertexShaderCode, final String fragmentShaderCode) {
-        this.vertexShaderCode = vertexShaderCode;
-        this.fragmentShaderCode = fragmentShaderCode;
-        compileShaderProgram(vertexShaderCode, fragmentShaderCode);
+    public ShaderProgram(final String vertexShaderSource, final String fragmentShaderSource) {
+        if (vertexShaderSource == null) throw new IllegalArgumentException("Vertex shader cannot be null.");
+        if (fragmentShaderSource == null) throw new IllegalArgumentException("Fragment shader cannot be null.");
+        this.vertexShaderSource = vertexShaderSource;
+        this.fragmentShaderSource = fragmentShaderSource;
+        // attributes
+        this.attributes = new MapObjectInt<>();
+        this.attributeTypes = new MapObjectInt<>();
+        this.attributeSizes = new MapObjectInt<>();
+        // uniforms
+        this.uniforms = new MapObjectInt<>();
+        this.uniformTypes = new MapObjectInt<>();
+        this.uniformSizes = new MapObjectInt<>();
+        program = GL20.glCreateProgram();
+        if (program == 0)
+            throw new RuntimeException("Could not create shader");
+        this.vertexShaderId = createVertexShader(vertexShaderSource);
+        this.fragmentShaderId = createFragmentShader(fragmentShaderSource);
     }
 
-    private void compileShaderProgram(final String vertexShaderCode, final String fragmentShaderCode) {
-        long compiler = Shaderc.shaderc_compiler_initialize();
-        if (compiler == MemoryUtil.NULL) throw new RuntimeException("Could not create LWJGL shader compiler.");
+    public int createVertexShader(final String shaderCode) {
+        int shaderId = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
+        if (shaderId == 0)
+            throw new RuntimeException("Error creating vertex shader.");
+        GL20.glShaderSource(shaderId, shaderCode);
+        GL20.glCompileShader(shaderId);
+        if (GL20.glGetShaderi(shaderId, GL20.GL_COMPILE_STATUS) == 0)
+            throw new RuntimeException("Error compiling vertex shader: " + GL20.glGetShaderInfoLog(shaderId, 1024));
+        GL20.glAttachShader(program, shaderId);
+        return shaderId;
+    }
 
-        // TODO: might have a problem with the "vertex" parameter into the file name for this.vertexShaderHandle = ...
-        // compile vertex shader program
-        this.vertexShaderHandle =
-                Shaderc.shaderc_compile_into_spv(compiler, vertexShaderCode, Shaderc.shaderc_glsl_vertex_shader, "vertex", "main", MemoryUtil.NULL);
-        if (this.vertexShaderHandle == MemoryUtil.NULL)
-            throw new RuntimeException("Failed to compile vertex shader.");
-        if (Shaderc.shaderc_result_get_compilation_status(this.vertexShaderHandle) != Shaderc.shaderc_compilation_status_success)
-            throw new RuntimeException("Error compiling vertex shader into SPIR-V: \n\n" + vertexShaderCode + "\n\n" + "Compilation failed with errors:\n" + Shaderc.shaderc_result_get_error_message(this.vertexShaderHandle));
-        this.vertexShaderBytecode = Shaderc.shaderc_result_get_bytes(vertexShaderHandle);
+    public int createFragmentShader(final String shaderCode) {
+        int shaderId = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER);
+        if (shaderId == 0)
+            throw new RuntimeException("Error creating fragment shader.");
+        GL20.glShaderSource(shaderId, shaderCode);
+        GL20.glCompileShader(shaderId);
+        if (GL20.glGetShaderi(shaderId, GL20.GL_COMPILE_STATUS) == 0)
+            throw new RuntimeException("Error compiling fragment shader: " + GL20.glGetShaderInfoLog(shaderId, 1024));
+        GL20.glAttachShader(program, shaderId);
+        return shaderId;
+    }
 
-        // TODO: might have a problem with the "fragment" parameter into the file name for this.fragmentShaderHandle = ...
-        // compile fragment shader program
-        this.fragmentShaderHandle =
-                Shaderc.shaderc_compile_into_spv(compiler, fragmentShaderCode, Shaderc.shaderc_glsl_fragment_shader, "fragment", "main", MemoryUtil.NULL);
-        if (this.fragmentShaderHandle == MemoryUtil.NULL)
-            throw new RuntimeException("Failed to compile fragment shader.");
-        if (Shaderc.shaderc_result_get_compilation_status(this.fragmentShaderHandle) != Shaderc.shaderc_compilation_status_success)
-            throw new RuntimeException("Error compiling fragment shader into SPIR-V: \n\n" + fragmentShaderCode + "\n\n" + "Compilation failed with errors:\n" + Shaderc.shaderc_result_get_error_message(this.fragmentShaderHandle));
-        this.fragmentShaderBytecode = Shaderc.shaderc_result_get_bytes(fragmentShaderHandle);
+    private void link() throws Exception {
+        GL20.glLinkProgram(program);
+        if (GL20.glGetProgrami(program, GL20.GL_LINK_STATUS) == 0)
+            throw new RuntimeException("Error linking shader code: " + GL20.glGetProgramInfoLog(program, 1024));
 
-        Shaderc.shaderc_compiler_release(compiler);
+        if (vertexShaderId != 0)
+            GL20.glDetachShader(program, vertexShaderId);
+
+        if (fragmentShaderId != 0)
+            GL20.glDetachShader(program, fragmentShaderId);
+
+        GL20.glValidateProgram(program);
+        if (GL20.glGetProgrami(program, GL20.GL_VALIDATE_STATUS) == 0)
+            throw new Exception("Could not validate shader code: " + GL20.glGetProgramInfoLog(program, 1024));
+    }
+
+    public void bind() {
+        GL20.glUseProgram(program);
+    }
+
+    public void unbind() {
+        GL20.glUseProgram(0);
     }
 
     @Override
     public void free() {
-        Shaderc.shaderc_result_release(vertexShaderHandle);
-        vertexShaderBytecode = null;
-        Shaderc.shaderc_result_release(fragmentShaderHandle);
-        fragmentShaderBytecode = null;
+        unbind();
+        if (program != 0) GL20.glDeleteProgram(program);
     }
 }

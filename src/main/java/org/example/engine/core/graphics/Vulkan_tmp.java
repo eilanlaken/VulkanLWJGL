@@ -343,7 +343,7 @@ public class Vulkan_tmp {
             final String vertexShaderGlsl = FileUtils.getFileContent("shaders/shader.vert");
             final String fragmentShaderGlsl = FileUtils.getFileContent("shaders/shader.frag");
 
-            ShaderProgram shaderProgram = new ShaderProgram(vertexShaderGlsl, fragmentShaderGlsl);
+            Z_ShaderProgram shaderProgram = new Z_ShaderProgram(vertexShaderGlsl, fragmentShaderGlsl);
 
             long vertShaderModule = createShaderModule(shaderProgram.vertexShaderBytecode);
             long fragShaderModule = createShaderModule(shaderProgram.fragmentShaderBytecode);
