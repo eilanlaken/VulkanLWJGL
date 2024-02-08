@@ -4,6 +4,8 @@ import java.util.Random;
 
 public final class MathUtils {
 
+    public static final double NANO_SECOND = 1.0 / 1000000000L;
+
     private static final Random random = new Random();
 
     public static int random(final int range) {

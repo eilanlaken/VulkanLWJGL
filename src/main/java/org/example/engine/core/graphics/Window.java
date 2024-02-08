@@ -1,5 +1,6 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.memory.Resource;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -10,6 +11,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.IntBuffer;
 
+import static org.example.engine.core.math.MathUtils.NANO_SECOND;
 import static org.lwjgl.glfw.GLFW.*;
 
 /*
@@ -23,8 +25,10 @@ etc.
 
 TODO: read
 LwjglGraphics.java
+
+TODO: refactor while considering context etc.
  */
-public class Window {
+public class Window implements Resource {
 
     private long window;
     private String title;
@@ -33,12 +37,23 @@ public class Window {
     private boolean enableVSync;
     private boolean allowResize;
     private GLFWErrorCallback errorCallback;
+    private WindowScreen screen;
     // TODO: add a bunch of other parameters:
     // is full screen
     // is borderless
     // target fps
     // current frame
     // delta time
+
+    private int targetFrameRate = 1000;
+
+    private boolean resetDeltaTime;
+    private float deltaTime;
+    private long frameStart;
+    private int frames;
+    private int fps;
+    private long lastTime;
+
 
     public Window(String title, int width, int height, boolean enableVSync, boolean allowResize) {
         this.title = title;
@@ -75,7 +90,7 @@ public class Window {
         GLFW.glfwSetKeyCallback(window, (window, key, scanCode, action, mods) -> {
             // update the appropriate input device module.
             // this is just an example. TODO: delete this line.
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) GLFW.glfwSetWindowShouldClose(window, true);
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) closeWindow();
             // test full screen
             if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) GLFW.glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, 100, 100, 60);
         });
@@ -109,11 +124,74 @@ public class Window {
         GL11.glCullFace(GL11.GL_BACK);
     }
 
+
+
     public void update() {
         GLFW.glfwSwapBuffers(window);
         // TODO: see what's up. Refactor as needed.
         // "this is what tells OpenGL to render anything in the render queue"
         GLFW.glfwPollEvents();
+
+
+        long time;
+        if (this.resetDeltaTime) {
+            this.resetDeltaTime = false;
+            time = this.lastTime;
+        } else {
+            time = System.nanoTime();
+        }
+
+        this.deltaTime = (float)(time - this.lastTime) / 1.0E9F;
+        this.lastTime = time;
+        if (time - this.frameStart >= 1000000000L) {
+            this.fps = this.frames;
+            this.frames = 0;
+            this.frameStart = time;
+        }
+
+        this.frames++;
+        System.out.println(fps);
+
+
+        if (this.screen != null) screen.update(deltaTime);
+
+        // limit frame rate.
+        final double targetFPS = 144.0;
+        final double targetFrameTime = 1.0 / targetFPS;
+        double frameStartTime = glfwGetTime();
+        double frameEndTime = GLFW.glfwGetTime();
+        double frameDuration = frameEndTime - frameStartTime;
+        double sleepTime = targetFrameTime - frameDuration;
+        if (sleepTime > 0) {
+            try {
+                Thread.sleep((long) (sleepTime * 1000));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    public void setScreen(WindowScreen screen) {
+        if (this.screen != null) {
+            this.screen.hide();
+        }
+        this.screen = screen;
+        this.screen.show();
+    }
+
+    // TODO: make a GLFW call
+    public void setTargetFrameRate(int frameRate) {
+        this.targetFrameRate = frameRate;
+    }
+
+    public int getTargetFrameRate() {
+        return targetFrameRate;
+    }
+
+
+    public void closeWindow() {
+        GLFW.glfwSetWindowShouldClose(window, true);
+        if (screen != null) screen.hide();
     }
 
     public boolean windowShouldClose() {
@@ -140,7 +218,8 @@ public class Window {
         //GLFW.glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
     }
 
-    public void cleanup() {
+    @Override
+    public void free() {
         GLFW.glfwDestroyWindow(window);
         GLFW.glfwTerminate();
         errorCallback.free();
