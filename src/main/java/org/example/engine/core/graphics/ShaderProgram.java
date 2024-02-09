@@ -2,9 +2,11 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.memory.Resource;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 public class ShaderProgram implements Resource {
 
@@ -43,6 +45,8 @@ public class ShaderProgram implements Resource {
         this.vertexShaderId = createVertexShader(vertexShaderSource);
         this.fragmentShaderId = createFragmentShader(fragmentShaderSource);
         link();
+        fetchAttributes();
+        fetchUniforms();
     }
 
     public int createVertexShader(final String shaderCode) {
@@ -85,17 +89,54 @@ public class ShaderProgram implements Resource {
             throw new RuntimeException("Could not validate shader code: " + GL20.glGetProgramInfoLog(program, 1024));
     }
 
+    private void fetchAttributes() {
+        IntBuffer params = BufferUtils.createIntBuffer(1);
+        IntBuffer type = BufferUtils.createIntBuffer(1);
+        GL20.glGetProgramiv(this.program, 35721, params);
+        int numAttributes = params.get(0);
+        this.attributeNames = new String[numAttributes];
+
+        for(int i = 0; i < numAttributes; ++i) {
+            params.clear();
+            params.put(0, 1);
+            type.clear();
+            String name = GL20.glGetActiveAttrib(this.program, i, params, type);
+            int location = GL20.glGetAttribLocation(this.program, name);
+            this.attributes.put(name, location);
+            this.attributeTypes.put(name, type.get(0));
+            this.attributeSizes.put(name, params.get(0));
+            this.attributeNames[i] = name;
+        }
+    }
+
+    private void fetchUniforms() {
+        IntBuffer params = BufferUtils.createIntBuffer(1);
+        IntBuffer type = BufferUtils.createIntBuffer(1);
+        GL20.glGetProgramiv(this.program, 35718, params);
+        int numUniforms = params.get(0);
+        this.uniformNames = new String[numUniforms];
+        for(int i = 0; i < numUniforms; ++i) {
+            params.clear();
+            params.put(0, 1);
+            type.clear();
+            String name = GL20.glGetActiveUniform(this.program, i, params, type);
+            int location = GL20.glGetUniformLocation(this.program, name);
+            this.uniforms.put(name, location);
+            this.uniformTypes.put(name, type.get(0));
+            this.uniformSizes.put(name, params.get(0));
+            this.uniformNames[i] = name;
+        }
+    }
+
     public void bind() {
         GL20.glUseProgram(program);
     }
 
-    public void unbind() {
-        GL20.glUseProgram(0);
-    }
-
     @Override
     public void free() {
-        unbind();
-        if (program != 0) GL20.glDeleteProgram(program);
+        GL20.glUseProgram(0);
+        GL20.glDeleteProgram(vertexShaderId);
+        GL20.glDeleteProgram(fragmentShaderId);
+        GL20.glDeleteProgram(program);
     }
 }

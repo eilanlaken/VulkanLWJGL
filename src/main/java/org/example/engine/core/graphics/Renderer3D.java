@@ -24,7 +24,7 @@ public class Renderer3D {
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.vertexCount);
         GL20.glDisableVertexAttribArray(0);
         GL30.glBindVertexArray(0);
-        shader.unbind(); // TODO: rewrite
+        GL20.glUseProgram(0);
     }
 
 }

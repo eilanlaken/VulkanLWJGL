@@ -150,7 +150,6 @@ public class Window implements Resource {
         }
 
         this.frames++;
-        System.out.println(fps);
 
 
         if (this.screen != null) screen.update(deltaTime);

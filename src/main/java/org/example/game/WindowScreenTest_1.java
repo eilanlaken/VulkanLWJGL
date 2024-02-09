@@ -16,8 +16,8 @@ public class WindowScreenTest_1 implements WindowScreen {
     public WindowScreenTest_1() {
         this.renderer3D = new Renderer3D();
         this.modelBuilder = new ModelBuilder();
-        final String vertexShaderSrc = FileUtils.getFileContent("shaders/vertex.glsl");
-        final String fragmentShaderSrc = FileUtils.getFileContent("shaders/fragment.glsl");
+        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/vertex.glsl");
+        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/fragment.glsl");
         shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
     }
 
