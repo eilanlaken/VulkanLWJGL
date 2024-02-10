@@ -19,16 +19,21 @@ public class TextureBinder {
             boundTextures[roundRobinIndex] = texture;
             GL13.glActiveTexture(GL20.GL_TEXTURE0 + roundRobinIndex + OFFSET);
             GL11.glBindTexture(GL20.GL_TEXTURE_2D, texture.glHandle);
-            GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MIN_FILTER, texture.minFilter.glValue);
-            GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MAG_FILTER, texture.magFilter.glValue);
-            GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_WRAP_S, texture.uWrap.glValue);
-            GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_WRAP_T, texture.vWrap.glValue);
+            updateTextureParameters(texture);
             return roundRobinIndex;
         } else { // texture was found in boundTextures cache
             // activate unit but no need to bind
             GL13.glActiveTexture(GL20.GL_TEXTURE0 + index + OFFSET);
+            updateTextureParameters(texture);
             return index;
         }
+    }
+
+    private static void updateTextureParameters(final Texture texture) {
+        GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MIN_FILTER, texture.minFilter.glValue);
+        GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MAG_FILTER, texture.magFilter.glValue);
+        GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_WRAP_S, texture.uWrap.glValue);
+        GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_WRAP_T, texture.vWrap.glValue);
     }
 
     private static int lookForTexture(final Texture texture) {
