@@ -13,6 +13,7 @@ public class WindowScreenTest_1 implements WindowScreen {
     private Renderer3D renderer3D;
     private ModelBuilder modelBuilder;
     private Model model;
+    private Texture texture;
 
     private ShaderProgram shader;
 
@@ -31,13 +32,11 @@ public class WindowScreenTest_1 implements WindowScreen {
     public void show() {
         System.out.println("show called");
 
-        float[] data = {
-                -0.5f, 0.5f, 0f,
+        float[] positions = {
+                -0.5f,  0.5f, 0f,
                 -0.5f, -0.5f, 0f,
                 0.5f, -0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                0.5f, 0.5f, 0f,
-                -0.5f, 0.5f, 0f
+                0.5f,  0.5f, 0f,
         };
 
         float[] textureCoordinates = {
@@ -52,7 +51,10 @@ public class WindowScreenTest_1 implements WindowScreen {
                 3,1,2
         };
 
-        model = modelBuilder.build(data, textureCoordinates, indices);
+        model = modelBuilder.build(positions, textureCoordinates, indices);
+        texture = assetLoaderTexture.load("assets/textures/minecraftCube.png");
+        model.texture = texture;
+
     }
 
     @Override

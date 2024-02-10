@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL20;
 // REFERENCE TODO: DefaultTextureBinder (libgdx)
 public class TextureBinder {
 
-    private static final int OFFSET = 0; // we will begin binding from slots 2,3,4... leaving slot 1 for texture loading and manipulation.
+    private static final int OFFSET = 0; // we will begin binding from slots OFFSET, OFFSET + 1,... leaving slots 0... OFFSET - 1 for texture loading and manipulation?
     private static final int availableTextureSlots = GL11.glGetInteger(GL20.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) - OFFSET;
     private static Texture[] boundTextures = new Texture[availableTextureSlots];
     private static int roundRobinIndex = 0;

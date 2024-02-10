@@ -30,6 +30,7 @@ public class AssetLoaderTexture {
             IntBuffer widthBuffer = stack.mallocInt(1);
             IntBuffer heightBuffer = stack.mallocInt(1);
             IntBuffer channelsBuffer = stack.mallocInt(1);
+            System.out.println("path");
             buffer = STBImage.stbi_load(path, widthBuffer, heightBuffer, channelsBuffer, 4);
             if (buffer == null) throw new RuntimeException("Failed to load Texture: " + path);
             width = widthBuffer.get();

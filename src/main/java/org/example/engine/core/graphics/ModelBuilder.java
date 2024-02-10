@@ -13,8 +13,8 @@ public class ModelBuilder {
 
     public Model build(float[] positions, float[] textureCoordinates, int[] indices) {
         int id = GL30.glGenVertexArrays();
-        storeIndicesBuffer(indices);
         GL30.glBindVertexArray(id);
+        storeIndicesBuffer(indices);
         int vboPositions = storeDataInAttributeList(0, 3, positions);
         int vboTextureCoordinates = storeDataInAttributeList(1, 2, textureCoordinates);
         GL30.glBindVertexArray(0);
