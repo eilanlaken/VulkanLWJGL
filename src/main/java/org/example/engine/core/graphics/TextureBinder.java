@@ -17,13 +17,15 @@ public class TextureBinder {
         if (index == -1) {  // texture not found in boundTextures cache
             roundRobinIndex = (roundRobinIndex + 1) % availableTextureSlots;
             boundTextures[roundRobinIndex] = texture;
-            GL13.glActiveTexture(GL20.GL_TEXTURE0 + roundRobinIndex + OFFSET);
+            final int slot = roundRobinIndex + OFFSET;
+            GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
             GL11.glBindTexture(GL20.GL_TEXTURE_2D, texture.glHandle);
             updateTextureParameters(texture);
             return roundRobinIndex;
         } else { // texture was found in boundTextures cache
             // activate unit but no need to bind
-            GL13.glActiveTexture(GL20.GL_TEXTURE0 + index + OFFSET);
+            final int slot = index + OFFSET;
+            GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
             updateTextureParameters(texture);
             return index;
         }
