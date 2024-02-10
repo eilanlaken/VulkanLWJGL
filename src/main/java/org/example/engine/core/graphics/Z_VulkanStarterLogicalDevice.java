@@ -1,4 +1,4 @@
 package org.example.engine.core.graphics;
 
-public class VulkanStarterLogicalDevice {
+public class Z_VulkanStarterLogicalDevice {
 }

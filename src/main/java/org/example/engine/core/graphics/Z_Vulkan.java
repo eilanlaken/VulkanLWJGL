@@ -7,7 +7,7 @@ import java.util.Set;
 
 // TODO: move Vulkan initialization here.
 // TODO: implement all Vulkan related API functionality here, such as creating shaders etc.
-public class Vulkan {
+public class Z_Vulkan {
 
     // window stuff belongs here? probably no
     private long window;

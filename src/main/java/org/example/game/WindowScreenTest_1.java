@@ -1,10 +1,14 @@
 package org.example.game;
 
+import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
 import org.lwjgl.opengl.GL11;
 
 public class WindowScreenTest_1 implements WindowScreen {
+
+    // TODO: refactor to use assetLoader.load() etc
+    AssetLoaderTexture assetLoaderTexture;
 
     private Renderer3D renderer3D;
     private ModelBuilder modelBuilder;
@@ -14,6 +18,8 @@ public class WindowScreenTest_1 implements WindowScreen {
 
 
     public WindowScreenTest_1() {
+        this.assetLoaderTexture = new AssetLoaderTexture();
+        System.out.println("max texture size: " + assetLoaderTexture.maxTextureSize);
         this.renderer3D = new Renderer3D();
         this.modelBuilder = new ModelBuilder();
         final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/vertex.glsl");

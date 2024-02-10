@@ -2,7 +2,7 @@ package org.example.engine.core.graphics;
 
 import org.lwjgl.opengl.GL20;
 
-public enum TextureFilter {
+public enum TextureSamplingFilter {
 
     NEAREST(GL20.GL_NEAREST),
     LINEAR(GL20.GL_LINEAR),
@@ -14,7 +14,7 @@ public enum TextureFilter {
 
     public final int glValue;
 
-    TextureFilter(final int glValue) {
+    TextureSamplingFilter(final int glValue) {
         this.glValue = glValue;
     }
 

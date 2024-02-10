@@ -1,12 +1,14 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.math.Matrix4;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 public class Renderer3D {
+
+    public final RendererFixedPipelineParamSetter paramSetter = new RendererFixedPipelineParamSetter();
+    public final RendererTextureBinder textureBinder = new RendererTextureBinder();
 
     public void begin() {
 

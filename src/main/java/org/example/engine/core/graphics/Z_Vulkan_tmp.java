@@ -29,7 +29,7 @@ import static org.lwjgl.vulkan.VK10.VK_SUCCESS;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 // TODO: move everything Vulkan from here to the static global Vulkan instance.
-public class Vulkan_tmp {
+public class Z_Vulkan_tmp {
 
     public static final int DEFAULT_WINDOW_WIDTH = 720;
     public static final int DEFAULT_WINDOW_HEIGHT = 420;
@@ -107,7 +107,7 @@ public class Vulkan_tmp {
 
     private long pipelineLayout;
 
-    public Vulkan_tmp(final String title, final boolean debugMode) {
+    public Z_Vulkan_tmp(final String title, final boolean debugMode) {
         this.title = title == null ? "Engine Application" : title;
         this.windowWidth = DEFAULT_WINDOW_WIDTH;
         this.windowHeight = DEFAULT_WINDOW_HEIGHT;
@@ -163,7 +163,7 @@ public class Vulkan_tmp {
                 debugCreateInfo.sType(VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT);
                 debugCreateInfo.messageSeverity(VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT);
                 debugCreateInfo.messageType(VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT);
-                debugCreateInfo.pfnUserCallback(Vulkan_tmp::debugCallback);
+                debugCreateInfo.pfnUserCallback(Z_Vulkan_tmp::debugCallback);
                 createInfo.pNext(debugCreateInfo.address());
             }
 
@@ -182,7 +182,7 @@ public class Vulkan_tmp {
                 createInfo.sType(VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT);
                 createInfo.messageSeverity(VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT);
                 createInfo.messageType(VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT);
-                createInfo.pfnUserCallback(Vulkan_tmp::debugCallback);
+                createInfo.pfnUserCallback(Z_Vulkan_tmp::debugCallback);
                 LongBuffer pDebugMessenger = stack.longs(VK_NULL_HANDLE);
                 if(createDebugUtilsMessengerEXT(instance, createInfo, null, pDebugMessenger) != VK_SUCCESS) {
                     throw new RuntimeException("Failed to set up debug messenger");

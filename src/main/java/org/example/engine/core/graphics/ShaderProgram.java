@@ -3,6 +3,8 @@ package org.example.engine.core.graphics;
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
@@ -10,6 +12,8 @@ import java.nio.IntBuffer;
 
 public class ShaderProgram implements Resource {
 
+    private final String vertexShaderSource;
+    private final String fragmentShaderSource;
     public final int program;
     protected final int vertexShaderId;
     protected final int fragmentShaderId;
@@ -23,8 +27,6 @@ public class ShaderProgram implements Resource {
     private final MapObjectInt<String> attributeTypes;
     private final MapObjectInt<String> attributeSizes;
     private String[] attributeNames;
-    private final String vertexShaderSource;
-    private final String fragmentShaderSource;
 
     public ShaderProgram(final String vertexShaderSource, final String fragmentShaderSource) {
         if (vertexShaderSource == null) throw new IllegalArgumentException("Vertex shader cannot be null.");
@@ -47,9 +49,10 @@ public class ShaderProgram implements Resource {
         link();
         fetchAttributes();
         fetchUniforms();
+        validate();
     }
 
-    public int createVertexShader(final String shaderCode) {
+    private int createVertexShader(final String shaderCode) {
         int shaderId = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
         if (shaderId == 0)
             throw new RuntimeException("Error creating vertex shader.");
@@ -61,7 +64,7 @@ public class ShaderProgram implements Resource {
         return shaderId;
     }
 
-    public int createFragmentShader(final String shaderCode) {
+    private int createFragmentShader(final String shaderCode) {
         int shaderId = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER);
         if (shaderId == 0)
             throw new RuntimeException("Error creating fragment shader.");
@@ -92,7 +95,7 @@ public class ShaderProgram implements Resource {
     private void fetchAttributes() {
         IntBuffer params = BufferUtils.createIntBuffer(1);
         IntBuffer type = BufferUtils.createIntBuffer(1);
-        GL20.glGetProgramiv(this.program, 35721, params);
+        GL20.glGetProgramiv(this.program, GL20.GL_ACTIVE_ATTRIBUTES, params);
         int numAttributes = params.get(0);
         this.attributeNames = new String[numAttributes];
 
@@ -112,9 +115,10 @@ public class ShaderProgram implements Resource {
     private void fetchUniforms() {
         IntBuffer params = BufferUtils.createIntBuffer(1);
         IntBuffer type = BufferUtils.createIntBuffer(1);
-        GL20.glGetProgramiv(this.program, 35718, params);
+        GL20.glGetProgramiv(this.program, GL20.GL_ACTIVE_UNIFORMS, params);
         int numUniforms = params.get(0);
         this.uniformNames = new String[numUniforms];
+        System.out.println(numUniforms);
         for(int i = 0; i < numUniforms; ++i) {
             params.clear();
             params.put(0, 1);
@@ -126,6 +130,18 @@ public class ShaderProgram implements Resource {
             this.uniformSizes.put(name, params.get(0));
             this.uniformNames[i] = name;
         }
+    }
+
+    private void validate() {
+        // validate that the number of sampled textures does not exceed the allowed maximum on current GPU
+        final int maxSampledTextures = GL11.glGetInteger(GL13.GL_MAX_TEXTURE_UNITS);
+        int sampledTextures = 0;
+        for (MapObjectInt.Entry<String> uniform : uniformTypes.entries()) {
+            int type = uniform.value;
+            if (type == ShaderProgramUniformType.SAMPLER_2D.glCode) sampledTextures++;
+        }
+        if (sampledTextures > maxSampledTextures) throw new IllegalArgumentException("Error: shader code trying " +
+                "to sample " + sampledTextures + ". The allowed maximum on this hardware is " + maxSampledTextures);
     }
 
     public void bind() {
