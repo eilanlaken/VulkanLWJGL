@@ -132,9 +132,11 @@ public class ShaderProgram implements Resource {
         }
     }
 
+    // TODO: see if this constant: GL_MAX_TEXTURE_IMAGE_UNITS is the right one.
     private void validate() {
         // validate that the number of sampled textures does not exceed the allowed maximum on current GPU
-        final int maxSampledTextures = GL11.glGetInteger(GL13.GL_MAX_TEXTURE_UNITS);
+        final int maxSampledTextures = GL11.glGetInteger(GL20.GL_MAX_TEXTURE_IMAGE_UNITS);
+        System.out.println("max sampled: " + maxSampledTextures);
         int sampledTextures = 0;
         for (MapObjectInt.Entry<String> uniform : uniformTypes.entries()) {
             int type = uniform.value;

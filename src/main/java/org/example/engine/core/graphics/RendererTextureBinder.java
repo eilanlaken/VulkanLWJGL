@@ -12,8 +12,9 @@ public class RendererTextureBinder {
     private Texture[] boundTextures;
     private int currentTextureSlot;
 
+    // TODO: see if this constant: GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS is the right one.
     protected RendererTextureBinder() {
-        availableTextureSlots = GL11.glGetInteger(GL20.GL_MAX_TEXTURE_IMAGE_UNITS);
+        availableTextureSlots = GL11.glGetInteger(GL20.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
         boundTextures = new Texture[availableTextureSlots];
         currentTextureSlot = 0;
     }
