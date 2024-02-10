@@ -8,7 +8,7 @@ import org.lwjgl.opengl.GL20;
 // TODO: finish
 public class Texture implements Resource {
 
-    public final int glHandle;
+    protected int glHandle;
     public final int width;
     public final int height;
     public TextureSamplingFilter magFilter;
@@ -30,11 +30,12 @@ public class Texture implements Resource {
         this.magFilter = magFilter;
         this.uWrap = uWrap;
         this.vWrap = vWrap;
-
     }
 
     @Override
     public void free() {
         GL11.glDeleteTextures(glHandle);
+        glHandle = 0;
     }
+
 }
