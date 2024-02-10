@@ -7,8 +7,13 @@ import org.lwjgl.opengl.GL30;
 
 public class Renderer3D {
 
-    public final RendererFixedPipelineParamSetter paramSetter = new RendererFixedPipelineParamSetter();
-    public final RendererTextureBinder textureBinder = new RendererTextureBinder();
+    public final RendererFixedPipelineParamSetter paramSetter;
+    public final RendererTextureBinder textureBinder;
+
+    public Renderer3D() {
+        textureBinder = new RendererTextureBinder();
+        paramSetter = new RendererFixedPipelineParamSetter();
+    }
 
     public void begin() {
 
