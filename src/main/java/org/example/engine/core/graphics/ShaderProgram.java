@@ -158,9 +158,6 @@ public class ShaderProgram implements Resource {
         final int type = uniformTypes.get(name, -1);
         switch (type) {
             case GL20.GL_SAMPLER_2D:
-                System.out.println("texture:");
-                System.out.println("location = " + location);
-                //GL20.glUniform1i(location, slot);
                 bindTexture(location, (Texture) value);
                 break;
             case GL20.GL_FLOAT_MAT4:
@@ -170,13 +167,9 @@ public class ShaderProgram implements Resource {
         uniformsCache.put(name, value);
     }
 
-    // TODO: fix
     private void bindTexture(int location, Texture texture) {
         int slot = TextureBinder.bindTexture(texture);
-        System.out.println("slot: " + slot);
         GL20.glUniform1i(location, slot);
-        System.out.println("slot: sdds" );
-
     }
 
     private void setUniformInt(int location, int value) {
@@ -191,7 +184,6 @@ public class ShaderProgram implements Resource {
     private void validate() {
         // validate that the number of sampled textures does not exceed the allowed maximum on current GPU
         final int maxSampledTextures = GL11.glGetInteger(GL20.GL_MAX_TEXTURE_IMAGE_UNITS);
-        System.out.println("max sampled: " + maxSampledTextures);
         int sampledTextures = 0;
         for (MapObjectInt.Entry<String> uniform : uniformTypes.entries()) {
             int type = uniform.value;
