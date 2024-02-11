@@ -27,6 +27,7 @@ public class TextureBinder {
             // activate unit but no need to rebind
             final int slot = index + OFFSET;
             GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
+            updateTextureParameters(texture);
             return slot;
         }
     }
