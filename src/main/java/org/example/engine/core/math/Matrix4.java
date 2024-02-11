@@ -17,6 +17,15 @@ public class Matrix4 {
     private static final Quaternion quaternion = new Quaternion();
     private static final Matrix4 tmpMtx = new Matrix4();
 
+    static final Vector3 l_vez = new Vector3();
+    static final Vector3 l_vex = new Vector3();
+    static final Vector3 l_vey = new Vector3();
+    private static final Vector3 tmpVec = new Vector3();
+    private static final Matrix4 tmpMat = new Matrix4();
+    private static final Vector3 right = new Vector3();
+    private static final Vector3 tmpForward = new Vector3();
+    private static final Vector3 tmpUp = new Vector3();
+
     public static final int M00 = 0;
     public static final int M01 = 4;
     public static final int M02 = 8;
@@ -61,6 +70,152 @@ public class Matrix4 {
                 scale.x, scale.y, scale.z);
     }
 
+    public Matrix4 set (Vector3 xAxis, Vector3 yAxis, Vector3 zAxis, Vector3 pos) {
+        val[M00] = xAxis.x;
+        val[M01] = xAxis.y;
+        val[M02] = xAxis.z;
+        val[M10] = yAxis.x;
+        val[M11] = yAxis.y;
+        val[M12] = yAxis.z;
+        val[M20] = zAxis.x;
+        val[M21] = zAxis.y;
+        val[M22] = zAxis.z;
+        val[M03] = pos.x;
+        val[M13] = pos.y;
+        val[M23] = pos.z;
+        val[M30] = 0f;
+        val[M31] = 0f;
+        val[M32] = 0f;
+        val[M33] = 1f;
+        return this;
+    }
+
+    public Matrix4 setToLookAt (Vector3 position, Vector3 target, Vector3 up) {
+        tmpVec.set(target).sub(position);
+        setToLookAt(tmpVec, up);
+        mul(tmpMat.setToTranslation(-position.x, -position.y, -position.z));
+        return this;
+    }
+
+    public Matrix4 setToLookAt(Vector3 direction, Vector3 up) {
+        l_vez.set(direction).normalize();
+        l_vex.set(direction).cross(up).normalize();
+        l_vey.set(l_vex).cross(l_vez).normalize();
+        idt();
+        val[M00] = l_vex.x;
+        val[M01] = l_vex.y;
+        val[M02] = l_vex.z;
+        val[M10] = l_vey.x;
+        val[M11] = l_vey.y;
+        val[M12] = l_vey.z;
+        val[M20] = -l_vez.x;
+        val[M21] = -l_vez.y;
+        val[M22] = -l_vez.z;
+        return this;
+    }
+
+    public Matrix4 setToTranslation(Vector3 vector) {
+        idt();
+        val[M03] = vector.x;
+        val[M13] = vector.y;
+        val[M23] = vector.z;
+        return this;
+    }
+
+    public Matrix4 setToTranslation(float x, float y, float z) {
+        idt();
+        val[M03] = x;
+        val[M13] = y;
+        val[M23] = z;
+        return this;
+    }
+
+    public Matrix4 setToWorld(Vector3 position, Vector3 forward, Vector3 up) {
+        tmpForward.set(forward).normalize();
+        right.set(tmpForward).cross(up).normalize();
+        tmpUp.set(right).cross(tmpForward).normalize();
+        set(right, tmpUp, tmpForward.scl(-1), position);
+        return this;
+    }
+    public Matrix4 rotate(float x, float y, float z, float w) {
+        float xx = x * x;
+        float xy = x * y;
+        float xz = x * z;
+        float xw = x * w;
+        float yy = y * y;
+        float yz = y * z;
+        float yw = y * w;
+        float zz = z * z;
+        float zw = z * w;
+        // Set matrix from quaternion
+        float r00 = 1 - 2 * (yy + zz);
+        float r01 = 2 * (xy - zw);
+        float r02 = 2 * (xz + yw);
+        float r10 = 2 * (xy + zw);
+        float r11 = 1 - 2 * (xx + zz);
+        float r12 = 2 * (yz - xw);
+        float r20 = 2 * (xz - yw);
+        float r21 = 2 * (yz + xw);
+        float r22 = 1 - 2 * (xx + yy);
+        float m00 = val[M00] * r00 + val[M01] * r10 + val[M02] * r20;
+        float m01 = val[M00] * r01 + val[M01] * r11 + val[M02] * r21;
+        float m02 = val[M00] * r02 + val[M01] * r12 + val[M02] * r22;
+        float m10 = val[M10] * r00 + val[M11] * r10 + val[M12] * r20;
+        float m11 = val[M10] * r01 + val[M11] * r11 + val[M12] * r21;
+        float m12 = val[M10] * r02 + val[M11] * r12 + val[M12] * r22;
+        float m20 = val[M20] * r00 + val[M21] * r10 + val[M22] * r20;
+        float m21 = val[M20] * r01 + val[M21] * r11 + val[M22] * r21;
+        float m22 = val[M20] * r02 + val[M21] * r12 + val[M22] * r22;
+        float m30 = val[M30] * r00 + val[M31] * r10 + val[M32] * r20;
+        float m31 = val[M30] * r01 + val[M31] * r11 + val[M32] * r21;
+        float m32 = val[M30] * r02 + val[M31] * r12 + val[M32] * r22;
+        val[M00] = m00;
+        val[M10] = m10;
+        val[M20] = m20;
+        val[M30] = m30;
+        val[M01] = m01;
+        val[M11] = m11;
+        val[M21] = m21;
+        val[M31] = m31;
+        val[M02] = m02;
+        val[M12] = m12;
+        val[M22] = m22;
+        val[M32] = m32;
+        return this;
+    }
+
+    public Matrix4 rotate(Quaternion rotation) {
+        return this.rotate(rotation.x, rotation.y, rotation.z, rotation.w);
+    }
+
+    public Matrix4 translate(Vector3 translation) {
+        return translate(translation.x, translation.y, translation.z);
+    }
+
+    public Matrix4 translate(float x, float y, float z) {
+        val[M03] += val[M00] * x + val[M01] * y + val[M02] * z;
+        val[M13] += val[M10] * x + val[M11] * y + val[M12] * z;
+        val[M23] += val[M20] * x + val[M21] * y + val[M22] * z;
+        val[M33] += val[M30] * x + val[M31] * y + val[M32] * z;
+        return this;
+    }
+
+    public Matrix4 scale(float scaleX, float scaleY, float scaleZ) {
+        val[M00] *= scaleX;
+        val[M01] *= scaleY;
+        val[M02] *= scaleZ;
+        val[M10] *= scaleX;
+        val[M11] *= scaleY;
+        val[M12] *= scaleZ;
+        val[M20] *= scaleX;
+        val[M21] *= scaleY;
+        val[M22] *= scaleZ;
+        val[M30] *= scaleX;
+        val[M31] *= scaleY;
+        val[M32] *= scaleZ;
+        return this;
+    }
+
     public Matrix4 setToTranslationRotationScale(float dx, float dy, float dz, float qx, float qy,
                                                  float qz, float qw, float sx, float sy, float sz) {
         final float xs = qx * 2f, ys = qy * 2f, zs = qz * 2f;
@@ -87,20 +242,6 @@ public class Matrix4 {
         val[M31] = 0f;
         val[M32] = 0f;
         val[M33] = 1f;
-        return this;
-    }
-
-    public Matrix4 translate(Vector3 translation) {
-        val[M03] += translation.x;
-        val[M13] += translation.y;
-        val[M23] += translation.z;
-        return this;
-    }
-
-    public Matrix4 translate(float dx, float dy, float dz) {
-        val[M03] += dx;
-        val[M13] += dy;
-        val[M23] += dz;
         return this;
     }
 
@@ -182,6 +323,14 @@ public class Matrix4 {
         val[M31] = 0f;
         val[M32] = 0f;
         val[M33] = 1f;
+        return this;
+    }
+
+    public Matrix4 setToScale(float sx, float sy, float sz) {
+        idt();
+        val[M00] = sx;
+        val[M11] = sy;
+        val[M22] = sz;
         return this;
     }
 

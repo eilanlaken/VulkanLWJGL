@@ -31,6 +31,11 @@ public class Shape3DPlane implements Shape3D {
         this.d = d;
     }
 
+    public void set (Vector3 point1, Vector3 point2, Vector3 point3) {
+        normal.set(point1).sub(point2).cross(point2.x - point3.x, point2.y - point3.y, point2.z - point3.z).normalize();
+        d = -1 * Vector3.dot(point1, normal);
+    }
+
     public float distance(final Vector3 point) {
         return Vector3.dot(normal, point) + d;
     }

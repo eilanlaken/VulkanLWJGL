@@ -177,7 +177,6 @@ public class Vector3 {
         return (oldLen2 == 0 || oldLen2 == len2) ? this : scl((float)Math.sqrt(len2 / oldLen2));
     }
 
-
     public Vector3 cap(float limit) {
         return cap2(limit * limit);
     }
@@ -222,6 +221,14 @@ public class Vector3 {
 
     public static float dot(float x1, float y1, float z1, float x2, float y2, float z2) {
         return x1 * x2 + y1 * y2 + z1 * z2;
+    }
+
+    public static Vector3 project(final Matrix4 matrix, final Vector3 in, Vector3 out) {
+        final float l_mat[] = matrix.val;
+        final float l_w = 1f / (in.x * l_mat[Matrix4.M30] + in.y * l_mat[Matrix4.M31] + in.z * l_mat[Matrix4.M32] + l_mat[Matrix4.M33]);
+        return out.set((in.x * l_mat[Matrix4.M00] + in.y * l_mat[Matrix4.M01] + in.z * l_mat[Matrix4.M02] + l_mat[Matrix4.M03]) * l_w,
+                (in.x * l_mat[Matrix4.M10] + in.y * l_mat[Matrix4.M11] + in.z * l_mat[Matrix4.M12] + l_mat[Matrix4.M13]) * l_w,
+                (in.x * l_mat[Matrix4.M20] + in.y * l_mat[Matrix4.M21] + in.z * l_mat[Matrix4.M22] + l_mat[Matrix4.M23]) * l_w);
     }
 
     public static float len(float x, float y, float z) {
