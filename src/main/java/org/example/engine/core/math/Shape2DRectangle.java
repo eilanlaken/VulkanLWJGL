@@ -1,4 +1,4 @@
 package org.example.engine.core.math;
 
-public class Frustum {
+public class Shape2DRectangle {
 }

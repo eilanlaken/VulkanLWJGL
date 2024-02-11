@@ -14,7 +14,8 @@ package org.example.engine.core.math;
 
 public class Matrix4 {
 
-    protected final Matrix4 tmpMtx = new Matrix4();
+    private static final Quaternion quaternion = new Quaternion();
+    private static final Matrix4 tmpMtx = new Matrix4();
 
     public static final int M00 = 0;
     public static final int M01 = 4;
@@ -114,6 +115,54 @@ public class Matrix4 {
         tmpMtx.setTo(matrix4);
         tmpMtx.mul(val);
         return setTo(tmpMtx);
+    }
+
+    public Matrix4 setToRotation(Quaternion quaternion) {
+        return this.setToRotation(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+    }
+
+    public Matrix4 setToRotation(float quaternionX, float quaternionY, float quaternionZ, float quaternionW) {
+        return this.setTranslationRotation(0.0f, 0.0f, 0.0f, quaternionX, quaternionY, quaternionZ, quaternionW);
+    }
+
+    public Matrix4 setTranslationRotation(float translationX, float translationY, float translationZ, float quaternionX, float quaternionY, float quaternionZ, float quaternionW) {
+        float xs = quaternionX * 2.0f;
+        float ys = quaternionY * 2.0f;
+        float zs = quaternionZ * 2.0f;
+        float wx = quaternionW * xs;
+        float wy = quaternionW * ys;
+        float wz = quaternionW * zs;
+        float xx = quaternionX * xs;
+        float xy = quaternionX * ys;
+        float xz = quaternionX * zs;
+        float yy = quaternionY * ys;
+        float yz = quaternionY * zs;
+        float zz = quaternionZ * zs;
+        this.val[0] = 1.0f - (yy + zz);
+        this.val[4] = xy - wz;
+        this.val[8] = xz + wy;
+        this.val[12] = translationX;
+        this.val[1] = xy + wz;
+        this.val[5] = 1.0f - (xx + zz);
+        this.val[9] = yz - wx;
+        this.val[13] = translationY;
+        this.val[2] = xz - wy;
+        this.val[6] = yz + wx;
+        this.val[10] = 1.0f - (xx + yy);
+        this.val[14] = translationZ;
+        this.val[3] = 0.0f;
+        this.val[7] = 0.0f;
+        this.val[11] = 0.0f;
+        this.val[15] = 1.0f;
+        return this;
+    }
+
+    public Matrix4 setToRotation(Vector3 axis, float radians) {
+        if (radians == 0) {
+            idt();
+            return this;
+        }
+        return setToRotation(quaternion.setFromAxis(axis, radians));
     }
 
     public Matrix4 idt() {
@@ -252,6 +301,7 @@ public class Matrix4 {
         val[15] = m33;
     }
 
+    @Override
     public String toString () {
         return "[" + val[M00] + "|" + val[M01] + "|" + val[M02] + "|" + val[M03] + "]\n" //
                 + "[" + val[M10] + "|" + val[M11] + "|" + val[M12] + "|" + val[M13] + "]\n" //

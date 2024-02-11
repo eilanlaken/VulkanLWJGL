@@ -11,7 +11,6 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.IntBuffer;
 
-import static org.example.engine.core.math.MathUtils.NANO_SECOND;
 import static org.lwjgl.glfw.GLFW.*;
 
 /*
