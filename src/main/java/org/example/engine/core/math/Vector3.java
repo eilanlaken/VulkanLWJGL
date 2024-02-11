@@ -140,6 +140,14 @@ public class Vector3 {
                 (x * l_mat[Matrix4.M20] + y * l_mat[Matrix4.M21] + z * l_mat[Matrix4.M22] + l_mat[Matrix4.M23]) * l_w);
     }
 
+    public Vector3 cross(final Vector3 v) {
+        return this.set(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
+    }
+
+    public Vector3 cross(float x, float y, float z) {
+        return this.set(this.y * z - this.z * y, this.z * x - this.x * z, this.x * y - this.y * x);
+    }
+
     public Vector3 lerp(final Vector3 target, float ds) {
         x += ds * (target.x - x);
         y += ds * (target.y - y);
