@@ -20,7 +20,6 @@ public class WindowScreenTest_1 implements WindowScreen {
 
     public WindowScreenTest_1() {
         this.assetLoaderTexture = new AssetLoaderTexture();
-        System.out.println("max texture size: " + assetLoaderTexture.maxTextureSize);
         this.renderer3D = new Renderer3D();
         this.modelBuilder = new ModelBuilder();
         final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/vertex.glsl");
@@ -30,7 +29,6 @@ public class WindowScreenTest_1 implements WindowScreen {
 
     @Override
     public void show() {
-        System.out.println("show called");
 
         float[] positions = {
                 -0.5f,  0.5f, 0f,

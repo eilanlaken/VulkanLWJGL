@@ -1,12 +1,7 @@
 package org.example.engine.core.files;
 
-import org.example.engine.core.graphics.Texture;
-import org.example.engine.core.graphics.TextureBinder;
-import org.example.engine.core.graphics.TextureSamplingFilter;
-import org.example.engine.core.graphics.TextureSamplingWrap;
+import org.example.engine.core.graphics.*;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
@@ -19,7 +14,7 @@ public class AssetLoaderTexture {
     public final int maxTextureSize;
 
     public AssetLoaderTexture() {
-        maxTextureSize = GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
+        maxTextureSize = GraphicsUtils.getMaxTextureSize();
     }
 
     public Texture load(final String path) {
@@ -30,7 +25,6 @@ public class AssetLoaderTexture {
             IntBuffer widthBuffer = stack.mallocInt(1);
             IntBuffer heightBuffer = stack.mallocInt(1);
             IntBuffer channelsBuffer = stack.mallocInt(1);
-            System.out.println("path");
             buffer = STBImage.stbi_load(path, widthBuffer, heightBuffer, channelsBuffer, 4);
             if (buffer == null) throw new RuntimeException("Failed to load Texture: " + path);
             width = widthBuffer.get();
@@ -42,8 +36,8 @@ public class AssetLoaderTexture {
         int glHandle = GL11.glGenTextures();
         Texture texture = new Texture(glHandle,
                 width, height,
-                TextureSamplingFilter.MIP_MAP_NEAREST_NEAREST, TextureSamplingFilter.MIP_MAP_NEAREST_NEAREST,
-                TextureSamplingWrap.CLAMP_TO_EDGE, TextureSamplingWrap.CLAMP_TO_EDGE
+                TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamFilter.MIP_MAP_NEAREST_NEAREST,
+                TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE
         );
         TextureBinder.bindTexture(texture);
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);

@@ -4,7 +4,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 
-// REFERENCE TODO: DefaultTextureBinder (libgdx)
+// REFERENCE TODO: DefaultTextureBinder (libGDX)
 public class TextureBinder {
 
     private static final int OFFSET = 0; // we will begin binding from slots OFFSET, OFFSET + 1,... leaving slots 0... OFFSET - 1 for texture loading and manipulation?

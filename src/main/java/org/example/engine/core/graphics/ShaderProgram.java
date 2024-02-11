@@ -54,9 +54,6 @@ public class ShaderProgram implements Resource {
         fetchAttributes();
         fetchUniforms();
         validate();
-        for (String name : uniformNames) {
-            System.out.println(name + ": " + uniformTypes.get(name, -1));
-        }
     }
 
     private int createVertexShader(final String shaderCode) {
@@ -125,7 +122,6 @@ public class ShaderProgram implements Resource {
         GL20.glGetProgramiv(this.program, GL20.GL_ACTIVE_UNIFORMS, params);
         int numUniforms = params.get(0);
         this.uniformNames = new String[numUniforms];
-        System.out.println(numUniforms);
         for(int i = 0; i < numUniforms; ++i) {
             params.clear();
             params.put(0, 1);

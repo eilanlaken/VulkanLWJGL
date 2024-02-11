@@ -29,7 +29,7 @@ public class Model implements Resource {
     }
 
     // later, TODO.
-    public Array<ModelPart> modelParts;
+    public Array<ModelPart> parts;
     public ModelArmature armature;
 
     @Override

@@ -28,7 +28,7 @@ public class Renderer3D {
     public void render(final Model model, final Matrix4 transform, ShaderProgram shader) {
         // TODO: move to render context.
         GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA,GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         shader.bind();
         shader.bindUniforms(model.get_material_debug());

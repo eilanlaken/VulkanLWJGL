@@ -2,6 +2,8 @@ package org.example.engine.core.collections;
 
 import org.example.engine.core.math.MathUtils;
 
+import java.util.Objects;
+
 public class Array<T> {
 
     public T[] items;
@@ -185,7 +187,7 @@ public class Array<T> {
         Object[] items1 = this.items, items2 = array.items;
         for (int i = 0; i < n; i++) {
             Object o1 = items1[i], o2 = items2[i];
-            if (!(o1 == null ? o2 == null : o1.equals(o2))) return false;
+            if (!(Objects.equals(o1, o2))) return false;
         }
         return true;
     }
