@@ -31,17 +31,10 @@ public class Renderer3D {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA,GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         shader.bind();
-
         shader.bindUniforms(model.get_material_debug());
-        //GL20.glUniform1i(0, 1);
-
         GL30.glBindVertexArray(model.vaoId);
         GL20.glEnableVertexAttribArray(0); // positions
         GL20.glEnableVertexAttribArray(1); // texture coordinates
-
-        //GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        //GL13.glBindTexture(GL11.GL_TEXTURE_2D, model.texture.glHandle);
-
         GL11.glDrawElements(GL11.GL_TRIANGLES, model.vertexCount, GL11.GL_UNSIGNED_INT, 0);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1); // texture coordinates
