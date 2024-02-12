@@ -6,12 +6,17 @@ import org.lwjgl.opengl.GL11;
 
 public final class GraphicsUtils {
 
+    static int[] width = new int[1];
+    static int[] height = new int[1];
+
     public static int getScreenWidth() {
-        return 0;
+        GLFW.glfwGetWindowSize(0, width, height);
+        return width[0];
     }
 
     public static int getScreenHeight() {
-        return 0;
+        GLFW.glfwGetWindowSize(0, width, height);
+        return width[0];
     }
 
     public static int getMaxTextureSize() {

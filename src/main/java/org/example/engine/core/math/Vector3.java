@@ -118,6 +118,10 @@ public class Vector3 {
         return this.scl(1f / (float)Math.sqrt(len2));
     }
 
+    public boolean isZero() {
+        return this.x == 0.0f && this.y == 0.0f && this.z == 0.0f;
+    }
+
     public Vector3 mul(final Matrix4 matrix) {
         final float[] l_mat = matrix.val;
         return this.set(x * l_mat[Matrix4.M00] + y * l_mat[Matrix4.M01] + z * l_mat[Matrix4.M02] + l_mat[Matrix4.M03],
@@ -163,7 +167,7 @@ public class Vector3 {
         return this.mul(mtx.setToRotation(axisX, axisY, axisZ, radians));
     }
 
-    public Vector3 rotateRad (final Vector3 axis, float radians) {
+    public Vector3 rotate(final Vector3 axis, float radians) {
         mtx.setToRotation(axis, radians);
         return this.mul(mtx);
     }

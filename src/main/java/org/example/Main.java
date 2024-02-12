@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Window window = new Window("he", 1600, 900, false, true);
         window.init();
-        window.setScreen(new WindowScreenTest_1());
+        window.setScreen(new WindowScreenTest_1(window));
         while (!window.windowShouldClose()) {
             window.update();
         }

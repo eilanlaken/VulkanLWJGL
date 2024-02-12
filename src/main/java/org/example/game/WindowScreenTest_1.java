@@ -3,9 +3,10 @@ package org.example.game;
 import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-public class WindowScreenTest_1 implements WindowScreen {
+public class WindowScreenTest_1 extends WindowScreen {
 
     // TODO: refactor to use assetLoader.load() etc
     AssetLoaderTexture assetLoaderTexture;
@@ -18,7 +19,8 @@ public class WindowScreenTest_1 implements WindowScreen {
     private ShaderProgram shader;
 
 
-    public WindowScreenTest_1() {
+    public WindowScreenTest_1(final Window window) {
+        super(window);
         this.assetLoaderTexture = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
         this.modelBuilder = new ModelBuilder();
@@ -63,6 +65,8 @@ public class WindowScreenTest_1 implements WindowScreen {
         renderer3D.begin();
         renderer3D.render(model, null, shader);
         renderer3D.end();
+
+        System.out.println("width: " + window.width);
     }
 
     @Override

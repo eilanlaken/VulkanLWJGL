@@ -31,8 +31,8 @@ public class Window implements Resource {
 
     private long window;
     private String title;
-    private int width;
-    private int height;
+    public int width;
+    public int height;
     private boolean enableVSync;
     private boolean allowResize;
     private GLFWErrorCallback errorCallback;

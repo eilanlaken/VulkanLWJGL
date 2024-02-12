@@ -1,17 +1,22 @@
 package org.example.engine.core.graphics;
 
-public interface WindowScreen {
+public abstract class WindowScreen {
 
-    public void show();
+    protected final Window window;
 
-    public void update(float delta);
+    protected WindowScreen(Window window) {
+        this.window = window;
+    }
 
-    public void resize(int width, int height);
+    public abstract void show();
 
-    public void pause();
+    public abstract void update(float delta);
 
-    public void resume();
+    public abstract void resize(int width, int height);
 
-    public void hide();
+    public abstract void pause();
 
+    public abstract void resume();
+
+    public abstract void hide();
 }
