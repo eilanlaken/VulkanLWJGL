@@ -12,11 +12,6 @@ public class Shape3DFrustum implements Shape3D {
 
     // for the purpose of intermediate computations
     private static final Vector3 vector = new Vector3();
-
-    private static final Vector3[] clipSpacePlanePoints = {new Vector3(-1, -1, -1), new Vector3(1, -1, -1),
-            new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clip
-            new Vector3(-1, -1, 1), new Vector3(1, -1, 1), new Vector3(1, 1, 1), new Vector3(-1, 1, 1)}; // far clip
-
     public static final int PLANE_NEAR = 0;
     public static final int PLANE_FAR = 1;
     public static final int PLANE_LEFT = 2;
@@ -24,9 +19,8 @@ public class Shape3DFrustum implements Shape3D {
     public static final int PLANE_TOP = 4;
     public static final int PLANE_BOTTOM = 5;
 
+    // the 6 clipping planes: near, far, left, right, top, bottom
     public Shape3DPlane[] planes;
-    public Vector3[] planePoints = {new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(),
-            new Vector3(), new Vector3()};
 
     public Shape3DFrustum() {
         this.planes = new Shape3DPlane[6];
@@ -35,18 +29,15 @@ public class Shape3DFrustum implements Shape3D {
         }
     }
 
-    // yanked from libGDX
-    public void set(Matrix4 invPrjView) {
-        for (int i = 0; i < 8; i++) {
-            Vector3.project(invPrjView, clipSpacePlanePoints[i], planePoints[i]);
-        }
-        // update the planes
-        planes[0].set(planePoints[1], planePoints[0], planePoints[2]);
-        planes[1].set(planePoints[4], planePoints[5], planePoints[7]);
-        planes[2].set(planePoints[0], planePoints[4], planePoints[3]);
-        planes[3].set(planePoints[5], planePoints[1], planePoints[6]);
-        planes[4].set(planePoints[2], planePoints[3], planePoints[6]);
-        planes[5].set(planePoints[4], planePoints[0], planePoints[1]);
+    public void set(final Vector3[] frustumCorners) {
+        if (frustumCorners == null) throw new IllegalArgumentException("Cannot set frustum planes based on null corners array.");
+        if (frustumCorners.length != 8) throw new IllegalArgumentException("Must provide exactly 8 points to set frustum planes.");
+        planes[0].set(frustumCorners[1], frustumCorners[0], frustumCorners[2]);
+        planes[1].set(frustumCorners[4], frustumCorners[5], frustumCorners[7]);
+        planes[2].set(frustumCorners[0], frustumCorners[4], frustumCorners[3]);
+        planes[3].set(frustumCorners[5], frustumCorners[1], frustumCorners[6]);
+        planes[4].set(frustumCorners[2], frustumCorners[3], frustumCorners[6]);
+        planes[5].set(frustumCorners[4], frustumCorners[0], frustumCorners[1]);
     }
 
     public boolean containsSphere(final Shape3DSphere sphere) {
@@ -75,6 +66,30 @@ public class Shape3DFrustum implements Shape3D {
         return true;
     }
 
+    public Shape3DPlane getNear() {
+        return planes[PLANE_NEAR];
+    }
+
+    public Shape3DPlane getFar() {
+        return planes[PLANE_FAR];
+    }
+
+    public Shape3DPlane getLeft() {
+        return planes[PLANE_LEFT];
+    }
+
+    public Shape3DPlane getRight() {
+        return planes[PLANE_RIGHT];
+    }
+
+    public Shape3DPlane getTop() {
+        return planes[PLANE_TOP];
+    }
+
+    public Shape3DPlane getBottom() {
+        return planes[PLANE_BOTTOM];
+    }
+
     @Override
     public boolean contains(float x, float y, float z) {
         for (int i = 0; i < planes.length; i++) {
@@ -83,6 +98,7 @@ public class Shape3DFrustum implements Shape3D {
         return true;
     }
 
+    @Override
     public String toString () {
         return "<Frustum: \n" +
                 "near: " + planes[0] + "\n" +
@@ -95,3 +111,44 @@ public class Shape3DFrustum implements Shape3D {
     }
 
 }
+
+/**
+ private static final Vector3[] clipSpacePlanePoints = { // This is the clipping volume
+ // near clipping plane
+ new Vector3(-1, -1, -1),
+ new Vector3(1, -1, -1),
+ new Vector3(1, 1, -1),
+ new Vector3(-1, 1, -1),
+ // far clipping plane
+ new Vector3(-1, -1, 1),
+ new Vector3(1, -1, 1),
+ new Vector3(1, 1, 1),
+ new Vector3(-1, 1, 1)
+ };
+ private static Vector3[] planePoints = {
+ // near
+ new Vector3(),
+ new Vector3(),
+ new Vector3(),
+ new Vector3(),
+ // far
+ new Vector3(),
+ new Vector3(),
+ new Vector3(),
+ new Vector3()
+ };
+ // yanked from libGDX
+ // TODO: see if there's a more modular solution, without sacrificing clearness.
+ @Deprecated public void set(Matrix4 invPrjView) {
+ for (int i = 0; i < 8; i++) {
+ Vector3.project(invPrjView, clipSpacePlanePoints[i], planePoints[i]);
+ }
+ // update the planes
+ planes[0].set(planePoints[1], planePoints[0], planePoints[2]);
+ planes[1].set(planePoints[4], planePoints[5], planePoints[7]);
+ planes[2].set(planePoints[0], planePoints[4], planePoints[3]);
+ planes[3].set(planePoints[5], planePoints[1], planePoints[6]);
+ planes[4].set(planePoints[2], planePoints[3], planePoints[6]);
+ planes[5].set(planePoints[4], planePoints[0], planePoints[1]);
+ }
+ */

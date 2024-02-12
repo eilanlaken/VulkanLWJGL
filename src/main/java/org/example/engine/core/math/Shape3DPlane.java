@@ -5,6 +5,11 @@ public class Shape3DPlane implements Shape3D {
     public Vector3 normal;
     public float d;
 
+    public Shape3DPlane() {
+        this.normal = new Vector3(0,0,1);
+        this.d = 0;
+    }
+
     // a plane with normal = normal and distance from the origin = d
     public Shape3DPlane(Vector3 normal, float d) {
         this.normal = new Vector3(normal);
@@ -31,7 +36,12 @@ public class Shape3DPlane implements Shape3D {
         this.d = d;
     }
 
-    public void set (Vector3 point1, Vector3 point2, Vector3 point3) {
+    public void set(final Shape3DPlane plane) {
+        this.normal.set(plane.normal);
+        this.d = plane.d;
+    }
+
+    public void set(Vector3 point1, Vector3 point2, Vector3 point3) {
         normal.set(point1).sub(point2).cross(point2.x - point3.x, point2.y - point3.y, point2.z - point3.z).normalize();
         d = -1 * Vector3.dot(point1, normal);
     }
