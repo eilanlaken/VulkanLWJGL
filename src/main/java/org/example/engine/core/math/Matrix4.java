@@ -83,7 +83,7 @@ public class Matrix4 {
     /** Constructs a matrix from the given matrix.
      * @param matrix The matrix to copy. (This matrix is not modified) */
     public Matrix4 (Matrix4 matrix) {
-        setToTranslationRotationScale(matrix);
+        set(matrix);
     }
 
     /** Constructs a matrix from the given float array. The array must have at least 16 elements; the first 16 will be copied.
@@ -91,7 +91,7 @@ public class Matrix4 {
      *           <a href="http://en.wikipedia.org/wiki/Row-major_order">column major</a> order. (The float array is not
      *           modified) */
     public Matrix4 (float[] values) {
-        setToTranslationRotationScale(values);
+        set(values);
     }
 
     /** Constructs a rotation matrix from the given {@link Quaternion}.
@@ -111,8 +111,8 @@ public class Matrix4 {
     /** Sets the matrix to the given matrix.
      * @param matrix The matrix that is to be copied. (The given matrix is not modified)
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 setToTranslationRotationScale(Matrix4 matrix) {
-        return setToTranslationRotationScale(matrix.val);
+    public Matrix4 set(Matrix4 matrix) {
+        return set(matrix.val);
     }
 
     /** Sets the matrix to the given matrix as a float array. The float array must have at least 16 elements; the first 16 will be
@@ -121,7 +121,7 @@ public class Matrix4 {
      * @param values The matrix, in float form, that is to be copied. Remember that this matrix is in
      *           <a href="http://en.wikipedia.org/wiki/Row-major_order">column major</a> order.
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 setToTranslationRotationScale(float[] values) {
+    public Matrix4 set(float[] values) {
         System.arraycopy(values, 0, val, 0, val.length);
         return this;
     }
@@ -130,7 +130,7 @@ public class Matrix4 {
      * @param quaternion The quaternion that is to be used to set this matrix.
      * @return This matrix for the purpose of chaining methods together. */
     public Matrix4 setToTranslationRotationScale(Quaternion quaternion) {
-        return setToTranslationRotationScale(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+        return set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
     }
 
     /** Sets the matrix to a rotation matrix representing the quaternion.
@@ -140,16 +140,16 @@ public class Matrix4 {
      * @param quaternionZ The Z component of the quaternion that is to be used to set this matrix.
      * @param quaternionW The W component of the quaternion that is to be used to set this matrix.
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 setToTranslationRotationScale(float quaternionX, float quaternionY, float quaternionZ, float quaternionW) {
-        return setToTranslationRotationScale(0f, 0f, 0f, quaternionX, quaternionY, quaternionZ, quaternionW);
+    public Matrix4 set(float quaternionX, float quaternionY, float quaternionZ, float quaternionW) {
+        return set(0f, 0f, 0f, quaternionX, quaternionY, quaternionZ, quaternionW);
     }
 
     /** Set this matrix to the specified translation and rotation.
      * @param position The translation
      * @param orientation The rotation, must be normalized
      * @return This matrix for chaining */
-    public Matrix4 setToTranslationRotationScale(Vector3 position, Quaternion orientation) {
-        return setToTranslationRotationScale(position.x, position.y, position.z, orientation.x, orientation.y, orientation.z, orientation.w);
+    public Matrix4 set(Vector3 position, Quaternion orientation) {
+        return set(position.x, position.y, position.z, orientation.x, orientation.y, orientation.z, orientation.w);
     }
 
     /** Sets the matrix to a rotation matrix representing the translation and quaternion.
@@ -161,8 +161,8 @@ public class Matrix4 {
      * @param quaternionZ The Z component of the quaternion that is to be used to set this matrix.
      * @param quaternionW The W component of the quaternion that is to be used to set this matrix.
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 setToTranslationRotationScale(float translationX, float translationY, float translationZ, float quaternionX, float quaternionY,
-                                                 float quaternionZ, float quaternionW) {
+    public Matrix4 set(float translationX, float translationY, float translationZ, float quaternionX, float quaternionY,
+                       float quaternionZ, float quaternionW) {
         final float xs = quaternionX * 2f, ys = quaternionY * 2f, zs = quaternionZ * 2f;
         final float wx = quaternionW * xs, wy = quaternionW * ys, wz = quaternionW * zs;
         final float xx = quaternionX * xs, xy = quaternionX * ys, xz = quaternionX * zs;
@@ -321,9 +321,9 @@ public class Matrix4 {
      * @param matrix The other matrix to multiply by.
      * @return This matrix for the purpose of chaining operations together. */
     public Matrix4 mulLeft(Matrix4 matrix) {
-        tmpMat.setToTranslationRotationScale(matrix);
+        tmpMat.set(matrix);
         mul(tmpMat.val, val);
-        return setToTranslationRotationScale(tmpMat);
+        return set(tmpMat);
     }
 
     /** Transposes the matrix.
@@ -468,12 +468,12 @@ public class Matrix4 {
      * according to the aspect ratio.
      * @param near The near plane
      * @param far The far plane
-     * @param fovy The field of view of the height in degrees
+     * @param verticalFov The field of view of the height in degrees
      * @param aspectRatio The "width over height" aspect ratio
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 setToProjection(float near, float far, float fovy, float aspectRatio) {
+    public Matrix4 setToPerspectiveProjection(float near, float far, float verticalFov, float aspectRatio) {
         idt();
-        float l_fd = (float)(1.0 / Math.tan((fovy * (Math.PI / 180)) / 2.0));
+        float l_fd = (float)(1.0 / Math.tan((verticalFov * (Math.PI / 180)) / 2.0));
         float l_a1 = (far + near) / (near - far);
         float l_a2 = (2 * far * near) / (near - far);
         val[M00] = l_fd / aspectRatio;
@@ -505,7 +505,7 @@ public class Matrix4 {
      * @param near The near plane
      * @param far The far plane
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 setToProjection(float left, float right, float bottom, float top, float near, float far) {
+    public Matrix4 setToPerspectiveProjection(float left, float right, float bottom, float top, float near, float far) {
         float x = 2.0f * near / (right - left);
         float y = 2.0f * near / (top - bottom);
         float a = (right + left) / (right - left);

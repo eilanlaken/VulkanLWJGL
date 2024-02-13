@@ -139,11 +139,11 @@ public class CameraLens {
         switch (projectionType) {
             case PERSPECTIVE_PROJECTION: {
                 float aspect = viewportWidth / viewportHeight;
-                projection.setToProjection(Math.abs(near), Math.abs(far), fieldOfView, aspect);
+                projection.setToPerspectiveProjection(Math.abs(near), Math.abs(far), fieldOfView, aspect);
                 view.setToLookAt(position, tmp.set(position).add(direction), up);
-                combined.setToTranslationRotationScale(projection);
+                combined.set(projection);
                 Matrix4.mul(combined.val, view.val);
-                invProjectionView.setToTranslationRotationScale(combined);
+                invProjectionView.set(combined);
                 Matrix4.inv(invProjectionView.val);
                 updateFrustum(invProjectionView);
             }

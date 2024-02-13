@@ -32,7 +32,7 @@ public class Shape3DCube implements Shape3D {
 
     @Override
     public boolean contains(float x, float y, float z) {
-        mtx4.setToTranslationRotationScale(transform);
+        mtx4.set(transform);
         mtx4.inv();
         vector.set(x,y,z).mul(mtx4);
         if (vector.x > 0.5f || vector.x < -0.5f) return false;
