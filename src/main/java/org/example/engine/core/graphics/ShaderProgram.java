@@ -30,7 +30,6 @@ public class ShaderProgram implements Resource {
     private final MapObjectInt<String> attributeTypes;
     private final MapObjectInt<String> attributeSizes;
     private String[] attributeNames;
-    private HashMap<String, Object> uniformsCache;
 
     public ShaderProgram(final String vertexShaderSource, final String fragmentShaderSource) {
         if (vertexShaderSource == null) throw new IllegalArgumentException("Vertex shader cannot be null.");
@@ -45,7 +44,6 @@ public class ShaderProgram implements Resource {
         this.uniformLocations = new MapObjectInt<>();
         this.uniformTypes = new MapObjectInt<>();
         this.uniformSizes = new MapObjectInt<>();
-        this.uniformsCache = new HashMap<>();
         this.program = GL20.glCreateProgram();
         if (program == 0)
             throw new RuntimeException("Could not create shader");
@@ -139,15 +137,12 @@ public class ShaderProgram implements Resource {
     protected final void bindUniforms(final HashMap<String, Object> uniforms) {
         if (uniforms == null) throw new IllegalArgumentException("Uniforms map cannot be null.");
         for (Map.Entry<String, Object> entry : uniforms.entrySet()) {
-            final String uniformName = entry.getKey();
-            final Object uniformCachedValue = uniformsCache.get(uniformName);
-            final Object uniformCurrentValue = uniforms.get(uniformName);
-            if (uniformCachedValue == null) bindUniform(uniformName, uniformCurrentValue);
-            else if (!uniformCachedValue.equals(uniformCurrentValue)) bindUniform(uniformName, uniformCurrentValue);
+            final String name = entry.getKey();
+            final Object value = uniforms.get(name);
+            bindUniform(name, value);
         }
     }
 
-    // TODO: finish
     public void bindUniform(final String name, final Object value) {
         final int location = uniformLocations.get(name, -1);
         if (location == -1) throw new IllegalArgumentException("Shader does not have a uniform named " + name + "." +
@@ -155,33 +150,19 @@ public class ShaderProgram implements Resource {
         final int type = uniformTypes.get(name, -1);
         switch (type) {
             case GL20.GL_SAMPLER_2D:
-                bindTexture(location, (Texture) value);
+                Texture texture = (Texture) value;
+                int slot = TextureBinder.bindTexture(texture);
+                GL20.glUniform1i(location, slot);
                 break;
             case GL20.GL_FLOAT_MAT4:
-                setUniformMatrix4(location, (Matrix4) value);
+                Matrix4 matrix4 = (Matrix4) value;
+                GL20.glUniformMatrix4fv(location, false, matrix4.val);
                 break;
             case GL20.GL_FLOAT_VEC3:
-                setUniform3f(location, (Vector3) value);
+                Vector3 vector3 = (Vector3) value;
+                GL20.glUniform3f(location, vector3.x, vector3.y, vector3.z);
+                break;
         }
-        uniformsCache.put(name, value);
-    }
-
-    // TODO: remove these function calls and place them in the bindUniform method.
-    private void bindTexture(int location, Texture texture) {
-        int slot = TextureBinder.bindTexture(texture);
-        GL20.glUniform1i(location, slot);
-    }
-
-    private void setUniform3f(int location, Vector3 value) {
-        GL20.glUniform3f(location, value.x, value.y, value.z);
-    }
-
-    private void setUniformInt(int location, int value) {
-
-    }
-
-    private void setUniformMatrix4(int location, Matrix4 matrix4) {
-        GL20.glUniformMatrix4fv(location, false, matrix4.val);
     }
 
     // TODO: see if this constant: GL_MAX_TEXTURE_IMAGE_UNITS is the right one.
@@ -199,7 +180,7 @@ public class ShaderProgram implements Resource {
 
     public void bind() {
         GL20.glUseProgram(program);
-        uniformsCache.clear();
+        //uniformsCache.clear();
     }
 
     public void unbind() {

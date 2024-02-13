@@ -90,6 +90,13 @@ public class Matrix4 {
         return this;
     }
 
+    public Matrix4 setAll(float m) {
+        for (int i = 0; i < val.length; i++) {
+            this.val[i] = m;
+        }
+        return this;
+    }
+
     public Matrix4 setToLookAt(Vector3 position, Vector3 target, Vector3 up) {
         tmpVec.set(target).sub(position);
         setToLookAt(tmpVec, up);
