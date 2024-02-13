@@ -1,22 +1,20 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.application.Application;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL11;
 
-public final class GraphicsUtils {
+public final class Graphics {
 
-    static int[] width = new int[1];
-    static int[] height = new int[1];
+    public static Window window;
 
     public static int getScreenWidth() {
-        GLFW.glfwGetWindowSize(0, width, height);
-        return width[0];
+        return window.width;
     }
 
     public static int getScreenHeight() {
-        GLFW.glfwGetWindowSize(0, width, height);
-        return width[0];
+        return window.height;
     }
 
     public static int getMaxTextureSize() {

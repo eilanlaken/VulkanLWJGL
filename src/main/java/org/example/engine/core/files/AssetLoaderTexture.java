@@ -14,7 +14,7 @@ public class AssetLoaderTexture {
     public final int maxTextureSize;
 
     public AssetLoaderTexture() {
-        maxTextureSize = GraphicsUtils.getMaxTextureSize();
+        maxTextureSize = Graphics.getMaxTextureSize();
     }
 
     public Texture load(final String path) {

@@ -35,7 +35,7 @@ Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
 j  org.lwjgl.opengl.GL11C.nglGetIntegerv(IJ)V+0
 j  org.lwjgl.opengl.GL11C.glGetInteger(I)I+20
 j  org.lwjgl.opengl.GL11.glGetInteger(I)I+1
-j  org.example.engine.core.graphics.GraphicsUtils.getMaxTextureSize()I+3
+j  org.example.engine.core.graphics.Graphics.getMaxTextureSize()I+3
 j  org.example.engine.core.files.AssetLoaderTexture.<init>()V+5
 j  org.example.game.WindowScreenTest_1.<init>()V+9
 j  org.example.Main.main([Ljava/lang/String;)V+13

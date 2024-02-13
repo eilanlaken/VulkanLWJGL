@@ -65,7 +65,7 @@ public class WindowScreenTest_1 extends WindowScreen {
         renderer3D.render(model, null, shader);
         renderer3D.end();
 
-        //System.out.println("width: " + window.width);
+        //System.out.println("width: " + Graphics.getScreenWidth());
     }
 
     @Override
