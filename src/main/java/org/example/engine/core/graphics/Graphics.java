@@ -9,11 +9,11 @@ public final class Graphics {
 
     public static Window window;
 
-    public static int getScreenWidth() {
+    public static int getWindowHeight() {
         return window.width;
     }
 
-    public static int getScreenHeight() {
+    public static int getWindowWidth() {
         return window.height;
     }
 

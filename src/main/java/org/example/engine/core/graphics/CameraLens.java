@@ -7,7 +7,7 @@ import org.example.engine.core.math.Vector3;
 
 public class CameraLens {
 
-    private final Vector3[] clipSpacePlanePoints = { // This is the clipping volume
+    private final Vector3[] clipSpacePlanePoints = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
             new Vector3(-1, -1, -1), new Vector3(1, -1, -1), new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clipping plane corners
             new Vector3(-1, -1, 1), new Vector3(1, -1, 1), new Vector3(1, 1, 1), new Vector3(-1, 1, 1), // far clipping plane corners
     };
@@ -15,7 +15,7 @@ public class CameraLens {
             new Vector3(), new Vector3(), new Vector3(), new Vector3(), // near frustum plane corners
             new Vector3(), new Vector3(), new Vector3(), new Vector3(), // far frustum plane corners
     };
-    private final Vector3 tmpVec = new Vector3();
+    private final Vector3 tmp = new Vector3();
 
     private CameraLensProjectionType projectionType;
     public final Matrix4 projection = new Matrix4();
@@ -24,6 +24,8 @@ public class CameraLens {
     public final Matrix4 invProjectionView = new Matrix4();
     public float near = 1;
     public float far = 100;
+    public float fieldOfView = 67;
+    public float zoom = 1;
     public float viewportWidth = 0;
     public float viewportHeight = 0;
     public Vector3 position;
@@ -31,7 +33,8 @@ public class CameraLens {
     public Vector3 up;
     public Shape3DFrustum frustum;
 
-    public CameraLens() {
+    public CameraLens(CameraLensProjectionType projectionType) {
+        this.projectionType = projectionType;
         this.position = new Vector3(0,0,0);
         this.direction = new Vector3(0,0,-1);
         this.up = new Vector3(0,1,0);
@@ -39,9 +42,9 @@ public class CameraLens {
     }
 
     public void lookAt(float x, float y, float z) {
-        tmpVec.set(x, y, z).sub(position).normalize();
-        if (!tmpVec.isZero()) {
-            float dot = Vector3.dot(tmpVec, up); // up and direction must ALWAYS be orthonormal vectors
+        tmp.set(x, y, z).sub(position).normalize();
+        if (!tmp.isZero()) {
+            float dot = Vector3.dot(tmp, up); // up and direction must ALWAYS be orthonormal vectors
             if (Math.abs(dot - 1) < 0.000000001f) {
                 // Collinear
                 up.set(direction).scl(-1);
@@ -49,7 +52,7 @@ public class CameraLens {
                 // Collinear opposite
                 up.set(direction);
             }
-            direction.set(tmpVec);
+            direction.set(tmp);
             normalizeUp();
         }
     }
@@ -59,8 +62,8 @@ public class CameraLens {
     }
 
     public void normalizeUp() {
-        tmpVec.set(direction).cross(up);
-        up.set(tmpVec).cross(direction).normalize();
+        tmp.set(direction).cross(up);
+        up.set(tmp).cross(direction).normalize();
     }
 
     public void rotate(float angle, float axisX, float axisY, float axisZ) {
@@ -83,13 +86,13 @@ public class CameraLens {
         q.transform(up);
     }
 
-    public void rotateAround (Vector3 point, Vector3 axis, float angle) {
-        tmpVec.set(point);
-        tmpVec.sub(position);
-        translate(tmpVec);
+    public void rotateAround(Vector3 point, Vector3 axis, float angle) {
+        tmp.set(point);
+        tmp.sub(position);
+        translate(tmp);
         rotate(axis, angle);
-        tmpVec.rotate(axis, angle);
-        translate(-tmpVec.x, -tmpVec.y, -tmpVec.z);
+        tmp.rotate(axis, angle);
+        translate(-tmp.x, -tmp.y, -tmp.z);
     }
 
     public void transform(final Matrix4 transform) {
@@ -105,15 +108,50 @@ public class CameraLens {
         position.add(vec);
     }
 
-    // TODO: window get with and get height
-//    public Vector3 unproject(Vector3 screenCoordinates, float viewportX, float viewportY, float viewportWidth, float viewportHeight) {
-//        float x = screenCoordinates.x - viewportX, y = Gdx.graphics.getHeight() - screenCoordinates.y - viewportY;
-//        screenCoordinates.x = (2 * x) / viewportWidth - 1;
-//        screenCoordinates.y = (2 * y) / viewportHeight - 1;
-//        screenCoordinates.z = 2 * screenCoordinates.z - 1;
-//        screenCoordinates.project(invProjectionView);
-//        return screenCoordinates;
-//    }
+    public Vector3 unproject(Vector3 screenCoordinates, float viewportX, float viewportY, float viewportWidth, float viewportHeight) {
+        float x = screenCoordinates.x - viewportX, y = Graphics.getWindowHeight() - screenCoordinates.y - viewportY;
+        screenCoordinates.x = (2 * x) / viewportWidth - 1;
+        screenCoordinates.y = (2 * y) / viewportHeight - 1;
+        screenCoordinates.z = 2 * screenCoordinates.z - 1;
+        screenCoordinates.project(invProjectionView);
+        return screenCoordinates;
+    }
+
+    public Vector3 unproject(Vector3 screenCoordinates) {
+        unproject(screenCoordinates, 0, 0, Graphics.getWindowWidth(), Graphics.getWindowHeight());
+        return screenCoordinates;
+    }
+
+    public Vector3 project(Vector3 worldCoordinates) {
+        project(worldCoordinates, 0, 0, Graphics.getWindowWidth(), Graphics.getWindowHeight());
+        return worldCoordinates;
+    }
+
+    public Vector3 project(Vector3 worldCoordinates, float viewportX, float viewportY, float viewportWidth, float viewportHeight) {
+        worldCoordinates.project(combined);
+        worldCoordinates.x = viewportWidth * (worldCoordinates.x + 1) / 2 + viewportX;
+        worldCoordinates.y = viewportHeight * (worldCoordinates.y + 1) / 2 + viewportY;
+        worldCoordinates.z = (worldCoordinates.z + 1) / 2;
+        return worldCoordinates;
+    }
+
+    public void update() {
+        switch (projectionType) {
+            case PERSPECTIVE_PROJECTION: {
+                float aspect = viewportWidth / viewportHeight;
+                projection.setToProjection(Math.abs(near), Math.abs(far), fieldOfView, aspect);
+                view.setToLookAt(position, tmp.set(position).add(direction), up);
+                combined.set(projection);
+                Matrix4.mul(combined.val, view.val);
+                invProjectionView.set(combined);
+                Matrix4.inv(invProjectionView.val);
+                updateFrustum(invProjectionView);
+            }
+            case ORTHOGRAPHIC_PROJECTION: {
+
+            }
+        }
+    }
 
     public void updateFrustum(final Matrix4 invPrjView) {
         // calculate corners of the frustum by un-projecting the clip space cube using invPrjView

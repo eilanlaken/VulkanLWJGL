@@ -32,6 +32,7 @@ public class Renderer3D {
 
         shader.bind();
         shader.bindUniforms(model.get_material_debug());
+        shader.bindUniform("transform", transform);
         GL30.glBindVertexArray(model.vaoId);
         GL20.glEnableVertexAttribArray(0); // positions
         GL20.glEnableVertexAttribArray(1); // texture coordinates

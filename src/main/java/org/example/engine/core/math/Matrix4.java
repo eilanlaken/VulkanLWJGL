@@ -16,10 +16,10 @@ public class Matrix4 {
 
     private static final Quaternion quaternion = new Quaternion();
     private static final Matrix4 tmpMtx = new Matrix4();
-
-    static final Vector3 l_vez = new Vector3();
-    static final Vector3 l_vex = new Vector3();
-    static final Vector3 l_vey = new Vector3();
+    private static final float[] tmp = new float[16];
+    private static final Vector3 l_vez = new Vector3();
+    private static final Vector3 l_vex = new Vector3();
+    private static final Vector3 l_vey = new Vector3();
     private static final Vector3 tmpVec = new Vector3();
     private static final Matrix4 tmpMat = new Matrix4();
     private static final Vector3 right = new Vector3();
@@ -59,7 +59,7 @@ public class Matrix4 {
         System.arraycopy(matrix4.val, 0, val, 0, 16);
     }
 
-    public Matrix4 setTo(final Matrix4 matrix4) {
+    public Matrix4 set(final Matrix4 matrix4) {
         System.arraycopy(matrix4.val, 0, val, 0, 16);
         return this;
     }
@@ -70,7 +70,7 @@ public class Matrix4 {
                 scale.x, scale.y, scale.z);
     }
 
-    public Matrix4 set (Vector3 xAxis, Vector3 yAxis, Vector3 zAxis, Vector3 pos) {
+    public Matrix4 set(Vector3 xAxis, Vector3 yAxis, Vector3 zAxis, Vector3 pos) {
         val[M00] = xAxis.x;
         val[M01] = xAxis.y;
         val[M02] = xAxis.z;
@@ -90,7 +90,7 @@ public class Matrix4 {
         return this;
     }
 
-    public Matrix4 setToLookAt (Vector3 position, Vector3 target, Vector3 up) {
+    public Matrix4 setToLookAt(Vector3 position, Vector3 target, Vector3 up) {
         tmpVec.set(target).sub(position);
         setToLookAt(tmpVec, up);
         mul(tmpMat.setToTranslation(-position.x, -position.y, -position.z));
@@ -245,17 +245,41 @@ public class Matrix4 {
         return this;
     }
 
+    public Matrix4 setToProjection(float near, float far, float fovVertical, float aspectRatio) {
+        idt();
+        float l_fd = (float)(1.0 / Math.tan((fovVertical * (Math.PI / 180)) / 2.0));
+        float l_a1 = (far + near) / (near - far);
+        float l_a2 = (2 * far * near) / (near - far);
+        val[M00] = l_fd / aspectRatio;
+        val[M10] = 0;
+        val[M20] = 0;
+        val[M30] = 0;
+        val[M01] = 0;
+        val[M11] = l_fd;
+        val[M21] = 0;
+        val[M31] = 0;
+        val[M02] = 0;
+        val[M12] = 0;
+        val[M22] = l_a1;
+        val[M32] = -1;
+        val[M03] = 0;
+        val[M13] = 0;
+        val[M23] = l_a2;
+        val[M33] = 0;
+        return this;
+    }
+
+
     // a.mul(b) :: a -> a * b
     public Matrix4 mul(final Matrix4 matrix4) {
         mul(matrix4.val);
         return this;
     }
 
-    // a.mulLeft(b) :: a -> b * a
     public Matrix4 mulLeft(final Matrix4 matrix4) {
-        tmpMtx.setTo(matrix4);
+        tmpMtx.set(matrix4);
         tmpMtx.mul(val);
-        return setTo(tmpMtx);
+        return set(tmpMtx);
     }
 
     public Matrix4 setToRotation(Quaternion quaternion) {
@@ -448,6 +472,113 @@ public class Matrix4 {
         val[13] = m13;
         val[14] = m23;
         val[15] = m33;
+    }
+
+    public static boolean inv(float[] values) {
+        float l_det = det(values);
+        if (l_det == 0) return false;
+        float m00 = values[M12] * values[M23] * values[M31] - values[M13] * values[M22] * values[M31]
+                + values[M13] * values[M21] * values[M32] - values[M11] * values[M23] * values[M32]
+                - values[M12] * values[M21] * values[M33] + values[M11] * values[M22] * values[M33];
+        float m01 = values[M03] * values[M22] * values[M31] - values[M02] * values[M23] * values[M31]
+                - values[M03] * values[M21] * values[M32] + values[M01] * values[M23] * values[M32]
+                + values[M02] * values[M21] * values[M33] - values[M01] * values[M22] * values[M33];
+        float m02 = values[M02] * values[M13] * values[M31] - values[M03] * values[M12] * values[M31]
+                + values[M03] * values[M11] * values[M32] - values[M01] * values[M13] * values[M32]
+                - values[M02] * values[M11] * values[M33] + values[M01] * values[M12] * values[M33];
+        float m03 = values[M03] * values[M12] * values[M21] - values[M02] * values[M13] * values[M21]
+                - values[M03] * values[M11] * values[M22] + values[M01] * values[M13] * values[M22]
+                + values[M02] * values[M11] * values[M23] - values[M01] * values[M12] * values[M23];
+        float m10 = values[M13] * values[M22] * values[M30] - values[M12] * values[M23] * values[M30]
+                - values[M13] * values[M20] * values[M32] + values[M10] * values[M23] * values[M32]
+                + values[M12] * values[M20] * values[M33] - values[M10] * values[M22] * values[M33];
+        float m11 = values[M02] * values[M23] * values[M30] - values[M03] * values[M22] * values[M30]
+                + values[M03] * values[M20] * values[M32] - values[M00] * values[M23] * values[M32]
+                - values[M02] * values[M20] * values[M33] + values[M00] * values[M22] * values[M33];
+        float m12 = values[M03] * values[M12] * values[M30] - values[M02] * values[M13] * values[M30]
+                - values[M03] * values[M10] * values[M32] + values[M00] * values[M13] * values[M32]
+                + values[M02] * values[M10] * values[M33] - values[M00] * values[M12] * values[M33];
+        float m13 = values[M02] * values[M13] * values[M20] - values[M03] * values[M12] * values[M20]
+                + values[M03] * values[M10] * values[M22] - values[M00] * values[M13] * values[M22]
+                - values[M02] * values[M10] * values[M23] + values[M00] * values[M12] * values[M23];
+        float m20 = values[M11] * values[M23] * values[M30] - values[M13] * values[M21] * values[M30]
+                + values[M13] * values[M20] * values[M31] - values[M10] * values[M23] * values[M31]
+                - values[M11] * values[M20] * values[M33] + values[M10] * values[M21] * values[M33];
+        float m21 = values[M03] * values[M21] * values[M30] - values[M01] * values[M23] * values[M30]
+                - values[M03] * values[M20] * values[M31] + values[M00] * values[M23] * values[M31]
+                + values[M01] * values[M20] * values[M33] - values[M00] * values[M21] * values[M33];
+        float m22 = values[M01] * values[M13] * values[M30] - values[M03] * values[M11] * values[M30]
+                + values[M03] * values[M10] * values[M31] - values[M00] * values[M13] * values[M31]
+                - values[M01] * values[M10] * values[M33] + values[M00] * values[M11] * values[M33];
+        float m23 = values[M03] * values[M11] * values[M20] - values[M01] * values[M13] * values[M20]
+                - values[M03] * values[M10] * values[M21] + values[M00] * values[M13] * values[M21]
+                + values[M01] * values[M10] * values[M23] - values[M00] * values[M11] * values[M23];
+        float m30 = values[M12] * values[M21] * values[M30] - values[M11] * values[M22] * values[M30]
+                - values[M12] * values[M20] * values[M31] + values[M10] * values[M22] * values[M31]
+                + values[M11] * values[M20] * values[M32] - values[M10] * values[M21] * values[M32];
+        float m31 = values[M01] * values[M22] * values[M30] - values[M02] * values[M21] * values[M30]
+                + values[M02] * values[M20] * values[M31] - values[M00] * values[M22] * values[M31]
+                - values[M01] * values[M20] * values[M32] + values[M00] * values[M21] * values[M32];
+        float m32 = values[M02] * values[M11] * values[M30] - values[M01] * values[M12] * values[M30]
+                - values[M02] * values[M10] * values[M31] + values[M00] * values[M12] * values[M31]
+                + values[M01] * values[M10] * values[M32] - values[M00] * values[M11] * values[M32];
+        float m33 = values[M01] * values[M12] * values[M20] - values[M02] * values[M11] * values[M20]
+                + values[M02] * values[M10] * values[M21] - values[M00] * values[M12] * values[M21]
+                - values[M01] * values[M10] * values[M22] + values[M00] * values[M11] * values[M22];
+        float inv_det = 1.0f / l_det;
+        values[M00] = m00 * inv_det;
+        values[M10] = m10 * inv_det;
+        values[M20] = m20 * inv_det;
+        values[M30] = m30 * inv_det;
+        values[M01] = m01 * inv_det;
+        values[M11] = m11 * inv_det;
+        values[M21] = m21 * inv_det;
+        values[M31] = m31 * inv_det;
+        values[M02] = m02 * inv_det;
+        values[M12] = m12 * inv_det;
+        values[M22] = m22 * inv_det;
+        values[M32] = m32 * inv_det;
+        values[M03] = m03 * inv_det;
+        values[M13] = m13 * inv_det;
+        values[M23] = m23 * inv_det;
+        values[M33] = m33 * inv_det;
+        return true;
+    }
+
+    public static float det(float[] values) {
+        return values[M30] * values[M21] * values[M12] * values[M03] - values[M20] * values[M31] * values[M12] * values[M03]
+                - values[M30] * values[M11] * values[M22] * values[M03] + values[M10] * values[M31] * values[M22] * values[M03]
+                + values[M20] * values[M11] * values[M32] * values[M03] - values[M10] * values[M21] * values[M32] * values[M03]
+                - values[M30] * values[M21] * values[M02] * values[M13] + values[M20] * values[M31] * values[M02] * values[M13]
+                + values[M30] * values[M01] * values[M22] * values[M13] - values[M00] * values[M31] * values[M22] * values[M13]
+                - values[M20] * values[M01] * values[M32] * values[M13] + values[M00] * values[M21] * values[M32] * values[M13]
+                + values[M30] * values[M11] * values[M02] * values[M23] - values[M10] * values[M31] * values[M02] * values[M23]
+                - values[M30] * values[M01] * values[M12] * values[M23] + values[M00] * values[M31] * values[M12] * values[M23]
+                + values[M10] * values[M01] * values[M32] * values[M23] - values[M00] * values[M11] * values[M32] * values[M23]
+                - values[M20] * values[M11] * values[M02] * values[M33] + values[M10] * values[M21] * values[M02] * values[M33]
+                + values[M20] * values[M01] * values[M12] * values[M33] - values[M00] * values[M21] * values[M12] * values[M33]
+                - values[M10] * values[M01] * values[M22] * values[M33] + values[M00] * values[M11] * values[M22] * values[M33];
+
+    }
+
+    public static void mul(float[] aVal, float[] bVal) {
+        tmp[M00] = aVal[M00] * bVal[M00] + aVal[M01] * bVal[M10] + aVal[M02] * bVal[M20] + aVal[M03] * bVal[M30];
+        tmp[M01] = aVal[M00] * bVal[M01] + aVal[M01] * bVal[M11] + aVal[M02] * bVal[M21] + aVal[M03] * bVal[M31];
+        tmp[M02] = aVal[M00] * bVal[M02] + aVal[M01] * bVal[M12] + aVal[M02] * bVal[M22] + aVal[M03] * bVal[M32];
+        tmp[M03] = aVal[M00] * bVal[M03] + aVal[M01] * bVal[M13] + aVal[M02] * bVal[M23] + aVal[M03] * bVal[M33];
+        tmp[M10] = aVal[M10] * bVal[M00] + aVal[M11] * bVal[M10] + aVal[M12] * bVal[M20] + aVal[M13] * bVal[M30];
+        tmp[M11] = aVal[M10] * bVal[M01] + aVal[M11] * bVal[M11] + aVal[M12] * bVal[M21] + aVal[M13] * bVal[M31];
+        tmp[M12] = aVal[M10] * bVal[M02] + aVal[M11] * bVal[M12] + aVal[M12] * bVal[M22] + aVal[M13] * bVal[M32];
+        tmp[M13] = aVal[M10] * bVal[M03] + aVal[M11] * bVal[M13] + aVal[M12] * bVal[M23] + aVal[M13] * bVal[M33];
+        tmp[M20] = aVal[M20] * bVal[M00] + aVal[M21] * bVal[M10] + aVal[M22] * bVal[M20] + aVal[M23] * bVal[M30];
+        tmp[M21] = aVal[M20] * bVal[M01] + aVal[M21] * bVal[M11] + aVal[M22] * bVal[M21] + aVal[M23] * bVal[M31];
+        tmp[M22] = aVal[M20] * bVal[M02] + aVal[M21] * bVal[M12] + aVal[M22] * bVal[M22] + aVal[M23] * bVal[M32];
+        tmp[M23] = aVal[M20] * bVal[M03] + aVal[M21] * bVal[M13] + aVal[M22] * bVal[M23] + aVal[M23] * bVal[M33];
+        tmp[M30] = aVal[M30] * bVal[M00] + aVal[M31] * bVal[M10] + aVal[M32] * bVal[M20] + aVal[M33] * bVal[M30];
+        tmp[M31] = aVal[M30] * bVal[M01] + aVal[M31] * bVal[M11] + aVal[M32] * bVal[M21] + aVal[M33] * bVal[M31];
+        tmp[M32] = aVal[M30] * bVal[M02] + aVal[M31] * bVal[M12] + aVal[M32] * bVal[M22] + aVal[M33] * bVal[M32];
+        tmp[M33] = aVal[M30] * bVal[M03] + aVal[M31] * bVal[M13] + aVal[M32] * bVal[M23] + aVal[M33] * bVal[M33];
+        System.arraycopy(tmp, 0, aVal, 0, 16);
     }
 
     @Override

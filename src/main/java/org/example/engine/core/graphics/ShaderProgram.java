@@ -2,6 +2,7 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.math.Matrix4;
+import org.example.engine.core.math.Vector3;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -147,7 +148,7 @@ public class ShaderProgram implements Resource {
     }
 
     // TODO: finish
-    private void bindUniform(final String name, final Object value) {
+    public void bindUniform(final String name, final Object value) {
         final int location = uniformLocations.get(name, -1);
         if (location == -1) throw new IllegalArgumentException("Shader does not have a uniform named " + name + "." +
                 "If you have defined the uniform but have not used it, the GLSL compiler discarded it.");
@@ -159,13 +160,20 @@ public class ShaderProgram implements Resource {
             case GL20.GL_FLOAT_MAT4:
                 setUniformMatrix4(location, (Matrix4) value);
                 break;
+            case GL20.GL_FLOAT_VEC3:
+                setUniform3f(location, (Vector3) value);
         }
         uniformsCache.put(name, value);
     }
 
+    // TODO: remove these function calls and place them in the bindUniform method.
     private void bindTexture(int location, Texture texture) {
         int slot = TextureBinder.bindTexture(texture);
         GL20.glUniform1i(location, slot);
+    }
+
+    private void setUniform3f(int location, Vector3 value) {
+        GL20.glUniform3f(location, value.x, value.y, value.z);
     }
 
     private void setUniformInt(int location, int value) {

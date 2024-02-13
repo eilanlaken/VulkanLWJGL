@@ -1,5 +1,6 @@
 package org.example.game;
 
+import org.example.engine.components.ComponentTransform3D;
 import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
@@ -15,8 +16,8 @@ public class WindowScreenTest_1 extends WindowScreen {
     private ModelBuilder modelBuilder;
     private Model model;
     private Texture texture;
-
     private ShaderProgram shader;
+    private ComponentTransform3D transform3D;
 
 
     public WindowScreenTest_1() {
@@ -30,6 +31,7 @@ public class WindowScreenTest_1 extends WindowScreen {
 
     @Override
     public void show() {
+        transform3D = new ComponentTransform3D();
 
         float[] positions = {
                 -0.5f,  0.5f, 0f,
@@ -62,7 +64,7 @@ public class WindowScreenTest_1 extends WindowScreen {
         GL11.glClearColor(1,0,0,1);
 
         renderer3D.begin();
-        renderer3D.render(model, null, shader);
+        renderer3D.render(model, transform3D.getMatrix4(), shader);
         renderer3D.end();
 
         //System.out.println("width: " + Graphics.getScreenWidth());
