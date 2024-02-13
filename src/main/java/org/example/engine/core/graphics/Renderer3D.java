@@ -34,6 +34,8 @@ public class Renderer3D {
         shader.bindUniforms(model.get_material_debug());
         shader.bindUniform("transform", transform);
         shader.bindUniform("view", camera.lens.view);
+        shader.bindUniform("projection", camera.lens.projection);
+
         GL30.glBindVertexArray(model.vaoId);
         GL20.glEnableVertexAttribArray(0); // positions
         GL20.glEnableVertexAttribArray(1); // texture coordinates

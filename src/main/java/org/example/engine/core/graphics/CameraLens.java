@@ -22,12 +22,12 @@ public class CameraLens {
     public final Matrix4 view = new Matrix4();
     public final Matrix4 combined = new Matrix4();
     public final Matrix4 invProjectionView = new Matrix4();
-    public float near = 1;
+    public float near = 0.1f;
     public float far = 100;
     public float fieldOfView = 67;
     public float zoom = 1;
-    public float viewportWidth = 0;
-    public float viewportHeight = 0;
+    public float viewportWidth = Graphics.getWindowWidth();
+    public float viewportHeight = Graphics.getWindowHeight();
     public Vector3 position;
     public Vector3 direction;
     public Vector3 up;
@@ -40,6 +40,33 @@ public class CameraLens {
         this.direction = new Vector3(0,0,-1);
         this.up = new Vector3(0,1,0);
         this.frustum = new Shape3DFrustum();
+    }
+
+    public void update() {
+        switch (projectionType) {
+            case PERSPECTIVE_PROJECTION: {
+                float aspect = viewportWidth / viewportHeight;
+                projection.setToPerspectiveProjection(Math.abs(near), Math.abs(far), fieldOfView, aspect);
+                view.setToLookAt(position, tmp.set(position).add(direction), up);
+                combined.set(projection);
+                Matrix4.mul(combined.val, view.val);
+                invProjectionView.set(combined);
+                Matrix4.inv(invProjectionView.val);
+            }
+            case ORTHOGRAPHIC_PROJECTION: {
+
+            }
+        }
+        updateFrustum(invProjectionView);
+    }
+
+    public void updateFrustum(final Matrix4 invPrjView) {
+        // calculate corners of the frustum by un-projecting the clip space cube using invPrjView
+        for (int i = 0; i < 8; i++) {
+            frustumCorners[i].set(clipSpacePlanePoints[i]);
+            frustumCorners[i].prj(invPrjView);
+        }
+        frustum.set(frustumCorners);
     }
 
     public void lookAt(float x, float y, float z) {
@@ -134,33 +161,6 @@ public class CameraLens {
         worldCoordinates.y = viewportHeight * (worldCoordinates.y + 1) / 2 + viewportY;
         worldCoordinates.z = (worldCoordinates.z + 1) / 2;
         return worldCoordinates;
-    }
-
-    public void update() {
-        switch (projectionType) {
-            case PERSPECTIVE_PROJECTION: {
-                float aspect = viewportWidth / viewportHeight;
-                projection.setToPerspectiveProjection(Math.abs(near), Math.abs(far), fieldOfView, aspect);
-                view.setToLookAt(position, tmp.set(position).add(direction), up);
-                combined.set(projection);
-                Matrix4.mul(combined.val, view.val);
-                invProjectionView.set(combined);
-                Matrix4.inv(invProjectionView.val);
-            }
-            case ORTHOGRAPHIC_PROJECTION: {
-
-            }
-        }
-        updateFrustum(invProjectionView);
-    }
-
-    public void updateFrustum(final Matrix4 invPrjView) {
-        // calculate corners of the frustum by un-projecting the clip space cube using invPrjView
-        for (int i = 0; i < 8; i++) {
-            frustumCorners[i].set(clipSpacePlanePoints[i]);
-            frustumCorners[i].prj(invPrjView);
-        }
-        frustum.set(frustumCorners);
     }
 
 }
