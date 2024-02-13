@@ -36,30 +36,64 @@ public class WindowScreenTest_1 extends WindowScreen {
     public void show() {
         transform3D = new ComponentTransform3D();
 
-        float[] positions = {
-                -0.5f,  0.5f, 0f,
-                -0.5f, -0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                0.5f,  0.5f, 0f,
+        float[] positions = new float[] {
+                -0.5f, 0.5f, 0.5f,
+                -0.5f, -0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+                -0.5f, 0.5f, -0.5f,
+                0.5f, 0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f, -0.5f,
+                -0.5f, 0.5f, -0.5f,
+                0.5f, 0.5f, -0.5f,
+                -0.5f, 0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
+                -0.5f, 0.5f, 0.5f,
+                -0.5f, -0.5f, 0.5f,
+                -0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
         };
-
-        float[] textureCoordinates = {
-                0,0,
-                0,1,
-                1,1,
-                1,0
+        float[] textureCoordinates = new float[]{
+                0.0f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.5f, 0.0f,
+                0.0f, 0.0f,
+                0.5f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.0f, 1.0f,
+                0.5f, 1.0f,
+                0.0f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.0f,
+                0.5f, 0.5f,
+                0.5f, 0.0f,
+                1.0f, 0.0f,
+                0.5f, 0.5f,
+                1.0f, 0.5f,
         };
-
-        int[] indices = {
-                0,1,3,
-                3,1,2
+        int[] indices = new int[]{
+                0, 1, 3, 3, 1, 2,
+                8, 10, 11, 9, 8, 11,
+                12, 13, 7, 5, 12, 7,
+                14, 15, 6, 4, 14, 6,
+                16, 18, 19, 17, 16, 19,
+                4, 6, 7, 5, 4, 7,
         };
 
         model = modelBuilder.build(positions, textureCoordinates, indices);
         texture = assetLoaderTexture.load("assets/textures/yellowSquare.png");
         model.texture = texture;
 
-        transform3D.matrix4.translate(0,0,-1f);
+        transform3D.matrix4.translate(0,0,-5f);
 
     }
 
@@ -76,7 +110,7 @@ public class WindowScreenTest_1 extends WindowScreen {
         renderer3D.end();
 
         // TODO: problem here: anything that has z > 1 or z < -1 is not rendered.
-        transform3D.matrix4.rotate(Vector3.X, 1);
+        transform3D.matrix4.rotate(Vector3.Y, 1);
 
         Matrix4 prjTrans = new Matrix4();
         prjTrans.set(camera.lens.projection);
