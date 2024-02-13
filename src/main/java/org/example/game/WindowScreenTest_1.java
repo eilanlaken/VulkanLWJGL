@@ -4,6 +4,7 @@ import org.example.engine.components.ComponentTransform3D;
 import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
+import org.example.engine.core.math.Matrix4;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -60,14 +61,20 @@ public class WindowScreenTest_1 extends WindowScreen {
 
     @Override
     public void update(float delta) {
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(1,0,0,1);
+
+        Matrix4 transform = transform3D.getMatrix4();
 
         renderer3D.begin();
         renderer3D.render(model, transform3D.getMatrix4(), shader);
         renderer3D.end();
 
-        //System.out.println("width: " + Graphics.getScreenWidth());
+        // TODO: problem here: anything that has z > 1 or z < -1 is not rendered.
+        transform3D.position.z += 0.01f;
+
+        System.out.println("transform: " + transform);
     }
 
     @Override

@@ -19,7 +19,6 @@ public class ComponentTransform3D {
                 rotation.x, rotation.y, rotation.z, rotation.w,
                 scale.x, scale.y, scale.z
         );
-
     }
 
 }
