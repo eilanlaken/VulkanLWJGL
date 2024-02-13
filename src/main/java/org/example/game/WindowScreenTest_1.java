@@ -53,7 +53,7 @@ public class WindowScreenTest_1 extends WindowScreen {
         };
 
         model = modelBuilder.build(positions, textureCoordinates, indices);
-        texture = assetLoaderTexture.load("assets/textures/minecraftCube.png");
+        texture = assetLoaderTexture.load("assets/textures/yellowSquare.png");
         model.texture = texture;
 
     }
