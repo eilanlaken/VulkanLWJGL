@@ -5,6 +5,7 @@ import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.math.Matrix4;
+import org.example.engine.core.math.Vector3;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -19,7 +20,7 @@ public class WindowScreenTest_1 extends WindowScreen {
     private Texture texture;
     private ShaderProgram shader;
     private ComponentTransform3D transform3D;
-
+    private Camera camera;
 
     public WindowScreenTest_1() {
         this.assetLoaderTexture = new AssetLoaderTexture();
@@ -27,7 +28,8 @@ public class WindowScreenTest_1 extends WindowScreen {
         this.modelBuilder = new ModelBuilder();
         final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/vertex.glsl");
         final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/fragment.glsl");
-        shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
+        this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
+        this.camera = new Camera();
     }
 
     @Override
@@ -65,14 +67,14 @@ public class WindowScreenTest_1 extends WindowScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(1,0,0,1);
 
-        Matrix4 transform = transform3D.getMatrix4();
+        Matrix4 transform = transform3D.matrix4;
 
         renderer3D.begin();
-        renderer3D.render(model, transform3D.getMatrix4(), shader);
+        renderer3D.render(camera, model, transform3D.matrix4, shader);
         renderer3D.end();
 
         // TODO: problem here: anything that has z > 1 or z < -1 is not rendered.
-        transform3D.position.z += 0.01f;
+        transform3D.matrix4.rotate(Vector3.Z, 1);
 
         System.out.println("transform: " + transform);
     }

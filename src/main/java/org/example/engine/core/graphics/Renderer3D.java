@@ -24,8 +24,8 @@ public class Renderer3D {
 
     }
 
-    // TODO: use this
-    public void render(final Model model, final Matrix4 transform, ShaderProgram shader) {
+    // TODO: maybe replace camera directly with the projection and transform of the lens.
+    public void render(final Camera camera, final Model model, final Matrix4 transform, ShaderProgram shader) {
         // TODO: move to render context.
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -33,6 +33,7 @@ public class Renderer3D {
         shader.bind();
         shader.bindUniforms(model.get_material_debug());
         shader.bindUniform("transform", transform);
+        shader.bindUniform("view", camera.lens.view);
         GL30.glBindVertexArray(model.vaoId);
         GL20.glEnableVertexAttribArray(0); // positions
         GL20.glEnableVertexAttribArray(1); // texture coordinates

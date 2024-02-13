@@ -33,8 +33,9 @@ public class CameraLens {
     public Vector3 up;
     public Shape3DFrustum frustum;
 
-    public CameraLens(CameraLensProjectionType projectionType) {
-        this.projectionType = projectionType;
+    // TODO: change
+    public CameraLens() {
+        this.projectionType = CameraLensProjectionType.PERSPECTIVE_PROJECTION;
         this.position = new Vector3(0,0,0);
         this.direction = new Vector3(0,0,-1);
         this.up = new Vector3(0,1,0);
@@ -145,12 +146,12 @@ public class CameraLens {
                 Matrix4.mul(combined.val, view.val);
                 invProjectionView.set(combined);
                 Matrix4.inv(invProjectionView.val);
-                updateFrustum(invProjectionView);
             }
             case ORTHOGRAPHIC_PROJECTION: {
 
             }
         }
+        updateFrustum(invProjectionView);
     }
 
     public void updateFrustum(final Matrix4 invPrjView) {
