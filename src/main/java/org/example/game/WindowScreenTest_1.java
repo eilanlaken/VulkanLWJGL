@@ -19,8 +19,7 @@ public class WindowScreenTest_1 extends WindowScreen {
     private ShaderProgram shader;
 
 
-    public WindowScreenTest_1(final Window window) {
-        super(window);
+    public WindowScreenTest_1() {
         this.assetLoaderTexture = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
         this.modelBuilder = new ModelBuilder();
@@ -66,7 +65,7 @@ public class WindowScreenTest_1 extends WindowScreen {
         renderer3D.render(model, null, shader);
         renderer3D.end();
 
-        System.out.println("width: " + window.width);
+        //System.out.println("width: " + window.width);
     }
 
     @Override

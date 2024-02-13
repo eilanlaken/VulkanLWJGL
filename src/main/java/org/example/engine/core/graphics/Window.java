@@ -54,10 +54,11 @@ public class Window implements Resource {
     private long lastTime;
 
 
-    public Window(String title, int width, int height, boolean enableVSync, boolean allowResize) {
+    public Window(String title, int width, int height, int targetFrameRate, boolean enableVSync, boolean allowResize) {
         this.title = title;
         this.width = width;
         this.height = height;
+        this.targetFrameRate = targetFrameRate;
         this.enableVSync = enableVSync;
         this.allowResize = allowResize;
     }
@@ -177,7 +178,6 @@ public class Window implements Resource {
         this.screen.show();
     }
 
-    // TODO: make a GLFW call
     public void setTargetFrameRate(int frameRate) {
         this.targetFrameRate = frameRate;
     }
