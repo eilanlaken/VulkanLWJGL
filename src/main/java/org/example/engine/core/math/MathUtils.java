@@ -4,9 +4,12 @@ import java.util.Random;
 
 public final class MathUtils {
 
+    public static final float FLOAT_ROUNDING_ERROR = 1.0E-6F;
     public static final float PI = (float)Math.PI;
     public static final float PI2 = PI * 2;
     public static  final float HALF_PI = PI / 2;
+    public static final float radiansToDegrees = 57.295776f;
+    public static final float degreesToRadians = 0.017453292f;
 
     private static final Random random = new Random();
 

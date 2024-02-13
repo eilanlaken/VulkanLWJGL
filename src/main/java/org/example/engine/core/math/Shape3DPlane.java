@@ -13,21 +13,21 @@ public class Shape3DPlane implements Shape3D {
     // a plane with normal = normal and distance from the origin = d
     public Shape3DPlane(Vector3 normal, float d) {
         this.normal = new Vector3(normal);
-        this.normal.normalize();
+        this.normal.nor();
         this.d = d;
     }
 
     // a plane with a normal = normal and a point on the plane pointOnPlane
     public Shape3DPlane(Vector3 normal, Vector3 pointOnPlane) {
         this.normal = new Vector3(normal);
-        this.normal.normalize();
+        this.normal.nor();
         this.d = -1 * Vector3.dot(normal, pointOnPlane);
     }
 
     // a plane with a,b and c points on the plane.
     public Shape3DPlane(Vector3 a, Vector3 b, Vector3 c) {
         this.normal = new Vector3();
-        normal.set(a).sub(b).cross(b.x - c.x, b.y - c.y, b.z - c.z).normalize();
+        normal.set(a).sub(b).crs(b.x - c.x, b.y - c.y, b.z - c.z).nor();
         d = -1 * Vector3.dot(a, normal);
     }
 
@@ -42,7 +42,7 @@ public class Shape3DPlane implements Shape3D {
     }
 
     public void set(Vector3 point1, Vector3 point2, Vector3 point3) {
-        normal.set(point1).sub(point2).cross(point2.x - point3.x, point2.y - point3.y, point2.z - point3.z).normalize();
+        normal.set(point1).sub(point2).crs(point2.x - point3.x, point2.y - point3.y, point2.z - point3.z).nor();
         d = -1 * Vector3.dot(point1, normal);
     }
 
