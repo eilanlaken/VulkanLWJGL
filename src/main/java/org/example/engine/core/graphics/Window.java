@@ -116,12 +116,11 @@ public class Window implements Resource {
         GL.createCapabilities();
 
         // TODO: refactor out
-        // clear the color of the window.
-        GL11.glClearColor(0.0f,0.0f,0.0f,0.0f);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL11.GL_STENCIL_TEST);
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glCullFace(GL11.GL_BACK);
+        // TODO: see what is up
+//        GL11.glEnable(GL11.GL_DEPTH_TEST);
+//        GL11.glEnable(GL11.GL_STENCIL_TEST);
+//        GL11.glEnable(GL11.GL_CULL_FACE);
+//        GL11.glCullFace(GL11.GL_BACK);
     }
 
 
