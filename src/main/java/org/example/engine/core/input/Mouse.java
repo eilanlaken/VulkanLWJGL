@@ -12,6 +12,8 @@ public class Mouse {
     private static int prevCursorY;
     private static int cursorX;
     private static int cursorY;
+    private static int cursorDeltaX;
+    private static int cursorDeltaY;
     private static boolean cursorHidden = false;
     private static boolean cursorInWindow = true;
     private static float verticalScroll = 0;
@@ -38,6 +40,8 @@ public class Mouse {
                 prevCursorY = cursorY;
                 cursorX = (int) xPos;
                 cursorY = (int) yPos;
+                cursorDeltaX = cursorX - prevCursorX;
+                cursorDeltaY = cursorY - prevCursorY;
             }
         });
 
@@ -115,6 +119,14 @@ public class Mouse {
 
     public static int getCursorY() {
         return cursorY;
+    }
+
+    public static int getCursorDeltaX() {
+        return cursorDeltaX;
+    }
+
+    public static int getCursorDeltaY() {
+        return cursorDeltaY;
     }
 
     public static boolean isCursorInWindow() {
