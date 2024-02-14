@@ -1,5 +1,6 @@
-package org.example.engine.core.graphics;
+package org.example.engine.core.application;
 
+import org.example.engine.core.input.Mouse;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -29,7 +30,7 @@ TODO: refactor while considering context etc.
  */
 public class Window implements Resource {
 
-    private long window;
+    private long handle;
     private String title;
     public int width;
     public int height;
@@ -76,18 +77,18 @@ public class Window implements Resource {
         GLFW.glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         GLFW.glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL11.GL_TRUE);
 
-        window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
-        if (window == MemoryUtil.NULL) throw new RuntimeException("Unable to create window.");
+        handle = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
+        if (handle == MemoryUtil.NULL) throw new RuntimeException("Unable to create window.");
 
         // set callback to see if the window has been resized.
-        GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
+        GLFW.glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
            this.width = width;
            this.height = height;
         });
 
         // TODO: see how this works. Refactor.
         // set an input event callback
-        GLFW.glfwSetKeyCallback(window, (window, key, scanCode, action, mods) -> {
+        GLFW.glfwSetKeyCallback(handle, (window, key, scanCode, action, mods) -> {
             // update the appropriate input device module.
             // this is just an example. TODO: delete this line.
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) closeWindow();
@@ -100,19 +101,19 @@ public class Window implements Resource {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);
             // get the window size passed to glfwCreateWindow
-            GLFW.glfwGetWindowSize(window, pWidth, pHeight);
+            GLFW.glfwGetWindowSize(handle, pWidth, pHeight);
             // get the resolution of the primary monitor
             GLFWVidMode vidMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
             // center the window
-            GLFW.glfwSetWindowPos(window, (vidMode.width() - pWidth.get(0)) / 2, (vidMode.height() - pHeight.get(0)) / 2);
+            GLFW.glfwSetWindowPos(handle, (vidMode.width() - pWidth.get(0)) / 2, (vidMode.height() - pHeight.get(0)) / 2);
         }
 
         // make the OpenGL context active
-        GLFW.glfwMakeContextCurrent(window);
+        GLFW.glfwMakeContextCurrent(handle);
         // enable / disable v-sync
         GLFW.glfwSwapInterval(enableVSync ? 1 : 0);
         // show the window
-        GLFW.glfwShowWindow(window);
+        GLFW.glfwShowWindow(handle);
         GL.createCapabilities();
 
         // TODO: refactor out
@@ -124,13 +125,17 @@ public class Window implements Resource {
     }
 
 
+    public long getHandle() {
+        return handle;
+    }
 
     public void update() {
-        GLFW.glfwSwapBuffers(window);
+        GLFW.glfwSwapBuffers(handle);
         // TODO: see what's up. Refactor as needed.
         // "this is what tells OpenGL to render anything in the render queue"
         GLFW.glfwPollEvents();
 
+        // TODO: reset input flags. See if there is a better solution.
 
         long time;
         if (this.resetDeltaTime) {
@@ -167,6 +172,8 @@ public class Window implements Resource {
                 Thread.currentThread().interrupt();
             }
         }
+
+        Mouse.resetInternalState();
     }
 
     public void setScreen(WindowScreen screen) {
@@ -187,27 +194,27 @@ public class Window implements Resource {
 
 
     public void closeWindow() {
-        GLFW.glfwSetWindowShouldClose(window, true);
+        GLFW.glfwSetWindowShouldClose(handle, true);
         if (screen != null) screen.hide();
     }
 
     public boolean windowShouldClose() {
-        return GLFW.glfwWindowShouldClose(window);
+        return GLFW.glfwWindowShouldClose(handle);
     }
 
     // TODO: refactor into an input module
     public boolean isKeyPressed(int keycode) {
-        return GLFW.glfwGetKey(window, keycode) == GLFW_PRESS;
+        return GLFW.glfwGetKey(handle, keycode) == GLFW_PRESS;
     }
 
     public void setTitle(String title) {
-        GLFW.glfwSetWindowTitle(window, title);
+        GLFW.glfwSetWindowTitle(handle, title);
         this.title = title;
     }
 
     // TODO: refactor, improve and test
     public boolean isKeyReleased(int keycode) {
-        return GLFW.glfwGetKey(window, keycode) == GLFW_RELEASE;
+        return GLFW.glfwGetKey(handle, keycode) == GLFW_RELEASE;
     }
 
     public void maximize() {
@@ -217,7 +224,7 @@ public class Window implements Resource {
 
     @Override
     public void free() {
-        GLFW.glfwDestroyWindow(window);
+        GLFW.glfwDestroyWindow(handle);
         GLFW.glfwTerminate();
         errorCallback.free();
     }

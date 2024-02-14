@@ -1,12 +1,14 @@
 package org.example.game;
 
 import org.example.engine.components.ComponentTransform3D;
+import org.example.engine.core.application.WindowScreen;
 import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
+import org.example.engine.core.input.Mouse;
+import org.example.engine.core.input.MouseButton;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 public class WindowScreenTest_1 extends WindowScreen {
@@ -108,6 +110,8 @@ public class WindowScreenTest_1 extends WindowScreen {
         renderer3D.begin();
         renderer3D.render(camera, model, transform3D.matrix4, shader);
         renderer3D.end();
+
+        if (Mouse.isButtonPressed(MouseButton.MIDDLE)) System.out.println("middle clicked");
 
         transform3D.matrix4.rotate(Vector3.Y, 1);
         transform3D.matrix4.rotate(Vector3.X, 1);

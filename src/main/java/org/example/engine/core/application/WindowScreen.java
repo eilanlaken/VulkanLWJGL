@@ -1,4 +1,4 @@
-package org.example.engine.core.graphics;
+package org.example.engine.core.application;
 
 public abstract class WindowScreen {
 

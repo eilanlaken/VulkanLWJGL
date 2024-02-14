@@ -1,13 +1,18 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.application.Application;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWVidMode;
+import org.example.engine.core.application.Window;
 import org.lwjgl.opengl.GL11;
 
 public final class Graphics {
 
-    public static Window window;
+    private static boolean initialized = false;
+    private static Window window;
+
+    public static void init(final Window window) {
+        if (initialized) throw new IllegalStateException(Graphics.class.getSimpleName() + " instance already initialized.");
+        Graphics.window = window;
+        initialized = true;
+    }
 
     public static int getWindowHeight() {
         return window.width;
