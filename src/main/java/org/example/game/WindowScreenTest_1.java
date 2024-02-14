@@ -109,16 +109,8 @@ public class WindowScreenTest_1 extends WindowScreen {
         renderer3D.render(camera, model, transform3D.matrix4, shader);
         renderer3D.end();
 
-        // TODO: problem here: anything that has z > 1 or z < -1 is not rendered.
         transform3D.matrix4.rotate(Vector3.Y, 1);
         transform3D.matrix4.rotate(Vector3.X, 1);
-
-
-        Matrix4 prjTrans = new Matrix4();
-        prjTrans.set(camera.lens.projection);
-        prjTrans.mul(transform);
-        Vector3 v = new Vector3(0.5f,0.5f,0);
-        v.mul(prjTrans);
     }
 
     @Override
