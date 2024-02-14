@@ -67,14 +67,6 @@ public class Mouse {
         return verticalScroll;
     }
 
-    public static void resetVerticalScroll() {
-        verticalScroll = 0;
-    }
-
-    public static void resetHorizontalScroll() {
-        horizontalScroll = 0;
-    }
-
     public static float getHorizontalScroll() {
         return horizontalScroll;
     }
@@ -133,15 +125,15 @@ public class Mouse {
         return cursorInWindow;
     }
 
-    public static boolean isButtonPressed(final MouseButton button) {
+    public static boolean isButtonPressed(final Button button) {
         return mouseButtonsCurrentStates[button.glfwCode] == GLFW.GLFW_PRESS;
     }
 
-    public static boolean isButtonReleased(final MouseButton button) {
+    public static boolean isButtonReleased(final Button button) {
         return mouseButtonsCurrentStates[button.glfwCode] == GLFW.GLFW_RELEASE;
     }
 
-    public static boolean isButtonClicked(final MouseButton button) {
+    public static boolean isButtonClicked(final Button button) {
         return mouseButtonsPrevStates[button.glfwCode] == GLFW.GLFW_PRESS && mouseButtonsCurrentStates[button.glfwCode] == GLFW.GLFW_RELEASE;
     }
 
@@ -155,4 +147,20 @@ public class Mouse {
         mouseButtonsPrevStates[GLFW.GLFW_MOUSE_BUTTON_5] = mouseButtonsCurrentStates[GLFW.GLFW_MOUSE_BUTTON_5];
     }
 
+    public enum Button {
+
+        LEFT(GLFW.GLFW_MOUSE_BUTTON_1),
+        RIGHT(GLFW.GLFW_MOUSE_BUTTON_2),
+        MIDDLE(GLFW.GLFW_MOUSE_BUTTON_3),
+        BACK(GLFW.GLFW_MOUSE_BUTTON_4),
+        FORWARD(GLFW.GLFW_MOUSE_BUTTON_5)
+        ;
+
+        public final int glfwCode;
+
+        Button(final int glfwCode) {
+            this.glfwCode = glfwCode;
+        }
+
+    }
 }

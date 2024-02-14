@@ -52,7 +52,7 @@ public class ArrayInt {
         return items[index];
     }
 
-    public boolean contains(long value) {
+    public boolean contains(int value) {
         int i = size - 1;
         int[] items = this.items;
         while (i >= 0)

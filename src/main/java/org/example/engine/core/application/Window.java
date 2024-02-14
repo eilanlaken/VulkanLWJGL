@@ -1,5 +1,6 @@
 package org.example.engine.core.application;
 
+import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.glfw.GLFW;
@@ -174,6 +175,8 @@ public class Window implements Resource {
         }
 
         Mouse.resetInternalState();
+        Keyboard.resetInternalState();
+
     }
 
     public void setScreen(WindowScreen screen) {
