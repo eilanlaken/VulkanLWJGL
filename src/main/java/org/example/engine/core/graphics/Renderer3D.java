@@ -33,10 +33,10 @@ public class Renderer3D {
         shader.bind();
 
         // TODO: optimize camera binding
-        shader.bindUniform("transform", transform);
         shader.bindUniform("view", camera.lens.view);
         shader.bindUniform("projection", camera.lens.projection);
 
+        shader.bindUniform("transform", transform);
         // TODO: optimize material binding
         shader.bindUniforms(model.get_material_debug());
 
