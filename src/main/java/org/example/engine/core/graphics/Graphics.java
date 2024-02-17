@@ -4,6 +4,8 @@ import org.example.engine.core.application.Window;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
+
 public final class Graphics {
 
     private static boolean initialized = false;
@@ -27,16 +29,19 @@ public final class Graphics {
         return GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
     }
 
+    // TODO
     public static int getFps() {
-        return window.fps;
+        return 0;
     }
 
+    // TODO
     public static int getTargetFps() {
-        return window.targetFrameRate;
+        return 0;
     }
 
-    public static void setTargetFrameRate(int targetFrameRate) {
-        window.targetFrameRate = targetFrameRate;
+    // TODO
+    public static void setTargetFrameRate(int targetFps) {
+        window.setTargetFps(targetFps);
     }
 
     public static void enableVSync() {
@@ -45,6 +50,12 @@ public final class Graphics {
 
     public static void disableVSync() {
         GLFW.glfwSwapInterval(0);
+    }
+
+    public static void setAntiAliasing(int value) {
+        if (value != 0 && value != 2 && value != 4 && value != 8 && value != 16)
+            throw new IllegalArgumentException("Multisampling (anti-aliasing) can only be set to: 0, 2, 4, 8 or 16. Got: " + value);
+        GLFW.glfwWindowHint(GLFW_SAMPLES, value); //  enable multi sampling
     }
 
 }

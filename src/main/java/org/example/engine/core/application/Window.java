@@ -2,7 +2,6 @@ package org.example.engine.core.application;
 
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
-import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -40,37 +39,16 @@ public class Window implements Resource {
     private boolean allowResize;
     private GLFWErrorCallback errorCallback;
     private WindowScreen screen;
-    // TODO: add a bunch of other parameters:
-    // is full screen
-    // is borderless
-    // target fps
-    // current frame
-    // delta time
-
-    public int targetFrameRate = 1000;
-
-    private boolean resetDeltaTime;
-    private float deltaTime;
-    private long frameStart;
-    private int frames;
-    public int fps;
-    private long lastTime;
-
-    private double elapsedTimeNanos;
-    private long currentTimeNanos;
-    private long prevTimeNanos;
-    private long deltaNanos;
-    private double targetFrameTimeNanos;
-    private double desiredFrameRate;
+    private int targetFps;
 
     // TODO:
     // https://github.com/LWJGL/lwjgl/blob/master/src/java/org/lwjgl/opengl/Sync.java
 
-    public Window(String title, int width, int height, int targetFrameRate, boolean enableVSync, boolean allowResize) {
+    public Window(String title, int width, int height, int targetFps, boolean enableVSync, boolean allowResize) {
         this.title = title;
         this.width = width;
         this.height = height;
-        this.targetFrameRate = targetFrameRate;
+        this.targetFps = targetFps;
         this.enableVSync = enableVSync;
         this.allowResize = allowResize;
 
@@ -99,34 +77,20 @@ public class Window implements Resource {
            this.height = height;
         });
 
-        // TODO: see how this works. Refactor.
-        // set an input event callback
-        GLFW.glfwSetKeyCallback(handle, (window, key, scanCode, action, mods) -> {
-            // update the appropriate input device module.
-            // this is just an example. TODO: delete this line.
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) closeWindow();
-            // test full screen
-            if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) GLFW.glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, 100, 100, 60);
-        });
-
-        // get the thread stack and push a new frame
+        // TODO: make that you can set custom position in config.
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);
-            // get the window size passed to glfwCreateWindow
             GLFW.glfwGetWindowSize(handle, pWidth, pHeight);
-            // get the resolution of the primary monitor
             GLFWVidMode vidMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-            // center the window
             GLFW.glfwSetWindowPos(handle, (vidMode.width() - pWidth.get(0)) / 2, (vidMode.height() - pHeight.get(0)) / 2);
         }
 
-        // make the OpenGL context active
         GLFW.glfwMakeContextCurrent(handle);
-        // enable / disable v-sync
         GLFW.glfwSwapInterval(enableVSync ? 1 : 0);
-        // show the window
         GLFW.glfwShowWindow(handle);
+
+        // anti aliasing
         GL.createCapabilities();
 
 
@@ -138,69 +102,44 @@ public class Window implements Resource {
 //        GL11.glCullFace(GL11.GL_BACK);
     }
 
+    public int getTargetFps() {
+        return targetFps;
+    }
+
+    public void setTargetFps(int targetFps) {
+        this.targetFps = targetFps;
+    }
 
     public long getHandle() {
         return handle;
     }
 
-    public void update() {
-        prevTimeNanos = currentTimeNanos;
-        currentTimeNanos = System.nanoTime();
-        deltaNanos = currentTimeNanos - prevTimeNanos;
-        double deltaSeconds = deltaNanos * 0.000000001;
-        targetFrameTimeNanos = 0.016 * 1000 * 1000;
+    public void loop() {
+        float previousTime = (float) GLFW.glfwGetTime();
+        float lag = 0;
 
-        long timeToSleep = (long) (targetFrameTimeNanos - deltaNanos) / 1000000L;
+        while (!shouldClose()) {
+            float fixedUpdateTimeInterval = 1.0f / targetFps; // in seconds
+            float currentTime = (float) GLFW.glfwGetTime();
+            float elapsedTime = currentTime - previousTime;
+            lag += elapsedTime;
+            previousTime = currentTime;
 
-        System.out.println(timeToSleep);
+            Mouse.resetInternalState();
+            Keyboard.resetInternalState();
+            GLFW.glfwPollEvents();
 
-        // TODO: reset input flags. See if there is a better solution.
+            while (lag >= fixedUpdateTimeInterval) {
+                if (this.screen != null) screen.fixedUpdate(fixedUpdateTimeInterval);
+                lag -= fixedUpdateTimeInterval;
+            }
 
-//        long time;
-//        if (this.resetDeltaTime) {
-//            this.resetDeltaTime = false;
-//            time = this.lastTime;
-//        } else {
-//            time = System.nanoTime();
-//        }
-//
-//        this.deltaTime = (float)(time - this.lastTime) / 1.0E9F;
-//        this.lastTime = time;
-//        if (time - this.frameStart >= 1000000000L) {
-//            this.fps = this.frames;
-//            this.frames = 0;
-//            this.frameStart = time;
-//        }
-//
-//        this.frames++;
-//
-//        // limit frame rate.
-//        final double targetFPS = 144.0;
-//        final double targetFrameTime = 1.0 / targetFPS;
-//        double frameStartTime = glfwGetTime();
-//        double frameEndTime = GLFW.glfwGetTime();
-//        double frameDuration = frameEndTime - frameStartTime;
-//        double sleepTime = targetFrameTime - frameDuration;
-//        if (sleepTime > 0) {
-//            try {
-//                Thread.sleep((long) (sleepTime * 1000));
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//            }
-//        }
-
-        // TODO: see star contract Sync
-        // http://forum.lwjgl.org/index.php?topic=5653.0
-
-        // TODO: continue from here. This is causing slowdown.
-        //WindowSync.sync(8000);
-
-        GLFW.glfwSwapBuffers(handle);
-        GLFW.glfwPollEvents();
-        Mouse.resetInternalState();
-        Keyboard.resetInternalState();
-        if (this.screen != null) screen.update(deltaTime);
+            if (this.screen != null) screen.frameUpdate(elapsedTime);
+            GLFW.glfwSwapBuffers(handle);
+        }
     }
+
+    //https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter02/chapter2.html
 
     public void setScreen(WindowScreen screen) {
         if (this.screen != null) {
@@ -209,28 +148,14 @@ public class Window implements Resource {
         this.screen = screen;
         this.screen.show();
     }
-    public void closeWindow() {
-        GLFW.glfwSetWindowShouldClose(handle, true);
-        if (screen != null) screen.hide();
-    }
 
-    public boolean windowShouldClose() {
+    public boolean shouldClose() {
         return GLFW.glfwWindowShouldClose(handle);
-    }
-
-    // TODO: refactor into an input module
-    public boolean isKeyPressed(int keycode) {
-        return GLFW.glfwGetKey(handle, keycode) == GLFW_PRESS;
     }
 
     public void setTitle(String title) {
         GLFW.glfwSetWindowTitle(handle, title);
         this.title = title;
-    }
-
-    // TODO: refactor, improve and test
-    public boolean isKeyReleased(int keycode) {
-        return GLFW.glfwGetKey(handle, keycode) == GLFW_RELEASE;
     }
 
     public void maximize() {

@@ -22,9 +22,7 @@ public abstract class Application {
     public static void launch(WindowScreen screen) {
         if (!initialized) throw new IllegalStateException("Must call createSingleWindowApplication before launch().");
         window.setScreen(screen);
-        while (!window.windowShouldClose()) {
-            window.update();
-        }
+        window.loop();
         window.free();
     }
     /// TODO: https://stackoverflow.com/questions/14968857/controlling-fps-limit-in-opengl-application

@@ -4,7 +4,9 @@ public abstract class WindowScreen {
 
     public abstract void show();
 
-    public abstract void update(float delta);
+    public abstract void fixedUpdate(float delta);
+
+    public abstract void frameUpdate(float delta);
 
     public abstract void resize(int width, int height);
 
