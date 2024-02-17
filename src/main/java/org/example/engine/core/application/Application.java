@@ -27,7 +27,7 @@ public abstract class Application {
         }
         window.free();
     }
-
+    /// TODO: https://stackoverflow.com/questions/14968857/controlling-fps-limit-in-opengl-application
     // TODO: implement later later later
     public static void createMultiWindowApplication(final ApplicationConfig[] configs, WindowScreen ...screens) {}
 

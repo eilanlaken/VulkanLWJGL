@@ -117,7 +117,7 @@ public class WindowScreenTest_1 extends WindowScreen {
         transform3D.matrix4.rotate(Vector3.Y, 1);
         transform3D.matrix4.rotate(Vector3.X, 1);
 
-        System.out.println(delta);
+        //System.out.println(delta);
     }
 
     @Override

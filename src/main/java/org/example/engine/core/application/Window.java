@@ -2,6 +2,7 @@ package org.example.engine.core.application;
 
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -55,6 +56,13 @@ public class Window implements Resource {
     public int fps;
     private long lastTime;
 
+    private double elapsedTimeNanos;
+    private long currentTimeNanos;
+    private long prevTimeNanos;
+    private long deltaNanos;
+    private double targetFrameTimeNanos;
+    private double desiredFrameRate;
+
     // TODO:
     // https://github.com/LWJGL/lwjgl/blob/master/src/java/org/lwjgl/opengl/Sync.java
 
@@ -65,6 +73,7 @@ public class Window implements Resource {
         this.targetFrameRate = targetFrameRate;
         this.enableVSync = enableVSync;
         this.allowResize = allowResize;
+
     }
 
     public void init() {
@@ -135,7 +144,15 @@ public class Window implements Resource {
     }
 
     public void update() {
+        prevTimeNanos = currentTimeNanos;
+        currentTimeNanos = System.nanoTime();
+        deltaNanos = currentTimeNanos - prevTimeNanos;
+        double deltaSeconds = deltaNanos * 0.000000001;
+        targetFrameTimeNanos = 0.016 * 1000 * 1000;
 
+        long timeToSleep = (long) (targetFrameTimeNanos - deltaNanos) / 1000000L;
+
+        System.out.println(timeToSleep);
 
         // TODO: reset input flags. See if there is a better solution.
 
@@ -175,8 +192,8 @@ public class Window implements Resource {
         // TODO: see star contract Sync
         // http://forum.lwjgl.org/index.php?topic=5653.0
 
-        // TODO: continue from here.
-        WindowSync.sync(5000);
+        // TODO: continue from here. This is causing slowdown.
+        //WindowSync.sync(8000);
 
         GLFW.glfwSwapBuffers(handle);
         GLFW.glfwPollEvents();
