@@ -1,5 +1,6 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.Matrix4;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -9,14 +10,16 @@ import org.lwjgl.opengl.GL30;
 public class Renderer3D {
 
     public final RendererFixedPipelineParamSetter paramSetter;
-    //public final TextureBinder textureBinder;
+    private boolean drawing;
+    private RendererShaderSelector shaderSelector;
 
     public Renderer3D() {
-        //textureBinder = new TextureBinder();
-        paramSetter = new RendererFixedPipelineParamSetter();
+        this.paramSetter = new RendererFixedPipelineParamSetter();
+        this.shaderSelector = new RendererShaderSelector();
+        this.drawing = false;
     }
 
-    public void begin() {
+    public void begin(final Camera camera) {
 
     }
 
@@ -30,11 +33,10 @@ public class Renderer3D {
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
+        // optimize shaders etc.
         shader.bind();
-
-        // TODO: optimize camera binding
-        shader.bindUniform("view", camera.lens.view);
-        shader.bindUniform("projection", camera.lens.projection);
+        shaderSelector.getDefaultShader().bindUniform("view", camera.lens.view);
+        shaderSelector.getDefaultShader().bindUniform("projection", camera.lens.projection);
 
         shader.bindUniform("transform", transform);
         // TODO: optimize material binding
@@ -47,7 +49,11 @@ public class Renderer3D {
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1); // texture coordinates
         GL30.glBindVertexArray(0);
-        shader.unbind();
+        //shader.unbind();
+    }
+
+    private void sort(Array<ModelPart> modelParts) {
+        // minimize: shader switching, camera binding, lights binding, material uniform binding
     }
 
 }

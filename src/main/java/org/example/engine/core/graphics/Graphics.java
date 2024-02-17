@@ -1,6 +1,7 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.application.Window;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 public final class Graphics {
@@ -24,6 +25,26 @@ public final class Graphics {
 
     public static int getMaxTextureSize() {
         return GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
+    }
+
+    public static int getFps() {
+        return window.fps;
+    }
+
+    public static int getTargetFps() {
+        return window.targetFrameRate;
+    }
+
+    public static void setTargetFrameRate(int targetFrameRate) {
+        window.targetFrameRate = targetFrameRate;
+    }
+
+    public static void enableVSync() {
+        GLFW.glfwSwapInterval(1);
+    }
+
+    public static void disableVSync() {
+        GLFW.glfwSwapInterval(0);
     }
 
 }

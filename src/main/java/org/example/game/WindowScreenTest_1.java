@@ -1,6 +1,7 @@
 package org.example.game;
 
 import org.example.engine.components.ComponentTransform3D;
+import org.example.engine.core.application.Application;
 import org.example.engine.core.application.WindowScreen;
 import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
@@ -96,6 +97,8 @@ public class WindowScreenTest_1 extends WindowScreen {
 
         transform3D.matrix4.translate(0,0,-5f);
 
+        renderer3D.begin(camera);
+
     }
 
     @Override
@@ -104,16 +107,17 @@ public class WindowScreenTest_1 extends WindowScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(1,0,0,1);
 
-        Matrix4 transform = transform3D.matrix4;
 
-        renderer3D.begin();
+        renderer3D.begin(camera);
         renderer3D.render(camera, model, transform3D.matrix4, shader);
         renderer3D.end();
 
-        if (Keyboard.isKeyHeld(Keyboard.Key.ANY_KEY)) System.out.println("pressed");
+        //if (Keyboard.isKeyHeld(Keyboard.Key.ANY_KEY)) System.out.println("pressed");
 
         transform3D.matrix4.rotate(Vector3.Y, 1);
         transform3D.matrix4.rotate(Vector3.X, 1);
+
+        System.out.println(delta);
     }
 
     @Override

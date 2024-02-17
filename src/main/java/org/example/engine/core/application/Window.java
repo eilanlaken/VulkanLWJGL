@@ -46,13 +46,13 @@ public class Window implements Resource {
     // current frame
     // delta time
 
-    private int targetFrameRate = 1000;
+    public int targetFrameRate = 1000;
 
     private boolean resetDeltaTime;
     private float deltaTime;
     private long frameStart;
     private int frames;
-    private int fps;
+    public int fps;
     private long lastTime;
 
 
@@ -67,6 +67,7 @@ public class Window implements Resource {
 
     public void init() {
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
+
         GLFWErrorCallback.createPrint(System.err).set();
         if (!GLFW.glfwInit()) throw new RuntimeException("Unable to initialize GLFW.");
 
@@ -117,6 +118,7 @@ public class Window implements Resource {
         GLFW.glfwShowWindow(handle);
         GL.createCapabilities();
 
+
         // TODO: refactor out
         // TODO: see what is up
 //        GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -131,52 +133,52 @@ public class Window implements Resource {
     }
 
     public void update() {
-        GLFW.glfwSwapBuffers(handle);
-        // TODO: see what's up. Refactor as needed.
-        // "this is what tells OpenGL to render anything in the render queue"
-        GLFW.glfwPollEvents();
+
 
         // TODO: reset input flags. See if there is a better solution.
 
-        long time;
-        if (this.resetDeltaTime) {
-            this.resetDeltaTime = false;
-            time = this.lastTime;
-        } else {
-            time = System.nanoTime();
-        }
+//        long time;
+//        if (this.resetDeltaTime) {
+//            this.resetDeltaTime = false;
+//            time = this.lastTime;
+//        } else {
+//            time = System.nanoTime();
+//        }
+//
+//        this.deltaTime = (float)(time - this.lastTime) / 1.0E9F;
+//        this.lastTime = time;
+//        if (time - this.frameStart >= 1000000000L) {
+//            this.fps = this.frames;
+//            this.frames = 0;
+//            this.frameStart = time;
+//        }
+//
+//        this.frames++;
+//
+//        // limit frame rate.
+//        final double targetFPS = 144.0;
+//        final double targetFrameTime = 1.0 / targetFPS;
+//        double frameStartTime = glfwGetTime();
+//        double frameEndTime = GLFW.glfwGetTime();
+//        double frameDuration = frameEndTime - frameStartTime;
+//        double sleepTime = targetFrameTime - frameDuration;
+//        if (sleepTime > 0) {
+//            try {
+//                Thread.sleep((long) (sleepTime * 1000));
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+//        }
 
-        this.deltaTime = (float)(time - this.lastTime) / 1.0E9F;
-        this.lastTime = time;
-        if (time - this.frameStart >= 1000000000L) {
-            this.fps = this.frames;
-            this.frames = 0;
-            this.frameStart = time;
-        }
-
-        this.frames++;
+        // TODO: see star contract Sync
+        // http://forum.lwjgl.org/index.php?topic=5653.0
 
 
-        if (this.screen != null) screen.update(deltaTime);
-
-        // limit frame rate.
-        final double targetFPS = 144.0;
-        final double targetFrameTime = 1.0 / targetFPS;
-        double frameStartTime = glfwGetTime();
-        double frameEndTime = GLFW.glfwGetTime();
-        double frameDuration = frameEndTime - frameStartTime;
-        double sleepTime = targetFrameTime - frameDuration;
-        if (sleepTime > 0) {
-            try {
-                Thread.sleep((long) (sleepTime * 1000));
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-
+        GLFW.glfwSwapBuffers(handle);
+        GLFW.glfwPollEvents();
         Mouse.resetInternalState();
         Keyboard.resetInternalState();
-
+        if (this.screen != null) screen.update(deltaTime);
     }
 
     public void setScreen(WindowScreen screen) {
@@ -186,16 +188,6 @@ public class Window implements Resource {
         this.screen = screen;
         this.screen.show();
     }
-
-    public void setTargetFrameRate(int frameRate) {
-        this.targetFrameRate = frameRate;
-    }
-
-    public int getTargetFrameRate() {
-        return targetFrameRate;
-    }
-
-
     public void closeWindow() {
         GLFW.glfwSetWindowShouldClose(handle, true);
         if (screen != null) screen.hide();
