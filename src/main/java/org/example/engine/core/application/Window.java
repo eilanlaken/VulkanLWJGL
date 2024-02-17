@@ -55,6 +55,8 @@ public class Window implements Resource {
     public int fps;
     private long lastTime;
 
+    // TODO:
+    // https://github.com/LWJGL/lwjgl/blob/master/src/java/org/lwjgl/opengl/Sync.java
 
     public Window(String title, int width, int height, int targetFrameRate, boolean enableVSync, boolean allowResize) {
         this.title = title;
