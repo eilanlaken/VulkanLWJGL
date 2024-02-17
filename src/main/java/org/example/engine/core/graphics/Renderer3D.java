@@ -31,10 +31,14 @@ public class Renderer3D {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         shader.bind();
-        shader.bindUniforms(model.get_material_debug());
+
+        // TODO: optimize camera binding
         shader.bindUniform("transform", transform);
         shader.bindUniform("view", camera.lens.view);
         shader.bindUniform("projection", camera.lens.projection);
+
+        // TODO: optimize material binding
+        shader.bindUniforms(model.get_material_debug());
 
         GL30.glBindVertexArray(model.vaoId);
         GL20.glEnableVertexAttribArray(0); // positions
