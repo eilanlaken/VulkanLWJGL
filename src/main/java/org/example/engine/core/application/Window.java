@@ -175,6 +175,8 @@ public class Window implements Resource {
         // TODO: see star contract Sync
         // http://forum.lwjgl.org/index.php?topic=5653.0
 
+        // TODO: continue from here.
+        WindowSync.sync(5000);
 
         GLFW.glfwSwapBuffers(handle);
         GLFW.glfwPollEvents();
