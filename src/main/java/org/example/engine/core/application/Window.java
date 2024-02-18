@@ -72,6 +72,7 @@ public class Window implements Resource {
         GLFW.glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
            this.width = width;
            this.height = height;
+           screen.resize(width, height);
         });
 
         GLFW.glfwMakeContextCurrent(handle);
@@ -115,18 +116,14 @@ public class Window implements Resource {
             Keyboard.resetInternalState();
             GLFW.glfwPollEvents();
 
-            // TODO: I don't know why and if it works.
-            if (enableVSync) {
+            // TODO: vsync does not work. Why?
+            while (lag >= fixedUpdateTimeInterval) {
                 screen.fixedUpdate(fixedUpdateTimeInterval);
-            } else {
-                while (lag >= fixedUpdateTimeInterval) {
-                    screen.fixedUpdate(fixedUpdateTimeInterval);
-                    lag -= fixedUpdateTimeInterval;
-                }
+                lag -= fixedUpdateTimeInterval;
             }
+
             screen.frameUpdate(elapsedTime);
             GLFW.glfwSwapBuffers(handle);
-
         }
     }
 
