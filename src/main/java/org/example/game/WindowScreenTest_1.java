@@ -7,6 +7,7 @@ import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.input.Mouse;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
 import org.lwjgl.opengl.GL11;
@@ -107,12 +108,12 @@ public class WindowScreenTest_1 extends WindowScreen {
         renderer3D.render(camera, model, transform3D.matrix4, shader);
         renderer3D.end();
 
-        if (Keyboard.isKeyPressed(Keyboard.Key.K)) System.out.println("pressed");
+        if (Mouse.isButtonPressed(Mouse.Button.LEFT)) System.out.println("pressed");
     }
 
     @Override
     public void fixedUpdate(float delta) {
-        float angularSpeed = 35; // degrees per second
+        float angularSpeed = 335; // degrees per second
         transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
 
     }
