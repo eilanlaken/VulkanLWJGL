@@ -2,7 +2,11 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.application.Window;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
 
@@ -17,6 +21,18 @@ public final class Graphics {
         initialized = true;
     }
 
+    public static int getMonitorWidth() {
+        return GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor()).width();
+    }
+
+    public static int getMonitorHeight() {
+        return GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor()).height();
+    }
+
+    public static void setWindowPosition(int x, int y) {
+        GLFW.glfwSetWindowPos(window.getHandle(), x, y);
+    }
+
     public static int getWindowHeight() {
         return window.width;
     }
@@ -29,17 +45,10 @@ public final class Graphics {
         return GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
     }
 
-    // TODO
-    public static int getFps() {
-        return 0;
-    }
-
-    // TODO
     public static int getTargetFps() {
-        return 0;
+        return window.getTargetFps();
     }
 
-    // TODO
     public static void setTargetFrameRate(int targetFps) {
         window.setTargetFps(targetFps);
     }

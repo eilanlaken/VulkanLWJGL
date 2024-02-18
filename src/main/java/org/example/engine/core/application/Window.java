@@ -51,15 +51,12 @@ public class Window implements Resource {
         this.targetFps = targetFps;
         this.enableVSync = enableVSync;
         this.allowResize = allowResize;
-
     }
 
     public void init() {
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-
         GLFWErrorCallback.createPrint(System.err).set();
         if (!GLFW.glfwInit()) throw new RuntimeException("Unable to initialize GLFW.");
-
         GLFW.glfwDefaultWindowHints();
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
         GLFW.glfwWindowHint(GLFW_RESIZABLE, allowResize ? GLFW.GLFW_TRUE : GLFW_FALSE);
@@ -89,8 +86,6 @@ public class Window implements Resource {
         GLFW.glfwMakeContextCurrent(handle);
         GLFW.glfwSwapInterval(enableVSync ? 1 : 0);
         GLFW.glfwShowWindow(handle);
-
-        // anti aliasing
         GL.createCapabilities();
 
 
@@ -161,6 +156,10 @@ public class Window implements Resource {
     public void maximize() {
         // see how it works
         //GLFW.glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+    }
+
+    public void setWindowPosition(int x, int y) {
+
     }
 
     @Override
