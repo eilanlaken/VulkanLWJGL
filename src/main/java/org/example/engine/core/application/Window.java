@@ -115,15 +115,14 @@ public class Window implements Resource {
             Mouse.resetInternalState();
             Keyboard.resetInternalState();
             GLFW.glfwPollEvents();
+            screen.frameUpdate(elapsedTime);
+            GLFW.glfwSwapBuffers(handle);
 
             // TODO: vsync does not work. Why?
             while (lag >= fixedUpdateTimeInterval) {
                 screen.fixedUpdate(fixedUpdateTimeInterval);
                 lag -= fixedUpdateTimeInterval;
             }
-
-            screen.frameUpdate(elapsedTime);
-            GLFW.glfwSwapBuffers(handle);
         }
     }
 
