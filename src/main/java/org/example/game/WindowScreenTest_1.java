@@ -106,6 +106,8 @@ public class WindowScreenTest_1 extends WindowScreen {
         renderer3D.begin(camera);
         renderer3D.render(camera, model, transform3D.matrix4, shader);
         renderer3D.end();
+
+        System.out.println(Keyboard.isKeyPressed(Keyboard.Key.K));
     }
 
     @Override
@@ -117,7 +119,7 @@ public class WindowScreenTest_1 extends WindowScreen {
 
     @Override
     public void resize(int width, int height) {
-
+        System.out.println("Resized called.");
     }
 
     @Override

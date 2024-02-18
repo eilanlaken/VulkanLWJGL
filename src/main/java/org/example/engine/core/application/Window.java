@@ -74,15 +74,6 @@ public class Window implements Resource {
            this.height = height;
         });
 
-        // TODO: make that you can set custom position in config.
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer pWidth = stack.mallocInt(1);
-            IntBuffer pHeight = stack.mallocInt(1);
-            GLFW.glfwGetWindowSize(handle, pWidth, pHeight);
-            GLFWVidMode vidMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-            GLFW.glfwSetWindowPos(handle, (vidMode.width() - pWidth.get(0)) / 2, (vidMode.height() - pHeight.get(0)) / 2);
-        }
-
         GLFW.glfwMakeContextCurrent(handle);
         GLFW.glfwSwapInterval(enableVSync ? 1 : 0);
         GLFW.glfwShowWindow(handle);
@@ -124,13 +115,18 @@ public class Window implements Resource {
             Keyboard.resetInternalState();
             GLFW.glfwPollEvents();
 
-            while (lag >= fixedUpdateTimeInterval) {
-                if (this.screen != null) screen.fixedUpdate(fixedUpdateTimeInterval);
-                lag -= fixedUpdateTimeInterval;
+            // TODO: I don't know why and if it works.
+            if (enableVSync) {
+                screen.fixedUpdate(fixedUpdateTimeInterval);
+            } else {
+                while (lag >= fixedUpdateTimeInterval) {
+                    screen.fixedUpdate(fixedUpdateTimeInterval);
+                    lag -= fixedUpdateTimeInterval;
+                }
             }
-
-            if (this.screen != null) screen.frameUpdate(elapsedTime);
+            screen.frameUpdate(elapsedTime);
             GLFW.glfwSwapBuffers(handle);
+
         }
     }
 

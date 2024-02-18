@@ -60,8 +60,9 @@ public class Keyboard {
     }
 
     public static boolean isKeyJustPressed(final Key key) {
+        System.out.println(keysJustPressed);
         if (key == Key.ANY_KEY) return keysJustPressed.size > 0;
-        return keysCurrentState[key.glfwCode] == GLFW.GLFW_RELEASE && (keysPrevState[key.glfwCode] == GLFW.GLFW_PRESS || keysPrevState[key.glfwCode] == GLFW.GLFW_REPEAT);
+        else return keysJustPressed.contains(key.glfwCode);
     }
 
     public static boolean isKeyHeld(final Key key) {
