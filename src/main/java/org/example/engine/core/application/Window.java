@@ -104,6 +104,7 @@ public class Window implements Resource {
     public void loop() {
         float previousTime = (float) GLFW.glfwGetTime();
         float lag = 0;
+        float totalTime = 0;
 
         while (!shouldClose()) {
             float fixedUpdateTimeInterval = 1.0f / targetFps; // in seconds
@@ -111,18 +112,20 @@ public class Window implements Resource {
             float elapsedTime = currentTime - previousTime;
             lag += elapsedTime;
             previousTime = currentTime;
+            totalTime += elapsedTime;
 
             Mouse.resetInternalState();
             Keyboard.resetInternalState();
             GLFW.glfwPollEvents();
-            screen.frameUpdate(elapsedTime);
-            GLFW.glfwSwapBuffers(handle);
 
-            // TODO: vsync does not work. Why?
+            // TODO: vsync does not work on laptop + intel HD integrated GPU.
             while (lag >= fixedUpdateTimeInterval) {
                 screen.fixedUpdate(fixedUpdateTimeInterval);
                 lag -= fixedUpdateTimeInterval;
             }
+
+            screen.frameUpdate(elapsedTime);
+            GLFW.glfwSwapBuffers(handle);
         }
     }
 

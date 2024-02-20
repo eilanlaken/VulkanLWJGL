@@ -113,7 +113,7 @@ public class WindowScreenTest_1 extends WindowScreen {
 
     @Override
     public void fixedUpdate(float delta) {
-        float angularSpeed = 335; // degrees per second
+        float angularSpeed = 200; // degrees per second
         transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
 
     }
