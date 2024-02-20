@@ -1,14 +1,11 @@
 package org.example.game;
 
 import org.example.engine.components.ComponentTransform3D;
-import org.example.engine.core.application.Application;
 import org.example.engine.core.application.WindowScreen;
 import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
-import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
 import org.lwjgl.opengl.GL11;
 
@@ -104,8 +101,9 @@ public class WindowScreenTest_1 extends WindowScreen {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(1,0,0,1);
-        renderer3D.begin(camera);
-        renderer3D.render(camera, model, transform3D.matrix4, shader);
+        renderer3D.begin(shader);
+        renderer3D.setCamera(camera);
+        renderer3D.draw(model, transform3D.matrix4);
         renderer3D.end();
 
         if (Mouse.isButtonPressed(Mouse.Button.LEFT)) System.out.println("pressed");
