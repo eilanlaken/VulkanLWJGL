@@ -1,15 +1,6 @@
 package org.example.engine.core.files;
 
-public class AssetLoader {
-
-    public void load() {
-
-    }
-
-    public void update() {
-
-    }
-
-
+public abstract class AssetLoader<T> {
+    public abstract T load(final String path);
 
 }

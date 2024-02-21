@@ -5,32 +5,21 @@ import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL30;
 
-import java.util.HashMap;
-
 public class Model implements Resource {
 
-    // TODO: refactor into parts etc.
     public final int vaoId;
-    ArrayInt vbos;
+    public final ArrayInt vbos;
     public final int vertexCount;
+    public final Array<ModelPart> parts;
+    public final ModelArmature armature;
 
-    // TODO: refactor into material etc.
-    public Texture texture;
-
-    public Model(final int vaoId, final int vertexCount, @Deprecated final int... vbos) {
+    public Model(int vaoId, ArrayInt vbos, int vertexCount, Array<ModelPart> parts, ModelArmature armature) {
         this.vaoId = vaoId;
+        this.vbos = vbos;
         this.vertexCount = vertexCount;
-
-        // TODO: see how to deprecate
-        this.vbos = new ArrayInt();
-        for (int vbo : vbos) {
-            this.vbos.add(vbo);
-        }
+        this.parts = parts;
+        this.armature = armature;
     }
-
-    // later, TODO.
-    public Array<ModelPart> parts;
-    public ModelArmature armature;
 
     @Override
     public void free() {
@@ -38,11 +27,5 @@ public class Model implements Resource {
         for (int vbo : vbos.items) {
             GL30.glDeleteBuffers(vbo);
         }
-    }
-
-    public HashMap<String, Object> get_material_debug() {
-        HashMap<String, Object> uniforms = new HashMap<>();
-        uniforms.put("texture0", texture);
-        return uniforms;
     }
 }

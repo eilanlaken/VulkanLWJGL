@@ -12,20 +12,18 @@ import org.lwjgl.opengl.GL11;
 public class WindowScreenTest_1 extends WindowScreen {
 
     // TODO: refactor to use assetLoader.load() etc
-    AssetLoaderTexture assetLoaderTexture;
+    AssetLoaderTexture assetLoaderTextures;
 
     private Renderer3D renderer3D;
-    private ModelBuilder modelBuilder;
-    private Model model;
+    private Model_old modelOld;
     private Texture texture;
     private ShaderProgram shader;
     private ComponentTransform3D transform3D;
     private Camera camera;
 
     public WindowScreenTest_1() {
-        this.assetLoaderTexture = new AssetLoaderTexture();
+        this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
-        this.modelBuilder = new ModelBuilder();
         final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/vertex.glsl");
         final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/fragment.glsl");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
@@ -58,6 +56,7 @@ public class WindowScreenTest_1 extends WindowScreen {
                 -0.5f, -0.5f, 0.5f,
                 0.5f, -0.5f, 0.5f,
         };
+
         float[] textureCoordinates = new float[]{
                 0.0f, 0.0f,
                 0.0f, 0.5f,
@@ -80,6 +79,7 @@ public class WindowScreenTest_1 extends WindowScreen {
                 0.5f, 0.5f,
                 1.0f, 0.5f,
         };
+
         int[] indices = new int[]{
                 0, 1, 3, 3, 1, 2,
                 8, 10, 11, 9, 8, 11,
@@ -89,9 +89,9 @@ public class WindowScreenTest_1 extends WindowScreen {
                 4, 6, 7, 5, 4, 7,
         };
 
-        model = modelBuilder.build(positions, textureCoordinates, indices);
-        texture = assetLoaderTexture.load("assets/textures/yellowSquare.png");
-        model.texture = texture;
+        modelOld = ModelBuilder.build(positions, textureCoordinates, indices);
+        texture = assetLoaderTextures.load("assets/textures/yellowSquare.png");
+        modelOld.texture = texture;
 
         transform3D.matrix4.translate(0,0,-5f);
     }
@@ -103,7 +103,7 @@ public class WindowScreenTest_1 extends WindowScreen {
         GL11.glClearColor(1,0,0,1);
         renderer3D.begin(shader);
         renderer3D.setCamera(camera);
-        renderer3D.draw(model, transform3D.matrix4);
+        renderer3D.draw(modelOld, transform3D.matrix4);
         renderer3D.end();
 
         if (Mouse.isButtonPressed(Mouse.Button.LEFT)) System.out.println("pressed");
@@ -135,7 +135,7 @@ public class WindowScreenTest_1 extends WindowScreen {
 
     @Override
     public void hide() {
-        model.free();
+        modelOld.free();
         shader.free();
     }
 }

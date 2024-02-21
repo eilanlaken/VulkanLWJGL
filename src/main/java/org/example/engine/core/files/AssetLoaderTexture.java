@@ -9,7 +9,7 @@ import org.lwjgl.system.MemoryStack;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-public class AssetLoaderTexture {
+public class AssetLoaderTexture extends AssetLoader<Texture> {
 
     public final int maxTextureSize;
 
@@ -17,6 +17,7 @@ public class AssetLoaderTexture {
         maxTextureSize = Graphics.getMaxTextureSize();
     }
 
+    @Override
     public Texture load(final String path) {
         int width;
         int height;
@@ -49,5 +50,4 @@ public class AssetLoaderTexture {
         STBImage.stbi_image_free(buffer);
         return texture;
     }
-
 }

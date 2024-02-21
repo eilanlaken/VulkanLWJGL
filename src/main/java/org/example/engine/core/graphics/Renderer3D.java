@@ -35,13 +35,13 @@ public class Renderer3D {
     }
 
     // TODO: refactor to ModelPart, which is the basic rendering unit.
-    public void draw(final Model model, final Matrix4 transform) {
+    public void draw(final Model_old modelOld, final Matrix4 transform) {
         currentShader.bindUniform("transform", transform);
-        currentShader.bindUniforms(model.get_material_debug());
-        GL30.glBindVertexArray(model.vaoId);
+        currentShader.bindUniforms(modelOld.get_material_debug());
+        GL30.glBindVertexArray(modelOld.vaoId);
         GL20.glEnableVertexAttribArray(0); // positions
         GL20.glEnableVertexAttribArray(1); // texture coordinates
-        GL11.glDrawElements(GL11.GL_TRIANGLES, model.vertexCount, GL11.GL_UNSIGNED_INT, 0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, modelOld.vertexCount, GL11.GL_UNSIGNED_INT, 0);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1); // texture coordinates
         GL30.glBindVertexArray(0);
@@ -52,7 +52,7 @@ public class Renderer3D {
     }
 
     // TODO: maybe replace camera directly with the projection and transform of the lens.
-    @Deprecated public void render(final Camera camera, final Model model, final Matrix4 transform, ShaderProgram shader) {
+    @Deprecated public void render(final Camera camera, final Model_old modelOld, final Matrix4 transform, ShaderProgram shader) {
         // TODO: move to render context.
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -64,12 +64,12 @@ public class Renderer3D {
 
         shader.bindUniform("transform", transform);
         // TODO: optimize material binding
-        shader.bindUniforms(model.get_material_debug());
+        shader.bindUniforms(modelOld.get_material_debug());
 
-        GL30.glBindVertexArray(model.vaoId);
+        GL30.glBindVertexArray(modelOld.vaoId);
         GL20.glEnableVertexAttribArray(0); // positions
         GL20.glEnableVertexAttribArray(1); // texture coordinates
-        GL11.glDrawElements(GL11.GL_TRIANGLES, model.vertexCount, GL11.GL_UNSIGNED_INT, 0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, modelOld.vertexCount, GL11.GL_UNSIGNED_INT, 0);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1); // texture coordinates
         GL30.glBindVertexArray(0);

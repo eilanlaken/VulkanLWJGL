@@ -16,7 +16,7 @@ public class RendererShaderSelector {
     public ShaderProgram getDefaultShader() {
         return defaultShader;
     }
-    public ShaderProgram get(final Model model) {
+    public ShaderProgram get(final Model_old modelOld) {
         return null;
     }
 
