@@ -104,7 +104,6 @@ public class Window implements Resource {
     public void loop() {
         float previousTime = (float) GLFW.glfwGetTime();
         float lag = 0;
-        float totalTime = 0;
 
         while (!shouldClose()) {
             float fixedUpdateTimeInterval = 1.0f / targetFps; // in seconds
@@ -112,7 +111,6 @@ public class Window implements Resource {
             float elapsedTime = currentTime - previousTime;
             lag += elapsedTime;
             previousTime = currentTime;
-            totalTime += elapsedTime;
 
             Mouse.resetInternalState();
             Keyboard.resetInternalState();

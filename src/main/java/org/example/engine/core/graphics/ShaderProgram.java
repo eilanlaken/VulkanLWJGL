@@ -2,7 +2,9 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.math.Matrix4;
+import org.example.engine.core.math.Quaternion;
 import org.example.engine.core.math.Vector3;
+import org.example.engine.core.math.Vector4;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -162,6 +164,20 @@ public class ShaderProgram implements Resource {
                 Vector3 vector3 = (Vector3) value;
                 GL20.glUniform3f(location, vector3.x, vector3.y, vector3.z);
                 break;
+            case GL20.GL_FLOAT_VEC4:
+                if (value instanceof Color) {
+                    Color color = (Color) value;
+                    GL20.glUniform4f(location, color.r, color.g, color.b, color.a);
+                    break;
+                } else if (value instanceof Vector4) {
+                    Vector4 vector4 = (Vector4) value;
+                    GL20.glUniform4f(location, vector4.x, vector4.y, vector4.z, vector4.w);
+                    break;
+                } else if (value instanceof Quaternion) {
+                    Quaternion quaternion = (Quaternion) value;
+                    GL20.glUniform4f(location, quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+                    break;
+                }
         }
     }
 
