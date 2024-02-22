@@ -7,10 +7,10 @@ import org.example.engine.core.input.Mouse;
 public abstract class Application {
 
     private static boolean initialized = false;
-    private static Window window;
+    private static Window_glfw window;
 
     public static void createSingleWindowApplication(final ApplicationConfig config) {
-        window = new Window(config.windowTitle, config.windowWidth, config.windowHeight, config.targetFps, config.vSyncEnabled, config.allowWindowResize);
+        window = new Window_glfw(config.windowTitle, config.windowWidth, config.windowHeight, config.targetFps, config.vSyncEnabled, config.allowWindowResize);
         window.init();
         GraphicsUtils.init(window);
         Mouse.init(window);
