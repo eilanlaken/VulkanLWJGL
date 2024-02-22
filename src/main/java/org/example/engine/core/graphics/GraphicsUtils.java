@@ -2,22 +2,18 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.application.Window;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.system.MemoryStack;
-
-import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
 
-public final class Graphics {
+public final class GraphicsUtils {
 
     private static boolean initialized = false;
     private static Window window;
 
     public static void init(final Window window) {
-        if (initialized) throw new IllegalStateException(Graphics.class.getSimpleName() + " instance already initialized.");
-        Graphics.window = window;
+        if (initialized) throw new IllegalStateException(GraphicsUtils.class.getSimpleName() + " instance already initialized.");
+        GraphicsUtils.window = window;
         initialized = true;
     }
 

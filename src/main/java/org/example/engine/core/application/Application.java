@@ -1,6 +1,6 @@
 package org.example.engine.core.application;
 
-import org.example.engine.core.graphics.Graphics;
+import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
 
@@ -12,7 +12,7 @@ public abstract class Application {
     public static void createSingleWindowApplication(final ApplicationConfig config) {
         window = new Window(config.windowTitle, config.windowWidth, config.windowHeight, config.targetFps, config.vSyncEnabled, config.allowWindowResize);
         window.init();
-        Graphics.init(window);
+        GraphicsUtils.init(window);
         Mouse.init(window);
         Keyboard.init(window);
 
