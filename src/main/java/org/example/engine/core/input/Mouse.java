@@ -1,11 +1,11 @@
 package org.example.engine.core.input;
 
-import org.example.engine.core.application.Window_glfw;
+import org.example.engine.core.application.Window;
 import org.lwjgl.glfw.*;
 
 public class Mouse {
 
-    private static Window_glfw window;
+    private static Window window;
     private static boolean initialized = false;
     private static float sensitivity = 1f; // goes from 0 to infinity. Default is 1.
     private static int prevCursorX;
@@ -21,7 +21,7 @@ public class Mouse {
     private static int[] mouseButtonsPrevStates = new int[5];
     private static int[] mouseButtonsCurrentStates = new int[5];
 
-    public static void init(Window_glfw window) {
+    public static void init(Window window) {
         if (initialized) throw new IllegalStateException("Device input " + Mouse.class.getSimpleName() + " already initialized.");
         Mouse.window = window;
 

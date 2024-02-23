@@ -1,6 +1,6 @@
 package org.example.engine.core.input;
 
-import org.example.engine.core.application.Window_glfw;
+import org.example.engine.core.application.Window;
 import org.example.engine.core.collections.ArrayInt;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -15,7 +15,7 @@ public class Keyboard {
     private static ArrayInt keysHeld = new ArrayInt(12);
     private static ArrayInt keysJustPressed = new ArrayInt(12);
 
-    public static void init(Window_glfw window) {
+    public static void init(Window window) {
         if (initialized)
             throw new IllegalStateException("Device input " + Keyboard.class.getSimpleName() + " already initialized.");
 

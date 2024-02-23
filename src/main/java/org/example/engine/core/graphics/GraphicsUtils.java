@@ -1,6 +1,6 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.application.Window_glfw;
+import org.example.engine.core.application.Window;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -9,9 +9,9 @@ import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
 public final class GraphicsUtils {
 
     private static boolean initialized = false;
-    private static Window_glfw window;
+    private static Window window;
 
-    public static void init(final Window_glfw window) {
+    public static void init(final Window window) {
         if (initialized) throw new IllegalStateException(GraphicsUtils.class.getSimpleName() + " instance already initialized.");
         GraphicsUtils.window = window;
         initialized = true;
