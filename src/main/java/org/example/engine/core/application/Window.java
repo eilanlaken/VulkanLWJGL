@@ -37,6 +37,12 @@ public class Window implements Resource {
     private WindowScreen screen;
     private int targetFps;
 
+    // debug
+    // TODO: this (kinda) solves the vsync issue. Just set the render skip interval according to the targetFps;
+    private boolean toRender = true;
+    private int renderSkip = 0;
+    private int renderCount = 0;
+
     // TODO:
     // https://github.com/LWJGL/lwjgl/blob/master/src/java/org/lwjgl/opengl/Sync.java
 
@@ -99,125 +105,7 @@ public class Window implements Resource {
     }
 
     // TODO: look at the main loop in the libGDX lwjgl-backend:
-    // LwjglApplication.java:
-    /**
-     *
-     * protected void mainLoop () {
-     * 		SnapshotArray<LifecycleListener> lifecycleListeners = this.lifecycleListeners;
-     *
-     * 		try {
-     * 			graphics.setupDisplay();
-     *                } catch (LWJGLException e) {
-     * 			throw new GdxRuntimeException(e);
-     *        }
-     *
-     * 		listener.create();
-     * 		graphics.resize = true;
-     *
-     * 		int lastWidth = graphics.getWidth();
-     * 		int lastHeight = graphics.getHeight();
-     *
-     * 		graphics.lastTime = System.nanoTime();
-     * 		boolean wasPaused = false;
-     * 		while (running) {
-     * 			Display.processMessages();
-     * 			if (Display.isCloseRequested()) exit();
-     *
-     * 			boolean isMinimized = graphics.config.pauseWhenMinimized && !Display.isVisible();
-     * 			boolean isBackground = !Display.isActive();
-     * 			boolean paused = isMinimized || (isBackground && graphics.config.pauseWhenBackground);
-     * 			if (!wasPaused && paused) { // just been minimized
-     * 				wasPaused = true;
-     * 				synchronized (lifecycleListeners) {
-     * 					LifecycleListener[] listeners = lifecycleListeners.begin();
-     * 					for (int i = 0, n = lifecycleListeners.size; i < n; ++i)
-     * 						listeners[i].pause();
-     * 					lifecycleListeners.end();
-     *                }
-     * 				listener.pause();
-     *            }
-     * 			if (wasPaused && !paused) { // just been restore from being minimized
-     * 				wasPaused = false;
-     * 				synchronized (lifecycleListeners) {
-     * 					LifecycleListener[] listeners = lifecycleListeners.begin();
-     * 					for (int i = 0, n = lifecycleListeners.size; i < n; ++i)
-     * 						listeners[i].resume();
-     * 					lifecycleListeners.end();
-     *                }
-     * 				listener.resume();
-     *            }
-     *
-     * 			boolean shouldRender = false;
-     *
-     * 			if (graphics.canvas != null) {
-     * 				int width = graphics.canvas.getWidth();
-     * 				int height = graphics.canvas.getHeight();
-     * 				if (lastWidth != width || lastHeight != height) {
-     * 					lastWidth = width;
-     * 					lastHeight = height;
-     * 					Gdx.gl.glViewport(0, 0, lastWidth, lastHeight);
-     * 					listener.resize(lastWidth, lastHeight);
-     * 					shouldRender = true;
-     *                }
-     *            } else {
-     * 				graphics.config.x = Display.getX();
-     * 				graphics.config.y = Display.getY();
-     * 				if (graphics.resize || Display.wasResized()
-     * 					|| (int)(Display.getWidth() * Display.getPixelScaleFactor()) != graphics.config.width
-     * 					|| (int)(Display.getHeight() * Display.getPixelScaleFactor()) != graphics.config.height) {
-     * 					graphics.resize = false;
-     * 					graphics.config.width = (int)(Display.getWidth() * Display.getPixelScaleFactor());
-     * 					graphics.config.height = (int)(Display.getHeight() * Display.getPixelScaleFactor());
-     * 					Gdx.gl.glViewport(0, 0, graphics.config.width, graphics.config.height);
-     * 					if (listener != null) listener.resize(graphics.config.width, graphics.config.height);
-     * 					shouldRender = true;
-     *                }
-     *            }
-     *
-     * 			if (executeRunnables()) shouldRender = true;
-     *
-     * 			// If one of the runnables set running to false, for example after an exit().
-     * 			if (!running) break;
-     *
-     * 			input.update();
-     * 			if (graphics.shouldRender()) shouldRender = true;
-     * 			input.processEvents();
-     * 			if (audio != null) audio.update();
-     *
-     * 			if (isMinimized)
-     * 				shouldRender = false;
-     * 			else if (isBackground && graphics.config.backgroundFPS == -1) //
-     * 				shouldRender = false;
-     *
-     * 			int frameRate = isBackground ? graphics.config.backgroundFPS : graphics.config.foregroundFPS;
-     * 			if (shouldRender) {
-     * 				graphics.updateTime();
-     * 				graphics.frameId++;
-     * 				listener.render();
-     * 				Display.update(false);
-     *            } else {
-     * 				// Sleeps to avoid wasting CPU in an empty loop.
-     * 				if (frameRate == -1) frameRate = 10;
-     * 				if (frameRate == 0) frameRate = graphics.config.backgroundFPS;
-     * 				if (frameRate == 0) frameRate = 30;
-     *            }
-     * 			if (frameRate > 0) Display.sync(frameRate);
-     *        }
-     *
-     * 		synchronized (lifecycleListeners) {
-     * 			LifecycleListener[] listeners = lifecycleListeners.begin();
-     * 			for (int i = 0, n = lifecycleListeners.size; i < n; ++i) {
-     * 				listeners[i].pause();
-     * 				listeners[i].dispose();
-     *            }
-     * 			lifecycleListeners.end();
-     *        }
-     * 		listener.pause();
-     * 		listener.dispose();
-     * 		Display.destroy();
-     * 		if (audio != null) audio.dispose();
-     * 		if (graphics.config.forceExit) System.exit(-1);* 	}
-     */
+    // TODO: LwjglApplication.java: protected void mainLoop ()
 
     public void loop() {
         float previousTime = (float) GLFW.glfwGetTime();
@@ -241,8 +129,15 @@ public class Window implements Resource {
             }
 
             // TODO: FIX lags if not rendering even repeating frames.
-            screen.frameUpdate(elapsedTime);
-            GLFW.glfwSwapBuffers(handle);
+            if (renderSkip == 0) {
+                screen.frameUpdate(elapsedTime);
+                GLFW.glfwSwapBuffers(handle);
+                renderCount++;
+            }
+            toRender = !toRender;
+            renderSkip++;
+            renderSkip %= 10;
+            System.out.println(renderSkip == 0 ? "render" : "----");
         }
     }
 
