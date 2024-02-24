@@ -31,11 +31,12 @@ public class Window implements Resource {
     private String title;
     public int width;
     public int height;
-    private boolean enableVSync;
+    private boolean vsyncEnabled;
     private boolean allowResize;
     private GLFWErrorCallback errorCallback;
     private WindowScreen screen;
     private int targetFps;
+    private int fps;
 
     // debug
     // TODO: this (kinda) solves the vsync issue. Just set the render skip interval according to the targetFps;
@@ -51,7 +52,7 @@ public class Window implements Resource {
         this.width = width;
         this.height = height;
         this.targetFps = targetFps;
-        this.enableVSync = enableVSync;
+        this.vsyncEnabled = enableVSync;
         this.allowResize = allowResize;
     }
 
@@ -79,7 +80,7 @@ public class Window implements Resource {
 
         GLFW.glfwMakeContextCurrent(handle);
         // TODO: fix
-        GLFW.glfwSwapInterval(enableVSync ? 1 : 0);
+        GLFW.glfwSwapInterval(vsyncEnabled ? 1 : 0);
         GLFW.glfwShowWindow(handle);
         GL.createCapabilities();
 
@@ -90,6 +91,10 @@ public class Window implements Resource {
 //        GL11.glEnable(GL11.GL_STENCIL_TEST);
 //        GL11.glEnable(GL11.GL_CULL_FACE);
 //        GL11.glCullFace(GL11.GL_BACK);
+    }
+
+    public int getFps() {
+        return fps;
     }
 
     public int getTargetFps() {
@@ -104,19 +109,35 @@ public class Window implements Resource {
         return handle;
     }
 
+    // TODO: implement
+    public void enableVSync() {
+
+    }
+
+    // TODO: implement
+    public void disableVSync() {
+
+    }
+
+    public boolean isVSyncEnabled() {
+        return vsyncEnabled;
+    }
+
     // TODO: look at the main loop in the libGDX lwjgl-backend:
     // TODO: LwjglApplication.java: protected void mainLoop ()
-
     public void loop() {
-        float previousTime = (float) GLFW.glfwGetTime();
+        float previousTime;
+        float currentTime = (float) GLFW.glfwGetTime();
         float lag = 0;
 
         while (!shouldClose()) {
             float fixedUpdateTimeInterval = 1.0f / targetFps; // in seconds
-            float currentTime = (float) GLFW.glfwGetTime();
-            float elapsedTime = currentTime - previousTime;
-            lag += elapsedTime;
             previousTime = currentTime;
+            currentTime = (float) GLFW.glfwGetTime();
+            float elapsedTime = currentTime - previousTime;
+            this.fps = (int) (1f / elapsedTime);
+            lag += elapsedTime;
+            totalTime += elapsedTime;
 
             Mouse.resetInternalState();
             Keyboard.resetInternalState();
@@ -129,15 +150,12 @@ public class Window implements Resource {
             }
 
             // TODO: FIX lags if not rendering even repeating frames.
-            if (renderSkip == 0) {
-                screen.frameUpdate(elapsedTime);
-                GLFW.glfwSwapBuffers(handle);
-                renderCount++;
-            }
-            toRender = !toRender;
-            renderSkip++;
-            renderSkip %= 10;
-            System.out.println(renderSkip == 0 ? "render" : "----");
+            screen.frameUpdate(elapsedTime);
+            GLFW.glfwSwapBuffers(handle);
+            // causes small initial lag?
+            /// if (renderSkip != 0) Thread.yield();
+            /// renderSkip++;
+            /// renderSkip %= 10;
         }
     }
 

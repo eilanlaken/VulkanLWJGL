@@ -49,12 +49,18 @@ public final class GraphicsUtils {
         window.setTargetFps(targetFps);
     }
 
+    public static int getFps() {
+        return window.getFps();
+    }
+
     public static void enableVSync() {
-        GLFW.glfwSwapInterval(1);
+        //GLFW.glfwSwapInterval(1);
+        window.enableVSync();
     }
 
     public static void disableVSync() {
-        GLFW.glfwSwapInterval(0);
+        //GLFW.glfwSwapInterval(0);
+        window.disableVSync();
     }
 
     public static void setAntiAliasing(int value) {
