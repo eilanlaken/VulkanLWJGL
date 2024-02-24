@@ -137,7 +137,6 @@ public class Window implements Resource {
             float elapsedTime = currentTime - previousTime;
             this.fps = (int) (1f / elapsedTime);
             lag += elapsedTime;
-            totalTime += elapsedTime;
 
             Mouse.resetInternalState();
             Keyboard.resetInternalState();
