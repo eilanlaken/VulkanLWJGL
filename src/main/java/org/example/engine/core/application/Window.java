@@ -38,12 +38,6 @@ public class Window implements Resource {
     private int targetFps;
     private int fps;
 
-    // debug
-    // TODO: this (kinda) solves the vsync issue. Just set the render skip interval according to the targetFps;
-    private boolean toRender = true;
-    private int renderSkip = 0;
-    private int renderCount = 0;
-
     // TODO:
     // https://github.com/LWJGL/lwjgl/blob/master/src/java/org/lwjgl/opengl/Sync.java
 
@@ -109,14 +103,14 @@ public class Window implements Resource {
         return handle;
     }
 
-    // TODO: implement
+    // TODO: does not work on Intel HD Graphics
     public void enableVSync() {
-
+        // GLFW.glfwSwapInterval(1);
     }
 
     // TODO: implement
     public void disableVSync() {
-
+        // GLFW.glfwSwapInterval(0);
     }
 
     public boolean isVSyncEnabled() {
