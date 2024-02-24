@@ -145,10 +145,6 @@ public class Window implements Resource {
             // TODO: FIX lags if not rendering even repeating frames.
             screen.frameUpdate(elapsedTime);
             GLFW.glfwSwapBuffers(handle);
-            // causes small initial lag?
-            /// if (renderSkip != 0) Thread.yield();
-            /// renderSkip++;
-            /// renderSkip %= 10;
         }
     }
 
