@@ -1,11 +1,15 @@
 package org.example.game;
 
+import org.example.engine.components.ComponentFactory;
 import org.example.engine.components.ComponentTransform3D;
 import org.example.engine.core.application.WindowScreen;
 import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
+import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
+import org.example.engine.core.math.Matrix4;
+import org.example.engine.core.math.Quaternion;
 import org.example.engine.core.math.Vector3;
 import org.lwjgl.opengl.GL11;
 
@@ -21,6 +25,8 @@ public class WindowScreenTest_2 extends WindowScreen {
     private ComponentTransform3D transform3D;
     private Camera camera;
 
+    private Matrix4 cameraTransform;
+
     public WindowScreenTest_2() {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
@@ -32,7 +38,7 @@ public class WindowScreenTest_2 extends WindowScreen {
 
     @Override
     public void show() {
-        transform3D = new ComponentTransform3D();
+        transform3D = ComponentFactory.createTransform3D();
 
         float[] positions = new float[] {
                 -0.5f, 0.5f, 0.5f,
@@ -94,6 +100,9 @@ public class WindowScreenTest_2 extends WindowScreen {
         modelOld.texture = texture;
 
         transform3D.matrix4.translate(0,0,-5f);
+
+        cameraTransform = new Matrix4();
+
     }
 
     @Override
@@ -105,15 +114,54 @@ public class WindowScreenTest_2 extends WindowScreen {
         renderer3D.setCamera(camera);
         renderer3D.draw(modelOld, transform3D.matrix4);
         renderer3D.end();
-
-        if (Mouse.isButtonPressed(Mouse.Button.LEFT)) System.out.println("pressed");
     }
 
     @Override
     public void fixedUpdate(float delta) {
         float angularSpeed = 200; // degrees per second
-        transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
+        //transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
         //System.out.println(GraphicsUtils.getFps());
+
+        if (Keyboard.isKeyPressed(Keyboard.Key.RIGHT)) {
+            cameraTransform.translate(0,0,-1*delta);
+            cameraTransform.rotate(0,0,1,1*delta);
+
+            Vector3 position = new Vector3();
+            camera.lens.position.set(cameraTransform.getTranslation(position));
+
+            Vector3 direction = new Vector3(0,0,-1);
+            camera.lens.direction.rot(cameraTransform);
+
+            Vector3 up = new Vector3(0,1,0);
+            camera.lens.up.rot(cameraTransform);
+
+            camera.lens.update();
+
+            Matrix4 m = new Matrix4(cameraTransform);
+            m.inv();
+            //camera.lens.view.set(m);
+        }
+
+        if (Keyboard.isKeyPressed(Keyboard.Key.LEFT)) {
+            camera.lens.up.rotate(1, camera.lens.direction.x,camera.lens.direction.y,camera.lens.direction.z);
+            camera.lens.update();
+            camera.lens.direction.rotate(1, camera.lens.up.x,camera.lens.up.y,camera.lens.up.z);
+            camera.lens.update();
+
+            //camera.lens.position.add(0,0,4*delta);
+            System.out.println("up \n" + camera.lens.up);
+            System.out.println("dir \n" + camera.lens.direction);
+
+            Matrix4 v = new Matrix4(camera.lens.view);
+            Matrix4 t = new Matrix4(camera.lens.view);
+            t.inv();
+            System.out.println("transform \n" + t);
+            System.out.println("transform inv (view) \n" + camera.lens.view);
+
+            Vector3 up2 = new Vector3(v.val[Matrix4.M00],v.val[Matrix4.M01],v.val[Matrix4.M02]);
+            up2.crs(camera.lens.direction);
+            System.out.println("up2 " + up2);
+        }
     }
 
     @Override

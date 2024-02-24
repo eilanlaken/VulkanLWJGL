@@ -18,10 +18,10 @@ public class CameraLens {
     private final Vector3 tmp = new Vector3();
 
     private CameraLensProjectionType projectionType;
-    public final Matrix4 projection = new Matrix4();
-    public final Matrix4 view = new Matrix4();
-    public final Matrix4 combined = new Matrix4();
-    public final Matrix4 invProjectionView = new Matrix4();
+    public Matrix4 projection = new Matrix4();
+    public Matrix4 view = new Matrix4();
+    public Matrix4 combined = new Matrix4();
+    public Matrix4 invProjectionView = new Matrix4();
     public float near = 0.1f;
     public float far = 100;
     public float fieldOfView = 67;
@@ -54,7 +54,7 @@ public class CameraLens {
                 Matrix4.inv(invProjectionView.val);
             }
             case ORTHOGRAPHIC_PROJECTION: {
-
+                // TODO: implement
             }
         }
         updateFrustum(invProjectionView);
