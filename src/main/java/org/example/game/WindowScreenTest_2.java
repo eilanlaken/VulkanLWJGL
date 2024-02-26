@@ -119,8 +119,8 @@ public class WindowScreenTest_2 extends WindowScreen {
     @Override
     public void fixedUpdate(float delta) {
         float angularSpeed = 200; // degrees per second
-        //transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
-        //System.out.println(GraphicsUtils.getFps());
+        transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
+        System.out.println(GraphicsUtils.getFps());
 
         if (Keyboard.isKeyPressed(Keyboard.Key.RIGHT)) {
             cameraTransform.translate(0,0,-1*delta);

@@ -25,7 +25,7 @@ LwjglGraphics.java
 
 TODO: refactor while considering context etc.
  */
-public class Window implements Resource {
+public final class Window implements Resource {
 
     private long handle;
     private String title;
@@ -136,15 +136,22 @@ public class Window implements Resource {
             Keyboard.resetInternalState();
             GLFW.glfwPollEvents();
 
+            boolean shouldRender = false;
+
             // TODO: FIX vsync does not work on laptop + intel HD integrated GPU.
             while (lag >= fixedUpdateTimeInterval) {
+                shouldRender = true;
                 screen.fixedUpdate(fixedUpdateTimeInterval);
                 lag -= fixedUpdateTimeInterval;
             }
 
             // TODO: FIX lags if not rendering even repeating frames.
-            screen.frameUpdate(elapsedTime);
-            GLFW.glfwSwapBuffers(handle);
+            if (shouldRender) {
+                screen.frameUpdate(elapsedTime);
+                GLFW.glfwSwapBuffers(handle);
+            }
+
+            WindowSync.sync(targetFps);
         }
     }
 
