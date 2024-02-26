@@ -5,6 +5,7 @@ import org.example.engine.core.input.Mouse;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
@@ -104,13 +105,20 @@ public final class Window implements Resource {
     }
 
     // TODO: does not work on Intel HD Graphics
-    public void enableVSync() {
-        // GLFW.glfwSwapInterval(1);
+    public boolean enableVSync() {
+        long monitor = GLFW.glfwGetPrimaryMonitor();
+        GLFWVidMode vidMode = GLFW.glfwGetVideoMode(monitor);
+        if (vidMode == null) return false;
+        int refreshRate = vidMode.refreshRate();
+        setTargetFps(refreshRate);
+        GLFW.glfwSwapInterval(1);
+        return true;
     }
 
     // TODO: implement
-    public void disableVSync() {
-        // GLFW.glfwSwapInterval(0);
+    public boolean disableVSync() {
+        GLFW.glfwSwapInterval(0);
+        return true;
     }
 
     public boolean isVSyncEnabled() {

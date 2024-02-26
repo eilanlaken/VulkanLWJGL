@@ -54,12 +54,10 @@ public final class GraphicsUtils {
     }
 
     public static void enableVSync() {
-        //GLFW.glfwSwapInterval(1);
         window.enableVSync();
     }
 
     public static void disableVSync() {
-        //GLFW.glfwSwapInterval(0);
         window.disableVSync();
     }
 

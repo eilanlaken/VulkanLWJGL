@@ -122,6 +122,9 @@ public class WindowScreenTest_2 extends WindowScreen {
         transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
         System.out.println(GraphicsUtils.getFps());
 
+        if (Keyboard.isKeyJustPressed(Keyboard.Key.A))
+            GraphicsUtils.enableVSync();
+
         if (Keyboard.isKeyPressed(Keyboard.Key.RIGHT)) {
             cameraTransform.translate(0,0,-1*delta);
             cameraTransform.rotate(0,0,1,1*delta);
