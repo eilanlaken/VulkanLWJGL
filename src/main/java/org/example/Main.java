@@ -1,15 +1,18 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
-import org.example.engine.core.application.ApplicationConfig;
-import org.example.game.WindowScreenTest_1;
+import org.example.engine.core.graphics.WindowAttributes;
 import org.example.game.WindowScreenTest_2;
+import org.example.game.WindowScreenTest_3;
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        ApplicationConfig config = new ApplicationConfig();
+//        ApplicationConfig config = new ApplicationConfig();
+//        Application.createSingleWindowApplication(config);
+//        Application.launch(new WindowScreenTest_2());
+        WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);
-        Application.launch(new WindowScreenTest_2());
+        Application.launch(new WindowScreenTest_3());
     }
 }

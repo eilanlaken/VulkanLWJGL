@@ -1,4 +1,4 @@
-package org.example.engine.core.application;
+package org.example.engine.core.application_old;
 
 public class ApplicationConfig {
 

@@ -14,7 +14,7 @@ public class AssetLoaderTexture extends AssetLoader<Texture> {
     public final int maxTextureSize;
 
     public AssetLoaderTexture() {
-        maxTextureSize = GraphicsUtils.getMaxTextureSize();
+        maxTextureSize = GraphicsUtils_old.getMaxTextureSize();
     }
 
     @Override

@@ -1,20 +1,79 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.application.Window;
+import org.example.engine.core.graphics.Window;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
-import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
-
-public final class GraphicsUtils {
+public class GraphicsUtils {
 
     private static boolean initialized = false;
     private static Window window;
+    protected static volatile boolean isContinuous = true;
+
+    private static long lastFrameTime = -1;
+    private static float deltaTime;
+    private static boolean resetDeltaTime = false;
+    private static long frameId = 0;
+    private static long frameCounterStart = 0;
+    private static int frames = 0;
+    private static int fps;
+    private static int targetFps = 120;
+    private static int idleFps = 10;
 
     public static void init(final Window window) {
         if (initialized) throw new IllegalStateException(GraphicsUtils.class.getSimpleName() + " instance already initialized.");
         GraphicsUtils.window = window;
         initialized = true;
+    }
+
+    public static void update() {
+        long time = System.nanoTime();
+        if (lastFrameTime == -1) lastFrameTime = time;
+        if (resetDeltaTime) {
+            resetDeltaTime = false;
+            deltaTime = 0;
+        } else
+            deltaTime = (time - lastFrameTime) / 1000000000.0f;
+        lastFrameTime = time;
+
+        if (time - frameCounterStart >= 1000000000) {
+            fps = frames;
+            frames = 0;
+            frameCounterStart = time;
+        }
+        frames++;
+        frameId++;
+    }
+
+    public static int getFps() {
+        return fps;
+    }
+
+    public static float getDeltaTime() {
+        return deltaTime;
+    }
+
+    public static int getIdleFps() {
+        return idleFps;
+    }
+
+    public static void setIdleFps(int idleFps) {
+        GraphicsUtils.idleFps = idleFps;
+    }
+
+    public static int getTargetFps() {
+        return targetFps;
+    }
+
+    public static void setTargetFps(int targetFps) {
+        GraphicsUtils.targetFps = targetFps;
+    }
+
+    public static void setContinuousRendering(boolean isContinuous) {
+        GraphicsUtils.isContinuous = isContinuous;
+    }
+
+    public static boolean isContinuousRendering () {
+        return isContinuous;
     }
 
     public static int getMonitorWidth() {
@@ -25,46 +84,5 @@ public final class GraphicsUtils {
         return GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor()).height();
     }
 
-    public static void setWindowPosition(int x, int y) {
-        GLFW.glfwSetWindowPos(window.getHandle(), x, y);
-    }
-
-    public static int getWindowHeight() {
-        return window.width;
-    }
-
-    public static int getWindowWidth() {
-        return window.height;
-    }
-
-    public static int getMaxTextureSize() {
-        return GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
-    }
-
-    public static int getTargetFps() {
-        return window.getTargetFps();
-    }
-
-    public static void setTargetFrameRate(int targetFps) {
-        window.setTargetFps(targetFps);
-    }
-
-    public static int getFps() {
-        return window.getFps();
-    }
-
-    public static void enableVSync() {
-        window.enableVSync();
-    }
-
-    public static void disableVSync() {
-        window.disableVSync();
-    }
-
-    public static void setAntiAliasing(int value) {
-        if (value != 0 && value != 2 && value != 4 && value != 8 && value != 16)
-            throw new IllegalArgumentException("Multisampling (anti-aliasing) can only be set to: 0, 2, 4, 8 or 16. Got: " + value);
-        GLFW.glfwWindowHint(GLFW_SAMPLES, value); //  enable multi sampling
-    }
 
 }

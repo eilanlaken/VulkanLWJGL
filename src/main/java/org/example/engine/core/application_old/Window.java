@@ -1,5 +1,6 @@
-package org.example.engine.core.application;
+package org.example.engine.core.application_old;
 
+import org.example.engine.core.application.ApplicationSync;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
 import org.example.engine.core.memory.Resource;
@@ -159,7 +160,7 @@ public final class Window implements Resource {
                 GLFW.glfwSwapBuffers(handle);
             }
 
-            WindowSync.sync(targetFps);
+            ApplicationSync.sync(targetFps);
         }
     }
 

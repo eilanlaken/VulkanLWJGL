@@ -2,7 +2,6 @@ package org.example.game;
 
 import org.example.engine.components.ComponentFactory;
 import org.example.engine.components.ComponentTransform3D;
-import org.example.engine.core.application_old.WindowScreen;
 import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
@@ -11,7 +10,7 @@ import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
 import org.lwjgl.opengl.GL11;
 
-public class WindowScreenTest_2 extends WindowScreen {
+public class WindowScreenTest_3 extends WindowScreen {
 
     // TODO: refactor to use assetLoader.load() etc
     AssetLoaderTexture assetLoaderTextures;
@@ -25,13 +24,13 @@ public class WindowScreenTest_2 extends WindowScreen {
 
     private Matrix4 cameraTransform;
 
-    public WindowScreenTest_2() {
+    public WindowScreenTest_3() {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
         final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/vertex.glsl");
         final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/fragment.glsl");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
-        this.camera = new Camera();
+        //this.camera = new Camera();
     }
 
     @Override
@@ -103,7 +102,12 @@ public class WindowScreenTest_2 extends WindowScreen {
 
     }
 
+
     @Override
+    protected void refresh() {
+        System.out.println(GraphicsUtils.getFps());
+    }
+
     public void frameUpdate(float delta) {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
@@ -114,7 +118,7 @@ public class WindowScreenTest_2 extends WindowScreen {
         renderer3D.end();
     }
 
-    @Override
+
     public void fixedUpdate(float delta) {
         float angularSpeed = 200; // degrees per second
         transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
@@ -172,19 +176,15 @@ public class WindowScreenTest_2 extends WindowScreen {
         System.out.println(height);
     }
 
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
 
     @Override
     public void hide() {
         modelOld.free();
         shader.free();
+    }
+
+    @Override
+    public void free() {
+
     }
 }

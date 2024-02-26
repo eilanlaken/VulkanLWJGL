@@ -1,6 +1,6 @@
 package org.example.engine.core.input;
 
-import org.example.engine.core.application.Window;
+import org.example.engine.core.graphics.Window;
 import org.lwjgl.glfw.*;
 
 public class Mouse {

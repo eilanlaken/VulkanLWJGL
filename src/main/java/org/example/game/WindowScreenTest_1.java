@@ -2,7 +2,7 @@ package org.example.game;
 
 import org.example.engine.components.ComponentFactory;
 import org.example.engine.components.ComponentTransform3D;
-import org.example.engine.core.application.WindowScreen;
+import org.example.engine.core.application_old.WindowScreen;
 import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
