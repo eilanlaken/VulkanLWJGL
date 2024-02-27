@@ -18,10 +18,11 @@ public class Application {
     private static Window window;
     private static Array<Runnable> tasks = new Array<>();
     private static boolean running = false;
+    private static GLFWErrorCallback errorCallback;
 
     public static void createSingleWindowApplication(final WindowAttributes attributes) {
         // init GLFW
-        GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
+        GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         GLFWErrorCallback.createPrint(System.err).set();
         if (!GLFW.glfwInit()) throw new RuntimeException("Unable to initialize GLFW.");
 
@@ -78,7 +79,9 @@ public class Application {
     }
 
     private static void clean() {
-
+        window.free();
+        GLFW.glfwTerminate();
+        errorCallback.free();
     }
 
     public static void exit() {

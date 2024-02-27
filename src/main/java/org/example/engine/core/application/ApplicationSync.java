@@ -4,20 +4,16 @@ import org.lwjgl.glfw.GLFW;
 
 public final class ApplicationSync {
 
-    /** number of nano seconds in a second */
     private static final long NANOS_IN_SECOND = 1000L * 1000L * 1000L;
-    /** The time to sleep/yield until the next frame */
     private static long nextFrame = 0;
-    /** whether the initialisation code has run */
     private static boolean initialised = false;
-    /** for calculating the averages the previous sleep/yield times are stored */
     private static RunningAvg sleepDurations = new RunningAvg(10);
     private static RunningAvg yieldDurations = new RunningAvg(10);
 
     /** An accurate sync method that will attempt to run at a constant frame rate. It should be called once every frame.
      *
      * @param fps - the desired frame rate, in frames per second */
-    public static void sync (int fps) {
+    public static void sync(int fps) {
         if (fps <= 0) return;
         if (!initialised) initialise();
 
@@ -37,7 +33,7 @@ public final class ApplicationSync {
                 yieldDurations.add((t1 = getTime()) - t0); // update average yield time
             }
         } catch (InterruptedException e) {
-
+            e.printStackTrace();
         }
 
         // schedule next frame, drop frame(s) if already too late for next frame
@@ -47,7 +43,7 @@ public final class ApplicationSync {
     /** This method will initialise the sync method by setting initial values for sleepDurations/yieldDurations and nextFrame.
      *
      * If running on windows it will start the sleep timer fix. */
-    private static void initialise () {
+    private static void initialise() {
         initialised = true;
 
         sleepDurations.init(1000 * 1000);
@@ -67,6 +63,7 @@ public final class ApplicationSync {
                     try {
                         Thread.sleep(Long.MAX_VALUE);
                     } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             });
