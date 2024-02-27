@@ -106,23 +106,10 @@ public class WindowScreenTest_3 extends WindowScreen {
     @Override
     protected void refresh() {
         System.out.println(GraphicsUtils.getWindowWidth());
-    }
-
-    public void frameUpdate(float delta) {
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glClearColor(1,0,0,1);
-        renderer3D.begin(shader);
-        renderer3D.setCamera(camera);
-        renderer3D.draw(modelOld, transform3D.matrix4);
-        renderer3D.end();
-    }
-
-
-    public void fixedUpdate(float delta) {
+        float delta = GraphicsUtils.getDeltaTime();
+        // fixed update
         float angularSpeed = 200; // degrees per second
         transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
-        System.out.println(GraphicsUtils_old.getFps());
 
         if (Keyboard.isKeyJustPressed(Keyboard.Key.A))
             GraphicsUtils_old.enableVSync();
@@ -167,6 +154,15 @@ public class WindowScreenTest_3 extends WindowScreen {
             up2.crs(camera.lens.direction);
             System.out.println("up2 " + up2);
         }
+
+        // frame update
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glClearColor(1,0,0,1);
+        renderer3D.begin(shader);
+        renderer3D.setCamera(camera);
+        renderer3D.draw(modelOld, transform3D.matrix4);
+        renderer3D.end();
     }
 
     @Override
