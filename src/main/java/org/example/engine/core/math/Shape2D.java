@@ -6,5 +6,7 @@ public interface Shape2D {
         return contains(point.x, point.y);
     }
     boolean contains(float x, float y);
+    float getArea();
+    float getPerimeter();
 
 }

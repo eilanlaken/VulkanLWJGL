@@ -90,4 +90,12 @@ public final class MathUtils {
         return x + y; // returns 0 for 0,0 or NaN if either y or x is NaN
     }
 
+    public static float areaTriangle(Vector2 a, Vector2 b, Vector2 c) {
+        return 0.5f * Math.abs((a.x - c.x) * (b.y - a.y) - (a.x - b.x) * (c.y - a.y));
+    }
+
+    public static float areaTriangle(float x1, float y1, float x2, float y2, float x3, float y3) {
+        return 0.5f * Math.abs((x1 - x3) * (y2 - y2) - (x1 - x2) * (y3 - y1));
+    }
+
 }
