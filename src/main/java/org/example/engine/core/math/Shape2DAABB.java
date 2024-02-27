@@ -25,4 +25,5 @@ public class Shape2DAABB implements Shape2D {
     public float getPerimeter() {
         return 2 * (max.y - min.y + max.x - min.x);
     }
+
 }
