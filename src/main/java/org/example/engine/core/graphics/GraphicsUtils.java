@@ -1,6 +1,5 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.graphics.Window;
 import org.lwjgl.glfw.GLFW;
 
 public class GraphicsUtils {

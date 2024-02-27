@@ -4,6 +4,7 @@ import org.example.engine.core.application.Application;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -11,8 +12,6 @@ import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 

@@ -2,7 +2,6 @@ package org.example;
 
 import org.example.engine.core.application.Application;
 import org.example.engine.core.graphics.WindowAttributes;
-import org.example.game.WindowScreenTest_2;
 import org.example.game.WindowScreenTest_3;
 
 public class Main {

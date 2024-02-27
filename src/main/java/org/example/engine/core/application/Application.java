@@ -1,7 +1,10 @@
 package org.example.engine.core.application;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.graphics.*;
+import org.example.engine.core.graphics.GraphicsUtils;
+import org.example.engine.core.graphics.Window;
+import org.example.engine.core.graphics.WindowAttributes;
+import org.example.engine.core.graphics.WindowScreen;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
 import org.lwjgl.glfw.GLFW;

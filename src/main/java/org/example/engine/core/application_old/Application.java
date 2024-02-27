@@ -1,9 +1,6 @@
 package org.example.engine.core.application_old;
 
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.GraphicsUtils_old;
-import org.example.engine.core.input.Keyboard;
-import org.example.engine.core.input.Mouse;
 
 public abstract class Application {
 

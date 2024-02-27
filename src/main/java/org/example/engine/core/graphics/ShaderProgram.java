@@ -9,7 +9,6 @@ import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
 import java.util.HashMap;

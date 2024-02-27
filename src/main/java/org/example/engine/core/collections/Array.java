@@ -3,8 +3,6 @@ package org.example.engine.core.collections;
 import org.example.engine.core.math.MathUtils;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public class Array<T> implements Iterable<T> {
 
