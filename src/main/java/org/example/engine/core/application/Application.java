@@ -7,19 +7,13 @@ import org.example.engine.core.input.Mouse;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 public class Application {
 
     private static boolean initialized = false;
     private static boolean debugMode;
     private static Window window;
-    private static List<Runnable> tasks = new ArrayList<>();
+    private static Array<Runnable> tasks = new Array<>();
     private static boolean running = false;
 
     public static void createSingleWindowApplication(final WindowAttributes attributes) {
@@ -27,14 +21,6 @@ public class Application {
         GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
         GLFWErrorCallback.createPrint(System.err).set();
         if (!GLFW.glfwInit()) throw new RuntimeException("Unable to initialize GLFW.");
-//        GLFW.glfwDefaultWindowHints();
-//        GLFW.glfwWindowHint(GLFW.GLFW_TRANSPARENT_FRAMEBUFFER, config.transparentFrameBuffer ? GLFW.GLFW_TRUE : GLFW_FALSE);
-//        GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
-//        GLFW.glfwWindowHint(GLFW_RESIZABLE, config.resizable ? GLFW.GLFW_TRUE : GLFW_FALSE);
-//        GLFW.glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-//        GLFW.glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-//        GLFW.glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-//        GLFW.glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL11.GL_TRUE);
 
         window = new Window(attributes);
         GraphicsUtils.init(window);
@@ -69,7 +55,7 @@ public class Application {
                 task.run();
             }
             synchronized (tasks) {
-                requestRendering = tasks.size() > 0;
+                requestRendering = tasks.size > 0;
                 tasks.clear();
             }
 

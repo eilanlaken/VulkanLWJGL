@@ -26,8 +26,8 @@ public class CameraLens {
     public float far = 100;
     public float fieldOfView = 67;
     public float zoom = 1;
-    public float viewportWidth = GraphicsUtils_old.getWindowWidth();
-    public float viewportHeight = GraphicsUtils_old.getWindowHeight();
+    public float viewportWidth = GraphicsUtils.getWindowWidth();
+    public float viewportHeight = GraphicsUtils.getWindowHeight();
     public Vector3 position;
     public Vector3 direction;
     public Vector3 up;
@@ -60,7 +60,7 @@ public class CameraLens {
         updateFrustum(invProjectionView);
     }
 
-    public void updateFrustum(final Matrix4 invPrjView) {
+    private void updateFrustum(final Matrix4 invPrjView) {
         // calculate corners of the frustum by un-projecting the clip space cube using invPrjView
         for (int i = 0; i < 8; i++) {
             frustumCorners[i].set(clipSpacePlanePoints[i]);

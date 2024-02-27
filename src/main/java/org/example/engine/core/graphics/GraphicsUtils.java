@@ -84,5 +84,13 @@ public class GraphicsUtils {
         return GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor()).height();
     }
 
+    public static int getWindowHeight() {
+        return window.attributes.height;
+    }
+
+    public static int getWindowWidth() {
+        return window.attributes.width;
+    }
+
 
 }

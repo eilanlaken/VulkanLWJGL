@@ -17,6 +17,10 @@ public final class MathUtils {
         return random.nextInt(range);
     }
 
+    public static int random(int start, int end) {
+        return start + random.nextInt(end - start + 1);
+    }
+
     static public short clamp(short value, short min, short max) {
         if (value < min) return min;
         if (value > max) return max;

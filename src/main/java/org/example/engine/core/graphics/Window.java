@@ -26,7 +26,7 @@ public class Window implements Resource {
 
     // window attributes
     private long handle;
-    private WindowAttributes attributes;
+    protected WindowAttributes attributes;
 
     private boolean focused = false;
     private Array<String> filesDropped = new Array<>();
@@ -36,7 +36,7 @@ public class Window implements Resource {
     private volatile int logicalHeight;
 
     // state management
-    List<Runnable> tasks = new ArrayList<>();
+    private Array<Runnable> tasks = new Array<>();
     private boolean requestRendering = false;
     private WindowScreen screen;
 
@@ -54,12 +54,12 @@ public class Window implements Resource {
                     @Override
                     public void run () {
                         requested = false;
-                        Window.this.attributes.width = width;
-                        Window.this.attributes.height = height;
                         renderWindow(width, height);
                     }
                 });
             }
+            Window.this.attributes.width = width;
+            Window.this.attributes.height = height;
         }
     };
 
@@ -199,7 +199,7 @@ public class Window implements Resource {
         for (Runnable task : tasks) {
             task.run();
         }
-        boolean shouldRefresh = tasks.size() > 0 || GraphicsUtils.isContinuousRendering();
+        boolean shouldRefresh = tasks.size > 0 || GraphicsUtils.isContinuousRendering();
         synchronized (this) {
             tasks.clear();
             shouldRefresh |= requestRendering && !attributes.minimized;

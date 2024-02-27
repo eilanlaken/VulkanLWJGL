@@ -30,7 +30,7 @@ public class WindowScreenTest_3 extends WindowScreen {
         final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/vertex.glsl");
         final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/fragment.glsl");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
-        //this.camera = new Camera();
+        this.camera = new Camera();
     }
 
     @Override
@@ -105,7 +105,7 @@ public class WindowScreenTest_3 extends WindowScreen {
 
     @Override
     protected void refresh() {
-        System.out.println(GraphicsUtils.getFps());
+        System.out.println(GraphicsUtils.getWindowWidth());
     }
 
     public void frameUpdate(float delta) {
