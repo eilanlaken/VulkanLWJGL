@@ -34,8 +34,27 @@ public class Renderer3D {
 
     }
 
-    // TODO: refactor to ModelPart, which is the basic rendering unit.
-    public void draw(final Model_old modelOld, final Matrix4 transform) {
+    public void draw(final ModelPart modelPart, final Matrix4 transform) {
+        // Enable depth testing (recommended for proper rendering)
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+
+        // Disable backface culling
+        GL11.glEnable(GL11.GL_CULL_FACE);
+
+        currentShader.bindUniform("transform", transform);
+        ModelPartMaterial material = modelPart.material;
+        currentShader.bindUniforms(material.materialParams);
+        ModelPartMesh mesh = modelPart.mesh;
+        GL30.glBindVertexArray(mesh.vaoId);
+        GL20.glEnableVertexAttribArray(0); // positions
+        GL20.glEnableVertexAttribArray(1); // texture coordinates
+        GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.vertexCount, GL11.GL_UNSIGNED_INT, 0);
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1); // texture coordinates
+        GL30.glBindVertexArray(0);
+    }
+
+    @Deprecated public void draw(final Model_old modelOld, final Matrix4 transform) {
         currentShader.bindUniform("transform", transform);
         currentShader.bindUniforms(modelOld.get_material_debug());
         GL30.glBindVertexArray(modelOld.vaoId);
@@ -49,31 +68,6 @@ public class Renderer3D {
 
     public void end() {
         this.currentShader.unbind();
-    }
-
-    // TODO: maybe replace camera directly with the projection and transform of the lens.
-    @Deprecated public void render(final Camera camera, final Model_old modelOld, final Matrix4 transform, ShaderProgram shader) {
-        // TODO: move to render context.
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        // optimize shaders etc.
-        shader.bind();
-        shaderSelector.getDefaultShader().bindUniform("view", camera.lens.view);
-        shaderSelector.getDefaultShader().bindUniform("projection", camera.lens.projection);
-
-        shader.bindUniform("transform", transform);
-        // TODO: optimize material binding
-        shader.bindUniforms(modelOld.get_material_debug());
-
-        GL30.glBindVertexArray(modelOld.vaoId);
-        GL20.glEnableVertexAttribArray(0); // positions
-        GL20.glEnableVertexAttribArray(1); // texture coordinates
-        GL11.glDrawElements(GL11.GL_TRIANGLES, modelOld.vertexCount, GL11.GL_UNSIGNED_INT, 0);
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1); // texture coordinates
-        GL30.glBindVertexArray(0);
-        //shader.unbind();
     }
 
     private void sort(Array<ModelPart> modelParts) {

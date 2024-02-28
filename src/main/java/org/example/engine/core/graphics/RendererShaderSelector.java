@@ -8,8 +8,8 @@ public class RendererShaderSelector {
     private ShaderProgram defaultShader;
 
     public RendererShaderSelector() {
-        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/vertex.glsl");
-        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/fragment.glsl");
+        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/1_vertex.glsl");
+        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/1_fragment.glsl");
         this.defaultShader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
     }
 

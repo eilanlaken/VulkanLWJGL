@@ -13,10 +13,7 @@ import org.example.engine.core.memory.Pool;
 import org.example.engine.core.memory.Pooled;
 import org.lwjgl.opengl.GL11;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-
-public class WindowScreenTest_BasicRendering_1 extends WindowScreen {
+public class WindowScreenTest_Lights_2 extends WindowScreen {
 
     // TODO: refactor to use assetLoader.load() etc
     AssetLoaderTexture assetLoaderTextures;
@@ -30,13 +27,11 @@ public class WindowScreenTest_BasicRendering_1 extends WindowScreen {
 
     private Matrix4 cameraTransform;
 
-    private Pool<Test> testPool = new Pool<>(Test.class);
-
-    public WindowScreenTest_BasicRendering_1() {
+    public WindowScreenTest_Lights_2() {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
-        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/1_vertex.glsl");
-        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/1_fragment.glsl");
+        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/2_vertex.glsl");
+        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/2_fragment.glsl");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
     }
@@ -113,11 +108,6 @@ public class WindowScreenTest_BasicRendering_1 extends WindowScreen {
 
     @Override
     protected void refresh() {
-        // Pooling example
-        Test test = testPool.grabOne();
-        System.out.println(test.x);
-        testPool.letGo(test);
-
         float delta = GraphicsUtils.getDeltaTime();
         // fixed update
         float angularSpeed = 200; // degrees per second
@@ -196,17 +186,4 @@ public class WindowScreenTest_BasicRendering_1 extends WindowScreen {
 
     }
 
-    public static class Test implements Pooled {
-
-        public int x;
-
-        public Test() {
-            reset();
-        }
-
-        @Override
-        public void reset() {
-            x = MathUtils.random(200);
-        }
-    }
 }

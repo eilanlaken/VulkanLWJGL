@@ -4,6 +4,7 @@ import org.example.engine.core.application.Application;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.game.WindowScreenTest_BasicRendering_1;
 import org.example.game.WindowScreenTest_Lights_1;
+import org.example.game.WindowScreenTest_Lights_2;
 
 public class Main {
 

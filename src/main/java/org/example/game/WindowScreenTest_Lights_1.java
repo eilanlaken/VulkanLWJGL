@@ -19,21 +19,18 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
     AssetLoaderTexture assetLoaderTextures;
 
     private Renderer3D renderer3D;
-    private Model_old modelOld;
-    private Texture texture;
+    private ModelPart modelPart;
     private ShaderProgram shader;
     private ComponentTransform3D transform3D;
     private Camera camera;
 
     private Matrix4 cameraTransform;
 
-    private Pool<Test> testPool = new Pool<>(Test.class);
-
     public WindowScreenTest_Lights_1() {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
-        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/vertex.glsl");
-        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/fragment.glsl");
+        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/2_vertex.glsl");
+        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/2_fragment.glsl");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
     }
@@ -42,64 +39,7 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
     public void show() {
         transform3D = ComponentFactory.createTransform3D();
 
-        float[] positions = new float[] {
-                -0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f, 0.5f,
-                0.5f, -0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-                -0.5f, 0.5f, -0.5f,
-                0.5f, 0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                -0.5f, 0.5f, -0.5f,
-                0.5f, 0.5f, -0.5f,
-                -0.5f, 0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-                0.5f, -0.5f, 0.5f,
-                -0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f, 0.5f,
-                -0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                -0.5f, -0.5f, 0.5f,
-                0.5f, -0.5f, 0.5f,
-        };
-
-        float[] textureCoordinates = new float[]{
-                0.0f, 0.0f,
-                0.0f, 0.5f,
-                0.5f, 0.5f,
-                0.5f, 0.0f,
-                0.0f, 0.0f,
-                0.5f, 0.0f,
-                0.0f, 0.5f,
-                0.5f, 0.5f,
-                0.0f, 0.5f,
-                0.5f, 0.5f,
-                0.0f, 1.0f,
-                0.5f, 1.0f,
-                0.0f, 0.0f,
-                0.0f, 0.5f,
-                0.5f, 0.0f,
-                0.5f, 0.5f,
-                0.5f, 0.0f,
-                1.0f, 0.0f,
-                0.5f, 0.5f,
-                1.0f, 0.5f,
-        };
-
-        int[] indices = new int[] {
-                0, 1, 3, 3, 1, 2,
-                8, 10, 11, 9, 8, 11,
-                12, 13, 7, 5, 12, 7,
-                14, 15, 6, 4, 14, 6,
-                16, 18, 19, 17, 16, 19,
-                4, 6, 7, 5, 4, 7,
-        };
-
-        modelOld = ModelBuilder.build(positions, textureCoordinates, indices);
-        texture = assetLoaderTextures.load("assets/textures/yellowSquare.png");
-        modelOld.texture = texture;
+        modelPart = ModelBuilder.createRedCube();
 
         transform3D.matrix4.translate(0,0,-5f);
 
@@ -110,11 +50,6 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
 
     @Override
     protected void refresh() {
-        // Pooling example
-        Test test = testPool.grabOne();
-        System.out.println(test.x);
-        testPool.letGo(test);
-
         float delta = GraphicsUtils.getDeltaTime();
         // fixed update
         float angularSpeed = 200; // degrees per second
@@ -172,7 +107,7 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
         GL11.glClearColor(0,0,0,1);
         renderer3D.begin(shader);
         renderer3D.setCamera(camera);
-        renderer3D.draw(modelOld, transform3D.matrix4);
+        renderer3D.draw(modelPart, transform3D.matrix4);
         renderer3D.end();
     }
 
@@ -184,7 +119,6 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
 
     @Override
     public void hide() {
-        modelOld.free();
         shader.free();
     }
 
@@ -193,17 +127,4 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
 
     }
 
-    public static class Test implements Pooled {
-
-        public int x;
-
-        public Test() {
-            reset();
-        }
-
-        @Override
-        public void reset() {
-            x = MathUtils.random(200);
-        }
-    }
 }
