@@ -1,6 +1,7 @@
 package org.example.engine.core.graphics;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 
 public class GraphicsUtils {
 
@@ -67,6 +68,10 @@ public class GraphicsUtils {
     public static void setTargetFps(int targetFps) {
         prevTargetFps = GraphicsUtils.targetFps;
         GraphicsUtils.targetFps = targetFps;
+    }
+
+    public static int getMaxTextureSize() {
+        return GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
     }
 
     public static void setContinuousRendering(boolean isContinuous) {

@@ -137,7 +137,7 @@ public class CameraLens {
     }
 
     public Vector3 unproject(Vector3 screenCoordinates, float viewportX, float viewportY, float viewportWidth, float viewportHeight) {
-        float x = screenCoordinates.x - viewportX, y = GraphicsUtils_old.getWindowHeight() - screenCoordinates.y - viewportY;
+        float x = screenCoordinates.x - viewportX, y = GraphicsUtils.getWindowHeight() - screenCoordinates.y - viewportY;
         screenCoordinates.x = (2 * x) / viewportWidth - 1;
         screenCoordinates.y = (2 * y) / viewportHeight - 1;
         screenCoordinates.z = 2 * screenCoordinates.z - 1;
@@ -146,12 +146,12 @@ public class CameraLens {
     }
 
     public Vector3 unproject(Vector3 screenCoordinates) {
-        unproject(screenCoordinates, 0, 0, GraphicsUtils_old.getWindowWidth(), GraphicsUtils_old.getWindowHeight());
+        unproject(screenCoordinates, 0, 0, GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight());
         return screenCoordinates;
     }
 
     public Vector3 project(Vector3 worldCoordinates) {
-        project(worldCoordinates, 0, 0, GraphicsUtils_old.getWindowWidth(), GraphicsUtils_old.getWindowHeight());
+        project(worldCoordinates, 0, 0, GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight());
         return worldCoordinates;
     }
 

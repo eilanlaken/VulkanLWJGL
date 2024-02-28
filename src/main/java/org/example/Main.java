@@ -2,7 +2,7 @@ package org.example;
 
 import org.example.engine.core.application.Application;
 import org.example.engine.core.graphics.WindowAttributes;
-import org.example.game.WindowScreenTest_3;
+import org.example.game.WindowScreenTest1;
 
 public class Main {
 
@@ -12,6 +12,6 @@ public class Main {
 //        Application.launch(new WindowScreenTest_2());
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);
-        Application.launch(new WindowScreenTest_3());
+        Application.launch(new WindowScreenTest1());
     }
 }
