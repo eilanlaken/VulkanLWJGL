@@ -5,8 +5,8 @@ public class EnvironmentLight {
     public Color color;
     public float intensity;
 
-    public EnvironmentLight(Color color, float intensity) {
-        this.color = color;
+    public EnvironmentLight(float r, float g, float b, float intensity) {
+        this.color = new Color(r, g, b,1.0f);
         this.intensity = intensity;
     }
 

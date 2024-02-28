@@ -98,4 +98,8 @@ public final class MathUtils {
         return 0.5f * Math.abs((x1 - x3) * (y2 - y2) - (x1 - x2) * (y3 - y1));
     }
 
+    public static float max(float a, float b, float c) {
+        return Math.max(a, Math.max(b, c));
+    }
+
 }
