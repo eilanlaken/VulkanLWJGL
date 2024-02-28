@@ -63,7 +63,7 @@ public final class GraphicsUtils_old {
 
     public static void setAntiAliasing(int value) {
         if (value != 0 && value != 2 && value != 4 && value != 8 && value != 16)
-            throw new IllegalArgumentException("Multisampling (anti-aliasing) can only be set to: 0, 2, 4, 8 or 16. Got: " + value);
+            throw new IllegalArgumentException("Multi-sampling (anti-aliasing) can only be set to: 0, 2, 4, 8 or 16. Got: " + value);
         GLFW.glfwWindowHint(GLFW_SAMPLES, value); //  enable multi sampling
     }
 

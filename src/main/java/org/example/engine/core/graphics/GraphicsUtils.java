@@ -16,6 +16,7 @@ public class GraphicsUtils {
     private static int frames = 0;
     private static int fps;
     private static int targetFps = 120;
+    private static int prevTargetFps = targetFps;
     private static int idleFps = 10;
 
     public static void init(final Window window) {
@@ -64,6 +65,7 @@ public class GraphicsUtils {
     }
 
     public static void setTargetFps(int targetFps) {
+        prevTargetFps = GraphicsUtils.targetFps;
         GraphicsUtils.targetFps = targetFps;
     }
 
@@ -91,5 +93,19 @@ public class GraphicsUtils {
         return window.attributes.width;
     }
 
+    public static void enableVSync() {
+        int refreshRate = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor()).refreshRate();
+        setTargetFps(refreshRate);
+        window.setVSync(true);
+    }
+
+    public static void disableVSync() {
+        window.setVSync(false);
+        setTargetFps(prevTargetFps); // restore target refresh rate before vsync.
+    }
+
+    public static boolean isVSyncEnabled() {
+        return window.attributes.vSyncEnabled;
+    }
 
 }

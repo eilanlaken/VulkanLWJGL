@@ -106,8 +106,8 @@ public final class ApplicationSync {
 
         public long avg () {
             long sum = 0;
-            for (int i = 0; i < this.slots.length; i++) {
-                sum += this.slots[i];
+            for (long slot : this.slots) {
+                sum += slot;
             }
             return sum / this.slots.length;
         }

@@ -79,7 +79,7 @@ public class Window implements Resource {
         public synchronized void invoke(long handle, final boolean minimized) {
             tasks.add(new Runnable() {
                 @Override
-                public void run () {
+                public void run() {
                     Window.this.attributes.minimized = minimized;
                 }
             });
@@ -91,7 +91,7 @@ public class Window implements Resource {
         public synchronized void invoke(long windowHandle, final boolean maximized) {
             tasks.add(new Runnable() {
                 @Override
-                public void run () {
+                public void run() {
                     Window.this.attributes.maximized = maximized;
                 }
             });
@@ -103,10 +103,11 @@ public class Window implements Resource {
         public synchronized void invoke(final long handle) {
             tasks.add(new Runnable() {
                 @Override
-                public void run () {
+                public void run() {
                     GLFW.glfwSetWindowShouldClose(handle, false);
                 }
             });
+
         }
     };
 
@@ -115,13 +116,14 @@ public class Window implements Resource {
         public synchronized void invoke(final long windowHandle, final int count, final long names) {
             tasks.add(new Runnable() {
                 @Override
-                public void run () {
+                public void run() {
                     filesDropped.clear();
                     for (int i = 0; i < count; i++) {
                         filesDropped.add(GLFWDropCallback.getName(names, i));
                     }
                 }
             });
+            System.err.println(filesDropped);
         }
     };
 
@@ -193,7 +195,6 @@ public class Window implements Resource {
         this.logicalHeight = tmpBuffer2.get(0);
     }
 
-    // TODO
     public boolean refresh() {
         for (Runnable task : tasks) {
             task.run();
@@ -204,8 +205,6 @@ public class Window implements Resource {
             shouldRefresh |= requestRendering && !attributes.minimized;
             requestRendering = false;
         }
-
-        // input handling here?
 
         if (shouldRefresh) {
             GraphicsUtils.update();
@@ -231,28 +230,28 @@ public class Window implements Resource {
         GLFW.glfwSetWindowAttrib(handle, GLFW.GLFW_DECORATED, decorated ? GLFW.GLFW_TRUE : GLFW.GLFW_FALSE);
     }
 
-    public void setTitle(final String title) {
+    protected void setTitle(final String title) {
         this.attributes.title = title;
         GLFW.glfwSetWindowTitle(handle, title);
     }
 
-    public void setPosition(int x, int y) {
+    protected void setPosition(int x, int y) {
         GLFW.glfwSetWindowPos(handle, x, y);
         attributes.posX = x;
         attributes.posY = y;
     }
 
-    public int getPositionX() {
+    protected int getPositionX() {
         GLFW.glfwGetWindowPos(handle, tmpBuffer, tmpBuffer2);
         return tmpBuffer.get(0);
     }
 
-    public int getPositionY() {
+    protected int getPositionY() {
         GLFW.glfwGetWindowPos(handle, tmpBuffer, tmpBuffer2);
         return tmpBuffer2.get(0);
     }
 
-    public void setVisible(boolean visible) {
+    protected void setVisible(boolean visible) {
         if (visible) {
             GLFW.glfwShowWindow(handle);
         } else {
@@ -260,37 +259,42 @@ public class Window implements Resource {
         }
     }
 
-    public void closeWindow() {
+    protected void setVSync(boolean enabled) {
+        GLFW.glfwSwapInterval(enabled ? 1 : 0);
+        attributes.vSyncEnabled = enabled;
+    }
+
+    protected void closeWindow() {
         GLFW.glfwSetWindowShouldClose(handle, true);
     }
 
-    public void minimize() {
+    protected void minimize() {
         GLFW.glfwIconifyWindow(handle);
         attributes.minimized = true;
     }
 
-    public boolean isMinimized() {
+    protected boolean isMinimized() {
         return attributes.minimized;
     }
 
-    public void maximize() {
+    protected void maximize() {
         GLFW.glfwMaximizeWindow(handle);
         attributes.maximized = true;
     }
 
-    public void flash() {
+    protected void flash() {
         GLFW.glfwRequestWindowAttention(handle);
     }
 
-    public void restoreWindow() {
+    protected void restoreWindow() {
         GLFW.glfwRestoreWindow(handle);
     }
 
-    public void focusWindow() {
+    protected void focusWindow() {
         GLFW.glfwFocusWindow(handle);
     }
 
-    public boolean isFocused() {
+    protected boolean isFocused() {
         return focused;
     }
 
@@ -309,15 +313,16 @@ public class Window implements Resource {
 
     }
 
-    public long getHandle() {
-        return handle;
-    }
-
     public void setSizeLimits(int minWidth, int minHeight, int maxWidth, int maxHeight) {
         GLFW.glfwSetWindowSizeLimits(handle, minWidth > -1 ? minWidth : GLFW.GLFW_DONT_CARE,
                 minHeight > -1 ? minHeight : GLFW.GLFW_DONT_CARE, maxWidth > -1 ? maxWidth : GLFW.GLFW_DONT_CARE,
                 maxHeight > -1 ? maxHeight : GLFW.GLFW_DONT_CARE);
     }
+
+    public long getHandle() {
+        return handle;
+    }
+
 
     @Override
     public void free() {

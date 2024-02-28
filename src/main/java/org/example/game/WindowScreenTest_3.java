@@ -6,8 +6,11 @@ import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
+import org.example.engine.core.memory.Pool;
+import org.example.engine.core.memory.Pooled;
 import org.lwjgl.opengl.GL11;
 
 public class WindowScreenTest_3 extends WindowScreen {
@@ -23,6 +26,8 @@ public class WindowScreenTest_3 extends WindowScreen {
     private Camera camera;
 
     private Matrix4 cameraTransform;
+
+    private Pool<Test> testPool = new Pool<>(Test.class);
 
     public WindowScreenTest_3() {
         this.assetLoaderTextures = new AssetLoaderTexture();
@@ -83,7 +88,7 @@ public class WindowScreenTest_3 extends WindowScreen {
                 1.0f, 0.5f,
         };
 
-        int[] indices = new int[]{
+        int[] indices = new int[] {
                 0, 1, 3, 3, 1, 2,
                 8, 10, 11, 9, 8, 11,
                 12, 13, 7, 5, 12, 7,
@@ -105,14 +110,20 @@ public class WindowScreenTest_3 extends WindowScreen {
 
     @Override
     protected void refresh() {
-        System.out.println(GraphicsUtils.getWindowWidth());
+
+        Test test = testPool.grabOne();
+        System.out.println(GraphicsUtils.getFps());
+        testPool.letGo(test);
+
         float delta = GraphicsUtils.getDeltaTime();
         // fixed update
         float angularSpeed = 200; // degrees per second
         transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
 
         if (Keyboard.isKeyJustPressed(Keyboard.Key.A))
-            GraphicsUtils_old.enableVSync();
+            GraphicsUtils.enableVSync();
+        if (Keyboard.isKeyJustPressed(Keyboard.Key.B))
+            GraphicsUtils.disableVSync();
 
         if (Keyboard.isKeyPressed(Keyboard.Key.RIGHT)) {
             cameraTransform.translate(0,0,-1*delta);
@@ -141,18 +152,18 @@ public class WindowScreenTest_3 extends WindowScreen {
             camera.lens.update();
 
             //camera.lens.position.add(0,0,4*delta);
-            System.out.println("up \n" + camera.lens.up);
-            System.out.println("dir \n" + camera.lens.direction);
+            //System.out.println("up \n" + camera.lens.up);
+            //System.out.println("dir \n" + camera.lens.direction);
 
             Matrix4 v = new Matrix4(camera.lens.view);
             Matrix4 t = new Matrix4(camera.lens.view);
             t.inv();
-            System.out.println("transform \n" + t);
-            System.out.println("transform inv (view) \n" + camera.lens.view);
+            //System.out.println("transform \n" + t);
+            //System.out.println("transform inv (view) \n" + camera.lens.view);
 
             Vector3 up2 = new Vector3(v.val[Matrix4.M00],v.val[Matrix4.M01],v.val[Matrix4.M02]);
             up2.crs(camera.lens.direction);
-            System.out.println("up2 " + up2);
+            //System.out.println("up2 " + up2);
         }
 
         // frame update
@@ -167,9 +178,7 @@ public class WindowScreenTest_3 extends WindowScreen {
 
     @Override
     public void resize(int width, int height) {
-        System.out.println("Resized called.");
-        System.out.println(width);
-        System.out.println(height);
+
     }
 
 
@@ -182,5 +191,19 @@ public class WindowScreenTest_3 extends WindowScreen {
     @Override
     public void free() {
 
+    }
+
+    public static class Test implements Pooled {
+
+        public int x;
+
+        public Test() {
+            reset();
+        }
+
+        @Override
+        public void reset() {
+            x = MathUtils.random(200);
+        }
     }
 }
