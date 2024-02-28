@@ -13,10 +13,7 @@ import org.example.engine.core.memory.Pool;
 import org.example.engine.core.memory.Pooled;
 import org.lwjgl.opengl.GL11;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-
-public class WindowScreenTest1 extends WindowScreen {
+public class WindowScreenTest_Lights_1 extends WindowScreen {
 
     // TODO: refactor to use assetLoader.load() etc
     AssetLoaderTexture assetLoaderTextures;
@@ -32,7 +29,7 @@ public class WindowScreenTest1 extends WindowScreen {
 
     private Pool<Test> testPool = new Pool<>(Test.class);
 
-    public WindowScreenTest1() {
+    public WindowScreenTest_Lights_1() {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
         final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/vertex.glsl");
@@ -172,7 +169,7 @@ public class WindowScreenTest1 extends WindowScreen {
         // frame update
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glClearColor(1,0,0,1);
+        GL11.glClearColor(0,0,0,1);
         renderer3D.begin(shader);
         renderer3D.setCamera(camera);
         renderer3D.draw(modelOld, transform3D.matrix4);
