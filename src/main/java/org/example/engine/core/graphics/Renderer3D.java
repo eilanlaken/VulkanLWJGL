@@ -30,14 +30,16 @@ public class Renderer3D {
     }
 
     // TODO: implement. Don't forget about the lights transform.
-    public void setLights() {
+    public void setEnvironment(final Environment environment) {
+        // bind all lights.
+        // ambient light
+        this.currentShader.bindUniform("ambient", environment.getTotalAmbient());
 
     }
 
     public void draw(final ModelPart modelPart, final Matrix4 transform) {
         // Enable depth testing (recommended for proper rendering)
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-
         // Disable backface culling
         GL11.glEnable(GL11.GL_CULL_FACE);
 

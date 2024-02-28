@@ -6,11 +6,8 @@ import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
-import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
-import org.example.engine.core.memory.Pool;
-import org.example.engine.core.memory.Pooled;
 import org.lwjgl.opengl.GL11;
 
 public class WindowScreenTest_Lights_1 extends WindowScreen {
@@ -23,7 +20,7 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
     private ShaderProgram shader;
     private ComponentTransform3D transform3D;
     private Camera camera;
-
+    private Environment environment;
     private Matrix4 cameraTransform;
 
     public WindowScreenTest_Lights_1() {
@@ -33,6 +30,7 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
         final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/2_fragment.glsl");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
+        this.environment = new Environment();
     }
 
     @Override
@@ -44,6 +42,8 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
         transform3D.matrix4.translate(0,0,-5f);
 
         cameraTransform = new Matrix4();
+
+        environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
 
     }
 
@@ -107,6 +107,7 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
         GL11.glClearColor(0,0,0,1);
         renderer3D.begin(shader);
         renderer3D.setCamera(camera);
+        renderer3D.setEnvironment(environment);
         renderer3D.draw(modelPart, transform3D.matrix4);
         renderer3D.end();
     }
