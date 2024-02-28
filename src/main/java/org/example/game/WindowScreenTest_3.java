@@ -113,9 +113,9 @@ public class WindowScreenTest_3 extends WindowScreen {
 
     @Override
     protected void refresh() {
-
+        // Pooling example
         Test test = testPool.grabOne();
-        System.out.println(GraphicsUtils.getFps());
+        System.out.println(test.x);
         testPool.letGo(test);
 
         float delta = GraphicsUtils.getDeltaTime();
