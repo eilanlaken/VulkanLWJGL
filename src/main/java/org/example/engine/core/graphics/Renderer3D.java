@@ -54,18 +54,6 @@ public class Renderer3D {
         GL30.glBindVertexArray(0);
     }
 
-    @Deprecated public void draw(final Model_old modelOld, final Matrix4 transform) {
-        currentShader.bindUniform("transform", transform);
-        currentShader.bindUniforms(modelOld.get_material_debug());
-        GL30.glBindVertexArray(modelOld.vaoId);
-        GL20.glEnableVertexAttribArray(0); // positions
-        GL20.glEnableVertexAttribArray(1); // texture coordinates
-        GL11.glDrawElements(GL11.GL_TRIANGLES, modelOld.vertexCount, GL11.GL_UNSIGNED_INT, 0);
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1); // texture coordinates
-        GL30.glBindVertexArray(0);
-    }
-
     public void end() {
         this.currentShader.unbind();
     }

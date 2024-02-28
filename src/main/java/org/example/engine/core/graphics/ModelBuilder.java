@@ -151,16 +151,6 @@ public class ModelBuilder {
         return null;
     }
 
-    public static Model_old build(float[] positions, float[] textureCoordinates, int[] indices) {
-        int id = GL30.glGenVertexArrays();
-        GL30.glBindVertexArray(id);
-        storeIndicesBuffer(indices);
-        int vboPositions = storeDataInAttributeList(0, 3, positions);
-        int vboTextureCoordinates = storeDataInAttributeList(1, 2, textureCoordinates);
-        GL30.glBindVertexArray(0);
-        return new Model_old(id, indices.length, vboPositions, vboTextureCoordinates);
-    }
-
     private static void storeIndicesBuffer(int[] indices) {
         int vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vbo);
