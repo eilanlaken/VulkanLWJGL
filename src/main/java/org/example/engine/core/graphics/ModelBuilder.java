@@ -15,53 +15,94 @@ public class ModelBuilder {
     public static ModelPart createRedCube() {
         // Positions of the vertices (8 vertices, 3 coordinates each)
         float[] positions = {
-                -1.0f, -1.0f, -1.0f, // 0. Left-Bottom-Back
-                1.0f, -1.0f, -1.0f, // 1. Right-Bottom-Back
-                -1.0f,  1.0f, -1.0f, // 2. Left-Top-Back
-                1.0f,  1.0f, -1.0f, // 3. Right-Top-Back
-                -1.0f, -1.0f,  1.0f, // 4. Left-Bottom-Front
-                1.0f, -1.0f,  1.0f, // 5. Right-Bottom-Front
-                -1.0f,  1.0f,  1.0f, // 6. Left-Top-Front
-                1.0f,  1.0f,  1.0f, // 7. Right-Top-Front
+                -1.000f, 1.000f, 1.000f,
+                -1.000f, -1.000f, 1.000f,
+                1.000f, 1.000f, 1.000f,
+                1.000f, -1.000f, 1.000f,
+                -1.000f, -1.000f, 1.000f,
+                1.000f, -1.000f, -1.000f,
+                1.000f, -1.000f, 1.000f,
+                -1.000f, -1.000f, -1.000f,
+                -1.000f, 1.000f, 1.000f,
+                -1.000f, -1.000f, -1.000f,
+                -1.000f, -1.000f, 1.000f,
+                -1.000f, 1.000f, -1.000f,
+                1.000f, -1.000f, -1.000f,
+                -1.000f, -1.000f, -1.000f,
+                -1.000f, 1.000f, -1.000f,
+                1.000f, 1.000f, -1.000f,
+                1.000f, -1.000f, 1.000f,
+                1.000f, 1.000f, -1.000f,
+                1.000f, 1.000f, 1.000f,
+                1.000f, -1.000f, -1.000f,
+                1.000f, 1.000f, 1.000f,
+                -1.000f, 1.000f, -1.000f,
+                -1.000f, 1.000f, 1.000f,
+                1.000f, 1.000f, -1.000f,
         };
 
         // Texture coordinates (6 faces, 4 corners each, 2 coordinates per corner)
         float[] textureCoordinates = {
-                0.0f, 0.0f,  // back bottom left
-                1.0f, 0.0f,  // back bottom right
-                0.0f, 1.0f,   // back top left
-                1.0f, 1.0f,  // back top right
-                0.0f, 0.0f,  // front bottom left
-                1.0f, 0.0f,  // front bottom right
-                0.0f, 1.0f,  // front top left
-                1.0f, 1.0f,  // front top right
+                0.875f, 0.500f,
+                0.875f, 0.750f,
+                0.625f, 0.500f,
+                0.625f, 0.750f,
+                0.625f, 1.000f,
+                0.375f, 0.750f,
+                0.625f, 0.750f,
+                0.375f, 1.000f,
+                0.625f, 0.250f,
+                0.375f, 0.000f,
+                0.625f, 0.000f,
+                0.375f, 0.250f,
+                0.375f, 0.750f,
+                0.125f, 0.750f,
+                0.125f, 0.500f,
+                0.375f, 0.500f,
+                0.625f, 0.750f,
+                0.375f, 0.500f,
+                0.625f, 0.500f,
+                0.375f, 0.750f,
+                0.625f, 0.500f,
+                0.375f, 0.250f,
+                0.625f, 0.250f,
+                0.375f, 0.500f,
         };
 
         // Normals of the vertices (each face has the same normal)
         float[] normals = {
-                0.0f,  1.0f,  0.0f,  // front
-                0.0f, -1.0f,  0.0f,  // back
-                1.0f,  0.0f,  0.0f,  // right
-                -1.0f,  0.0f,  0.0f,  // left
-                0.0f,  0.0f,  1.0f,  // top
-                0.0f,  0.0f, -1.0f,  // bottom
+                0.000f, 0.000f, 1.000f,
+                0.000f, 0.000f, 1.000f,
+                0.000f, 0.000f, 1.000f,
+                0.000f, 0.000f, 1.000f,
+                0.000f, -1.000f, 0.000f,
+                0.000f, -1.000f, 0.000f,
+                0.000f, -1.000f, 0.000f,
+                0.000f, -1.000f, 0.000f,
+                -1.000f, 0.000f, 0.000f,
+                -1.000f, 0.000f, 0.000f,
+                -1.000f, 0.000f, 0.000f,
+                -1.000f, 0.000f, 0.000f,
+                0.000f, 0.000f, -1.000f,
+                0.000f, 0.000f, -1.000f,
+                0.000f, 0.000f, -1.000f,
+                0.000f, 0.000f, -1.000f,
+                1.000f, 0.000f, 0.000f,
+                1.000f, 0.000f, 0.000f,
+                1.000f, 0.000f, 0.000f,
+                1.000f, 0.000f, 0.000f,
+                0.000f, 1.000f, 0.000f,
+                0.000f, 1.000f, 0.000f,
+                0.000f, 1.000f, 0.000f,
+                0.000f, 1.000f, 0.000f,
         };
 
         // Index buffer to specify the order of vertices to draw each face
         // (note: this uses triangle strips for efficiency)
         int[] indices = {
-                // Front face
-                4, 5, 7, 7, 6, 4,
-                // Back face
-                0, 2, 3, 3, 1, 0,
-                // Left face
-                0, 4, 6, 6, 2, 0,
-                // Right face
-                1, 3, 7, 7, 5, 1,
-                // Top face
-                2, 6, 7, 7, 3, 2,
-                // Bottom face
-                0, 1, 5, 5, 4, 0
+                0,   1,   2,   2,   1,   3,   4,   5,   6,   5,   4,   7,
+                8,   9,  10,   9,   8,  11,  12,  13,  14,  12,  14,  15,
+                16,  17,  18,  17,  16,  19,  20,  21,  22,  21,  20,  23
         };
 
         ModelPartMesh mesh = create(positions, textureCoordinates, normals, indices);
