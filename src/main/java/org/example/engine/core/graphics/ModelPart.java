@@ -2,7 +2,7 @@ package org.example.engine.core.graphics;
 
 public class ModelPart {
 
-    public final Class shaderClass;
+    public final Class<? extends ShaderProgram> shaderClass;
     public ModelPartMesh mesh;
     public ModelPartMaterial material;
 
