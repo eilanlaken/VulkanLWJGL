@@ -60,7 +60,6 @@ public class Keyboard {
     }
 
     public static boolean isKeyJustPressed(final Key key) {
-        System.out.println(keysJustPressed);
         if (key == Key.ANY_KEY) return keysJustPressed.size > 0;
         else return keysJustPressed.contains(key.glfwCode);
     }

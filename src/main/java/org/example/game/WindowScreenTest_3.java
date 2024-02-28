@@ -13,6 +13,9 @@ import org.example.engine.core.memory.Pool;
 import org.example.engine.core.memory.Pooled;
 import org.lwjgl.opengl.GL11;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+
 public class WindowScreenTest_3 extends WindowScreen {
 
     // TODO: refactor to use assetLoader.load() etc
