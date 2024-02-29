@@ -25,8 +25,8 @@ public class Renderer3D {
     }
 
     public void setCamera(final Camera camera) {
-        this.currentShader.bindUniform("cameraPosition", camera.lens.position);
-        this.currentShader.bindUniform("cameraCombined", camera.lens.combined);
+        this.currentShader.bindUniform("camera_position", camera.lens.position);
+        this.currentShader.bindUniform("camera_combined", camera.lens.combined);
     }
 
     // TODO: implement. Don't forget about the lights transform.
@@ -35,7 +35,7 @@ public class Renderer3D {
         // ambient light
         //this.currentShader.bindUniform("ambient", environment.getTotalAmbient());
 
-        this.currentShader.bindUniform("pointLightPosition", environment.pointLights.get(0).position);
+        this.currentShader.bindUniform("pointLightPos", environment.pointLights.get(0).position);
         this.currentShader.bindUniform("pointLightColor", environment.pointLights.get(0).color);
         this.currentShader.bindUniform("pointLightIntensity", environment.pointLights.get(0).intensity);
     }
@@ -46,7 +46,7 @@ public class Renderer3D {
         // Disable backface culling
         GL11.glEnable(GL11.GL_CULL_FACE);
 
-        currentShader.bindUniform("transform", transform);
+        currentShader.bindUniform("body_transform", transform);
         ModelPartMaterial material = modelPart.material;
         currentShader.bindUniforms(material.materialParams);
         ModelPartMesh mesh = modelPart.mesh;

@@ -30,11 +30,11 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
     public WindowScreenTest_Lights_2() {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
-//        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/2_vertex.glsl");
-//        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/2_fragment.glsl");
+//        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/simple_1.vert");
+//        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/simple_1.frag");
 
-        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/defaultShader.vert");
-        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/defaultShader.frag");
+        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/simple_1.vert");
+        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/simple_1.frag");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
         this.environment = new Environment();
@@ -60,7 +60,6 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
     @Override
     protected void refresh() {
         float delta = GraphicsUtils.getDeltaTime();
-        System.out.println(Mouse.getCursorDeltaX());
         cameraController.update(delta);
         // fixed update
         float angularSpeed = 200; // degrees per second
