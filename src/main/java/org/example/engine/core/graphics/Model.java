@@ -7,6 +7,9 @@ import org.lwjgl.opengl.GL30;
 
 public class Model implements Resource {
 
+    // TODO:
+    public final short vertexAttributesMask = 0b000;
+
     public final Array<ModelPart> parts;
     public final ModelArmature armature;
 
