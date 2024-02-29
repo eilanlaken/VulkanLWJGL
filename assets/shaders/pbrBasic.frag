@@ -3,6 +3,8 @@
 /**
 redo using:
 https://gist.github.com/galek/53557375251e1a942dfa
+read tutorial
+https://typhomnt.github.io/teaching/ray_tracing/pbr_intro/
 */
 
 // definitions: macros and structs
