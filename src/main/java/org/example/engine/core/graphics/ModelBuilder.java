@@ -107,8 +107,11 @@ public class ModelBuilder {
 
         ModelPartMesh mesh = create(positions, textureCoordinates, normals, indices);
         HashMap<String, Object> materialAttributes = new HashMap<>();
-        materialAttributes.put("color", new Color(1,0,0,1));
+        materialAttributes.put("albedo", new Color(1,0,0,1));
+        materialAttributes.put("metallic", 0.8f);
+        materialAttributes.put("roughness", 0.05f);
         ModelPartMaterial material = new ModelPartMaterial(materialAttributes);
+
         return new ModelPart(mesh, material, null);
     }
 

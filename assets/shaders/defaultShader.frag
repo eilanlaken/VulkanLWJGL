@@ -19,7 +19,6 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0);
 // inputs from previous shaders
 in vec3 tbnUnitVertexToCamera;
 in vec3 tbnCameraPosition;
-in vec3 tbnVertexToLight;
 in vec3 tbnVertexPosition;
 in vec3 tbnNormal;
 in vec3 tbnPointLightPosition;
@@ -27,12 +26,12 @@ in vec3 tbnPointLightPosition;
 // uniforms - environment
 uniform vec4 ambient;
 uniform vec4 pointLightColor;
+uniform float pointLightIntensity;
 
 // uniforms - material
 uniform vec4 albedo;
 uniform float metallic;
 uniform float roughness;
-uniform float rim; // <- TODO: discover what it does.
 
 layout (location = 0) out vec4 fragColor;
 
@@ -41,7 +40,7 @@ void main() {
     vec3 N = normalize(tbnNormal);
     vec3 V = normalize(tbnCameraPosition - tbnVertexPosition);
     vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo, metallic);
+    F0 = mix(F0, albedo.rgb, metallic);
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
@@ -51,7 +50,7 @@ void main() {
         vec3 L = normalize(tbnPointLightPosition - tbnVertexPosition); // TODO: replace constant light with light[i]
         vec3 H = normalize(V + L);
         float distance    = length(tbnPointLightPosition - tbnVertexPosition);
-        float attenuation = 1.0 / (distance * distance);
+        float attenuation = pointLightIntensity / (distance * distance);
         vec3 radiance     = pointLightColor.rgb * attenuation;
 
         // cook-torrance brdf
@@ -72,13 +71,14 @@ void main() {
         Lo += (kD * albedo.rgb / PI + specular) * radiance * NdotL;
     }
 
+    float ao = 1; // TODO
     vec3 ambient = vec3(0.03) * albedo.rgb * ao;
-    vec3 color = ambient + Lo;
+    vec3 color = Lo + ambient;
 
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0/2.2));
 
-    FragColor = vec4(color, 1.0);
+    fragColor = vec4(color, 1.0);
 
 }
 

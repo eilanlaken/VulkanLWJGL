@@ -4,21 +4,15 @@ in vec3 a_position;
 in vec2 a_textureCoordinates;
 in vec3 a_normal;
 
-// uniforms:
-// model transform
+// uniforms
 uniform mat4 transform;
-// camera lens
 uniform vec3 cameraPosition;
-uniform mat4 cameraView;
-uniform mat4 cameraProjection;
 uniform mat4 cameraCombined;
-// light positions and directions.
-uniform vec3 pointLightPosition; // TODO: should be an array.
+uniform vec3 pointLightPosition;
 
 // shader pass through variables
 out vec3 tbnUnitVertexToCamera;
 out vec3 tbnCameraPosition;
-out vec3 tbnVertexToLight;
 out vec3 tbnVertexPosition;
 out vec3 tbnVertexNormal;
 out vec3 tbnPointLightPosition;
@@ -41,10 +35,9 @@ void main() {
     mat3 toTBN = transpose(TBN); // TBN is orthogonal therefore inverse(TBN) = transpose(TBN) = toTBN
 
     // compute vertex shader out variables: invTBN matrix, unit vertex to camera, world vertex position and world vertex normal
-    tbnUnitVertexToCamera = normalize(toTBN * (cameraPosition - vertexPosition4.xyz));
+    tbnUnitVertexToCamera = normalize(toTBN * (cameraPosition - worldVertexPosition.xyz));
     tbnCameraPosition = toTBN * cameraPosition;
-    tbnVertexToLight = toTBN * (pointLightPosition - worldVertexPosition.xyz);
     tbnVertexPosition = toTBN * worldVertexPosition.xyz;
     tbnVertexNormal = toTBN * worldVertexNormal.xyz;
-    tbnPointLightPosition = toTBN * tbnPointLightPosition;
+    tbnPointLightPosition = toTBN * pointLightPosition;
 }

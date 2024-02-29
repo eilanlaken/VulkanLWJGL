@@ -25,16 +25,18 @@ public class Renderer3D {
     }
 
     public void setCamera(final Camera camera) {
-        this.currentShader.bindUniform("view", camera.lens.view);
-        this.currentShader.bindUniform("projection", camera.lens.projection);
+        this.currentShader.bindUniform("cameraCombined", camera.lens.combined);
     }
 
     // TODO: implement. Don't forget about the lights transform.
     public void setEnvironment(final Environment environment) {
         // bind all lights.
         // ambient light
-        this.currentShader.bindUniform("ambient", environment.getTotalAmbient());
+        //this.currentShader.bindUniform("ambient", environment.getTotalAmbient());
 
+        //this.currentShader.bindUniform("pointLightPosition", environment.pointLights.get(0).position);
+        this.currentShader.bindUniform("pointLightColor", environment.pointLights.get(0).color);
+        this.currentShader.bindUniform("pointLightIntensity", environment.pointLights.get(0).intensity);
     }
 
     public void draw(final ModelPart modelPart, final Matrix4 transform) {
