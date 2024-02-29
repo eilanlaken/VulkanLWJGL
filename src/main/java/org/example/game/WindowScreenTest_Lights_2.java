@@ -47,7 +47,7 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
         cameraTransform = new Matrix4();
 
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
-        environment.add(new EnvironmentLightPoint(new Color(0,1,1,1), 1, 0, 3, -1));
+        environment.add(new EnvironmentLightPoint(new Color(0,1,1,1), 10, 0, 0, -5));
     }
 
 
@@ -56,12 +56,12 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
         float delta = GraphicsUtils.getDeltaTime();
         // fixed update
         float angularSpeed = 200; // degrees per second
-        transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
+        //transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
 
-        if (Keyboard.isKeyJustPressed(Keyboard.Key.A))
-            GraphicsUtils.enableVSync();
-        if (Keyboard.isKeyJustPressed(Keyboard.Key.B))
-            GraphicsUtils.disableVSync();
+        if (Keyboard.isKeyPressed(Keyboard.Key.W)) {
+            transform3D.matrix4.translate(0,-1*delta,0);
+        }
+
 
         if (Keyboard.isKeyPressed(Keyboard.Key.RIGHT)) {
             cameraTransform.translate(0,0,-1*delta);

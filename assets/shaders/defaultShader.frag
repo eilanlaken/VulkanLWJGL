@@ -20,7 +20,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0);
 in vec3 tbnUnitVertexToCamera;
 in vec3 tbnCameraPosition;
 in vec3 tbnVertexPosition;
-in vec3 tbnNormal;
+in vec3 tbnVertexNormal;
 in vec3 tbnPointLightPosition;
 
 // uniforms - environment
@@ -33,19 +33,20 @@ uniform vec4 albedo;
 uniform float metallic;
 uniform float roughness;
 
+in vec3 debug;
 layout (location = 0) out vec4 fragColor;
 
 void main() {
 
-    vec3 N = normalize(tbnNormal);
+    vec3 N = normalize(tbnVertexNormal);
     vec3 V = normalize(tbnCameraPosition - tbnVertexPosition);
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo.rgb, metallic);
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < 1; ++i) // TODO: use variable number of lights
-    {
+//    for(int i = 0; i < 1; ++i) // TODO: use variable number of lights
+//    {
         // calculate per-light radiance
         vec3 L = normalize(tbnPointLightPosition - tbnVertexPosition); // TODO: replace constant light with light[i]
         vec3 H = normalize(V + L);
@@ -69,17 +70,19 @@ void main() {
         // add to outgoing radiance Lo
         float NdotL = max(dot(N, L), 0.0);
         Lo += (kD * albedo.rgb / PI + specular) * radiance * NdotL;
-    }
+    //}
 
     float ao = 1; // TODO
     vec3 ambient = vec3(0.03) * albedo.rgb * ao;
     vec3 color = Lo + ambient;
 
-    color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0/2.2));
+    //color = color / (color + vec3(1.0));
+    //color = pow(color, vec3(1.0/2.2));
 
-    fragColor = vec4(color, 1.0);
+    fragColor = vec4(H, 1.0);
 
+    // debug:
+    //fragColor = vec4(V, 1.0);
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {

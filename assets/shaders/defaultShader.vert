@@ -17,6 +17,8 @@ out vec3 tbnVertexPosition;
 out vec3 tbnVertexNormal;
 out vec3 tbnPointLightPosition;
 
+out vec3 debug;
+
 void main() {
     // vertex shader immediate output
     vec4 worldVertexPosition = transform * vec4(a_position, 1.0);
@@ -40,4 +42,6 @@ void main() {
     tbnVertexPosition = toTBN * worldVertexPosition.xyz;
     tbnVertexNormal = toTBN * worldVertexNormal.xyz;
     tbnPointLightPosition = toTBN * pointLightPosition;
+
+    debug = a_normal;
 }

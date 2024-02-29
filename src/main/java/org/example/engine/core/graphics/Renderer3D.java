@@ -25,6 +25,7 @@ public class Renderer3D {
     }
 
     public void setCamera(final Camera camera) {
+        this.currentShader.bindUniform("cameraPosition", camera.lens.position);
         this.currentShader.bindUniform("cameraCombined", camera.lens.combined);
     }
 
@@ -34,7 +35,7 @@ public class Renderer3D {
         // ambient light
         //this.currentShader.bindUniform("ambient", environment.getTotalAmbient());
 
-        //this.currentShader.bindUniform("pointLightPosition", environment.pointLights.get(0).position);
+        this.currentShader.bindUniform("pointLightPosition", environment.pointLights.get(0).position);
         this.currentShader.bindUniform("pointLightColor", environment.pointLights.get(0).color);
         this.currentShader.bindUniform("pointLightIntensity", environment.pointLights.get(0).intensity);
     }
@@ -50,11 +51,17 @@ public class Renderer3D {
         currentShader.bindUniforms(material.materialParams);
         ModelPartMesh mesh = modelPart.mesh;
         GL30.glBindVertexArray(mesh.vaoId);
+
+        // TODO: bind by need
         GL20.glEnableVertexAttribArray(0); // positions
         GL20.glEnableVertexAttribArray(1); // texture coordinates
+        GL20.glEnableVertexAttribArray(2); // normals
         GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.vertexCount, GL11.GL_UNSIGNED_INT, 0);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1); // texture coordinates
+        GL20.glDisableVertexAttribArray(2); // normals
+
+
         GL30.glBindVertexArray(0);
     }
 

@@ -146,6 +146,7 @@ public class ShaderProgram implements Resource {
 
     public void bindUniform(final String name, final Object value) {
         final int location = uniformLocations.get(name, -1);
+        // TODO: put back
         if (location == -1) throw new IllegalArgumentException("\n\nError: " + this.getClass().getSimpleName() +  " does not have a uniform named " + name + "." +
                 "\nIf you have defined the uniform but have not used it, the GLSL compiler discarded it.\n");
         final int type = uniformTypes.get(name, -1);
@@ -154,6 +155,10 @@ public class ShaderProgram implements Resource {
                 Texture texture = (Texture) value;
                 int slot = TextureBinder.bindTexture(texture);
                 GL20.glUniform1i(location, slot);
+                break;
+            case GL20.GL_FLOAT:
+                float f = (Float) value;
+                GL20.glUniform1f(location, f);
                 break;
             case GL20.GL_FLOAT_MAT4:
                 Matrix4 matrix4 = (Matrix4) value;
