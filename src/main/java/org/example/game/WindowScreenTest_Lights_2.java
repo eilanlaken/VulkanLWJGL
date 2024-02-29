@@ -6,6 +6,7 @@ import org.example.engine.core.files.AssetLoaderTexture;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.input.Mouse;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
 import org.lwjgl.opengl.GL11;
@@ -23,6 +24,9 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
     private Environment environment;
     private Matrix4 cameraTransform;
 
+    // debug
+    private BlenderCameraController cameraController;
+
     public WindowScreenTest_Lights_2() {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
@@ -34,6 +38,8 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
         this.environment = new Environment();
+
+        cameraController = new BlenderCameraController(camera);
     }
 
     @Override
@@ -54,6 +60,8 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
     @Override
     protected void refresh() {
         float delta = GraphicsUtils.getDeltaTime();
+        System.out.println(Mouse.getCursorDeltaX());
+        cameraController.update(delta);
         // fixed update
         float angularSpeed = 200; // degrees per second
         //transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
