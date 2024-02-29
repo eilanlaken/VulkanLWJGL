@@ -1,6 +1,7 @@
 package org.example.engine.core.application;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Window;
 import org.example.engine.core.graphics.WindowAttributes;
@@ -25,15 +26,14 @@ public class Application {
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         GLFWErrorCallback.createPrint(System.err).set();
         if (!GLFW.glfwInit()) throw new RuntimeException("Unable to initialize GLFW.");
-
         window = new Window(attributes);
         GraphicsUtils.init(window);
+        FileUtils.init(window);
         Mouse.init(window);
         Keyboard.init(window);
-
-        initialized = true;
         // init OpenGL Context
         GL.createCapabilities();
+        initialized = true;
     }
 
     public static void launch(WindowScreen screen) {

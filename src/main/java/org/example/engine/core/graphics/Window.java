@@ -28,7 +28,8 @@ public class Window implements Resource {
     protected WindowAttributes attributes;
 
     private boolean focused = false;
-    private Array<String> filesDropped = new Array<>();
+    private Array<String> filesDraggedAndDropped = new Array<>();
+    private int latestFilesDraggedAndDroppedCount = 0;
     private volatile int backBufferWidth;
     private volatile int backBufferHeight;
     private volatile int logicalWidth;
@@ -117,13 +118,12 @@ public class Window implements Resource {
             tasks.add(new Runnable() {
                 @Override
                 public void run() {
-                    filesDropped.clear();
+                    latestFilesDraggedAndDroppedCount = count;
                     for (int i = 0; i < count; i++) {
-                        filesDropped.add(GLFWDropCallback.getName(names, i));
+                        filesDraggedAndDropped.add(GLFWDropCallback.getName(names, i));
                     }
                 }
             });
-            System.err.println(filesDropped);
         }
     };
 
@@ -296,6 +296,14 @@ public class Window implements Resource {
 
     protected boolean isFocused() {
         return focused;
+    }
+
+    public Array<String> getFilesDraggedAndDropped() {
+        return filesDraggedAndDropped;
+    }
+
+    public int getLatestFilesDraggedAndDroppedCount() {
+        return latestFilesDraggedAndDroppedCount;
     }
 
     public void setScreen(WindowScreen screen) {

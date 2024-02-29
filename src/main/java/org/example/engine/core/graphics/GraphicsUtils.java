@@ -7,8 +7,8 @@ public class GraphicsUtils {
 
     private static boolean initialized = false;
     private static Window window;
-    protected static volatile boolean isContinuous = true;
 
+    protected static volatile boolean isContinuous = true;
     private static long lastFrameTime = -1;
     private static float deltaTime;
     private static boolean resetDeltaTime = false;
