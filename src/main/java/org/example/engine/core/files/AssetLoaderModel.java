@@ -4,6 +4,8 @@ import org.example.engine.core.graphics.Model;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
+import java.util.Arrays;
+
 public class AssetLoaderModel implements AssetLoader<Model> {
 
     // TODO: complete implementing.
@@ -17,7 +19,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
             for (int i = 0; i < bufferMeshes.limit(); i++) {
                 AIMesh mesh = AIMesh.create(bufferMeshes.get(i));
                 float[] positions = getPositions(mesh);
-                System.out.println(positions);
+                System.out.println(Arrays.toString(positions));
             }
 
         }
