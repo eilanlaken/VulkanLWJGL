@@ -1,5 +1,6 @@
 package org.example.engine.core.files;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.Model;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
@@ -8,9 +9,15 @@ import java.util.Arrays;
 
 public class AssetLoaderModel implements AssetLoader<Model> {
 
-    // TODO: complete implementing.
+    private Array<AIMesh> meshes = new Array<>();
+
     @Override
-    public Model load(final String path) {
+    public Model create(String path) {
+        return null;
+    }
+
+    @Override
+    public void asyncLoad(final String path) {
         try (AIScene scene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate)) {
             PointerBuffer bufferMeshes = scene.mMeshes();
             PointerBuffer bufferMaterials = scene.mMaterials();
@@ -18,12 +25,12 @@ public class AssetLoaderModel implements AssetLoader<Model> {
 
             for (int i = 0; i < bufferMeshes.limit(); i++) {
                 AIMesh mesh = AIMesh.create(bufferMeshes.get(i));
-                float[] positions = getPositions(mesh);
-                System.out.println(Arrays.toString(positions));
+                meshes.add(mesh);
+                //float[] positions = getPositions(mesh);
+                //System.out.println(Arrays.toString(positions));
             }
 
         }
-        return null;
     }
 
     private float[] getPositions(AIMesh mesh) {

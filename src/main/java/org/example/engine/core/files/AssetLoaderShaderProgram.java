@@ -8,7 +8,12 @@ public class AssetLoaderShaderProgram implements AssetLoader<ShaderProgram> {
     public static final String FRAGMENT_SHADER_FILE_SUFFIX = ".frag";
 
     @Override
-    public ShaderProgram load(String path) {
+    public void asyncLoad(String path) {
+
+    }
+
+    @Override
+    public ShaderProgram create(String path) {
         return null;
     }
 }

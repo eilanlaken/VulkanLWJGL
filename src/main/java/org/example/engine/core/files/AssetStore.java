@@ -9,6 +9,8 @@ import org.example.engine.core.memory.Resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,28 +22,21 @@ import java.util.Map;
 // TODO: make async (later)
 public final class AssetStore {
 
-    private static HashMap<Class<?>, AssetLoader<?>> loaders;
+    private static HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> loaders;
     static {
         loaders = new HashMap<>();
-        loaders.put(Texture.class, new AssetLoaderTexture());
-        loaders.put(Model.class, new AssetLoaderModel());
-        loaders.put(ShaderProgram.class, new AssetLoaderShaderProgram());
+        loaders.put(Texture.class, AssetLoaderTexture.class);
+        loaders.put(Model.class, AssetLoaderModel.class);
+        loaders.put(ShaderProgram.class, AssetLoaderShaderProgram.class);
     }
     private static volatile float progress = 0;
     private static boolean doneLoading = false;
-    private static long totalBytesLoadQueue = 0;
+    private static volatile long totalBytesLoadQueue = 0;
     private static volatile Queue<AssetDescriptor> loadQueue = new Queue<>();
     private static volatile HashMap<String, Asset> store = new HashMap<>();
 
     public static synchronized void put(final Class<?> type, final String path) {
-        Asset asset = store.get(path);
-        if (asset != null) asset.refCount++;
-        try {
-            AssetDescriptor descriptor = new AssetDescriptor(type, path);
-            loadQueue.addFirst(descriptor);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     public static synchronized void discard(final String path) {
@@ -59,9 +54,19 @@ public final class AssetStore {
     }
 
     public static synchronized void clean() {
-        for (Map.Entry<String, Asset> entry : store.entrySet()) {
-            entry.getValue().free();
-        }
-        store.clear();
+
     }
+
+    protected static synchronized AssetLoader<? extends Resource> getNewLoader(Class<? extends Resource> type) {
+        Class<? extends AssetLoader<? extends Resource>> loaderClass = AssetStore.loaders.get(type);
+        AssetLoader<? extends Resource> loaderInstance;
+        try {
+            Constructor<?> constructor = loaderClass.getConstructor(String.class);
+            loaderInstance = (AssetLoader<? extends Resource>) constructor.newInstance();
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException  | InvocationTargetException e) {
+            throw new RuntimeException("Could not get loader for type: " + type.getSimpleName());
+        }
+        return loaderInstance;
+    }
+
 }
