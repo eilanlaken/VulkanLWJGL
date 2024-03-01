@@ -16,6 +16,8 @@ public class AssetLoaderModel extends AssetLoader<Model> {
 
             for (int i = 0; i < bufferMeshes.limit(); i++) {
                 AIMesh mesh = AIMesh.create(bufferMeshes.get(i));
+                float[] positions = getPositions(mesh);
+                System.out.println(positions);
             }
 
         }

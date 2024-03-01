@@ -3,6 +3,7 @@ package org.example.game;
 import org.example.engine.components.ComponentFactory;
 import org.example.engine.components.ComponentTransform3D;
 import org.example.engine.core.files.AssetLoaderTexture;
+import org.example.engine.core.files.AssetStore;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
@@ -10,6 +11,8 @@ import org.example.engine.core.input.Mouse;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
 import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
 
 public class WindowScreenTest_Lights_2 extends WindowScreen {
 
@@ -44,6 +47,14 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
 
     @Override
     public void show() {
+        try {
+            long bytes = FileUtils.getFileSize("assets/models/Car.fbx");
+            System.out.println("bytes: " + bytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        AssetStore.load(Model.class, "assets/models/Car.fbx");
+
         transform3D = ComponentFactory.createTransform3D();
 
         modelPart = ModelBuilder.createRedCube();

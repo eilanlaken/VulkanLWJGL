@@ -6,6 +6,7 @@ import org.example.engine.core.graphics.Window;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public final class FileUtils {
@@ -45,6 +46,11 @@ public final class FileUtils {
             droppedFilesHistory.add(allFileDraggedAndDroppedPaths.get(i));
         }
         return droppedFilesHistory;
+    }
+
+    public static long getFileSize(final String path) throws IOException {
+        Path filePath = Paths.get(path);
+        return Files.size(filePath);
     }
 
 }
