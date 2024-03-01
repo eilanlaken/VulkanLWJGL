@@ -4,7 +4,7 @@ import org.example.engine.core.graphics.Model;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
-public class AssetLoaderModel extends AssetLoader<Model> {
+public class AssetLoaderModel implements AssetLoader<Model> {
 
     // TODO: complete implementing.
     @Override

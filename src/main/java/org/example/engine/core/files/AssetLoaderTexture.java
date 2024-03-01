@@ -9,7 +9,7 @@ import org.lwjgl.system.MemoryStack;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-public class AssetLoaderTexture extends AssetLoader<Texture> {
+public class AssetLoaderTexture implements AssetLoader<Texture> {
 
     public final int maxTextureSize;
 
