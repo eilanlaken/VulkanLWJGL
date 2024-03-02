@@ -8,7 +8,7 @@ public final class RunnerTaskAsync {
     public static void submit(TaskAsync task) {
         Thread spawningThread = new Thread(() -> {
             try {
-                process(task);
+                start(task);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -17,10 +17,10 @@ public final class RunnerTaskAsync {
         spawningThread.start();
     }
 
-    private static Thread process(TaskAsync task) {
+    private static Thread start(TaskAsync task) {
         List<Thread> preRequisiteThreads = new ArrayList<>();
         for (TaskAsync prerequisite : task.prerequisites) {
-            Thread prerequisiteThread = process(prerequisite);
+            Thread prerequisiteThread = start(prerequisite);
             preRequisiteThreads.add(prerequisiteThread);
         }
 
@@ -32,7 +32,7 @@ public final class RunnerTaskAsync {
             }
         }
 
-        Thread taskThread = new Thread(task::task);
+        Thread taskThread = new Thread(task::start);
         taskThread.setDaemon(true);
         taskThread.start();
         return taskThread;

@@ -11,7 +11,7 @@ import org.example.game.WindowScreenTest_AssetStore_1;
 public class Main {
 
     public static void main(String[] args) {
-        //testCode1();
+        testCode1();
         testCode2();
 
         WindowAttributes config = new WindowAttributes();
@@ -20,11 +20,53 @@ public class Main {
     }
 
     private static void testCode1() {
-        TaskAsync taskAsyncChildAAA = new TaskAsync("child AAA", 5);
-        TaskAsync taskAsyncChildAA = new TaskAsync("child AA", 5, taskAsyncChildAAA);
-        TaskAsync taskAsyncChildA = new TaskAsync("child A", 3, taskAsyncChildAA);
-        TaskAsync taskAsyncChildB = new TaskAsync("child B", 6);
-        TaskAsync parent = new TaskAsync("parent", 2, taskAsyncChildB, taskAsyncChildA);
+        TaskAsync childA = new TaskAsync() {
+            @Override
+            public void task() {
+                for (int i = 0; i < 5; i++) {
+                    System.out.println("childA");
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        TaskAsync childB = new TaskAsync() {
+            @Override
+            public void task() {
+                for (int i = 0; i < 10; i++) {
+                    System.out.println("childB");
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        TaskAsync parent = new TaskAsync(childA, childB) {
+            @Override
+            public void task() {
+                for (int i = 0; i < 10; i++) {
+                    System.out.println("parent");
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                System.out.println("parent completed");
+            }
+        };
+
         RunnerTaskAsync.submit(parent);
     }
 

@@ -2,36 +2,29 @@ package org.example.engine.core.async;
 
 import org.example.engine.core.collections.Array;
 
-// TODO: make abstract
-public class TaskAsync {
+public abstract class TaskAsync {
 
-
-    private volatile boolean complete = false;
     public Array<TaskAsync> prerequisites;
-    String id;
-    int counter = 0;
-    int length;
+    private volatile boolean inProgress = false;
+    private volatile boolean finished = false;
 
-    public TaskAsync(String id, int length, TaskAsync... prerequisites) {
-        this.id = id;
+    public TaskAsync(TaskAsync... prerequisites) {
         this.prerequisites = new Array<>();
         this.prerequisites.addAll(prerequisites);
-        this.length = length;
     }
 
-    public void task() {
-        for (int i = 0; i < length; i++) {
-            System.out.println(id + ": " + i);
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            counter = i;
+    protected final void start() {
+        synchronized (this) {
+            if (finished) return;
+            inProgress = true;
         }
+        task();
+        onComplete();
+        synchronized (this) { inProgress = false; finished = true; }
     }
 
-    // should only be called from the main Thread.
+    public abstract void task();
+
     public void onComplete() {
 
     }
