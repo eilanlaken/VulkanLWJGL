@@ -7,8 +7,6 @@ class AssetStoreTask implements Runnable {
     final AssetDescriptor descriptor;
     final AssetLoader loader;
     final long startTime;
-    private volatile boolean asyncDone;
-    private volatile boolean dependenciesLoaded;
     private volatile Array<AssetDescriptor> dependencies;
     private volatile Asset asset;
     private volatile boolean cancel;
@@ -21,19 +19,6 @@ class AssetStoreTask implements Runnable {
 
     @Override
     public void run() {
-        if (cancel) return;
-        if (!dependenciesLoaded) {
-            dependencies = loader.getDependencies(descriptor.path);
-            if (dependencies != null) {
-                dependencies.removeDuplicates(false);
-                //manager.injectDependencies(descriptor.fileName, dependencies);
-            } else {
-                loader.asyncLoad(descriptor.path);
-                asyncDone = true;
-            }
-        } else {
-            loader.asyncLoad(descriptor.path);
-            asyncDone = true;
-        }
+
     }
 }
