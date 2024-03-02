@@ -2,7 +2,7 @@ package org.example.engine.core.async;
 
 import org.lwjgl.glfw.GLFW;
 
-public final class SyncStep {
+public final class StepSync {
 
     private static final long NANOS_IN_SECOND = 1000L * 1000L * 1000L;
     private static long nextFrame = 0;

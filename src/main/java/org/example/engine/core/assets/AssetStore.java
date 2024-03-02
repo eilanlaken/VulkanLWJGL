@@ -10,7 +10,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-// TODO: make async (later)
 public final class AssetStore {
 
     private static HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> loaders;
