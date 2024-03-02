@@ -67,6 +67,7 @@ public class WindowScreenTest_AssetStore_1 extends WindowScreen {
 
     @Override
     protected void refresh() {
+        if (GraphicsUtils.getFrameCount() % 60 == 0) System.out.println("Main Thread.");
         float delta = GraphicsUtils.getDeltaTime();
         cameraController.update(delta);
         // fixed update

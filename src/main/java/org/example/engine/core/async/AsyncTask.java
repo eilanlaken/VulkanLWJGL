@@ -1,15 +1,38 @@
 package org.example.engine.core.async;
 
-public abstract class AsyncTask {
+import org.example.engine.core.collections.Array;
 
-    // the array of Task(s) required to be completed BEFORE this Task.
-    public AsyncTask[] dependencies;
+public class AsyncTask {
 
-    public AsyncTask(AsyncTask...dependencies) {
-        this.dependencies = dependencies;
+
+    private volatile boolean complete = false;
+    public Array<AsyncTask> prerequisites;
+    String id;
+    int counter = 0;
+    int length;
+
+    public AsyncTask(String id, int length, AsyncTask... prerequisites) {
+        this.id = id;
+        this.prerequisites = new Array<>();
+        this.prerequisites.addAll(prerequisites);
+        this.length = length;
     }
 
-    public abstract void task();
-    public abstract void onComplete();
+    public void task() {
+        for (int i = 0; i < length; i++) {
+            System.out.println(id + ": " + i);
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            counter = i;
+        }
+    }
+
+    // should only be called from the main Thread.
+    public void onComplete() {
+
+    }
 
 }

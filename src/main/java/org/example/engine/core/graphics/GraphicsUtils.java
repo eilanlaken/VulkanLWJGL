@@ -74,6 +74,10 @@ public class GraphicsUtils {
         return GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
     }
 
+    public static int getFrameCount() {
+        return frames;
+    }
+
     public static void setContinuousRendering(boolean isContinuous) {
         GraphicsUtils.isContinuous = isContinuous;
     }

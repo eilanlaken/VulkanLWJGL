@@ -1,5 +1,6 @@
 package org.example.engine.core.application;
 
+import org.example.engine.core.async.SyncStep;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.files.FileUtils;
 import org.example.engine.core.graphics.GraphicsUtils;
@@ -73,7 +74,7 @@ public class Application {
                     // ignore
                 }
             } else if (targetFrameRate > 0) {
-                ApplicationSync.sync(targetFrameRate); // sleep as needed to meet the target framerate
+                SyncStep.sync(targetFrameRate); // sleep as needed to meet the target framerate
             }
         }
     }

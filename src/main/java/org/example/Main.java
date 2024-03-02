@@ -1,13 +1,10 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.async.AsyncTask;
+import org.example.engine.core.async.AsyncTaskRunner;
 import org.example.engine.core.graphics.WindowAttributes;
-import org.example.engine.core.math.Vector2;
-import org.example.engine.core.math.Vector3;
 import org.example.game.WindowScreenTest_AssetStore_1;
-import org.example.game.WindowScreenTest_Lights_1;
-import org.example.game.WindowScreenTest_Lights_2;
 
 public class Main {
 
@@ -21,5 +18,19 @@ public class Main {
 
     private static void testCode() {
 
+        AsyncTask asyncTaskChildAAA = new AsyncTask("child AAA", 5);
+
+        AsyncTask asyncTaskChildAA = new AsyncTask("child AA", 5, asyncTaskChildAAA);
+
+        AsyncTask asyncTaskChildA = new AsyncTask("child A", 3, asyncTaskChildAA);
+        AsyncTask asyncTaskChildB = new AsyncTask("child B", 6);
+        AsyncTask parent = new AsyncTask("parent", 2, asyncTaskChildB, asyncTaskChildA);
+
+        var runner = new AsyncTaskRunner();
+        try {
+            runner.submit(parent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
