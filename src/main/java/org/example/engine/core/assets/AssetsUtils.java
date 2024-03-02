@@ -8,14 +8,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public final class AssetUtils {
+public final class AssetsUtils {
 
     private static boolean initialized = false;
     private static Window window;
 
     public static void init(final Window window) {
-        if (initialized) throw new IllegalStateException(AssetUtils.class.getSimpleName() + " instance already initialized.");
-        AssetUtils.window = window;
+        if (initialized) throw new IllegalStateException(AssetsUtils.class.getSimpleName() + " instance already initialized.");
+        AssetsUtils.window = window;
         initialized = true;
     }
 

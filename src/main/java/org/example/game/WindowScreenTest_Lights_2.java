@@ -4,7 +4,7 @@ import org.example.engine.components.ComponentFactory;
 import org.example.engine.components.ComponentTransform3D;
 import org.example.engine.core.assets.AssetLoaderTexture;
 import org.example.engine.core.assets.AssetStore;
-import org.example.engine.core.assets.AssetUtils;
+import org.example.engine.core.assets.AssetsUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.math.Matrix4;
@@ -35,8 +35,8 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
 //        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/simple_1.vert");
 //        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/simple_1.frag");
 
-        final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.vert");
-        final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.frag");
+        final String vertexShaderSrc = AssetsUtils.getFileContent("assets/shaders/simple_1.vert");
+        final String fragmentShaderSrc = AssetsUtils.getFileContent("assets/shaders/simple_1.frag");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
         this.environment = new Environment();
@@ -47,7 +47,7 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
     @Override
     public void show() {
         try {
-            long bytes = AssetUtils.getFileSize("assets/models/Car.fbx");
+            long bytes = AssetsUtils.getFileSize("assets/models/Car.fbx");
             System.out.println("bytes: " + bytes);
         } catch (IOException e) {
             throw new RuntimeException(e);
