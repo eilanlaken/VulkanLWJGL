@@ -2,8 +2,8 @@ package org.example.game;
 
 import org.example.engine.components.ComponentFactory;
 import org.example.engine.components.ComponentTransform3D;
-import org.example.engine.core.files.AssetLoaderTexture;
-import org.example.engine.core.files.FileUtils;
+import org.example.engine.core.assets.AssetLoaderTexture;
+import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.math.Matrix4;
@@ -26,8 +26,8 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
     public WindowScreenTest_Lights_1() {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
-        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/simple_1.vert");
-        final String fragmentShaderSrc = FileUtils.getFileContent("assets/shaders/simple_1.frag");
+        final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.vert");
+        final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.frag");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
         this.environment = new Environment();

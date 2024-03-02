@@ -1,7 +1,6 @@
-package org.example.engine.core.files;
+package org.example.engine.core.assets;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Window;
 
 import java.io.IOException;
@@ -9,14 +8,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public final class FileUtils {
+public final class AssetUtils {
 
     private static boolean initialized = false;
     private static Window window;
 
     public static void init(final Window window) {
-        if (initialized) throw new IllegalStateException(FileUtils.class.getSimpleName() + " instance already initialized.");
-        FileUtils.window = window;
+        if (initialized) throw new IllegalStateException(AssetUtils.class.getSimpleName() + " instance already initialized.");
+        AssetUtils.window = window;
         initialized = true;
     }
 

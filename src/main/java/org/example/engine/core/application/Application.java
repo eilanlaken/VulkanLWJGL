@@ -2,7 +2,7 @@ package org.example.engine.core.application;
 
 import org.example.engine.core.async.SyncStep;
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.files.FileUtils;
+import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Window;
 import org.example.engine.core.graphics.WindowAttributes;
@@ -29,7 +29,7 @@ public class Application {
         if (!GLFW.glfwInit()) throw new RuntimeException("Unable to initialize GLFW.");
         window = new Window(attributes);
         GraphicsUtils.init(window);
-        FileUtils.init(window);
+        AssetUtils.init(window);
         Mouse.init(window);
         Keyboard.init(window);
         // init OpenGL Context

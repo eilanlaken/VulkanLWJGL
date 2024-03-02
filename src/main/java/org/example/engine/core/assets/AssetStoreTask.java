@@ -1,4 +1,4 @@
-package org.example.engine.core.files;
+package org.example.engine.core.assets;
 
 import org.example.engine.core.collections.Array;
 

@@ -1,7 +1,5 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.files.FileUtils;
-
 @Deprecated
 public class RendererShaderSelector {
 
