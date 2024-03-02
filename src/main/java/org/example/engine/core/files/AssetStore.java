@@ -1,23 +1,14 @@
 package org.example.engine.core.files;
 
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.Queue;
 import org.example.engine.core.graphics.Model;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.Texture;
 import org.example.engine.core.memory.Resource;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
 // TODO: make async (later)
 public final class AssetStore {
@@ -35,20 +26,15 @@ public final class AssetStore {
     private static volatile Queue<AssetDescriptor> loadQueue = new Queue<>();
     private static volatile HashMap<String, Asset> store = new HashMap<>();
 
-    public static synchronized void put(final Class<?> type, final String path) {
+    public static synchronized void loadAsset(final Class<?> type, final String path) {
 
     }
 
-    public static synchronized void discard(final String path) {
+    public static synchronized void unloadAsset(final String path) {
 
     }
 
-    public static synchronized boolean load(float deltaTime) {
-
-        return doneLoading;
-    }
-
-    public static synchronized <T> T get(final String path) {
+    public static synchronized <T> T getAsset(final String path) {
 
         return null;
     }

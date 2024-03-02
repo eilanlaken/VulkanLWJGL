@@ -1,5 +1,6 @@
 package org.example.engine.core.files;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.ShaderProgram;
 
 public class AssetLoaderShaderProgram implements AssetLoader<ShaderProgram> {
@@ -16,4 +17,10 @@ public class AssetLoaderShaderProgram implements AssetLoader<ShaderProgram> {
     public ShaderProgram create(String path) {
         return null;
     }
+
+    @Override
+    public Array<AssetDescriptor> getDependencies(String path) {
+        return null;
+    }
+
 }

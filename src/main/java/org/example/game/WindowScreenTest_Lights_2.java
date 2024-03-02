@@ -52,7 +52,7 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        AssetStore.put(Model.class, "assets/models/Car.fbx");
+        AssetStore.loadAsset(Model.class, "assets/models/Car.fbx");
 
         transform3D = ComponentFactory.createTransform3D();
 

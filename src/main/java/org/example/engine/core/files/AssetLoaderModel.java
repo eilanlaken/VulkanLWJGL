@@ -33,6 +33,12 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         }
     }
 
+    // TODO: implement
+    @Override
+    public Array<AssetDescriptor> getDependencies(String path) {
+        return null;
+    }
+
     private float[] getPositions(AIMesh mesh) {
         float[] positions = new float[mesh.mVertices().limit() * 3];
         AIVector3D.Buffer positionsBuffer = mesh.mVertices();

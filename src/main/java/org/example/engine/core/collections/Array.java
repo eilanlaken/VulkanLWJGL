@@ -318,6 +318,17 @@ public class Array<T> implements Iterable<T> {
         }
     }
 
+    public void removeDuplicates(boolean identity) {
+        Array<T> uniques = new Array<>();
+        for (int i = 0; i < size; i++) {
+            T item = items[i];
+            if (uniques.contains(item, identity)) continue;
+            uniques.add(item);
+        }
+        this.items = uniques.items;
+        this.size = uniques.size;
+    }
+
     /** Reduces the size of the array to the specified size. If the array is already smaller than the specified size, no action is
      * taken. */
     public void truncate(int newSize) {

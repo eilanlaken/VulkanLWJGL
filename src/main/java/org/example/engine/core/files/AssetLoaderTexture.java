@@ -1,5 +1,6 @@
 package org.example.engine.core.files;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
@@ -50,7 +51,12 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
         return texture;
     }
 
-//    @Override
+    @Override
+    public Array<AssetDescriptor> getDependencies(String path) {
+        return null;
+    }
+
+    //    @Override
 //    public Texture create(final String path) {
 //        int width;
 //        int height;
