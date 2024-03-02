@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 public class AsyncTaskRunner {
 
-    public void submit(AsyncTask task) throws Exception {
+    public static void submit(AsyncTask task) {
         Thread spawningThread = new Thread(() -> {
             try {
                 process(task);
@@ -19,7 +19,7 @@ public class AsyncTaskRunner {
         spawningThread.start();
     }
 
-    private Thread process(AsyncTask task) throws Exception {
+    private static Thread process(AsyncTask task) {
         List<Thread> preRequisiteThreads = new ArrayList<>();
         for (AsyncTask prerequisite : task.prerequisites) {
             Thread prerequisiteThread = process(prerequisite);

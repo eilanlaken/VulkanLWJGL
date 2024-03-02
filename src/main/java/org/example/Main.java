@@ -26,11 +26,6 @@ public class Main {
         AsyncTask asyncTaskChildB = new AsyncTask("child B", 6);
         AsyncTask parent = new AsyncTask("parent", 2, asyncTaskChildB, asyncTaskChildA);
 
-        var runner = new AsyncTaskRunner();
-        try {
-            runner.submit(parent);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        AsyncTaskRunner.submit(parent);
     }
 }
