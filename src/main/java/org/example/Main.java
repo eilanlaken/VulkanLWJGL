@@ -1,10 +1,7 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
-import org.example.engine.core.async.RunnerTaskSync;
-import org.example.engine.core.async.TaskAsync;
-import org.example.engine.core.async.RunnerTaskAsync;
-import org.example.engine.core.async.TaskSync;
+import org.example.engine.core.async.*;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.game.WindowScreenTest_AssetStore_1;
 
@@ -20,9 +17,9 @@ public class Main {
     }
 
     private static void testCode1() {
-        TaskAsync childA = new TaskAsync() {
+        Task childA = new Task() {
             @Override
-            public void task() {
+            public void run() {
                 for (int i = 0; i < 5; i++) {
                     System.out.println("childA");
                     try {
@@ -34,13 +31,13 @@ public class Main {
             }
         };
 
-        TaskAsync childB = new TaskAsync() {
+        Task childB = new Task() {
             @Override
-            public void task() {
-                for (int i = 0; i < 10; i++) {
+            public void run() {
+                for (int i = 0; i < 11; i++) {
                     System.out.println("childB");
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(400);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -48,9 +45,9 @@ public class Main {
             }
         };
 
-        TaskAsync parent = new TaskAsync(childA, childB) {
+        Task parent = new Task(childA, childB) {
             @Override
-            public void task() {
+            public void run() {
                 for (int i = 0; i < 10; i++) {
                     System.out.println("parent");
                     try {
@@ -67,11 +64,11 @@ public class Main {
             }
         };
 
-        RunnerTaskAsync.submit(parent);
+        TaskRunner.runAsync(parent);
     }
 
     private static void testCode2() {
-        TaskSync a = new TaskSync() {
+        Task a = new Task() {
             @Override
             public void run() {
                 System.out.println("a");
@@ -83,7 +80,7 @@ public class Main {
             }
         };
 
-        TaskSync aa = new TaskSync(a) {
+        Task aa = new Task(a) {
             @Override
             public void run() {
                 System.out.println("aa");
@@ -95,7 +92,7 @@ public class Main {
             }
         };
 
-        TaskSync b = new TaskSync(a) {
+        Task b = new Task(a) {
             @Override
             public void run() {
                 System.out.println("b");
@@ -107,7 +104,7 @@ public class Main {
             }
         };
 
-        TaskSync c = new TaskSync(a,b) {
+        Task c = new Task(a,b) {
             @Override
             public void run() {
                 System.out.println("c");
@@ -119,7 +116,7 @@ public class Main {
             }
         };
 
-        TaskSync d = new TaskSync(aa,a,b,c) {
+        Task d = new Task(aa,a,b,c) {
             @Override
             public void run() {
                 System.out.println("d");
@@ -131,16 +128,6 @@ public class Main {
             }
         };
 
-//        TaskSync aa = new TaskSync("aa",a);
-//        TaskSync b = new TaskSync("b",a);
-//        TaskSync c = new TaskSync("c,",a, b);
-//        TaskSync d = new TaskSync("d,",aa, a, b, c);
-
-//        System.out.println("a: " + TaskSync.countPrerequisites(a));
-//        System.out.println("b: " + TaskSync.countPrerequisites(b));
-//        System.out.println("c: " + TaskSync.countPrerequisites(c));
-//        System.out.println("d: " + TaskSync.countPrerequisites(d));
-
-        RunnerTaskSync.run(a,aa,d,c,b);
+        TaskRunner.runSync(a,aa,d,c,b);
     }
 }
