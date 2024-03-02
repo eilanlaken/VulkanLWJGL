@@ -10,8 +10,6 @@ class AssetStoreTask implements Runnable {
     private volatile boolean asyncDone;
     private volatile boolean dependenciesLoaded;
     private volatile Array<AssetDescriptor> dependencies;
-    //private volatile AsyncResult<Void> depsFuture;
-    //volatile AsyncResult<Void> loadFuture;
     private volatile Asset asset;
     private volatile boolean cancel;
 

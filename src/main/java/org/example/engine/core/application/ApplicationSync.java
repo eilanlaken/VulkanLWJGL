@@ -2,6 +2,7 @@ package org.example.engine.core.application;
 
 import org.lwjgl.glfw.GLFW;
 
+@Deprecated // TODO: move to async
 public final class ApplicationSync {
 
     private static final long NANOS_IN_SECOND = 1000L * 1000L * 1000L;
