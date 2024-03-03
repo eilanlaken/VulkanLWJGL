@@ -3,7 +3,6 @@ package org.example.game;
 import org.example.engine.components.ComponentFactory;
 import org.example.engine.components.ComponentTransform3D;
 import org.example.engine.core.assets.AssetLoaderTexture;
-import org.example.engine.core.assets.z_AssetStore;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
@@ -52,7 +51,6 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        z_AssetStore.loadAsset(Model.class, "assets/models/Car.fbx");
 
         transform3D = ComponentFactory.createTransform3D();
 
