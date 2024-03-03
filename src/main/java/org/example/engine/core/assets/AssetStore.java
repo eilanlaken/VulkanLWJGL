@@ -1,6 +1,5 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.async.Task;
 import org.example.engine.core.async.TaskRunner;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.Queue;
@@ -9,7 +8,6 @@ import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.Texture;
 import org.example.engine.core.memory.Resource;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -20,7 +18,9 @@ public final class AssetStore {
 
     private final static HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> loaders = getLoadersMap();
     private static volatile Queue<AssetDescriptor> loadQueue = new Queue<>();
-    private static volatile HashMap<String, Asset> store = new HashMap<>();
+
+    // TODO: change to private
+    protected static volatile HashMap<String, Asset> store = new HashMap<>();
 
     private static volatile Set<AssetStoreLoadingTask> completedAsyncTasks = new HashSet<>();
     private static volatile Set<AssetStoreLoadingTask> parallelLoadTasks = new HashSet<>();
@@ -29,6 +29,11 @@ public final class AssetStore {
     private static volatile Set<AssetStoreLoadingTask> inOrderLoadTasks = new HashSet<>();
 
     public static synchronized void update() {
+        for (AssetStoreLoadingTask task : parallelLoadTasks) {
+            if (task.isLoadDataFromDiscComplete()) completedAsyncTasks.add(task);
+            inOrderLoadTasks.add(task);
+        }
+
         parallelLoadTasks.removeAll(completedAsyncTasks);
         for (AssetDescriptor descriptor : loadQueue) {
             AssetStoreLoadingTask task = new AssetStoreLoadingTask(descriptor);
@@ -42,6 +47,7 @@ public final class AssetStore {
             if (task.readyForCreation()) {
                 Asset asset = task.create();
                 AssetStore.store(asset);
+                System.out.println("store: " + store);
                 completedSyncTasks.add(task);
             }
         }
@@ -60,6 +66,9 @@ public final class AssetStore {
     }
 
     protected static synchronized boolean areLoaded(final Array<AssetDescriptor> dependencies) {
+        if (dependencies == null || dependencies.size == 0) return true;
+        System.out.println(dependencies.size);
+
         for (AssetDescriptor dependency : dependencies) {
             Asset asset = store.get(dependency.path);
             if (asset == null) return false;
@@ -86,7 +95,7 @@ public final class AssetStore {
     }
 
     public static synchronized Asset getAsset(final String path) {
-        return AssetStore.getAsset(path);
+        return store.get(path);
     }
 
     public static synchronized void clean() {

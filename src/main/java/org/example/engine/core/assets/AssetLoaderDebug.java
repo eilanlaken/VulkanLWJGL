@@ -37,10 +37,14 @@ public class AssetLoaderDebug implements AssetLoader<Debug> {
 
     @Override
     public Debug create() {
+        System.out.println("create debug: " + dependPath1);
+        System.out.println(AssetStore.store);
+
         Debug debug = new Debug();
         debug.text = content;
         debug.dependency1 = (DebugDependency) AssetStore.getAsset(dependPath1).obj;
         debug.dependency2 = (DebugDependency) AssetStore.getAsset(dependPath2).obj;
+        System.out.println("created debug");
         return debug;
     }
 }
