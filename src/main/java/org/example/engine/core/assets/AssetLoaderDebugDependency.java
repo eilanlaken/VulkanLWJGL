@@ -13,6 +13,7 @@ public class AssetLoaderDebugDependency implements AssetLoader<DebugDependency> 
 
     @Override
     public void asyncLoad(String path) {
+        System.out.println("path: " + path);
         content = AssetUtils.getFileContent(path);
     }
 

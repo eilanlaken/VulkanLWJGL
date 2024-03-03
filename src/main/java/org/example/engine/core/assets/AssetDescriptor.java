@@ -19,8 +19,7 @@ class AssetDescriptor {
         try {
             s = AssetUtils.getFileSize(path);
         } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
+
         }
         this.size = s;
     }

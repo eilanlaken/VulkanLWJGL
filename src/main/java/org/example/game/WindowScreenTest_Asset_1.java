@@ -2,9 +2,7 @@ package org.example.game;
 
 import org.example.engine.components.ComponentFactory;
 import org.example.engine.components.ComponentTransform3D;
-import org.example.engine.core.assets.AssetLoaderTexture;
-import org.example.engine.core.assets.z_AssetStore;
-import org.example.engine.core.assets.AssetUtils;
+import org.example.engine.core.assets.*;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.math.Matrix4;
@@ -13,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 
-public class WindowScreenTest_AssetStore_1 extends WindowScreen {
+public class WindowScreenTest_Asset_1 extends WindowScreen {
 
     // TODO: refactor to use assetLoader.load() etc
     AssetLoaderTexture assetLoaderTextures;
@@ -29,7 +27,7 @@ public class WindowScreenTest_AssetStore_1 extends WindowScreen {
     // debug
     private BlenderCameraController cameraController;
 
-    public WindowScreenTest_AssetStore_1() {
+    public WindowScreenTest_Asset_1() {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
 
@@ -44,13 +42,9 @@ public class WindowScreenTest_AssetStore_1 extends WindowScreen {
 
     @Override
     public void show() {
-        try {
-            long bytes = AssetUtils.getFileSize("assets/models/Car.fbx");
-            System.out.println("bytes: " + bytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        z_AssetStore.loadAsset(Model.class, "assets/models/Car.fbx");
+
+        AssetStore.loadAsset(Debug.class, "assets/text/parent.txt");
+
 
         transform3D = ComponentFactory.createTransform3D();
 

@@ -3,6 +3,8 @@ package org.example.engine.core.assets;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.Window;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,12 +22,17 @@ public final class AssetUtils {
     }
 
     public static String getFileContent(final String path) {
-        try {
-            return Files.readString(Paths.get(path));
+        final StringBuilder builder = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                builder.append(line);
+                builder.append('\n');
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return builder.toString();
     }
 
     public static Array<String> getLastDroppedFilePaths() {
@@ -48,6 +55,7 @@ public final class AssetUtils {
     }
 
     public static long getFileSize(final String path) throws IOException {
+        System.out.println(path);
         Path filePath = Paths.get(path);
         return Files.size(filePath);
     }

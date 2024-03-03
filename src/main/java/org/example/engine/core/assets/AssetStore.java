@@ -97,9 +97,10 @@ public final class AssetStore {
         Class<? extends AssetLoader<? extends Resource>> loaderClass = AssetStore.loaders.get(type);
         AssetLoader<? extends Resource> loaderInstance;
         try {
-            Constructor<?> constructor = loaderClass.getConstructor(String.class);
+            Constructor<?> constructor = loaderClass.getConstructor();
             loaderInstance = (AssetLoader<? extends Resource>) constructor.newInstance();
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException  | InvocationTargetException e) {
+            e.printStackTrace();
             throw new RuntimeException("Could not get loader for type: " + type.getSimpleName());
         }
         return loaderInstance;

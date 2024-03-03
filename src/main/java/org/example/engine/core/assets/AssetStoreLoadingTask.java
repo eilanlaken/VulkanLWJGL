@@ -22,6 +22,7 @@ public class AssetStoreLoadingTask extends Task {
 
     @Override
     public void onComplete() {
+        if (dependencies == null) return;
         for (AssetDescriptor dependency : dependencies) AssetStore.loadAsset(dependency.type, dependency.path);
     }
 

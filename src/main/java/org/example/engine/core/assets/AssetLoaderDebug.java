@@ -2,6 +2,9 @@ package org.example.engine.core.assets;
 
 import org.example.engine.core.collections.Array;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class AssetLoaderDebug implements AssetLoader<Debug> {
 
     private String content;
@@ -10,6 +13,9 @@ public class AssetLoaderDebug implements AssetLoader<Debug> {
 
     @Override
     public Array<AssetDescriptor> getDependencies() {
+        System.out.println("d1: " + dependPath1);
+        System.out.println("d2: " + dependPath2);
+
         Array<AssetDescriptor> dependencies = new Array<>();
         dependencies.add(new AssetDescriptor(DebugDependency.class, dependPath1));
         dependencies.add(new AssetDescriptor(DebugDependency.class, dependPath2));
@@ -18,10 +24,15 @@ public class AssetLoaderDebug implements AssetLoader<Debug> {
 
     @Override
     public void asyncLoad(String path) {
+        System.out.println("path parent: " + path);
         content = AssetUtils.getFileContent(path);
+        System.out.println("content parent: \n" + content);
         String[] lines = content.split("\n");
-        dependPath1 = lines[1];
-        dependPath2 = lines[2];
+
+        Path filePath = Paths.get(path);
+
+        dependPath1 = "assets/text/someText1.txt";
+        dependPath2 = "assets/text/someText2.txt";
     }
 
     @Override

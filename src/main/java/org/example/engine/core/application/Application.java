@@ -1,5 +1,6 @@
 package org.example.engine.core.application;
 
+import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.async.StepSync;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.assets.AssetUtils;
@@ -51,6 +52,8 @@ public class Application {
             boolean windowRendered = window.refresh();
             int targetFrameRate = GraphicsUtils.getTargetFps();
 
+            // asset loading
+            AssetStore.update();
             Mouse.resetInternalState();
             Keyboard.resetInternalState();
             GLFW.glfwPollEvents();
