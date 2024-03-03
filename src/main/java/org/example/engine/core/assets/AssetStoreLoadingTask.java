@@ -5,7 +5,6 @@ import org.example.engine.core.collections.Array;
 
 public class AssetStoreLoadingTask extends Task {
 
-    private boolean asyncFinished;
     private final AssetDescriptor descriptor;
     private Array<AssetDescriptor> dependencies;
     private final AssetLoader loader;
@@ -13,7 +12,6 @@ public class AssetStoreLoadingTask extends Task {
     AssetStoreLoadingTask(AssetDescriptor descriptor) {
         this.descriptor = descriptor;
         this.loader = AssetStore.getNewLoader(descriptor.type);
-        this.asyncFinished = false;
     }
 
     @Override
@@ -24,18 +22,14 @@ public class AssetStoreLoadingTask extends Task {
 
     @Override
     public void onComplete() {
-        asyncFinished = true;
         if (dependencies == null) return;
         for (AssetDescriptor dependency : dependencies) AssetStore.loadAsset(dependency.type, dependency.path);
     }
 
-    protected boolean dependenciesLoaded() {
+    protected boolean ready() {
+        if (!isRunComplete()) return false;
         if (dependencies == null || dependencies.size == 0) return true;
         return AssetStore.areLoaded(dependencies);
-    }
-
-    public boolean asyncFinished() {
-        return asyncFinished;
     }
 
     protected Asset create() {

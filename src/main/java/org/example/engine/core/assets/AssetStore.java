@@ -26,7 +26,7 @@ public final class AssetStore {
 
     public static synchronized void update() {
         for (AssetStoreLoadingTask task : asyncTasks) {
-            if (task.asyncFinished() && task.dependenciesLoaded())  {
+            if (task.ready())  {
                 completedAsyncTasks.add(task);
                 createTasks.add(task);
             }
@@ -64,8 +64,6 @@ public final class AssetStore {
 
     protected static synchronized boolean areLoaded(final Array<AssetDescriptor> dependencies) {
         if (dependencies == null || dependencies.size == 0) return true;
-        System.out.println(dependencies.size);
-
         for (AssetDescriptor dependency : dependencies) {
             Asset asset = store.get(dependency.path);
             if (asset == null) return false;

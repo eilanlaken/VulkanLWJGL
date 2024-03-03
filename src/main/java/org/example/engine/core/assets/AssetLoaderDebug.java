@@ -13,9 +13,6 @@ public class AssetLoaderDebug implements AssetLoader<Debug> {
 
     @Override
     public Array<AssetDescriptor> getDependencies() {
-        System.out.println("d1: " + dependPath1);
-        System.out.println("d2: " + dependPath2);
-
         Array<AssetDescriptor> dependencies = new Array<>();
         dependencies.add(new AssetDescriptor(DebugDependency.class, dependPath1));
         dependencies.add(new AssetDescriptor(DebugDependency.class, dependPath2));

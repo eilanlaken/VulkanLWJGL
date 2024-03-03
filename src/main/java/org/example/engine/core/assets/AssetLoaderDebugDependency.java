@@ -13,12 +13,10 @@ public class AssetLoaderDebugDependency implements AssetLoader<DebugDependency> 
 
     @Override
     public void asyncLoad(String path) {
-        System.out.println("path: " + path);
         content = AssetUtils.getFileContent(path);
         int i = 0;
         while (i < 5) {
             i++;
-            System.out.println("loader dep i: " + i);
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
