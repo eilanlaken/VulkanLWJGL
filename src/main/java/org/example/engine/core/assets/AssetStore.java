@@ -77,21 +77,16 @@ public final class AssetStore {
             asset.refCount++;
             return;
         }
-        try {
-            AssetDescriptor descriptor = new AssetDescriptor(type, path);
-            loadQueue.addFirst(descriptor);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        AssetDescriptor descriptor = new AssetDescriptor(type, path);
+        loadQueue.addFirst(descriptor);
     }
 
     public static synchronized void unloadAsset(final String path) {
 
     }
 
-    public static synchronized <T> T getAsset(final String path) {
-
-        return null;
+    public static synchronized Asset getAsset(final String path) {
+        return AssetStore.getAsset(path);
     }
 
     public static synchronized void clean() {
@@ -115,6 +110,10 @@ public final class AssetStore {
         loaders.put(Texture.class, AssetLoaderTexture.class);
         loaders.put(Model.class, AssetLoaderModel.class);
         loaders.put(ShaderProgram.class, AssetLoaderShaderProgram.class);
+
+        loaders.put(Debug.class, AssetLoaderDebug.class);
+        loaders.put(DebugDependency.class, AssetLoaderDebugDependency.class);
+
         return loaders;
     }
 

@@ -11,10 +11,18 @@ class AssetDescriptor {
     public final String path;
     public final long size;
 
-    public AssetDescriptor(Class<? extends Resource> type, String path) throws IOException {
+    // TODO: error handling.
+    public AssetDescriptor(Class<? extends Resource> type, String path) {
         this.type = type;
         this.path = path;
-        this.size = AssetUtils.getFileSize(path);
+        long s = 0;
+        try {
+            s = AssetUtils.getFileSize(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        this.size = s;
     }
 
     @Override
