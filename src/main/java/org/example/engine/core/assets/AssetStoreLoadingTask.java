@@ -26,13 +26,13 @@ public class AssetStoreLoadingTask extends Task {
     @Override
     public void onComplete() {
 
+        loadDataFromDiscComplete = true;
         if (dependencies == null) return;
         for (AssetDescriptor dependency : dependencies) AssetStore.loadAsset(dependency.type, dependency.path);
-        loadDataFromDiscComplete = true;
     }
 
-    protected boolean readyForCreation() {
-        System.out.println(dependencies);
+    protected boolean dependenciesLoaded() {
+        if (dependencies == null || dependencies.size == 0) return true;
         return AssetStore.areLoaded(dependencies);
     }
 
@@ -41,6 +41,7 @@ public class AssetStoreLoadingTask extends Task {
     }
 
     protected Asset create() {
+        System.out.println("FROM CREATEEEEE: " + Thread.currentThread().getName());
         final Object obj = loader.create();
         final Array<Asset> assetDependencies = AssetStore.getDependencies(dependencies);
         Asset asset = new Asset(obj, descriptor, assetDependencies);

@@ -25,14 +25,14 @@ public final class AssetStore {
     private static volatile Set<AssetStoreLoadingTask> completedAsyncTasks = new HashSet<>();
     private static volatile Set<AssetStoreLoadingTask> parallelLoadTasks = new HashSet<>();
 
-    private static volatile Set<AssetStoreLoadingTask> completedSyncTasks = new HashSet<>();
-    private static volatile Set<AssetStoreLoadingTask> inOrderLoadTasks = new HashSet<>();
+    private static volatile Set<AssetStoreLoadingTask> completedCreateTasks = new HashSet<>();
+    private static volatile Set<AssetStoreLoadingTask> createTasks = new HashSet<>();
 
     public static synchronized void update() {
         for (AssetStoreLoadingTask task : parallelLoadTasks) {
-            if (task.isLoadDataFromDiscComplete() && task.readyForCreation())  {
+            if (task.isLoadDataFromDiscComplete() && task.dependenciesLoaded())  {
                 completedAsyncTasks.add(task);
-                inOrderLoadTasks.add(task);
+                createTasks.add(task);
             }
         }
 
@@ -44,12 +44,12 @@ public final class AssetStore {
         }
         loadQueue.clear();
 
-        inOrderLoadTasks.removeAll(completedSyncTasks);
-        for (AssetStoreLoadingTask task : inOrderLoadTasks) {
+        createTasks.removeAll(completedCreateTasks);
+        System.out.println("create tasks: " + createTasks.size());
+        for (AssetStoreLoadingTask task : createTasks) {
             Asset asset = task.create();
             AssetStore.store(asset);
-            System.out.println("store: " + store);
-            completedSyncTasks.add(task);
+            completedCreateTasks.add(task);
         }
     }
 
@@ -59,8 +59,10 @@ public final class AssetStore {
 
     protected static synchronized Array<Asset> getDependencies(final Array<AssetDescriptor> dependencies) {
         Array<Asset> assets = new Array<>();
-        for (AssetDescriptor dependency : dependencies) {
-            assets.add(store.get(dependency.path));
+        if (dependencies != null) {
+            for (AssetDescriptor dependency : dependencies) {
+                assets.add(store.get(dependency.path));
+            }
         }
         return assets;
     }

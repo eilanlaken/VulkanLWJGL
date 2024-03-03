@@ -55,7 +55,6 @@ public final class AssetUtils {
     }
 
     public static long getFileSize(final String path) throws IOException {
-        System.out.println(path);
         Path filePath = Paths.get(path);
         return Files.size(filePath);
     }
