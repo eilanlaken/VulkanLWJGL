@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 
 public class AssetLoaderDebug implements AssetLoader<Debug> {
 
-    private String content;
+    private int num;
     private String dependPath1;
     private String dependPath2;
 
@@ -24,27 +24,24 @@ public class AssetLoaderDebug implements AssetLoader<Debug> {
 
     @Override
     public void asyncLoad(String path) {
-        System.out.println("path parent: " + path);
-        content = AssetUtils.getFileContent(path);
-        System.out.println("content parent: \n" + content);
+        String content = AssetUtils.getFileContent(path);
         String[] lines = content.split("\n");
-
+        num = Integer.parseInt(lines[0]);
         Path filePath = Paths.get(path);
+        Path parentPath = filePath.getParent();
 
         dependPath1 = "assets/text/someText1.txt";
         dependPath2 = "assets/text/someText2.txt";
+
+        dependPath1 = parentPath.resolve(lines[1]).toString();
     }
 
     @Override
     public Debug create() {
-        System.out.println("create debug: " + dependPath1);
-        System.out.println(AssetStore.store);
-
         Debug debug = new Debug();
-        debug.text = content;
+        debug.num = num;
         debug.dependency1 = (DebugDependency) AssetStore.getAsset(dependPath1).obj;
         debug.dependency2 = (DebugDependency) AssetStore.getAsset(dependPath2).obj;
-        System.out.println("created debug");
         return debug;
     }
 }

@@ -4,7 +4,7 @@ import org.example.engine.core.memory.Resource;
 
 public class Debug implements Resource {
 
-    public String text;
+    public int num;
     public DebugDependency dependency1;
     public DebugDependency dependency2;
 

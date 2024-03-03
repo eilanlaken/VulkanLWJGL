@@ -25,4 +25,8 @@ public abstract class Task {
     public abstract void run();
     public void onComplete() {}
 
+    public boolean isFinished() {
+        return finished;
+    }
+
 }

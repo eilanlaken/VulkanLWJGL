@@ -18,34 +18,29 @@ public final class AssetStore {
 
     private final static HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> loaders = getLoadersMap();
     private static volatile Queue<AssetDescriptor> loadQueue = new Queue<>();
-
-    // TODO: change to private
-    protected static volatile HashMap<String, Asset> store = new HashMap<>();
-
+    private static volatile HashMap<String, Asset> store = new HashMap<>();
     private static volatile Set<AssetStoreLoadingTask> completedAsyncTasks = new HashSet<>();
-    private static volatile Set<AssetStoreLoadingTask> parallelLoadTasks = new HashSet<>();
-
+    private static volatile Set<AssetStoreLoadingTask> asyncTasks = new HashSet<>();
     private static volatile Set<AssetStoreLoadingTask> completedCreateTasks = new HashSet<>();
     private static volatile Set<AssetStoreLoadingTask> createTasks = new HashSet<>();
 
     public static synchronized void update() {
-        for (AssetStoreLoadingTask task : parallelLoadTasks) {
-            if (task.isLoadDataFromDiscComplete() && task.dependenciesLoaded())  {
+        for (AssetStoreLoadingTask task : asyncTasks) {
+            if (task.asyncFinished() && task.dependenciesLoaded())  {
                 completedAsyncTasks.add(task);
                 createTasks.add(task);
             }
         }
 
-        parallelLoadTasks.removeAll(completedAsyncTasks);
+        asyncTasks.removeAll(completedAsyncTasks);
         for (AssetDescriptor descriptor : loadQueue) {
             AssetStoreLoadingTask task = new AssetStoreLoadingTask(descriptor);
-            parallelLoadTasks.add(task);
+            asyncTasks.add(task);
             TaskRunner.runAsync(task);
         }
         loadQueue.clear();
 
         createTasks.removeAll(completedCreateTasks);
-        System.out.println("create tasks: " + createTasks.size());
         for (AssetStoreLoadingTask task : createTasks) {
             Asset asset = task.create();
             AssetStore.store(asset);

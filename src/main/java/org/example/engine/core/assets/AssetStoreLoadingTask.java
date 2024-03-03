@@ -5,7 +5,7 @@ import org.example.engine.core.collections.Array;
 
 public class AssetStoreLoadingTask extends Task {
 
-    private boolean loadDataFromDiscComplete;
+    private boolean asyncFinished;
     private final AssetDescriptor descriptor;
     private Array<AssetDescriptor> dependencies;
     private final AssetLoader loader;
@@ -13,20 +13,18 @@ public class AssetStoreLoadingTask extends Task {
     AssetStoreLoadingTask(AssetDescriptor descriptor) {
         this.descriptor = descriptor;
         this.loader = AssetStore.getNewLoader(descriptor.type);
-        this.loadDataFromDiscComplete = false;
+        this.asyncFinished = false;
     }
 
     @Override
     public void run() {
         loader.asyncLoad(descriptor.path);
         this.dependencies = loader.getDependencies();
-        System.out.println("end of run: " + this.dependencies);
     }
 
     @Override
     public void onComplete() {
-
-        loadDataFromDiscComplete = true;
+        asyncFinished = true;
         if (dependencies == null) return;
         for (AssetDescriptor dependency : dependencies) AssetStore.loadAsset(dependency.type, dependency.path);
     }
@@ -36,15 +34,13 @@ public class AssetStoreLoadingTask extends Task {
         return AssetStore.areLoaded(dependencies);
     }
 
-    public boolean isLoadDataFromDiscComplete() {
-        return loadDataFromDiscComplete;
+    public boolean asyncFinished() {
+        return asyncFinished;
     }
 
     protected Asset create() {
-        System.out.println("FROM CREATEEEEE: " + Thread.currentThread().getName());
         final Object obj = loader.create();
         final Array<Asset> assetDependencies = AssetStore.getDependencies(dependencies);
-        Asset asset = new Asset(obj, descriptor, assetDependencies);
-        return asset;
+        return new Asset(obj, descriptor, assetDependencies);
     }
 }

@@ -29,7 +29,6 @@ public class AssetLoaderDebugDependency implements AssetLoader<DebugDependency> 
 
     @Override
     public DebugDependency create() {
-        System.out.println("created dependency");
         return new DebugDependency(content);
     }
 }
