@@ -30,8 +30,10 @@ public final class AssetStore {
 
     public static synchronized void update() {
         for (AssetStoreLoadingTask task : parallelLoadTasks) {
-            if (task.isLoadDataFromDiscComplete()) completedAsyncTasks.add(task);
-            inOrderLoadTasks.add(task);
+            if (task.isLoadDataFromDiscComplete() && task.readyForCreation())  {
+                completedAsyncTasks.add(task);
+                inOrderLoadTasks.add(task);
+            }
         }
 
         parallelLoadTasks.removeAll(completedAsyncTasks);
@@ -44,12 +46,10 @@ public final class AssetStore {
 
         inOrderLoadTasks.removeAll(completedSyncTasks);
         for (AssetStoreLoadingTask task : inOrderLoadTasks) {
-            if (task.readyForCreation()) {
-                Asset asset = task.create();
-                AssetStore.store(asset);
-                System.out.println("store: " + store);
-                completedSyncTasks.add(task);
-            }
+            Asset asset = task.create();
+            AssetStore.store(asset);
+            System.out.println("store: " + store);
+            completedSyncTasks.add(task);
         }
     }
 
