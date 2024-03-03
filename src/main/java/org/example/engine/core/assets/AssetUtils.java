@@ -21,7 +21,7 @@ public final class AssetUtils {
         initialized = true;
     }
 
-    public static String getFileContent(final String path) {
+    public synchronized static String getFileContent(final String path) {
         final StringBuilder builder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
