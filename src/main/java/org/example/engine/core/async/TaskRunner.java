@@ -4,6 +4,10 @@ import java.util.*;
 
 public class TaskRunner {
 
+    public static void runAsync(Task ...tasks) {
+        for (Task task : tasks) runAsync(task);
+    }
+
     public static void runAsync(Task task) {
         Thread spawningThread = new Thread(() -> {
             try {

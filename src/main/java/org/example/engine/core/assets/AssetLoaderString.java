@@ -5,7 +5,7 @@ import org.example.engine.core.collections.Array;
 public class AssetLoaderString implements AssetLoader<String> {
 
     @Override
-    public Array<AssetDescriptor> getDependencies(String path) {
+    public Array<AssetDescriptor> getDependencies() {
         return null;
     }
 
@@ -15,7 +15,7 @@ public class AssetLoaderString implements AssetLoader<String> {
     }
 
     @Override
-    public String create(String path) {
+    public String create() {
         return null;
     }
 }

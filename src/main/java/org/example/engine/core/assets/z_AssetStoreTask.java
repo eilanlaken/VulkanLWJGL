@@ -2,7 +2,7 @@ package org.example.engine.core.assets;
 
 import org.example.engine.core.collections.Array;
 
-class AssetStoreTask implements Runnable {
+class z_AssetStoreTask {
 
     final AssetDescriptor descriptor;
     final AssetLoader loader;
@@ -11,14 +11,10 @@ class AssetStoreTask implements Runnable {
     private volatile Asset asset;
     private volatile boolean cancel;
 
-    AssetStoreTask(final AssetDescriptor descriptor) {
+    z_AssetStoreTask(final AssetDescriptor descriptor) {
         this.descriptor = descriptor;
-        this.loader = AssetStore.getNewLoader(descriptor.type);
+        this.loader = z_AssetStore.getNewLoader(descriptor.type);
         startTime = System.nanoTime();
     }
 
-    @Override
-    public void run() {
-
-    }
 }

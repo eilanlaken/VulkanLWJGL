@@ -33,7 +33,7 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
     }
 
     @Override
-    public Texture create(final String path) {
+    public Texture create() {
         int glHandle = GL11.glGenTextures();
         Texture texture = new Texture(glHandle,
                 width, height,
@@ -52,7 +52,7 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
     }
 
     @Override
-    public Array<AssetDescriptor> getDependencies(String path) {
+    public Array<AssetDescriptor> getDependencies() {
         return null;
     }
 

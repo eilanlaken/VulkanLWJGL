@@ -14,12 +14,12 @@ public class AssetLoaderShaderProgram implements AssetLoader<ShaderProgram> {
     }
 
     @Override
-    public ShaderProgram create(String path) {
+    public ShaderProgram create() {
         return null;
     }
 
     @Override
-    public Array<AssetDescriptor> getDependencies(String path) {
+    public Array<AssetDescriptor> getDependencies() {
         return null;
     }
 

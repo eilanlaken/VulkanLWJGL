@@ -1,0 +1,38 @@
+package org.example.engine.core.assets;
+
+import org.example.engine.core.async.Task;
+import org.example.engine.core.collections.Array;
+
+public class AssetStoreLoadingTask extends Task {
+
+    private final AssetDescriptor descriptor;
+    private Array<AssetDescriptor> dependencies;
+    private final AssetLoader loader;
+
+    AssetStoreLoadingTask(AssetDescriptor descriptor) {
+        this.descriptor = descriptor;
+        this.loader = AssetStore.getNewLoader(descriptor.type);
+    }
+
+    @Override
+    public void run() {
+        loader.asyncLoad(descriptor.path);
+        this.dependencies = loader.getDependencies();
+    }
+
+    @Override
+    public void onComplete() {
+        for (AssetDescriptor dependency : dependencies) AssetStore.loadAsset(dependency.type, dependency.path);
+    }
+
+    protected boolean readyForCreation() {
+        return AssetStore.areLoaded(dependencies);
+    }
+
+    protected Asset create() {
+        final Object obj = loader.create();
+        final Array<Asset> assetDependencies = AssetStore.getDependencies(dependencies);
+        Asset asset = new Asset(obj, descriptor, assetDependencies);
+        return asset;
+    }
+}

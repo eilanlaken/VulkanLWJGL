@@ -10,7 +10,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
     private Array<AIMesh> meshes = new Array<>();
 
     @Override
-    public Model create(String path) {
+    public Model create() {
         return null;
     }
 
@@ -33,7 +33,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
 
     // TODO: implement
     @Override
-    public Array<AssetDescriptor> getDependencies(String path) {
+    public Array<AssetDescriptor> getDependencies() {
         return null;
     }
 

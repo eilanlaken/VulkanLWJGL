@@ -10,12 +10,11 @@ class Asset implements Resource {
     public final AssetDescriptor descriptor;
     public final Array<Asset> dependencies;
 
-    Asset(final Object obj, final AssetDescriptor descriptor, Asset ...dependencies) {
+    Asset(final Object obj, final AssetDescriptor descriptor, Array<Asset> dependencies) {
         this.refCount = 1;
         this.obj = obj;
         this.descriptor = descriptor;
-        this.dependencies = new Array<>(dependencies.length);
-        this.dependencies.addAll(dependencies);
+        this.dependencies = dependencies;
     }
 
     @Override

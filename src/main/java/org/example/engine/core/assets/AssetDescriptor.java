@@ -14,7 +14,7 @@ class AssetDescriptor {
     public AssetDescriptor(Class<? extends Resource> type, String path) throws IOException {
         this.type = type;
         this.path = path;
-        this.size = AssetsUtils.getFileSize(path);
+        this.size = AssetUtils.getFileSize(path);
     }
 
     @Override
