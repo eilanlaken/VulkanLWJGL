@@ -46,6 +46,7 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
         AssetStore.loadAsset(Debug.class, "assets/text/parent.txt");
 
 
+
         transform3D = ComponentFactory.createTransform3D();
 
         modelPart = ModelBuilder.createRedCube();
@@ -61,6 +62,11 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
 
     @Override
     protected void refresh() {
+        if (!AssetStore.isLoadingInProgress()) {
+            Debug debug = AssetStore.get("assets/text/parent.txt");
+            System.out.println(debug.dependency1.content);
+        }
+
         //if (GraphicsUtils.getFrameCount() % 60 == 0) System.out.println("Main Thread.");
         float delta = GraphicsUtils.getDeltaTime();
         cameraController.update(delta);
