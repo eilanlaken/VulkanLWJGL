@@ -6,10 +6,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.stb.STBImage;
-import org.lwjgl.system.MemoryStack;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
@@ -128,48 +125,25 @@ public class ModelBuilder {
         int vboTextureCoordinates = storeDataInAttributeList(1, 2, textureCoordinates);
         int vboNormals = storeDataInAttributeList(2, 3, normals);
         GL30.glBindVertexArray(0);
+        return new ModelPartMesh(vaoId, indices.length, (short) 0, vboPositions, vboTextureCoordinates, vboNormals);
 
-        System.out.println("vbo pos: " + vboPositions);
-        System.out.println("vbo uv: " + vboTextureCoordinates);
-        System.out.println("vbo n: " + vboNormals);
-
-
-        return new ModelPartMesh(vaoId, indices.length, vboPositions, vboTextureCoordinates, vboNormals);
     }
 
 
-    public static Model build(float[] positions,
-                              float[] colors,
-                              float[] textureCoordinates0,
-                              float[] textureCoordinates1,
-                              float[] normals,
-                              float[] tangents,
-                              float[] biNormals,
-                              float[] boneWeights0,
-                              float[] boneWeights1,
-                              float[] boneWeights2,
-                              float[] boneWeights3,
-                              float[] boneWeights4,
-                              float[] boneWeights5,
-                              int[] indices) {
-
-        return null;
-    }
-
-    public static Model create(float[] positions,
-                               float[] colors,
-                               float[] textureCoordinates0,
-                               float[] textureCoordinates1,
-                               float[] normals,
-                               float[] tangents,
-                               float[] biNormals,
-                               float[] boneWeights0,
-                               float[] boneWeights1,
-                               float[] boneWeights2,
-                               float[] boneWeights3,
-                               float[] boneWeights4,
-                               float[] boneWeights5,
-                               int[] indices) {
+    public static Model_old create(float[] positions,
+                                   float[] colors,
+                                   float[] textureCoordinates0,
+                                   float[] textureCoordinates1,
+                                   float[] normals,
+                                   float[] tangents,
+                                   float[] biNormals,
+                                   float[] boneWeights0,
+                                   float[] boneWeights1,
+                                   float[] boneWeights2,
+                                   float[] boneWeights3,
+                                   float[] boneWeights4,
+                                   float[] boneWeights5,
+                                   int[] indices) {
         int vaoId = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vaoId);
         if (indices != null) storeIndicesBuffer(indices);

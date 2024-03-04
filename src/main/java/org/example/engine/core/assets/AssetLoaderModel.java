@@ -1,25 +1,16 @@
 package org.example.engine.core.assets;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.graphics.Model;
-import org.example.engine.core.graphics.ModelPartMesh;
-import org.example.engine.core.memory.MemoryUtils;
+import org.example.engine.core.graphics.Model_old;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-
-public class AssetLoaderModel implements AssetLoader<Model> {
+public class AssetLoaderModel implements AssetLoader<Model_old> {
 
     private Array<AIMesh> meshes = new Array<>();
 
     @Override
-    public Model create() {
+    public Model_old create() {
         return null;
     }
 
