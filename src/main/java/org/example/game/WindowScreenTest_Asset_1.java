@@ -29,8 +29,9 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
 
-        final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.vert");
-        final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.frag");
+
+        final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_2.vert");
+        final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_2.frag");
         this.shader = new Shader(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
         this.environment = new Environment();
@@ -44,6 +45,7 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
         AssetStore.loadAsset(Debug.class, "assets/text/parent.txt");
 
 
+
         transform3D = ComponentFactory.createTransform3D();
 
         modelPart = ModelBuilder.createRedCube();
@@ -53,18 +55,23 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
         cameraTransform = new Matrix4();
 
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
-        environment.add(new EnvironmentLightPoint(new Color(0,1,1,1), 10, 0, 0, -5));
+        environment.add(new EnvironmentLightPoint(new Color(0,1,1,1), 10, 0, 0, -3));
     }
 
 
     @Override
     protected void refresh() {
+        if (!AssetStore.isLoadingInProgress()) {
+            Debug debug = AssetStore.get("assets/text/parent.txt");
+            System.out.println(debug.dependency1.content);
+        }
+
         //if (GraphicsUtils.getFrameCount() % 60 == 0) System.out.println("Main Thread.");
         float delta = GraphicsUtils.getDeltaTime();
         cameraController.update(delta);
         // fixed update
         float angularSpeed = 200; // degrees per second
-        //transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
+        transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
 
         if (Keyboard.isKeyPressed(Keyboard.Key.W)) {
             transform3D.matrix4.translate(0,-1*delta,0);
@@ -118,7 +125,7 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
         GL11.glClearColor(0,0,0,1);
         renderer3D.begin(shader);
         renderer3D.setCamera(camera);
-        renderer3D.setEnvironment(environment);
+        //renderer3D.setEnvironment(environment);
         renderer3D.draw(modelPart, transform3D.matrix4);
         renderer3D.end();
     }

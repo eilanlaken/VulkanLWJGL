@@ -25,7 +25,7 @@ public class Renderer3D {
     }
 
     public void setCamera(final Camera camera) {
-        this.currentShader.bindUniform("camera_position", camera.lens.position);
+        //this.currentShader.bindUniform("camera_position", camera.lens.position);
         this.currentShader.bindUniform("camera_combined", camera.lens.combined);
     }
 

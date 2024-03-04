@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public final class AssetStore {
@@ -23,6 +24,8 @@ public final class AssetStore {
     private static volatile Set<AssetStoreLoadingTask> asyncTasks = new HashSet<>();
     private static volatile Set<AssetStoreLoadingTask> completedCreateTasks = new HashSet<>();
     private static volatile Set<AssetStoreLoadingTask> createTasks = new HashSet<>();
+
+    // loading state
 
     public static synchronized void update() {
         for (AssetStoreLoadingTask task : asyncTasks) {
@@ -89,12 +92,28 @@ public final class AssetStore {
 
     }
 
+    public static synchronized <T extends Resource> T get(final String path) {
+        return (T) store.get(path).obj;
+    }
+
     public static synchronized Asset getAsset(final String path) {
         return store.get(path);
     }
 
     public static synchronized void clean() {
 
+    }
+
+    public static long getTotalStorageBytes() {
+        long total = 0;
+        for (Map.Entry<String, Asset> assetEntry : store.entrySet()) {
+            total += assetEntry.getValue().descriptor.size;
+        }
+        return total;
+    }
+
+    public static boolean isLoadingInProgress() {
+        return !loadQueue.isEmpty() || !asyncTasks.isEmpty() || !createTasks.isEmpty();
     }
 
     protected static synchronized AssetLoader<? extends Resource> getNewLoader(Class<? extends Resource> type) {
@@ -116,6 +135,7 @@ public final class AssetStore {
         loaders.put(Model.class, AssetLoaderModel.class);
         loaders.put(Shader.class, AssetLoaderShaderProgram.class);
 
+        // TODO: delete
         loaders.put(Debug.class, AssetLoaderDebug.class);
         loaders.put(DebugDependency.class, AssetLoaderDebugDependency.class);
 

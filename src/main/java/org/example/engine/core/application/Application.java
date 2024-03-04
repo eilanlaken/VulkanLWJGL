@@ -1,7 +1,7 @@
 package org.example.engine.core.application;
 
 import org.example.engine.core.assets.AssetStore;
-import org.example.engine.core.async.StepSync;
+import org.example.engine.core.async.AsyncUtils;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.GraphicsUtils;
@@ -77,7 +77,7 @@ public class Application {
                     // ignore
                 }
             } else if (targetFrameRate > 0) {
-                StepSync.sync(targetFrameRate); // sleep as needed to meet the target framerate
+                AsyncUtils.sync(targetFrameRate); // sleep as needed to meet the target framerate
             }
         }
     }

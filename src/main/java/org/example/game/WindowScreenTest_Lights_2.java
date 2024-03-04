@@ -51,19 +51,14 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         transform3D = ComponentFactory.createTransform3D();
-
         modelPart = ModelBuilder.createRedCube();
-
         transform3D.matrix4.translate(0,0,-5f);
-
         cameraTransform = new Matrix4();
 
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
         environment.add(new EnvironmentLightPoint(new Color(0,1,1,1), 10, 0, 0, -5));
     }
-
 
     @Override
     protected void refresh() {
