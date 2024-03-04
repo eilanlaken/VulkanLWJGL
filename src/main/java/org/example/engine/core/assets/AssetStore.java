@@ -1,6 +1,6 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.async.TaskRunner;
+import org.example.engine.core.async.AsyncTaskRunner;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.Queue;
 import org.example.engine.core.graphics.Model;
@@ -39,7 +39,7 @@ public final class AssetStore {
         for (AssetDescriptor descriptor : loadQueue) {
             AssetStoreLoadingTask task = new AssetStoreLoadingTask(descriptor);
             asyncTasks.add(task);
-            TaskRunner.runAsync(task);
+            AsyncTaskRunner.runAsync(task);
         }
         loadQueue.clear();
 

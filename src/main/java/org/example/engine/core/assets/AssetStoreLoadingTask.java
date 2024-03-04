@@ -1,9 +1,9 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.async.Task;
+import org.example.engine.core.async.AsyncTask;
 import org.example.engine.core.collections.Array;
 
-public class AssetStoreLoadingTask extends Task {
+public class AssetStoreLoadingTask extends AsyncTask {
 
     private final AssetDescriptor descriptor;
     private Array<AssetDescriptor> dependencies;

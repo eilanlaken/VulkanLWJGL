@@ -11,9 +11,6 @@ import org.lwjgl.opengl.GL11;
 
 public class WindowScreenTest_Asset_1 extends WindowScreen {
 
-    // TODO: refactor to use assetLoader.load() etc
-    AssetLoaderTexture assetLoaderTextures;
-
     private Renderer3D renderer3D;
     private ModelPart modelPart;
     private Shader shader;
@@ -26,9 +23,7 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
     private BlenderCameraController cameraController;
 
     public WindowScreenTest_Asset_1() {
-        this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
-
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_2.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_2.frag");
@@ -42,45 +37,50 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
     @Override
     public void show() {
 
-        AssetStore.loadAsset(Debug.class, "assets/text/parent.txt");
-
-
-
         transform3D = ComponentFactory.createTransform3D();
 
         modelPart = ModelBuilder.createRedCube();
 
-        transform3D.matrix4.translate(0,0,-5f);
+        transform3D.matrix4.translateSelfAxis(0,0,-5f);
 
         cameraTransform = new Matrix4();
 
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
         environment.add(new EnvironmentLightPoint(new Color(0,1,1,1), 10, 0, 0, -3));
+
+        transform3D.matrix4.rotateSelfAxis(Vector3.Y, 30);
+
     }
 
 
     @Override
     protected void refresh() {
-        if (!AssetStore.isLoadingInProgress()) {
-            Debug debug = AssetStore.get("assets/text/parent.txt");
-            System.out.println(debug.dependency1.content);
-        }
 
         //if (GraphicsUtils.getFrameCount() % 60 == 0) System.out.println("Main Thread.");
         float delta = GraphicsUtils.getDeltaTime();
         cameraController.update(delta);
         // fixed update
         float angularSpeed = 200; // degrees per second
-        transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
+
+        if (Keyboard.isKeyPressed(Keyboard.Key.B)) {
+            transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
+            System.out.println(transform3D.matrix4);
+        }
+
+        if (Keyboard.isKeyPressed(Keyboard.Key.A)) {
+            transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
+            System.out.println(transform3D.matrix4);
+        }
 
         if (Keyboard.isKeyPressed(Keyboard.Key.W)) {
-            transform3D.matrix4.translate(0,-1*delta,0);
+            transform3D.matrix4.translateXYZAxis(0,-1*delta,0);
+
         }
 
 
         if (Keyboard.isKeyPressed(Keyboard.Key.RIGHT)) {
-            cameraTransform.translate(0,0,-1*delta);
-            cameraTransform.rotate(0,0,1,1*delta);
+            cameraTransform.translateSelfAxis(0,0,-1*delta);
+            cameraTransform.rotateSelfAxis(0,0,1,1*delta);
 
             Vector3 position = new Vector3();
             camera.lens.position.set(cameraTransform.getTranslation(position));

@@ -735,7 +735,7 @@ public class Matrix4 {
      * @param v1 The base vector
      * @param v2 The target vector
      * @return This matrix for the purpose of chaining methods together */
-    public Matrix4 setToRotation (final Vector3 v1, final Vector3 v2) {
+    public Matrix4 setToRotation(final Vector3 v1, final Vector3 v2) {
         return setToTranslationRotationScale(quat.setFromCross(v1, v2));
     }
 
@@ -846,29 +846,6 @@ public class Matrix4 {
             val[i] = val[i] * (1 - alpha) + matrix.val[i] * alpha;
         return this;
     }
-
-      // TODO
-//    /** Sets this matrix to the given 3x3 matrix. The third column of this matrix is set to (0,0,1,0).
-//     * @param mat the matrix */
-//    public Matrix4 set(Matrix3 mat) {
-//        val[0] = mat.val[0];
-//        val[1] = mat.val[1];
-//        val[2] = mat.val[2];
-//        val[3] = 0;
-//        val[4] = mat.val[3];
-//        val[5] = mat.val[4];
-//        val[6] = mat.val[5];
-//        val[7] = 0;
-//        val[8] = 0;
-//        val[9] = 0;
-//        val[10] = 1;
-//        val[11] = 0;
-//        val[12] = mat.val[6];
-//        val[13] = mat.val[7];
-//        val[14] = 0;
-//        val[15] = mat.val[8];
-//        return this;
-//    }
 
     public Matrix4 scl(Vector3 scale) {
         val[M00] *= scale.x;
@@ -1260,8 +1237,8 @@ public class Matrix4 {
      * glTranslate/glRotate/glScale
      * @param translation
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 translate(Vector3 translation) {
-        return translate(translation.x, translation.y, translation.z);
+    public Matrix4 translateSelfAxis(Vector3 translation) {
+        return translateSelfAxis(translation.x, translation.y, translation.z);
     }
 
     /** Postmultiplies this matrix by a translation matrix. Postmultiplication is also used by OpenGL ES' 1.x
@@ -1270,11 +1247,20 @@ public class Matrix4 {
      * @param y Translation in the y-axis.
      * @param z Translation in the z-axis.
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 translate(float x, float y, float z) {
+    // TODO: this one translates on the frame of reference that is adjacent to the matrix.
+    public Matrix4 translateSelfAxis(float x, float y, float z) {
         val[M03] += val[M00] * x + val[M01] * y + val[M02] * z;
         val[M13] += val[M10] * x + val[M11] * y + val[M12] * z;
         val[M23] += val[M20] * x + val[M21] * y + val[M22] * z;
         val[M33] += val[M30] * x + val[M31] * y + val[M32] * z;
+        return this;
+    }
+
+    // TODO: see what is up
+    public Matrix4 translateXYZAxis(float x, float y, float z) {
+        val[M03] += x;
+        val[M13] += y;
+        val[M23] += z;
         return this;
     }
 
@@ -1283,10 +1269,10 @@ public class Matrix4 {
      * @param axis The vector axis to rotate around.
      * @param degrees The angle in degrees.
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 rotate(Vector3 axis, float degrees) {
+    public Matrix4 rotateSelfAxis(Vector3 axis, float degrees) {
         if (degrees == 0) return this;
         quat.set(axis, degrees);
-        return rotate(quat);
+        return rotateSelfAxis(quat);
     }
 
     /** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
@@ -1297,7 +1283,7 @@ public class Matrix4 {
     public Matrix4 rotateRad(Vector3 axis, float radians) {
         if (radians == 0) return this;
         quat.setFromAxisRad(axis, radians);
-        return rotate(quat);
+        return rotateSelfAxis(quat);
     }
 
     /** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
@@ -1307,10 +1293,10 @@ public class Matrix4 {
      * @param axisZ The z-axis component of the vector to rotate around.
      * @param degrees The angle in degrees
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 rotate(float axisX, float axisY, float axisZ, float degrees) {
+    public Matrix4 rotateSelfAxis(float axisX, float axisY, float axisZ, float degrees) {
         if (degrees == 0) return this;
         quat.setFromAxis(axisX, axisY, axisZ, degrees);
-        return rotate(quat);
+        return rotateSelfAxis(quat);
     }
 
     /** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
@@ -1323,14 +1309,14 @@ public class Matrix4 {
     public Matrix4 rotateRad(float axisX, float axisY, float axisZ, float radians) {
         if (radians == 0) return this;
         quat.setFromAxisRad(axisX, axisY, axisZ, radians);
-        return rotate(quat);
+        return rotateSelfAxis(quat);
     }
 
     /** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale.
      * @param rotation
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 rotate(Quaternion rotation) {
+    public Matrix4 rotateSelfAxis(Quaternion rotation) {
         float x = rotation.x, y = rotation.y, z = rotation.z, w = rotation.w;
         float xx = x * x;
         float xy = x * y;
@@ -1382,9 +1368,11 @@ public class Matrix4 {
      * @param v1 The base vector
      * @param v2 The target vector
      * @return This matrix for the purpose of chaining methods together */
-    public Matrix4 rotate(final Vector3 v1, final Vector3 v2) {
-        return rotate(quat.setFromCross(v1, v2));
+    public Matrix4 rotateSelfAxis(final Vector3 v1, final Vector3 v2) {
+        return rotateSelfAxis(quat.setFromCross(v1, v2));
     }
+
+
 
     /** Post-multiplies this matrix by a rotation toward a direction.
      * @param direction direction to rotate toward

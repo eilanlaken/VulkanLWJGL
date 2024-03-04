@@ -1,5 +1,6 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.memory.MemoryUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -110,7 +111,10 @@ public class ModelBuilder {
 
         ModelPartMesh mesh = create(positions, textureCoordinates, normals, indices);
         HashMap<String, Object> materialAttributes = new HashMap<>();
-        materialAttributes.put("albedo_map", debug_createTexture("assets/textures/yellowSquare.png"));
+        //materialAttributes.put("albedo_map", debug_createTexture("assets/textures/yellowSquare.png"));
+        materialAttributes.put("albedo_map", AssetStore.get("assets/textures/yellowSquare.png"));
+
+
         //materialAttributes.put("shineDamper", 0.8f);
         //materialAttributes.put("reflectivity", 0.05f);
         ModelPartMaterial material = new ModelPartMaterial(materialAttributes);

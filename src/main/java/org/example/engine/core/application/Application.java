@@ -46,6 +46,10 @@ public class Application {
         clean();
     }
 
+    public static void switchScreen(WindowScreen screen) {
+        window.setScreen(screen);
+    }
+
     public static void loop() {
         while (running && !window.shouldClose()) {
             GLFW.glfwMakeContextCurrent(window.getHandle());

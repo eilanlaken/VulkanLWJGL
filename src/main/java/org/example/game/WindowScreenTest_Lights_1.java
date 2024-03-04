@@ -39,7 +39,7 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
 
         modelPart = ModelBuilder.createRedCube();
 
-        transform3D.matrix4.translate(0,0,-5f);
+        transform3D.matrix4.translateSelfAxis(0,0,-5f);
 
         cameraTransform = new Matrix4();
 
@@ -53,7 +53,7 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
         float delta = GraphicsUtils.getDeltaTime();
         // fixed update
         float angularSpeed = 200; // degrees per second
-        transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
+        transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
 
         if (Keyboard.isKeyJustPressed(Keyboard.Key.A))
             GraphicsUtils.enableVSync();
@@ -61,8 +61,8 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
             GraphicsUtils.disableVSync();
 
         if (Keyboard.isKeyPressed(Keyboard.Key.RIGHT)) {
-            cameraTransform.translate(0,0,-1*delta);
-            cameraTransform.rotate(0,0,1,1*delta);
+            cameraTransform.translateSelfAxis(0,0,-1*delta);
+            cameraTransform.rotateSelfAxis(0,0,1,1*delta);
 
             Vector3 position = new Vector3();
             camera.lens.position.set(cameraTransform.getTranslation(position));

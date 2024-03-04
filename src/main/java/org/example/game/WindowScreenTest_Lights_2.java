@@ -53,7 +53,7 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
         }
         transform3D = ComponentFactory.createTransform3D();
         modelPart = ModelBuilder.createRedCube();
-        transform3D.matrix4.translate(0,0,-5f);
+        transform3D.matrix4.translateSelfAxis(0,0,-5f);
         cameraTransform = new Matrix4();
 
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
@@ -69,13 +69,13 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
         //transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
 
         if (Keyboard.isKeyPressed(Keyboard.Key.W)) {
-            transform3D.matrix4.translate(0,-1*delta,0);
+            transform3D.matrix4.translateSelfAxis(0,-1*delta,0);
         }
 
 
         if (Keyboard.isKeyPressed(Keyboard.Key.RIGHT)) {
-            cameraTransform.translate(0,0,-1*delta);
-            cameraTransform.rotate(0,0,1,1*delta);
+            cameraTransform.translateSelfAxis(0,0,-1*delta);
+            cameraTransform.rotateSelfAxis(0,0,1,1*delta);
 
             Vector3 position = new Vector3();
             camera.lens.position.set(cameraTransform.getTranslation(position));

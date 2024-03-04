@@ -2,13 +2,13 @@ package org.example.engine.core.async;
 
 import java.util.*;
 
-public class TaskRunner {
+public class AsyncTaskRunner {
 
-    public static void runAsync(Task ...tasks) {
-        for (Task task : tasks) runAsync(task);
+    public static void runAsync(AsyncTask...tasks) {
+        for (AsyncTask task : tasks) runAsync(task);
     }
 
-    public static void runAsync(Task task) {
+    public static void runAsync(AsyncTask task) {
         Thread spawningThread = new Thread(() -> {
             try {
                 start(task);
@@ -20,9 +20,9 @@ public class TaskRunner {
         spawningThread.start();
     }
 
-    private static Thread start(Task task) {
+    private static Thread start(AsyncTask task) {
         List<Thread> preRequisiteThreads = new ArrayList<>();
-        for (Task prerequisite : task.prerequisites) {
+        for (AsyncTask prerequisite : task.prerequisites) {
             Thread prerequisiteThread = start(prerequisite);
             preRequisiteThreads.add(prerequisiteThread);
         }
@@ -41,7 +41,7 @@ public class TaskRunner {
         return taskThread;
     }
 
-    public static void runSync(Task ...tasks) {
+    public static void runSync(AsyncTask...tasks) {
         TaskPriority[] taskPriorities = new TaskPriority[tasks.length];
         for (int i = 0; i < taskPriorities.length; i++) {
             taskPriorities[i] = new TaskPriority();
@@ -53,22 +53,22 @@ public class TaskRunner {
     }
 
 
-    private static int countPrerequisites(Task task) {
-        Set<Task> allDistinctPrerequisites = new HashSet<>();
+    private static int countPrerequisites(AsyncTask task) {
+        Set<AsyncTask> allDistinctPrerequisites = new HashSet<>();
         collectDistinctPrerequisites(task, allDistinctPrerequisites);
         return allDistinctPrerequisites.size();
     }
 
-    private static void collectDistinctPrerequisites(Task task, Set<Task> allDistinctPrerequisites) {
+    private static void collectDistinctPrerequisites(AsyncTask task, Set<AsyncTask> allDistinctPrerequisites) {
         if (task == null) return;
-        for (Task prerequisite : task.prerequisites) {
+        for (AsyncTask prerequisite : task.prerequisites) {
             allDistinctPrerequisites.add(prerequisite);
             collectDistinctPrerequisites(prerequisite, allDistinctPrerequisites);
         }
     }
 
     private static class TaskPriority {
-        public Task task;
+        public AsyncTask task;
         public int priority;
     }
     
