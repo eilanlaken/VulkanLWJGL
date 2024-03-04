@@ -10,8 +10,6 @@ public final class ComponentFactory {
     public static ComponentTransform3D createTransform3D() {
         return new ComponentTransform3D(null);
     }
-
-    // Transform 3D
     public static ComponentTransform3D createTransform3D(Matrix4 matrix4) {
         return new ComponentTransform3D(matrix4);
     }
