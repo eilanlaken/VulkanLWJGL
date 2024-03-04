@@ -14,7 +14,7 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ShaderProgram implements Resource {
+public class Shader implements Resource {
 
     private final String vertexShaderSource;
     private final String fragmentShaderSource;
@@ -32,7 +32,7 @@ public class ShaderProgram implements Resource {
     private final MapObjectInt<String> attributeSizes;
     private String[] attributeNames;
 
-    public ShaderProgram(final String vertexShaderSource, final String fragmentShaderSource) {
+    public Shader(final String vertexShaderSource, final String fragmentShaderSource) {
         if (vertexShaderSource == null) throw new IllegalArgumentException("Vertex shader cannot be null.");
         if (fragmentShaderSource == null) throw new IllegalArgumentException("Fragment shader cannot be null.");
         this.vertexShaderSource = vertexShaderSource;
@@ -200,7 +200,6 @@ public class ShaderProgram implements Resource {
 
     public void bind() {
         GL20.glUseProgram(program);
-        //uniformsCache.clear();
     }
 
     public void unbind() {

@@ -1,9 +1,9 @@
 package org.example.engine.core.assets;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.graphics.ShaderProgram;
+import org.example.engine.core.graphics.Shader;
 
-public class AssetLoaderShaderProgram implements AssetLoader<ShaderProgram> {
+public class AssetLoaderShaderProgram implements AssetLoader<Shader> {
 
     public static final String VERTEX_SHADER_FILE_SUFFIX = ".vert";
     public static final String FRAGMENT_SHADER_FILE_SUFFIX = ".frag";
@@ -14,7 +14,7 @@ public class AssetLoaderShaderProgram implements AssetLoader<ShaderProgram> {
     }
 
     @Override
-    public ShaderProgram create() {
+    public Shader create() {
         return null;
     }
 

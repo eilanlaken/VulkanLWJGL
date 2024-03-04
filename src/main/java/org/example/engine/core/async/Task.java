@@ -4,7 +4,7 @@ import org.example.engine.core.collections.Array;
 
 public abstract class Task {
 
-    public Array<Task> prerequisites;
+    protected Array<Task> prerequisites;
     private volatile boolean inProgress = false;
     private volatile boolean runComplete = false;
 

@@ -11,7 +11,7 @@ public class Renderer3D {
     public final RendererFixedPipelineParamSetter paramSetter;
     private boolean drawing;
     private RendererShaderSelector shaderSelector;
-    private ShaderProgram currentShader;
+    private Shader currentShader;
 
     public Renderer3D() {
         this.paramSetter = new RendererFixedPipelineParamSetter();
@@ -19,7 +19,7 @@ public class Renderer3D {
         this.drawing = false;
     }
 
-    public void begin(ShaderProgram shader) {
+    public void begin(Shader shader) {
         this.currentShader = shader;
         this.currentShader.bind();
     }

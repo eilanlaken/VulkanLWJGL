@@ -9,8 +9,6 @@ import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
 import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
-
 public class WindowScreenTest_Asset_1 extends WindowScreen {
 
     // TODO: refactor to use assetLoader.load() etc
@@ -18,7 +16,7 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
 
     private Renderer3D renderer3D;
     private ModelPart modelPart;
-    private ShaderProgram shader;
+    private Shader shader;
     private ComponentTransform3D transform3D;
     private Camera camera;
     private Environment environment;
@@ -33,7 +31,7 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.frag");
-        this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
+        this.shader = new Shader(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
         this.environment = new Environment();
 

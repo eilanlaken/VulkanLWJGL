@@ -6,9 +6,9 @@ public class ModelPart implements Resource {
 
     public ModelPartMesh mesh;
     public ModelPartMaterial material;
-    public final Class<? extends ShaderProgram> customShaderClass;
+    public final Class<? extends Shader> customShaderClass;
 
-    public ModelPart(final ModelPartMesh mesh, final ModelPartMaterial material, final ShaderProgram shader) {
+    public ModelPart(final ModelPartMesh mesh, final ModelPartMaterial material, final Shader shader) {
         this.mesh = mesh;
         this.material = material;
         if (shader == null) this.customShaderClass = null;

@@ -3,7 +3,7 @@ package org.example.engine.core.graphics;
 @Deprecated
 public class RendererShaderSelector {
 
-    private ShaderProgram defaultShader;
+    private Shader defaultShader;
 
     public RendererShaderSelector() {
 //        final String vertexShaderSrc = FileUtils.getFileContent("assets/shaders/1_vertex.glsl");
@@ -11,10 +11,10 @@ public class RendererShaderSelector {
 //        this.defaultShader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
     }
 
-    public ShaderProgram getDefaultShader() {
+    public Shader getDefaultShader() {
         return defaultShader;
     }
-    public ShaderProgram get(final ModelPart part) {
+    public Shader get(final ModelPart part) {
         return null;
     }
 
