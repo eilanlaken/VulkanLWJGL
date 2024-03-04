@@ -77,6 +77,8 @@ public class Main {
         float[] positions = getPositions(aiMesh);
         float[] textCoords0 = getTextureCoords0(aiMesh);
         float[] normals = getNormals(aiMesh);
+        float[] tangents = getTangents(aiMesh);
+
         int[] indices = getIndices(aiMesh);
 
         System.out.println("positions");
@@ -85,6 +87,8 @@ public class Main {
         System.out.println(textCoords0);
         System.out.println("normals");
         System.out.println(normals);
+        System.out.println("tangents");
+        System.out.println(tangents);
         System.out.println("indices");
         System.out.println(indices[4]);
 
@@ -151,6 +155,19 @@ public class Main {
             normals[3*i+2] = vector3D.z();
         }
         return normals;
+    }
+
+    private static float[] getTangents(AIMesh mesh) {
+        float[] tangents = new float[mesh.mVertices().limit() * 3];
+        AIVector3D.Buffer tangentsBuffer = mesh.mTangents();
+        System.out.println(tangentsBuffer);
+        for (int i = 0; i < tangentsBuffer.limit(); i++) {
+            AIVector3D vector3D = tangentsBuffer.get(i);
+            tangents[3*i] = vector3D.x();
+            tangents[3*i+1] = vector3D.y();
+            tangents[3*i+2] = vector3D.z();
+        }
+        return tangents;
     }
 
     private static float[] getColors(AIMesh mesh) {
