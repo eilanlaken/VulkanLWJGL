@@ -166,19 +166,18 @@ public class Main {
         return colors;
     }
 
+    // https://github.com/LWJGL/lwjgl3-demos/blob/main/src/org/lwjgl/demo/opengl/assimp/WavefrontObjDemo.java
+    // line 393
     private static int[] getIndices(AIMesh mesh) {
         int faceCount = mesh.mNumFaces();
         AIFace.Buffer faces = mesh.mFaces();
-        ArrayInt indices = new ArrayInt();
+        ArrayInt indices = new ArrayInt(faceCount * 3);
         for (int i = 0; i < faceCount; i++) {
             AIFace face = faces.get(i);
+            if (face.mNumIndices() != 3) throw new IllegalArgumentException("Faces were not properly triangulated");
             IntBuffer buffer = face.mIndices();
-            while (buffer.remaining() > 0) {
-                int index = buffer.get();
-                indices.add(index);
-            }
+            while (buffer.remaining() > 0) indices.add(buffer.get());
         }
-        indices.pack();
         return indices.items;
     }
 
