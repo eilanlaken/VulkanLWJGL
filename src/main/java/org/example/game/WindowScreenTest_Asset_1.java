@@ -31,8 +31,8 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
         this.assetLoaderTextures = new AssetLoaderTexture();
         this.renderer3D = new Renderer3D();
 
-        final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.vert");
-        final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.frag");
+        final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_2.vert");
+        final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_2.frag");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
         this.environment = new Environment();
@@ -55,7 +55,7 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
         cameraTransform = new Matrix4();
 
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
-        environment.add(new EnvironmentLightPoint(new Color(0,1,1,1), 10, 0, 0, -5));
+        environment.add(new EnvironmentLightPoint(new Color(0,1,1,1), 10, 0, 0, -3));
     }
 
 
@@ -66,7 +66,7 @@ public class WindowScreenTest_Asset_1 extends WindowScreen {
         cameraController.update(delta);
         // fixed update
         float angularSpeed = 200; // degrees per second
-        //transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
+        transform3D.matrix4.rotate(Vector3.X, angularSpeed * delta);
 
         if (Keyboard.isKeyPressed(Keyboard.Key.W)) {
             transform3D.matrix4.translate(0,-1*delta,0);

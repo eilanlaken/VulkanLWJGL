@@ -5,7 +5,10 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryStack;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
@@ -107,7 +110,7 @@ public class ModelBuilder {
 
         ModelPartMesh mesh = create(positions, textureCoordinates, normals, indices);
         HashMap<String, Object> materialAttributes = new HashMap<>();
-        materialAttributes.put("color", new Color(1,0,0,1));
+        materialAttributes.put("albedo_map", debug_createTexture("assets/textures/yellowSquare.png"));
         materialAttributes.put("shineDamper", 0.8f);
         materialAttributes.put("reflectivity", 0.05f);
         ModelPartMaterial material = new ModelPartMaterial(materialAttributes);
@@ -171,5 +174,36 @@ public class ModelBuilder {
         return vbo;
     }
 
+
+    // TODO: delete this shit and use a proper loader
+    public static Texture debug_createTexture(final String path) {
+        int width;
+        int height;
+        ByteBuffer buffer;
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer widthBuffer = stack.mallocInt(1);
+            IntBuffer heightBuffer = stack.mallocInt(1);
+            IntBuffer channelsBuffer = stack.mallocInt(1);
+            buffer = STBImage.stbi_load(path, widthBuffer, heightBuffer, channelsBuffer, 4);
+            if (buffer == null) throw new RuntimeException("Failed to load Texture: " + path);
+            width = widthBuffer.get();
+            height = heightBuffer.get();
+        }
+        int glHandle = GL11.glGenTextures();
+        Texture texture = new Texture(glHandle,
+                width, height,
+                TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamFilter.MIP_MAP_NEAREST_NEAREST,
+                TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE
+        );
+        TextureBinder.bindTexture(texture);
+        GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+        // TODO: here we need to see if we want to: generate mipmaps, use anisotropic filtering, what level of anisotropy etc
+        // TODO: For a raw Texture with no TextureMap, use defaults.
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
+        // TODO: we need to see if the anisotropic filtering extension is available. If yes, create that instead of mipmaps.
+        STBImage.stbi_image_free(buffer);
+        return texture;
+    }
 
 }
