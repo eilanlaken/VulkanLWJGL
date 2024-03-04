@@ -7,9 +7,8 @@ import org.example.engine.core.math.Vector3;
 
 public class Environment {
 
-    private static final Color finalAmbient = new Color(0,0,0,1);
-    private static final Vector3 totalAmbient = new Vector3(0,0,0);
-
+    private final Color finalAmbient = new Color(0,0,0,1);
+    private final Vector3 totalAmbient = new Vector3(0,0,0);
     public Array<EnvironmentLightAmbient> ambientLights = new Array<>();
     public Array<EnvironmentLightDirectional> directionalLights = new Array<>();
     public Array<EnvironmentLightPoint> pointLights = new Array<>();
