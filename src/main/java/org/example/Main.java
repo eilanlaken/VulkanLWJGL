@@ -76,6 +76,8 @@ public class Main {
     private static ModelPart processModelPart(AIMesh aiMesh, Array<ModelPartMaterial> materials) {
         float[] positions = getPositions(aiMesh);
         float[] textCoords0 = getTextureCoords0(aiMesh);
+        float[] textCoords1 = getTextureCoords1(aiMesh);
+
         float[] normals = getNormals(aiMesh);
         float[] tangents = getTangents(aiMesh);
 
@@ -136,9 +138,9 @@ public class Main {
 
     private static float[] getTextureCoords1(AIMesh mesh) {
         float[] textureCoordinates1 = new float[mesh.mVertices().limit() * 2];
-        AIVector3D.Buffer textureCoordinatesBuffer = mesh.mTextureCoords(1);
-        for (int i = 0; i < textureCoordinatesBuffer.limit(); i++) {
-            AIVector3D coordinates = textureCoordinatesBuffer.get(i);
+        AIVector3D.Buffer textureCoords1Buffer = mesh.mTextureCoords(1);
+        for (int i = 0; i < textureCoords1Buffer.limit(); i++) {
+            AIVector3D coordinates = textureCoords1Buffer.get(i);
             textureCoordinates1[2*i] = coordinates.x();
             textureCoordinates1[2*i+1] = coordinates.y();
         }
