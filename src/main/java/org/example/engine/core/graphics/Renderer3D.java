@@ -11,7 +11,7 @@ public class Renderer3D {
     public final RendererFixedPipelineParamSetter paramSetter;
     private boolean drawing;
     private RendererShaderSelector shaderSelector;
-    private Shader currentShader;
+    private ShaderProgram currentShader;
 
     public Renderer3D() {
         this.paramSetter = new RendererFixedPipelineParamSetter();
@@ -19,7 +19,7 @@ public class Renderer3D {
         this.drawing = false;
     }
 
-    public void begin(Shader shader) {
+    public void begin(ShaderProgram shader) {
         this.currentShader = shader;
         this.currentShader.bind();
     }
@@ -52,11 +52,21 @@ public class Renderer3D {
         ModelPartMesh mesh = modelPart.mesh;
         GL30.glBindVertexArray(mesh.vaoId);
 
-        // TODO: bind by need
-        GL20.glEnableVertexAttribArray(0); // positions
+        // TODO: enabling by need
+        GL20.glEnableVertexAttribArray(5); // positions
         GL20.glEnableVertexAttribArray(1); // texture coordinates
         GL20.glEnableVertexAttribArray(2); // normals
+
+
+        // enable
+
+        ModelVertexAttribute position = ModelVertexAttribute.POSITION;
+        GL20.glEnableVertexAttribArray(2); // normals
+
+        // draw
         GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.vertexCount, GL11.GL_UNSIGNED_INT, 0);
+
+        // disable
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1); // texture coordinates
         GL20.glDisableVertexAttribArray(2); // normals

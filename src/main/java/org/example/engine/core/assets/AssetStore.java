@@ -4,7 +4,7 @@ import org.example.engine.core.async.AsyncTaskRunner;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.Queue;
 import org.example.engine.core.graphics.Model;
-import org.example.engine.core.graphics.Shader;
+import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.Texture;
 import org.example.engine.core.memory.Resource;
 
@@ -133,7 +133,7 @@ public final class AssetStore {
         HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> loaders = new HashMap<>();
         loaders.put(Texture.class, AssetLoaderTexture.class);
         loaders.put(Model.class, AssetLoaderModel.class);
-        loaders.put(Shader.class, AssetLoaderShaderProgram.class);
+        loaders.put(ShaderProgram.class, AssetLoaderShaderProgram.class);
 
         // TODO: delete
         loaders.put(Debug.class, AssetLoaderDebug.class);

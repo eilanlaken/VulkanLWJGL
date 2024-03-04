@@ -113,8 +113,6 @@ public class ModelBuilder {
         HashMap<String, Object> materialAttributes = new HashMap<>();
         //materialAttributes.put("albedo_map", debug_createTexture("assets/textures/yellowSquare.png"));
         materialAttributes.put("albedo_map", AssetStore.get("assets/textures/yellowSquare.png"));
-
-
         //materialAttributes.put("shineDamper", 0.8f);
         //materialAttributes.put("reflectivity", 0.05f);
         ModelPartMaterial material = new ModelPartMaterial(materialAttributes);
@@ -122,43 +120,75 @@ public class ModelBuilder {
         return new ModelPart(mesh, material, null);
     }
 
-    public static ModelPartMesh create(float[] positions, float[] textureCoordinates, float[] normals, int[] indices) {
+    @Deprecated public static ModelPartMesh create(float[] positions, float[] textureCoordinates, float[] normals, int[] indices) {
         int vaoId = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vaoId);
         storeIndicesBuffer(indices);
-        int vboPositions = storeDataInAttributeList(0, 3, positions);
+        int vboPositions = storeDataInAttributeList(5, 3, positions);
         int vboTextureCoordinates = storeDataInAttributeList(1, 2, textureCoordinates);
         int vboNormals = storeDataInAttributeList(2, 3, normals);
         GL30.glBindVertexArray(0);
+
+        System.out.println("vbo pos: " + vboPositions);
+        System.out.println("vbo uv: " + vboTextureCoordinates);
+        System.out.println("vbo n: " + vboNormals);
+
+
         return new ModelPartMesh(vaoId, indices.length, vboPositions, vboTextureCoordinates, vboNormals);
     }
 
-    private static ModelPartMaterial create(HashMap<String, Object> materialParams) {
-        return new ModelPartMaterial(materialParams);
-    }
-
-    private static ModelPart build(final ModelPartMesh mesh, ModelPartMaterial material) {
-        return new ModelPart(mesh, material, null);
-    }
-
-    public static Model build(ModelPart modelPart) {
-        return new Model(modelPart);
-    }
-
-    public static Model buildTexturedCube(float width, float height, float depth, Texture texture) {
-
-        return null;
-    }
 
     public static Model build(float[] positions,
-                                  float[] colors,
-                                  float[] textureCoordinates,
-                                  float[] normals,
-                                  float[] tangents,
-                                  float[] biNormals,
-                                  int[] indices) {
+                              float[] colors,
+                              float[] textureCoordinates0,
+                              float[] textureCoordinates1,
+                              float[] normals,
+                              float[] tangents,
+                              float[] biNormals,
+                              float[] boneWeights0,
+                              float[] boneWeights1,
+                              float[] boneWeights2,
+                              float[] boneWeights3,
+                              float[] boneWeights4,
+                              float[] boneWeights5,
+                              int[] indices) {
 
         return null;
+    }
+
+    public static Model create(float[] positions,
+                               float[] colors,
+                               float[] textureCoordinates0,
+                               float[] textureCoordinates1,
+                               float[] normals,
+                               float[] tangents,
+                               float[] biNormals,
+                               float[] boneWeights0,
+                               float[] boneWeights1,
+                               float[] boneWeights2,
+                               float[] boneWeights3,
+                               float[] boneWeights4,
+                               float[] boneWeights5,
+                               int[] indices) {
+        int vaoId = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(vaoId);
+        if (indices != null) storeIndicesBuffer(indices);
+        int vboPositions = storeDataInAttributeList(ModelVertexAttribute.POSITION, positions);
+        int vboColors = storeDataInAttributeList(ModelVertexAttribute.COLOR, colors);
+        int vboTextureCoordinates0 = storeDataInAttributeList(ModelVertexAttribute.TEXTURE_COORDINATES0, textureCoordinates0);
+        int vboTextureCoordinates1 = storeDataInAttributeList(ModelVertexAttribute.TEXTURE_COORDINATES1, textureCoordinates1);
+        int vboNormals = storeDataInAttributeList(ModelVertexAttribute.NORMAL, normals);
+        int vboTangents = storeDataInAttributeList(ModelVertexAttribute.TANGENT, tangents);
+        int vboBiNormals = storeDataInAttributeList(ModelVertexAttribute.BI_NORMAL, biNormals);
+        int vboBoneWeight0 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT0, boneWeights0);
+        int vboBoneWeight1 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT1, boneWeights1);
+        int vboBoneWeight2 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT2, boneWeights2);
+        int vboBoneWeight3 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT3, boneWeights3);
+        int vboBoneWeight4 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT4, boneWeights4);
+        int vboBoneWeight5 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT5, boneWeights5);
+        GL30.glBindVertexArray(0);
+        //return new ModelPartMesh(vaoId, indices.length, vboPositions, vboTextureCoordinates, vboNormals);
+        return null; // for now
     }
 
     private static void storeIndicesBuffer(int[] indices) {
@@ -168,46 +198,28 @@ public class ModelBuilder {
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
     }
 
-    private static int storeDataInAttributeList(int attributeNumber, int attributeDataLength, float[] data) {
+    private static int storeDataInAttributeList(final ModelVertexAttribute attribute, final float[] data) {
+        if (data == null) return -1;
+        final int attributeNumber = attribute.ordinal();
+        final int attributeUnitSize = attribute.attributeUnitSize;
         int vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo); // bind
         FloatBuffer buffer = MemoryUtils.store(data);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
-        GL20.glVertexAttribPointer(attributeNumber, attributeDataLength, GL11.GL_FLOAT, false, 0, 0);
+        GL20.glVertexAttribPointer(attributeNumber, attributeUnitSize, GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0); // unbind
         return vbo;
     }
 
-
-    // TODO: delete this shit and use a proper loader
-    public static Texture debug_createTexture(final String path) {
-        int width;
-        int height;
-        ByteBuffer buffer;
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer widthBuffer = stack.mallocInt(1);
-            IntBuffer heightBuffer = stack.mallocInt(1);
-            IntBuffer channelsBuffer = stack.mallocInt(1);
-            buffer = STBImage.stbi_load(path, widthBuffer, heightBuffer, channelsBuffer, 4);
-            if (buffer == null) throw new RuntimeException("Failed to load Texture: " + path);
-            width = widthBuffer.get();
-            height = heightBuffer.get();
-        }
-        int glHandle = GL11.glGenTextures();
-        Texture texture = new Texture(glHandle,
-                width, height,
-                TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamFilter.MIP_MAP_NEAREST_NEAREST,
-                TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE
-        );
-        TextureBinder.bindTexture(texture);
-        GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
-        // TODO: here we need to see if we want to: generate mipmaps, use anisotropic filtering, what level of anisotropy etc
-        // TODO: For a raw Texture with no TextureMap, use defaults.
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-        GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
-        // TODO: we need to see if the anisotropic filtering extension is available. If yes, create that instead of mipmaps.
-        STBImage.stbi_image_free(buffer);
-        return texture;
+    @Deprecated private static int storeDataInAttributeList(int attributeNumber, int attributeUnitSize, float[] data) {
+        if (data == null) return -1;
+        int vbo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo); // bind
+        FloatBuffer buffer = MemoryUtils.store(data);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+        GL20.glVertexAttribPointer(attributeNumber, attributeUnitSize, GL11.GL_FLOAT, false, 0, 0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0); // unbind
+        return vbo;
     }
 
 }

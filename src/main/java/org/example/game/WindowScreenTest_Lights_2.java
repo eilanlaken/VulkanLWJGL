@@ -19,7 +19,7 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
 
     private Renderer3D renderer3D;
     private ModelPart modelPart;
-    private Shader shader;
+    private ShaderProgram shader;
     private ComponentTransform3D transform3D;
     private Camera camera;
     private Environment environment;
@@ -36,7 +36,7 @@ public class WindowScreenTest_Lights_2 extends WindowScreen {
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/simple_1.frag");
-        this.shader = new Shader(vertexShaderSrc, fragmentShaderSrc);
+        this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
         this.camera = new Camera();
         this.environment = new Environment();
 
