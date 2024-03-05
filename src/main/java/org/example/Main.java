@@ -30,10 +30,10 @@ public class Main {
     }
 
     private static void loadModel() throws Exception {
-        String path = "assets/models/cube.fbx";
-        Array<ModelPart> parts = new Array<>();
+        String path = "assets/models/cube.obj";
 
-        try (AIScene aiScene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate | Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_FixInfacingNormals)) {
+        try (AIScene aiScene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenUVCoords | Assimp.aiProcess_GenNormals | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_CalcTangentSpace
+                | Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_ImproveCacheLocality | Assimp.aiProcess_RemoveRedundantMaterials)) {
 
             int numMaterials = aiScene.mNumMaterials();
             PointerBuffer aiMaterials = aiScene.mMaterials();
@@ -48,7 +48,6 @@ public class Main {
             PointerBuffer aiMeshes = aiScene.mMeshes();
             for (int i = 0; i < numMeshes; i++) {
                 AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
-                System.out.println("count: " + aiMesh.mNumVertices());
                 processMesh(aiMesh, materials);
             }
         }
@@ -134,7 +133,7 @@ public class Main {
         float[] positions = getPositions(aiMesh);
         System.out.println(Arrays.toString(positions));
 
-        System.out.println("pos");
+        System.out.println("textCoords0");
         float[] textCoords0 = getTextureCoords0(aiMesh);
         System.out.println(Arrays.toString(textCoords0));
 
@@ -157,18 +156,6 @@ public class Main {
         System.out.println("indices");
         int[] indices = getIndices(aiMesh);
         System.out.println(Arrays.toString(indices));
-
-
-        System.out.println("positions");
-        System.out.println(positions[0]);
-        System.out.println("textCoords0");
-        System.out.println(textCoords0);
-        System.out.println("normals");
-        System.out.println(normals);
-        System.out.println("tangents");
-        System.out.println(tangents);
-        System.out.println("indices");
-        System.out.println(indices[4]);
 
         ModelPartMesh mesh = null;//ModelBuilder.create(positions, textCoords0, normals, indices);
         ModelPartMaterial material;
