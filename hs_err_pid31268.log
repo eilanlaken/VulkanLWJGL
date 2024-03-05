@@ -35,7 +35,7 @@ Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
 j  org.lwjgl.opengl.GL30C.nglGenVertexArrays(IJ)V+0
 j  org.lwjgl.opengl.GL30C.glGenVertexArrays()I+20
 j  org.lwjgl.opengl.GL30.glGenVertexArrays()I+0
-j  org.example.engine.core.graphics.ModelBuilder.create([F[F[F[I)Lorg/example/engine/core/graphics/ModelPartMesh;+0
+j  org.example.engine.core.graphics.ModelBuilder_old.create([F[F[F[I)Lorg/example/engine/core/graphics/ModelPartMesh;+0
 j  org.example.Main.processModelPart(Lorg/lwjgl/assimp/AIMesh;Lorg/example/engine/core/collections/Array;)Lorg/example/engine/core/graphics/ModelPart;+90
 j  org.example.Main.loadModel()V+111
 j  org.example.Main.main([Ljava/lang/String;)V+0

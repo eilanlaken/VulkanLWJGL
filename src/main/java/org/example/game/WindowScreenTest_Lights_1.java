@@ -37,7 +37,7 @@ public class WindowScreenTest_Lights_1 extends WindowScreen {
     public void show() {
         transform3D = ComponentFactory.createTransform3D();
 
-        modelPart = ModelBuilder.createRedCube();
+        modelPart = ModelBuilder_old.createRedCube();
 
         transform3D.matrix4.translateSelfAxis(0,0,-5f);
 
