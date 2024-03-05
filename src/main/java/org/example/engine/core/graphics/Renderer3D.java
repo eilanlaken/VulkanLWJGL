@@ -39,36 +39,19 @@ public class Renderer3D {
     }
 
     public void draw(final ModelPart modelPart, final Matrix4 transform) {
-        // Enable depth testing (recommended for proper rendering)
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-        // Disable backface culling
         GL11.glEnable(GL11.GL_CULL_FACE);
-
         currentShader.bindUniform("body_transform", transform);
         ModelPartMaterial material = modelPart.material;
         currentShader.bindUniforms(material.materialParams);
         ModelPartMesh mesh = modelPart.mesh;
         GL30.glBindVertexArray(mesh.vaoId);
-
-        // TODO: enabling by need
-        GL20.glEnableVertexAttribArray(0); // positions
-        GL20.glEnableVertexAttribArray(1); // texture coordinates
-        GL20.glEnableVertexAttribArray(2); // normals
-
-
-        // enable
-
-        ModelVertexAttribute position = ModelVertexAttribute.POSITION;
-
-        // draw
-        GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.vertexCount, GL11.GL_UNSIGNED_INT, 0);
-
-        // disable
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1); // texture coordinates
-        GL20.glDisableVertexAttribArray(2); // normals
-
-
+            for (ModelVertexAttribute attribute : ModelVertexAttribute.values())
+                if (mesh.hasVertexAttribute(attribute)) GL20.glEnableVertexAttribArray(attribute.slot);
+            if (mesh.indexed) GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.vertexCount, GL11.GL_UNSIGNED_INT, 0);
+            else GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, mesh.vertexCount);
+            for (ModelVertexAttribute attribute : ModelVertexAttribute.values())
+                if (mesh.hasVertexAttribute(attribute)) GL20.glDisableVertexAttribArray(attribute.slot);
         GL30.glBindVertexArray(0);
     }
 

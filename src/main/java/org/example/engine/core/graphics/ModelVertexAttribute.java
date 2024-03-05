@@ -1,7 +1,5 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.collections.Array;
-
 public enum ModelVertexAttribute {
 
     POSITION("a_position", 3),
@@ -22,17 +20,13 @@ public enum ModelVertexAttribute {
     public final String glslVariableName;
     public final short bitmask;
     public final int length;
-    public final int shaderLocation;
+    public final int slot;
 
     ModelVertexAttribute(final String glslVariableName, final int length) {
         this.glslVariableName = glslVariableName;
         this.bitmask = (short) (0b000001 << ordinal());
         this.length = length;
-        this.shaderLocation = ordinal();
-    }
-
-    public static boolean hasAttribute(final short modelVertexAttributeBitMask, final ModelVertexAttribute attribute) {
-        return (modelVertexAttributeBitMask & attribute.bitmask) != 0;
+        this.slot = ordinal();
     }
 
 }

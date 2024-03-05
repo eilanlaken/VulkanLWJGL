@@ -20,6 +20,10 @@ public class ModelPartMesh implements Resource {
         this.vbos = vbos;
     }
 
+    public boolean hasVertexAttribute(final ModelVertexAttribute attribute) {
+        return (vertexAttributeBitmask & attribute.bitmask) != 0;
+    }
+
     @Override
     // TODO: confirm it works
     public void free() {
