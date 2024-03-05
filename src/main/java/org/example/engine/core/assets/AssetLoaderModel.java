@@ -35,7 +35,9 @@ public class AssetLoaderModel implements AssetLoader<Model> {
 
     @Override
     public void asyncLoad(final String path) {
-        try (AIScene aiScene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_CalcTangentSpace)) {
+        try (AIScene aiScene = Assimp.aiImportFile(path,
+                Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenNormals | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_CalcTangentSpace
+                       | Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_ImproveCacheLocality | Assimp.aiProcess_RemoveRedundantMaterials)) {
             PointerBuffer aiMaterials  = aiScene.mMaterials();
             int numMaterials = aiScene.mNumMaterials();
             materialsData = new ModelPartMaterialData[numMaterials];
