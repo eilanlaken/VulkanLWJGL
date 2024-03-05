@@ -20,13 +20,14 @@ public class ScreenLoading extends WindowScreen {
     public void show() {
         AssetStore.loadAsset(Texture.class, "assets/textures/yellowSquare.png");
         AssetStore.loadAsset(Debug.class, "assets/text/parent.txt");
+        AssetStore.loadAsset(Model.class, "assets/models/cube.obj");
     }
 
 
     @Override
     protected void refresh() {
         if (!AssetStore.isLoadingInProgress()) {
-            Application.switchScreen(new WindowScreenTest_Asset_1());
+            Application.switchScreen(new WindowScreenTest_Asset_2());
         }
 
         // frame update

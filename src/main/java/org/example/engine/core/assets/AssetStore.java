@@ -3,6 +3,7 @@ package org.example.engine.core.assets;
 import org.example.engine.core.async.AsyncTaskRunner;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.Queue;
+import org.example.engine.core.graphics.Model;
 import org.example.engine.core.graphics.Model_old;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.Texture;
@@ -132,7 +133,7 @@ public final class AssetStore {
     private static HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> getLoadersMap() {
         HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> loaders = new HashMap<>();
         loaders.put(Texture.class, AssetLoaderTexture.class);
-        loaders.put(Model_old.class, AssetLoaderModel.class);
+        loaders.put(Model.class, AssetLoaderModel.class);
         loaders.put(ShaderProgram.class, AssetLoaderShaderProgram.class);
 
         // TODO: delete

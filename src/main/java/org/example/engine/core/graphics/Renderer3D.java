@@ -44,6 +44,7 @@ public class Renderer3D {
         currentShader.bindUniform("body_transform", transform);
         ModelPartMaterial material = modelPart.material;
         currentShader.bindUniforms(material.materialParams);
+        //currentShader.bindUniform("colorDiffuse", material.materialParams.get("colorDiffuse"));
         ModelPartMesh mesh = modelPart.mesh;
         GL30.glBindVertexArray(mesh.vaoId);
         {
