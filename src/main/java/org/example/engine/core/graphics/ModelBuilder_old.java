@@ -125,45 +125,10 @@ public class ModelBuilder_old {
         int vboTextureCoordinates = storeDataInAttributeList(1, 2, textureCoordinates);
         int vboNormals = storeDataInAttributeList(2, 3, normals);
         GL30.glBindVertexArray(0);
-        return new ModelPartMesh(vaoId, indices.length, (short) 0, vboPositions, vboTextureCoordinates, vboNormals);
+        return new ModelPartMesh(vaoId, indices.length, (short) 0, true, vboPositions, vboTextureCoordinates, vboNormals);
 
     }
 
-
-    public static Model_old create(float[] positions,
-                                   float[] colors,
-                                   float[] textureCoordinates0,
-                                   float[] textureCoordinates1,
-                                   float[] normals,
-                                   float[] tangents,
-                                   float[] biNormals,
-                                   float[] boneWeights0,
-                                   float[] boneWeights1,
-                                   float[] boneWeights2,
-                                   float[] boneWeights3,
-                                   float[] boneWeights4,
-                                   float[] boneWeights5,
-                                   int[] indices) {
-        int vaoId = GL30.glGenVertexArrays();
-        GL30.glBindVertexArray(vaoId);
-        if (indices != null) storeIndicesBuffer(indices);
-        int vboPositions = storeDataInAttributeList(ModelVertexAttribute.POSITION, positions);
-        int vboColors = storeDataInAttributeList(ModelVertexAttribute.COLOR, colors);
-        int vboTextureCoordinates0 = storeDataInAttributeList(ModelVertexAttribute.TEXTURE_COORDINATES0, textureCoordinates0);
-        int vboTextureCoordinates1 = storeDataInAttributeList(ModelVertexAttribute.TEXTURE_COORDINATES1, textureCoordinates1);
-        int vboNormals = storeDataInAttributeList(ModelVertexAttribute.NORMAL, normals);
-        int vboTangents = storeDataInAttributeList(ModelVertexAttribute.TANGENT, tangents);
-        int vboBiNormals = storeDataInAttributeList(ModelVertexAttribute.BI_NORMAL, biNormals);
-        int vboBoneWeight0 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT0, boneWeights0);
-        int vboBoneWeight1 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT1, boneWeights1);
-        int vboBoneWeight2 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT2, boneWeights2);
-        int vboBoneWeight3 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT3, boneWeights3);
-        int vboBoneWeight4 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT4, boneWeights4);
-        int vboBoneWeight5 = storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT5, boneWeights5);
-        GL30.glBindVertexArray(0);
-        //return new ModelPartMesh(vaoId, indices.length, vboPositions, vboTextureCoordinates, vboNormals);
-        return null; // for now
-    }
 
     private static void storeIndicesBuffer(int[] indices) {
         int vbo = GL15.glGenBuffers();

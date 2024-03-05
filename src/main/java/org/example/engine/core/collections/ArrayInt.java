@@ -102,8 +102,9 @@ public class ArrayInt {
 
     /** Reduces the size of the backing array to the size of the actual items. This is useful to release memory when many items
      * have been removed, or if it is known that more items will not be added. */
-    public void pack() {
+    public ArrayInt pack() {
         if (items.length != size) resize(size);
+        return this;
     }
 
     private int[] resize(int newSize) {
@@ -129,7 +130,7 @@ public class ArrayInt {
     }
 
     @Override
-    public int hashCode () {
+    public int hashCode() {
         if (!ordered) return super.hashCode();
         int[] items = this.items;
         int h = 1;
@@ -139,7 +140,7 @@ public class ArrayInt {
         return h;
     }
 
-    public boolean equals (Object object) {
+    public boolean equals(Object object) {
         if (object == this) return true;
         if (!ordered) return false;
         if (!(object instanceof ArrayInt)) return false;

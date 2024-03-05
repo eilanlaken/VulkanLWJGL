@@ -9,12 +9,14 @@ public class ModelPartMesh implements Resource {
     public final int vaoId;
     public final int vertexCount;
     public final short vertexAttributeBitmask;
+    public final boolean indexed;
     public final int[] vbos;
 
-    public ModelPartMesh(final int vaoId, final int vertexCount, short bitmask, final int... vbos) {
+    public ModelPartMesh(final int vaoId, final int vertexCount, final short bitmask, final boolean indexed, final int... vbos) {
         this.vaoId = vaoId;
         this.vertexCount = vertexCount;
         this.vertexAttributeBitmask = bitmask;
+        this.indexed = indexed;
         this.vbos = vbos;
     }
 
