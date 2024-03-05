@@ -1,6 +1,6 @@
 package org.example.engine.core.graphics;
 
-public class TextureRegion {
+public class TextureMapRegion {
 
     public final Texture texture;
     public final float u;
@@ -12,9 +12,9 @@ public class TextureRegion {
     public final int width;
     public final int height;
 
-    public TextureRegion(final Texture texture,
-                         final float u, final float v,
-                         final float u2, final float v2) {
+    public TextureMapRegion(final Texture texture,
+                            final float u, final float v,
+                            final float u2, final float v2) {
         this.texture = texture;
         this.u = u;
         this.v = v;
@@ -26,9 +26,9 @@ public class TextureRegion {
         this.y = Math.round(v * (float) texture.height);
     }
 
-    public TextureRegion(final Texture texture,
-                         final int x, final int y,
-                         final int width, final int height) {
+    public TextureMapRegion(final Texture texture,
+                            final int x, final int y,
+                            final int width, final int height) {
         this.texture = texture;
         this.x = x;
         this.y = y;

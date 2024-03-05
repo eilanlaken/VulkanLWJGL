@@ -3,7 +3,7 @@ package org.example.engine.core.graphics;
 public enum ModelVertexAttribute {
 
     POSITION("a_position", 3),
-    COLOR("a_color", 3),
+    COLOR("a_color", 4),
     TEXTURE_COORDINATES0("a_textCoords0", 2),
     TEXTURE_COORDINATES1("a_textCoords1", 2),
     NORMAL("a_normal", 3),
