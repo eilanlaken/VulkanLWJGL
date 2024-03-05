@@ -73,7 +73,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
     public void asyncLoad(final String path) {
         final int importFlags = Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenUVCoords |
                 Assimp.aiProcess_GenNormals | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_CalcTangentSpace
-                | Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_ImproveCacheLocality |
+                | Assimp.aiProcess_ImproveCacheLocality |
                 Assimp.aiProcess_RemoveRedundantMaterials;
             try (AIScene aiScene = Assimp.aiImportFile(path, importFlags)) {
             PointerBuffer aiMaterials  = aiScene.mMaterials();
@@ -278,7 +278,6 @@ public class AssetLoaderModel implements AssetLoader<Model> {
 
     private int[] getIndices(final AIMesh aiMesh) {
         int faceCount = aiMesh.mNumFaces();
-        System.out.println("face count: " + faceCount * 3);
         if (faceCount <= 0) return null;
         AIFace.Buffer faces = aiMesh.mFaces();
         ArrayInt indices = new ArrayInt(faceCount * 3);
@@ -314,6 +313,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         }
         GL30.glBindVertexArray(0);
         final short bitmask = generateBitmask(attributesCollector);
+        System.out.println("bm: " + Integer.toString(bitmask, 2));
         final int[] vbos = vbosCollector.pack().items;
         return new ModelPartMesh(vaoId, meshData.vertexCount, bitmask, meshData.indices != null, vbos);
     }
@@ -330,6 +330,8 @@ public class AssetLoaderModel implements AssetLoader<Model> {
 
     private void storeDataInAttributeList(final ModelVertexAttribute attribute, final ModelPartMeshData meshData, Array<ModelVertexAttribute> attributesCollector, ArrayInt vbosCollector) {
         final float[] data = (float[]) meshData.vertexBuffers.get(attribute);
+        System.out.println("attrib: " + attribute.name());
+        System.out.println("data: " + Arrays.toString(data));
         if (data == null) return;
         final int attributeNumber = attribute.ordinal();
         final int attributeUnitSize = attribute.length;

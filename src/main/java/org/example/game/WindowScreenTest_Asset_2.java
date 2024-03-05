@@ -42,7 +42,7 @@ public class WindowScreenTest_Asset_2 extends WindowScreen {
 
         transform3D = ComponentFactory.createTransform3D();
 
-        model = AssetStore.get("assets/models/cube.obj");
+        model = AssetStore.get("assets/models/cube-blue.obj");
 
         transform3D.matrix4.translateSelfAxis(0,0,-15f);
 
@@ -71,7 +71,7 @@ public class WindowScreenTest_Asset_2 extends WindowScreen {
         }
 
         if (Keyboard.isKeyPressed(Keyboard.Key.A)) {
-            transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
+            transform3D.matrix4.rotateSelfAxis(Vector3.Y, angularSpeed * delta);
             System.out.println(transform3D.matrix4);
         }
 
