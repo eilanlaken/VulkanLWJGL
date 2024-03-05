@@ -81,6 +81,9 @@ public class Main {
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             for (MapObjectInt.Entry<String> entry : namedTextureTypes) {
+                int val = entry.value;
+                if (val == Assimp.aiTextureType_DIFFUSE) System.out.println("diffuse");
+
                 AIString path = AIString.calloc();
                 IntBuffer mapping = stack.mallocInt(1);
                 IntBuffer uvIndex = stack.mallocInt(1);
@@ -115,7 +118,7 @@ public class Main {
         for (Map.Entry<String, String> colorEntry : namedColorTypes.entrySet()) {
             int result = Assimp.aiGetMaterialColor(aiMaterial, colorEntry.getValue(), Assimp.aiTextureType_NONE, 0, colour);
             if (result == Assimp.aiReturn_SUCCESS) {
-                System.out.println("color:");
+                System.out.println(colorEntry.getKey() + ": " + colour.r() + " " + colour.g() + " " + colour.b() + " " + colour.a());
             }
         }
 
