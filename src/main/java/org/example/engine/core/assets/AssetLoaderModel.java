@@ -284,7 +284,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
             IntBuffer buffer = face.mIndices();
             while (buffer.remaining() > 0) indices.add(buffer.get());
         }
-        return indices.items;
+        return indices.pack().items;
     }
 
     private ModelPartMesh create(final ModelPartMeshData meshData) {
