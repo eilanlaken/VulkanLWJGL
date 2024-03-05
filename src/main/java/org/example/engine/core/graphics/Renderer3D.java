@@ -33,9 +33,9 @@ public class Renderer3D {
         // ambient light
         //this.currentShader.bindUniform("ambient", environment.getTotalAmbient());
 
-        this.currentShader.bindUniform("pointLightPos", environment.pointLights.get(0).position);
-        this.currentShader.bindUniform("pointLightColor", environment.pointLights.get(0).color);
-        this.currentShader.bindUniform("pointLightIntensity", environment.pointLights.get(0).intensity);
+//        this.currentShader.bindUniform("pointLightPos", environment.pointLights.get(0).position);
+//        this.currentShader.bindUniform("pointLightColor", environment.pointLights.get(0).color);
+//        this.currentShader.bindUniform("pointLightIntensity", environment.pointLights.get(0).intensity);
     }
 
     public void draw(final ModelPart modelPart, final Matrix4 transform) {
@@ -43,8 +43,8 @@ public class Renderer3D {
         GL11.glEnable(GL11.GL_CULL_FACE);
         currentShader.bindUniform("body_transform", transform);
         ModelPartMaterial material = modelPart.material;
-        currentShader.bindUniforms(material.materialParams);
-        //currentShader.bindUniform("colorDiffuse", material.materialParams.get("colorDiffuse"));
+        //currentShader.bindUniforms(material.materialParams);
+        currentShader.bindUniform("colorDiffuse", material.materialParams.get("colorDiffuse"));
         ModelPartMesh mesh = modelPart.mesh;
         GL30.glBindVertexArray(mesh.vaoId);
         {

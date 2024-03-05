@@ -44,7 +44,7 @@ public class WindowScreenTest_Asset_2 extends WindowScreen {
 
         model = AssetStore.get("assets/models/cube.obj");
 
-        transform3D.matrix4.translateSelfAxis(0,0,-5f);
+        transform3D.matrix4.translateSelfAxis(0,0,-15f);
 
         cameraTransform = new Matrix4();
 
@@ -130,7 +130,7 @@ public class WindowScreenTest_Asset_2 extends WindowScreen {
         renderer3D.setCamera(camera);
         //renderer3D.setEnvironment(environment);
         renderer3D.draw(model.parts[0], transform3D.matrix4);
-        renderer3D.draw(model.parts[1], transform3D.matrix4);
+
 
         renderer3D.end();
     }

@@ -16,6 +16,7 @@ import org.lwjgl.system.MemoryStack;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,9 +71,11 @@ public class AssetLoaderModel implements AssetLoader<Model> {
 
     @Override
     public void asyncLoad(final String path) {
-        try (AIScene aiScene = Assimp.aiImportFile(path,
-                Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenUVCoords | Assimp.aiProcess_GenNormals | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_CalcTangentSpace
-                       | Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_ImproveCacheLocality | Assimp.aiProcess_RemoveRedundantMaterials)) {
+        final int importFlags = Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenUVCoords |
+                Assimp.aiProcess_GenNormals | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_CalcTangentSpace
+                | Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_ImproveCacheLocality |
+                Assimp.aiProcess_RemoveRedundantMaterials;
+            try (AIScene aiScene = Assimp.aiImportFile(path, importFlags)) {
             PointerBuffer aiMaterials  = aiScene.mMaterials();
             int numMaterials = aiScene.mNumMaterials();
             materialsData = new ModelPartMaterialData[numMaterials];
@@ -273,16 +276,17 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         return biNormals;
     }
 
-    private int[] getIndices(final AIMesh mesh) {
-        int faceCount = mesh.mNumFaces();
+    private int[] getIndices(final AIMesh aiMesh) {
+        int faceCount = aiMesh.mNumFaces();
+        System.out.println("face count: " + faceCount * 3);
         if (faceCount <= 0) return null;
-        AIFace.Buffer faces = mesh.mFaces();
+        AIFace.Buffer faces = aiMesh.mFaces();
         ArrayInt indices = new ArrayInt(faceCount * 3);
         for (int i = 0; i < faceCount; i++) {
-            AIFace face = faces.get(i);
-            if (face.mNumIndices() != 3) throw new IllegalArgumentException("Faces were not properly triangulated");
-            IntBuffer buffer = face.mIndices();
-            while (buffer.remaining() > 0) indices.add(buffer.get());
+            AIFace aiFace = faces.get(i);
+            if (aiFace.mNumIndices() != 3) throw new IllegalArgumentException("Faces were not properly triangulated");
+            for (int j = 0; j < aiFace.mNumIndices(); j++)
+                indices.add(aiFace.mIndices().get(j));
         }
         return indices.pack().items;
     }
@@ -319,6 +323,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         int vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vbo);
         IntBuffer buffer = MemoryUtils.store(indices);
+        System.out.println(Arrays.toString(indices));
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
         vbosCollector.add(vbo);
     }
