@@ -4,7 +4,6 @@ import org.example.engine.core.async.AsyncTaskRunner;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.Queue;
 import org.example.engine.core.graphics.Model;
-import org.example.engine.core.graphics.Model_old;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.Texture;
 import org.example.engine.core.memory.Resource;

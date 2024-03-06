@@ -42,14 +42,14 @@ public class WindowScreenTest_Asset_2 extends WindowScreen {
 
         transform3D = ComponentFactory.createTransform3D();
 
-        model = AssetStore.get("assets/models/cube-blue.obj");
+        model = AssetStore.get("assets/models/cube-blue.fbx");
 
         transform3D.matrix4.translateSelfAxis(0,0,-15f);
 
         cameraTransform = new Matrix4();
 
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
-        environment.add(new EnvironmentLightPoint(new Color(0,1,1,1), 10, 0, 0, -3));
+        environment.add(new EnvironmentLightPoint(new Color(1,0.2f,0,1), 1f, 0, 0, -3));
 
         transform3D.matrix4.rotateSelfAxis(Vector3.Y, 30);
 
@@ -65,18 +65,14 @@ public class WindowScreenTest_Asset_2 extends WindowScreen {
         // fixed update
         float angularSpeed = 200; // degrees per second
 
-        if (Keyboard.isKeyPressed(Keyboard.Key.B)) {
-            transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
-            System.out.println(transform3D.matrix4);
-        }
-
         if (Keyboard.isKeyPressed(Keyboard.Key.A)) {
             transform3D.matrix4.rotateSelfAxis(Vector3.Y, angularSpeed * delta);
-            System.out.println(transform3D.matrix4);
+
         }
 
         if (Keyboard.isKeyPressed(Keyboard.Key.W)) {
-            transform3D.matrix4.translateXYZAxis(0,-1*delta,0);
+            transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
+
 
         }
 
@@ -128,7 +124,7 @@ public class WindowScreenTest_Asset_2 extends WindowScreen {
         GL11.glClearColor(0,0,0,1);
         renderer3D.begin(shader);
         renderer3D.setCamera(camera);
-        //renderer3D.setEnvironment(environment);
+        renderer3D.setEnvironment(environment);
         renderer3D.draw(model.parts[0], transform3D.matrix4);
 
 

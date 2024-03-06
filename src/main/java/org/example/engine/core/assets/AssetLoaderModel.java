@@ -71,7 +71,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
 
     @Override
     public void asyncLoad(final String path) {
-        final int importFlags = Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenUVCoords |
+        final int importFlags = Assimp.aiProcess_GenUVCoords |
                 Assimp.aiProcess_GenNormals | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_CalcTangentSpace
                 | Assimp.aiProcess_ImproveCacheLocality |
                 Assimp.aiProcess_RemoveRedundantMaterials;

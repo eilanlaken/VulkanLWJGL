@@ -32,10 +32,10 @@ public class Main {
     }
 
     private static void loadModel() throws Exception {
-        String path = "assets/models/cube.obj";
+        String path = "assets/models/cube-blue.fbx";
 
         try (AIScene aiScene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenUVCoords | Assimp.aiProcess_GenNormals | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_CalcTangentSpace
-                | Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_ImproveCacheLocality | Assimp.aiProcess_RemoveRedundantMaterials)) {
+                 | Assimp.aiProcess_ImproveCacheLocality | Assimp.aiProcess_RemoveRedundantMaterials)) {
 
             int numMaterials = aiScene.mNumMaterials();
             PointerBuffer aiMaterials = aiScene.mMaterials();
@@ -49,8 +49,8 @@ public class Main {
             System.out.println("num meshes " + numMeshes);
             PointerBuffer aiMeshes = aiScene.mMeshes();
             for (int i = 0; i < numMeshes; i++) {
-                AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
-                processMesh(aiMesh, materials);
+                //AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
+                //processMesh(aiMesh, materials);
             }
         }
     }
@@ -84,8 +84,6 @@ public class Main {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             for (MapObjectInt.Entry<String> entry : namedTextureTypes) {
                 int val = entry.value;
-                if (val == Assimp.aiTextureType_DIFFUSE) System.out.println("diffuse");
-
                 AIString path = AIString.calloc();
                 IntBuffer mapping = stack.mallocInt(1);
                 IntBuffer uvIndex = stack.mallocInt(1);
@@ -93,16 +91,15 @@ public class Main {
                 IntBuffer mapMode = stack.mallocInt(1);
                 FloatBuffer blendMode = stack.mallocFloat(1);
                 int result = Assimp.aiGetMaterialTexture(aiMaterial, entry.value, 0, path, (IntBuffer) mapping, uvIndex, blendMode, op, mapMode, null);
-
                 // Assimp.aiTextureMapping_SPHERE;
                 if (result == Assimp.aiReturn_SUCCESS) {
-                    System.out.println("texture: " + entry.key);
-                    System.out.println(path.dataString());
-                    System.out.println("uv index: " + uvIndex.get(0));
-                    System.out.println("mapping: " + mapping.get(0));
-                    System.out.println("map mode: " + mapMode.get(0));
-                    System.out.println("op: " + op.get(0));
-                    System.out.println("blend mode: " + blendMode.get(0));
+//                    System.out.println("texture: " + entry.key);
+//                    System.out.println(path.dataString());
+//                    System.out.println("uv index: " + uvIndex.get(0));
+//                    System.out.println("mapping: " + mapping.get(0));
+//                    System.out.println("map mode: " + mapMode.get(0));
+//                    System.out.println("op: " + op.get(0));
+//                    System.out.println("blend mode: " + blendMode.get(0));
                 }
             }
         }
@@ -116,9 +113,12 @@ public class Main {
         namedColorTypes.put("colorSpecular", Assimp.AI_MATKEY_COLOR_SPECULAR);
         namedColorTypes.put("colorTransparent", Assimp.AI_MATKEY_COLOR_TRANSPARENT);
 
+        System.out.println("material: colors");
+
         AIColor4D colour = AIColor4D.create();
         for (Map.Entry<String, String> colorEntry : namedColorTypes.entrySet()) {
             int result = Assimp.aiGetMaterialColor(aiMaterial, colorEntry.getValue(), Assimp.aiTextureType_NONE, 0, colour);
+            System.out.println(colorEntry.getKey() + ": " + "["+colour.r() + "," +colour.g() + "," +colour.b()+","+colour.a()+"]");
             if (result == Assimp.aiReturn_SUCCESS) {
                 System.out.println(colorEntry.getKey() + ": " + colour.r() + " " + colour.g() + " " + colour.b() + " " + colour.a());
             }

@@ -54,8 +54,6 @@ public class ShaderProgram implements Resource {
         fetchAttributes();
         fetchUniforms();
         validate();
-
-        System.out.println(attributeLocations);
     }
 
     private int createVertexShader(final String shaderCode) {
