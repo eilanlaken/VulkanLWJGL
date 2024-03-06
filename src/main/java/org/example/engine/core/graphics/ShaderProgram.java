@@ -16,8 +16,8 @@ import java.util.Map;
 
 public class ShaderProgram implements Resource {
 
-    private final String vertexShaderSource;
-    private final String fragmentShaderSource;
+    public final String vertexShaderSource;
+    public final String fragmentShaderSource;
     public final int program;
     protected final int vertexShaderId;
     protected final int fragmentShaderId;

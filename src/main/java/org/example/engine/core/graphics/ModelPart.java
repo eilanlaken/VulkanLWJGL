@@ -18,6 +18,5 @@ public class ModelPart implements Resource {
     @Override
     public void free() {
         mesh.free();
-        material.free();
     }
 }

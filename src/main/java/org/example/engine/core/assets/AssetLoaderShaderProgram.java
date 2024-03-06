@@ -5,17 +5,18 @@ import org.example.engine.core.graphics.ShaderProgram;
 
 public class AssetLoaderShaderProgram implements AssetLoader<ShaderProgram> {
 
-    public static final String VERTEX_SHADER_FILE_SUFFIX = ".vert";
-    public static final String FRAGMENT_SHADER_FILE_SUFFIX = ".frag";
+    private String vertexShaderSrc;
+    private String fragmentShaderSrc;
 
     @Override
     public void asyncLoad(String path) {
-
+        vertexShaderSrc = AssetUtils.getFileContent(path + ".vert");
+        fragmentShaderSrc = AssetUtils.getFileContent(path + ".frag");
     }
 
     @Override
     public ShaderProgram create() {
-        return null;
+        return new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
     }
 
     @Override
