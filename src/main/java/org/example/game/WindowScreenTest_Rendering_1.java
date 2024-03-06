@@ -10,9 +10,9 @@ import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
 import org.lwjgl.opengl.GL11;
 
-public class WindowScreenTest_Asset_2 extends WindowScreen {
+public class WindowScreenTest_Rendering_1 extends WindowScreen {
 
-    private Renderer3D renderer3D;
+    private Renderer3D_old renderer3DOld;
     private Model model;
     private ShaderProgram shader;
     private ComponentTransform3D transform3D;
@@ -23,8 +23,8 @@ public class WindowScreenTest_Asset_2 extends WindowScreen {
     // debug
     private BlenderCameraController cameraController;
 
-    public WindowScreenTest_Asset_2() {
-        this.renderer3D = new Renderer3D();
+    public WindowScreenTest_Rendering_1() {
+        this.renderer3DOld = new Renderer3D_old();
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default.frag");
@@ -88,11 +88,11 @@ public class WindowScreenTest_Asset_2 extends WindowScreen {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,1);
-        renderer3D.begin(shader);
-        renderer3D.setCamera(camera);
-        renderer3D.setEnvironment(environment);
-        renderer3D.draw(model.parts[0], transform3D.matrix4);
-        renderer3D.end();
+        renderer3DOld.begin(shader);
+        renderer3DOld.setCamera(camera);
+        renderer3DOld.setEnvironment(environment);
+        renderer3DOld.draw(model.parts[0], transform3D.matrix4);
+        renderer3DOld.end();
     }
 
     @Override

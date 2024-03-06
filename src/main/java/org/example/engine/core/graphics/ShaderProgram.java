@@ -145,7 +145,7 @@ public class ShaderProgram implements Resource {
 
     public void bindUniform(final String name, final Object value) {
         final int location = uniformLocations.get(name, -1);
-        // TODO: put back
+        // TODO: remove. Good only for debugging, but prevents custom flexible shading.
         if (location == -1) throw new IllegalArgumentException("\n\nError: " + this.getClass().getSimpleName() +  " does not have a uniform named " + name + "." +
                 "\nIf you have defined the uniform but have not used it, the GLSL compiler discarded it.\n");
         final int type = uniformTypes.get(name, -1);

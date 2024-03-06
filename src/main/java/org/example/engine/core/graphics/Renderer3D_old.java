@@ -1,49 +1,25 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.components.Component;
-import org.example.engine.components.ComponentCamera;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.Matrix4;
-import org.example.engine.entities.Entity;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import java.util.HashMap;
-import java.util.Map;
+public class Renderer3D_old {
 
-public class Renderer3D {
-
-    private Camera currentCamera;
-    private Environment environment;
+    public final RendererFixedPipelineParamSetter paramSetter;
     private boolean drawing;
-    private Map<ShaderProgram, Entity> shaderProgramEntities;
-
     private ShaderProgram currentShader;
 
-    public Renderer3D() {
-        currentCamera = null;
-        environment = new Environment();
-        shaderProgramEntities = new HashMap<>();
-        drawing = false;
+    public Renderer3D_old() {
+        this.paramSetter = new RendererFixedPipelineParamSetter();
+        this.drawing = false;
     }
 
-    public void begin(Camera camera) {
-        if (drawing) throw new IllegalStateException("Must call end(); Cannot nest begin() and end() blocks.");
-        shaderProgramEntities.clear();
-        drawing = true;
-        currentCamera = camera;
-    }
-
-    // cull in this function - before adding model-part / light to render queue
-    public void draw(final Entity entity) {
-        // just storing logic!
-        // entity: model, decal, light
-    }
-
-    public void end() {
-        if (!drawing) throw new IllegalStateException("Must call begin() before call to end().; Cannot nest begin() and end() blocks.");
-        // the ACTUAL rendering logic
+    public void begin(ShaderProgram shader) {
+        this.currentShader = shader;
+        this.currentShader.bind();
     }
 
     public void setCamera(final Camera camera) {
@@ -53,6 +29,9 @@ public class Renderer3D {
 
     // TODO: implement. Don't forget about the lights transform.
     public void setEnvironment(final Environment environment) {
+        // bind all lights.
+        // ambient light
+        //this.currentShader.bindUniform("ambient", environment.getTotalAmbient());
         this.currentShader.bindUniform("pointLightPos", environment.pointLights.get(0).position);
         this.currentShader.bindUniform("pointLightColor", environment.pointLights.get(0).color);
         this.currentShader.bindUniform("pointLightIntensity", environment.pointLights.get(0).intensity);
@@ -78,5 +57,12 @@ public class Renderer3D {
         GL30.glBindVertexArray(0);
     }
 
+    public void end() {
+        this.currentShader.unbind();
+    }
+
+    private void sort(Array<ModelPart> modelParts) {
+        // minimize: shader switching, camera binding, lights binding, material uniform binding
+    }
 
 }
