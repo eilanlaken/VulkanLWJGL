@@ -40,7 +40,7 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
     @Override
     public void show() {
         transform3D = ComponentFactory.createTransform3D();
-        model = AssetStore.get("assets/models/cube-blue.fbx");
+        model = AssetStore.get("assets/models/scene-debug.fbx");
         transform3D.matrix4.translateSelfAxis(0,0,-15f);
         cameraTransform = new Matrix4();
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
@@ -92,6 +92,8 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
         renderer3DOld.setCamera(camera);
         renderer3DOld.setEnvironment(environment);
         renderer3DOld.draw(model.parts[0], transform3D.matrix4);
+        renderer3DOld.draw(model.parts[1], transform3D.matrix4);
+
         renderer3DOld.end();
     }
 

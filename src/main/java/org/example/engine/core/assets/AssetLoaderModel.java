@@ -104,33 +104,39 @@ public class AssetLoaderModel implements AssetLoader<Model> {
     }
 
     private ModelPartMaterialData processMaterial(final AIMaterial aiMaterial) {
-        ModelPartMaterialData modelPartMaterialData = new ModelPartMaterialData();
-
-        MapObjectInt<String> namedTextureTypes = new MapObjectInt<>();
-        namedTextureTypes.put("textureBaseColor", Assimp.aiTextureType_BASE_COLOR);
-        namedTextureTypes.put("textureNormal", Assimp.aiTextureType_NORMALS);
-        namedTextureTypes.put("textureDiffuse", Assimp.aiTextureType_DIFFUSE);
-        namedTextureTypes.put("textureNone", Assimp.aiTextureType_NONE);
-        namedTextureTypes.put("textureAmbient", Assimp.aiTextureType_AMBIENT);
-        namedTextureTypes.put("textureAmbientOcclusion", Assimp.aiTextureType_AMBIENT_OCCLUSION);
-        namedTextureTypes.put("textureClearCoat", Assimp.aiTextureType_CLEARCOAT);
-        namedTextureTypes.put("textureDiffuseRoughness", Assimp.aiTextureType_DIFFUSE_ROUGHNESS);
-        namedTextureTypes.put("textureDisplacement", Assimp.aiTextureType_DISPLACEMENT);
-        namedTextureTypes.put("textureEmissionColor", Assimp.aiTextureType_EMISSION_COLOR);
-        namedTextureTypes.put("textureEmissive", Assimp.aiTextureType_EMISSIVE);
-        namedTextureTypes.put("textureHeight", Assimp.aiTextureType_HEIGHT);
-        namedTextureTypes.put("textureLightmap", Assimp.aiTextureType_LIGHTMAP);
-        namedTextureTypes.put("textureMetallic", Assimp.aiTextureType_METALNESS);
-        namedTextureTypes.put("textureReflection", Assimp.aiTextureType_REFLECTION);
-        namedTextureTypes.put("textureSpecular", Assimp.aiTextureType_SPECULAR);
-        namedTextureTypes.put("textureShininess", Assimp.aiTextureType_SHININESS);
-        namedTextureTypes.put("textureNormalCamera", Assimp.aiTextureType_NORMAL_CAMERA);
-        namedTextureTypes.put("textureSheen", Assimp.aiTextureType_SHEEN);
-        namedTextureTypes.put("textureOpacity", Assimp.aiTextureType_OPACITY);
-        namedTextureTypes.put("textureTransmission", Assimp.aiTextureType_TRANSMISSION);
-        namedTextureTypes.put("textureUnknown", Assimp.aiTextureType_UNKNOWN);
-
         try (MemoryStack stack = MemoryStack.stackPush()) {
+            ModelPartMaterialData modelPartMaterialData = new ModelPartMaterialData();
+
+            AIString name = AIString.calloc();
+            if (Assimp.aiGetMaterialString(aiMaterial, Assimp.AI_MATKEY_NAME, 0, 0, name) == Assimp.aiReturn_SUCCESS) {
+                modelPartMaterialData.name = name.dataString();
+            }
+            name.free();
+
+            MapObjectInt<String> namedTextureTypes = new MapObjectInt<>();
+            namedTextureTypes.put("textureBaseColor", Assimp.aiTextureType_BASE_COLOR);
+            namedTextureTypes.put("textureNormal", Assimp.aiTextureType_NORMALS);
+            namedTextureTypes.put("textureDiffuse", Assimp.aiTextureType_DIFFUSE);
+            namedTextureTypes.put("textureNone", Assimp.aiTextureType_NONE);
+            namedTextureTypes.put("textureAmbient", Assimp.aiTextureType_AMBIENT);
+            namedTextureTypes.put("textureAmbientOcclusion", Assimp.aiTextureType_AMBIENT_OCCLUSION);
+            namedTextureTypes.put("textureClearCoat", Assimp.aiTextureType_CLEARCOAT);
+            namedTextureTypes.put("textureDiffuseRoughness", Assimp.aiTextureType_DIFFUSE_ROUGHNESS);
+            namedTextureTypes.put("textureDisplacement", Assimp.aiTextureType_DISPLACEMENT);
+            namedTextureTypes.put("textureEmissionColor", Assimp.aiTextureType_EMISSION_COLOR);
+            namedTextureTypes.put("textureEmissive", Assimp.aiTextureType_EMISSIVE);
+            namedTextureTypes.put("textureHeight", Assimp.aiTextureType_HEIGHT);
+            namedTextureTypes.put("textureLightmap", Assimp.aiTextureType_LIGHTMAP);
+            namedTextureTypes.put("textureMetallic", Assimp.aiTextureType_METALNESS);
+            namedTextureTypes.put("textureReflection", Assimp.aiTextureType_REFLECTION);
+            namedTextureTypes.put("textureSpecular", Assimp.aiTextureType_SPECULAR);
+            namedTextureTypes.put("textureShininess", Assimp.aiTextureType_SHININESS);
+            namedTextureTypes.put("textureNormalCamera", Assimp.aiTextureType_NORMAL_CAMERA);
+            namedTextureTypes.put("textureSheen", Assimp.aiTextureType_SHEEN);
+            namedTextureTypes.put("textureOpacity", Assimp.aiTextureType_OPACITY);
+            namedTextureTypes.put("textureTransmission", Assimp.aiTextureType_TRANSMISSION);
+            namedTextureTypes.put("textureUnknown", Assimp.aiTextureType_UNKNOWN);
+
             for (MapObjectInt.Entry<String> entry : namedTextureTypes) {
                 final String uniform = entry.key;
                 AIString path = AIString.calloc();
@@ -151,25 +157,47 @@ public class AssetLoaderModel implements AssetLoader<Model> {
                     modelPartMaterialData.attributesData.put(uniform, params);
                 }
             }
-        }
 
-        Map<String, String> namedColorTypes = new HashMap<>();
-        namedColorTypes.put("colorAmbient", Assimp.AI_MATKEY_COLOR_AMBIENT);
-        namedColorTypes.put("colorDiffuse", Assimp.AI_MATKEY_COLOR_DIFFUSE);
-        namedColorTypes.put("colorEmissive", Assimp.AI_MATKEY_COLOR_EMISSIVE);
-        namedColorTypes.put("colorReflective", Assimp.AI_MATKEY_COLOR_REFLECTIVE);
-        namedColorTypes.put("colorSpecular", Assimp.AI_MATKEY_COLOR_SPECULAR);
-        namedColorTypes.put("colorTransparent", Assimp.AI_MATKEY_COLOR_TRANSPARENT);
 
-        AIColor4D colour = AIColor4D.create();
-        for (Map.Entry<String, String> colorEntry : namedColorTypes.entrySet()) {
-            int result = Assimp.aiGetMaterialColor(aiMaterial, colorEntry.getValue(), Assimp.aiTextureType_NONE, 0, colour);
-            if (result == Assimp.aiReturn_SUCCESS) {
-                modelPartMaterialData.attributesData.put(colorEntry.getKey(), new Color(colour.r(), colour.g(), colour.b(), colour.a()));
+            Map<String, String> namedColorParams = new HashMap<>();
+            namedColorParams.put("colorAmbient", Assimp.AI_MATKEY_COLOR_AMBIENT);
+            namedColorParams.put("colorDiffuse", Assimp.AI_MATKEY_COLOR_DIFFUSE);
+            namedColorParams.put("colorEmissive", Assimp.AI_MATKEY_COLOR_EMISSIVE);
+            namedColorParams.put("colorReflective", Assimp.AI_MATKEY_COLOR_REFLECTIVE);
+            namedColorParams.put("colorSpecular", Assimp.AI_MATKEY_COLOR_SPECULAR);
+            namedColorParams.put("colorTransparent", Assimp.AI_MATKEY_COLOR_TRANSPARENT);
+            AIColor4D colour = AIColor4D.create();
+            for (Map.Entry<String, String> colorEntry : namedColorParams.entrySet()) {
+                int result = Assimp.aiGetMaterialColor(aiMaterial, colorEntry.getValue(), Assimp.aiTextureType_NONE, 0, colour);
+                if (result == Assimp.aiReturn_SUCCESS) {
+                    modelPartMaterialData.attributesData.put(colorEntry.getKey(), new Color(colour.r(), colour.g(), colour.b(), colour.a()));
+                }
             }
-        }
+            colour.free();
 
-        return modelPartMaterialData;
+            Map<String, String> namedProperties = new HashMap<>();
+            namedProperties.put("propAlpha", Assimp.AI_MATKEY_OPACITY);
+            namedProperties.put("propReflectivity", Assimp.AI_MATKEY_REFLECTIVITY);
+            namedProperties.put("propMetallic", Assimp.AI_MATKEY_METALLIC_FACTOR);
+            namedProperties.put("propTransparency", Assimp.AI_MATKEY_TRANSPARENCYFACTOR);
+            namedProperties.put("propShininess", Assimp.AI_MATKEY_SHININESS);
+            namedProperties.put("propShadingModel", Assimp.AI_MATKEY_SHADING_MODEL);
+            namedProperties.put("propRoughness", Assimp.AI_MATKEY_ROUGHNESS_FACTOR);
+            namedProperties.put("propTwoSided", Assimp.AI_MATKEY_TWOSIDED);
+            namedProperties.put("propGlossiness", Assimp.AI_MATKEY_GLOSSINESS_FACTOR);
+
+            PointerBuffer pointerBuffer = stack.mallocPointer(1);
+            for (Map.Entry<String, String> namedProp : namedProperties.entrySet()) {
+                int result = Assimp.aiGetMaterialProperty(aiMaterial, namedProp.getValue(), pointerBuffer);
+                if (result == Assimp.aiReturn_SUCCESS) {
+                    AIMaterialProperty property = AIMaterialProperty.create(pointerBuffer.get(0));
+                    modelPartMaterialData.attributesData.put(namedProp.getKey(), property.mData().asFloatBuffer().get());
+
+                }
+            }
+
+            return modelPartMaterialData;
+        }
     }
 
     private ModelPartMeshData processMesh(final AIMesh aiMesh) {
@@ -313,7 +341,6 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         }
         GL30.glBindVertexArray(0);
         final short bitmask = generateBitmask(attributesCollector);
-        System.out.println("bm: " + Integer.toString(bitmask, 2));
         final int[] vbos = vbosCollector.pack().items;
         return new ModelPartMesh(vaoId, meshData.vertexCount, bitmask, meshData.indices != null, vbos);
     }
@@ -323,15 +350,12 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         int vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vbo);
         IntBuffer buffer = MemoryUtils.store(indices);
-        System.out.println(Arrays.toString(indices));
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
         vbosCollector.add(vbo);
     }
 
     private void storeDataInAttributeList(final ModelVertexAttribute attribute, final ModelPartMeshData meshData, Array<ModelVertexAttribute> attributesCollector, ArrayInt vbosCollector) {
         final float[] data = (float[]) meshData.vertexBuffers.get(attribute);
-        System.out.println("attrib: " + attribute.name());
-        System.out.println("data: " + Arrays.toString(data));
         if (data == null) return;
         final int attributeNumber = attribute.ordinal();
         final int attributeUnitSize = attribute.length;
@@ -361,6 +385,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
     }
 
     private static class ModelPartMaterialData {
+        public String name;
         public Map<String, Object> attributesData = new HashMap<>();
     }
 
