@@ -71,11 +71,12 @@ public class AssetLoaderModel implements AssetLoader<Model> {
 
     @Override
     public void asyncLoad(final String path) {
-        final int importFlags = Assimp.aiProcess_GenUVCoords |
-                Assimp.aiProcess_GenNormals | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_CalcTangentSpace
-                | Assimp.aiProcess_ImproveCacheLocality |
+        final int importFlags =
+                Assimp.aiProcess_Triangulate |
+                Assimp.aiProcess_GenNormals |
+                Assimp.aiProcess_CalcTangentSpace |
                 Assimp.aiProcess_RemoveRedundantMaterials;
-            try (AIScene aiScene = Assimp.aiImportFile(path, importFlags)) {
+        try (AIScene aiScene = Assimp.aiImportFile(path, importFlags)) {
             PointerBuffer aiMaterials  = aiScene.mMaterials();
             int numMaterials = aiScene.mNumMaterials();
             materialsData = new ModelPartMaterialData[numMaterials];
@@ -189,9 +190,10 @@ public class AssetLoaderModel implements AssetLoader<Model> {
             PointerBuffer pointerBuffer = stack.mallocPointer(1);
             for (Map.Entry<String, String> namedProp : namedProperties.entrySet()) {
                 int result = Assimp.aiGetMaterialProperty(aiMaterial, namedProp.getValue(), pointerBuffer);
+                System.out.println(namedProp.getKey() + ": " + result);
                 if (result == Assimp.aiReturn_SUCCESS) {
                     AIMaterialProperty property = AIMaterialProperty.create(pointerBuffer.get(0));
-                    modelPartMaterialData.attributesData.put(namedProp.getKey(), property.mData().asFloatBuffer().get());
+                    //modelPartMaterialData.attributesData.put(namedProp.getKey(), property.mData().asFloatBuffer().get());
 
                 }
             }
@@ -212,6 +214,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         meshData.vertexBuffers.put(ModelVertexAttribute.BI_NORMAL, getBiNormals(aiMesh));
         meshData.indices = getIndices(aiMesh);
         meshData.materialIndex = aiMesh.mMaterialIndex();
+        System.out.println("indices: \n" + Arrays.toString(meshData.indices));
         return meshData;
     }
 
