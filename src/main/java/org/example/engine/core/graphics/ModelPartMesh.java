@@ -1,6 +1,7 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.ArrayInt;
+import org.example.engine.core.math.Shape3DAABB;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL30;
 
@@ -10,13 +11,15 @@ public class ModelPartMesh implements Resource {
     public final int vertexCount;
     public final short vertexAttributeBitmask;
     public final boolean indexed;
+    public final Shape3DAABB boundingBox;
     public final int[] vbos;
 
-    public ModelPartMesh(final int vaoId, final int vertexCount, final short bitmask, final boolean indexed, final int... vbos) {
+    public ModelPartMesh(final int vaoId, final int vertexCount, final short bitmask, final boolean indexed, final Shape3DAABB boundingBox, final int... vbos) {
         this.vaoId = vaoId;
         this.vertexCount = vertexCount;
         this.vertexAttributeBitmask = bitmask;
         this.indexed = indexed;
+        this.boundingBox = boundingBox;
         this.vbos = vbos;
     }
 

@@ -56,10 +56,11 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
         cameraController.update(delta);
         float angularSpeed = 200; // degrees per second
         if (Keyboard.isKeyPressed(Keyboard.Key.A)) {
-            transform3D.matrix4.rotateSelfAxis(Vector3.Y, angularSpeed * delta);
+            transform3D.matrix4.translateXYZAxis(-1,0,0);
         }
-        if (Keyboard.isKeyPressed(Keyboard.Key.W)) {
-            transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
+        if (Keyboard.isKeyPressed(Keyboard.Key.D)) {
+            //transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
+            transform3D.matrix4.translateXYZAxis(1,0,0);
         }
         if (Keyboard.isKeyPressed(Keyboard.Key.RIGHT)) {
             cameraTransform.translateSelfAxis(0,0,-1*delta);
@@ -93,7 +94,7 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
         renderer3DOld.setCamera(camera);
         renderer3DOld.setEnvironment(environment);
         renderer3DOld.draw(model.parts[0], transform3D.matrix4);
-        renderer3DOld.draw(model.parts[1], transform3D.matrix4);
+        //renderer3DOld.draw(model.parts[1], transform3D.matrix4);
 
         renderer3DOld.end();
     }

@@ -43,6 +43,7 @@ public class CameraLens {
         this.left = new Vector3(this.up);
         this.left.crs(this.direction);
         this.frustum = new Shape3DFrustum();
+        update();
     }
 
     public void update() {

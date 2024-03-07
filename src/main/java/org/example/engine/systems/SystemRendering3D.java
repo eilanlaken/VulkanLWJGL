@@ -42,6 +42,7 @@ public class SystemRendering3D {
     public void end() {
         if (!drawing) throw new IllegalStateException("Must call begin() before call to end().; Cannot nest begin() and end() blocks.");
         // the ACTUAL rendering logic
+        drawing = false;
     }
 
     public void setCamera(final Camera camera) {
@@ -66,12 +67,10 @@ public class SystemRendering3D {
         ModelPartMesh mesh = modelPart.mesh;
         GL30.glBindVertexArray(mesh.vaoId);
         {
-            for (ModelVertexAttribute attribute : ModelVertexAttribute.values())
-                if (mesh.hasVertexAttribute(attribute)) GL20.glEnableVertexAttribArray(attribute.slot);
+            for (ModelVertexAttribute attribute : ModelVertexAttribute.values()) if (mesh.hasVertexAttribute(attribute)) GL20.glEnableVertexAttribArray(attribute.slot);
             if (mesh.indexed) GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.vertexCount, GL11.GL_UNSIGNED_INT, 0);
             else GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, mesh.vertexCount);
-            for (ModelVertexAttribute attribute : ModelVertexAttribute.values())
-                if (mesh.hasVertexAttribute(attribute)) GL20.glDisableVertexAttribArray(attribute.slot);
+            for (ModelVertexAttribute attribute : ModelVertexAttribute.values()) if (mesh.hasVertexAttribute(attribute)) GL20.glDisableVertexAttribArray(attribute.slot);
         }
         GL30.glBindVertexArray(0);
     }

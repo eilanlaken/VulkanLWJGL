@@ -6,7 +6,6 @@ public class Camera {
 
     public Camera() {
         this.lens = new CameraLens();
-        this.lens.update();
     }
 
 }

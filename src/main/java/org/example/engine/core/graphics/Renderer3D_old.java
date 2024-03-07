@@ -11,6 +11,7 @@ public class Renderer3D_old {
     public final RendererFixedPipelineParamSetter paramSetter;
     private boolean drawing;
     private ShaderProgram currentShader;
+    private Camera camera;
 
     public Renderer3D_old() {
         this.paramSetter = new RendererFixedPipelineParamSetter();
@@ -25,6 +26,7 @@ public class Renderer3D_old {
     public void setCamera(final Camera camera) {
         //this.currentShader.bindUniform("camera_position", camera.lens.position);
         this.currentShader.bindUniform("camera_combined", camera.lens.combined);
+        this.camera = camera;
     }
 
     // TODO: implement. Don't forget about the lights transform.
@@ -38,6 +40,17 @@ public class Renderer3D_old {
     }
 
     public void draw(final ModelPart modelPart, final Matrix4 transform) {
+        // TODO: fix this frustum and bounding box not working shit.
+        modelPart.mesh.boundingBox.update(transform);
+        // cull?
+        System.out.println(modelPart.mesh.boundingBox);
+        if (camera.lens.frustum.intersectsAABB(modelPart.mesh.boundingBox)) {
+            System.out.println("don't");
+            System.out.println(modelPart.mesh.boundingBox);
+        } else {
+            System.out.println("CULLING");
+        }
+
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_CULL_FACE);
         currentShader.bindUniform("body_transform", transform);

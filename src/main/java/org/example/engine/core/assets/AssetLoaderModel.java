@@ -4,6 +4,7 @@ import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.graphics.*;
+import org.example.engine.core.math.Shape3DAABB;
 import org.example.engine.core.memory.MemoryUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
@@ -229,7 +230,19 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         meshData.indices = getIndices(aiMesh);
         meshData.materialIndex = aiMesh.mMaterialIndex();
         meshData.vertexCount = getVertexCount(aiMesh);
+        meshData.boundingBox = getBoundingAABB(aiMesh);
         return meshData;
+    }
+
+    private Shape3DAABB getBoundingAABB(final AIMesh aiMesh) {
+        AIAABB aiAABB = aiMesh.mAABB();
+        AIVector3D min = aiAABB.mMin();
+        AIVector3D max = aiAABB.mMax();
+        System.out.println("AABB: ");
+        System.out.println("min: " + min.x() + "," + min.y() + "," + min.z());
+        System.out.println("max: " + max.x() + "," + max.y() + "," + max.z());
+        System.out.println();
+        return new Shape3DAABB(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
     }
 
     private int getVertexCount(final AIMesh aiMesh) {
@@ -327,13 +340,11 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         return biNormals;
     }
 
-    // TODO: bug with indices (missing face).
     private int[] getIndices(final AIMesh aiMesh) {
         int faceCount = aiMesh.mNumFaces();
         if (faceCount <= 0) return null;
         AIFace.Buffer faces = aiMesh.mFaces();
         int[] indices = new int[faceCount * 3];
-        System.out.println("face count: " + faceCount);
         for (int i = 0; i < faceCount; i++) {
             AIFace aiFace = faces.get(i);
             if (aiFace.mNumIndices() != 3) throw new IllegalArgumentException("Faces were not properly triangulated");
@@ -369,7 +380,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         GL30.glBindVertexArray(0);
         final short bitmask = generateBitmask(attributesCollector);
         final int[] vbos = vbosCollector.pack().items;
-        return new ModelPartMesh(vaoId, meshData.vertexCount, bitmask, meshData.indices != null, vbos);
+        return new ModelPartMesh(vaoId, meshData.vertexCount, bitmask,meshData.indices != null, meshData.boundingBox, vbos);
     }
 
     private void storeIndicesBuffer(int[] indices, ArrayInt vbosCollector) {
@@ -409,6 +420,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         public Map<ModelVertexAttribute, Object> vertexBuffers = new HashMap<>();
         public int materialIndex;
         public int[] indices;
+        public Shape3DAABB boundingBox;
     }
 
     private static class ModelPartMaterialData {

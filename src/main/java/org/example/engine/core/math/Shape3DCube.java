@@ -26,6 +26,7 @@ public class Shape3DCube implements Shape3D {
     }
 
     public Vector3 computeCorner(int i, Vector3 result) {
+        if (i < 0 || i >= 8) throw new IllegalArgumentException("3D Cube only has 8 corners, index should be between 0 and 7. Provided: " + i);
         result.set(vertices[i]);
         return result.mul(transform);
     }

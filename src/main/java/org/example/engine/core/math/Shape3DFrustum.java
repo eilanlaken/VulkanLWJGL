@@ -51,19 +51,11 @@ public class Shape3DFrustum implements Shape3D {
         return true;
     }
 
-    public boolean containsCube(final Shape3DCube cube) {
-        for (int i = 0; i < planes.length; i++) {
-            if (planes[i].distance(cube.computeCorner(0, vector)) < 1) continue;
-            if (planes[i].distance(cube.computeCorner(1, vector)) < 1) continue;
-            if (planes[i].distance(cube.computeCorner(2, vector)) < 1) continue;
-            if (planes[i].distance(cube.computeCorner(3, vector)) < 1) continue;
-            if (planes[i].distance(cube.computeCorner(4, vector)) < 1) continue;
-            if (planes[i].distance(cube.computeCorner(5, vector)) < 1) continue;
-            if (planes[i].distance(cube.computeCorner(6, vector)) < 1) continue;
-            if (planes[i].distance(cube.computeCorner(7, vector)) < 1) continue;
-            return false;
+    public boolean intersectsAABB(final Shape3DAABB aabb) {
+        for (int i = 0; i < 8; i++) {
+            if (contains(aabb.computeCorner(i, vector))) return true;
         }
-        return true;
+        return false;
     }
 
     public Shape3DPlane getNear() {
