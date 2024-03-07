@@ -1,8 +1,5 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.components.Component;
-import org.example.engine.components.ComponentCamera;
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.entities.Entity;
 import org.lwjgl.opengl.GL11;
@@ -64,7 +61,7 @@ public class Renderer3D {
         currentShader.bindUniform("body_transform", transform);
         ModelPartMaterial material = modelPart.material;
         //currentShader.bindUniforms(material.materialParams);
-        currentShader.bindUniform("colorDiffuse", material.materialParams.get("colorDiffuse"));
+        currentShader.bindUniform("colorDiffuse", material.uniformParams.get("colorDiffuse"));
         ModelPartMesh mesh = modelPart.mesh;
         GL30.glBindVertexArray(mesh.vaoId);
         {

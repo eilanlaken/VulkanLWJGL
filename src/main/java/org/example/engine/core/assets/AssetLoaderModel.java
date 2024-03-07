@@ -5,7 +5,6 @@ import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.memory.MemoryUtils;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 import org.lwjgl.opengl.GL11;
@@ -16,12 +15,58 @@ import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class AssetLoaderModel implements AssetLoader<Model> {
+
+    private static final MapObjectInt<String> namedTextureTypes;
+    private static final Map<String, String> namedColorParams;
+    private static final Map<String, String> namedProps;
+    static {
+        namedTextureTypes = new MapObjectInt<>();
+        namedTextureTypes.put("textureBaseColor", Assimp.aiTextureType_BASE_COLOR);
+        namedTextureTypes.put("textureNormal", Assimp.aiTextureType_NORMALS);
+        namedTextureTypes.put("textureDiffuse", Assimp.aiTextureType_DIFFUSE);
+        namedTextureTypes.put("textureNone", Assimp.aiTextureType_NONE);
+        namedTextureTypes.put("textureAmbient", Assimp.aiTextureType_AMBIENT);
+        namedTextureTypes.put("textureAmbientOcclusion", Assimp.aiTextureType_AMBIENT_OCCLUSION);
+        namedTextureTypes.put("textureClearCoat", Assimp.aiTextureType_CLEARCOAT);
+        namedTextureTypes.put("textureDiffuseRoughness", Assimp.aiTextureType_DIFFUSE_ROUGHNESS);
+        namedTextureTypes.put("textureDisplacement", Assimp.aiTextureType_DISPLACEMENT);
+        namedTextureTypes.put("textureEmissionColor", Assimp.aiTextureType_EMISSION_COLOR);
+        namedTextureTypes.put("textureEmissive", Assimp.aiTextureType_EMISSIVE);
+        namedTextureTypes.put("textureHeight", Assimp.aiTextureType_HEIGHT);
+        namedTextureTypes.put("textureLightmap", Assimp.aiTextureType_LIGHTMAP);
+        namedTextureTypes.put("textureMetallic", Assimp.aiTextureType_METALNESS);
+        namedTextureTypes.put("textureReflection", Assimp.aiTextureType_REFLECTION);
+        namedTextureTypes.put("textureSpecular", Assimp.aiTextureType_SPECULAR);
+        namedTextureTypes.put("textureShininess", Assimp.aiTextureType_SHININESS);
+        namedTextureTypes.put("textureNormalCamera", Assimp.aiTextureType_NORMAL_CAMERA);
+        namedTextureTypes.put("textureSheen", Assimp.aiTextureType_SHEEN);
+        namedTextureTypes.put("textureOpacity", Assimp.aiTextureType_OPACITY);
+        namedTextureTypes.put("textureTransmission", Assimp.aiTextureType_TRANSMISSION);
+        namedTextureTypes.put("textureUnknown", Assimp.aiTextureType_UNKNOWN);
+
+        namedColorParams = new HashMap<>();
+        namedColorParams.put("colorAmbient", Assimp.AI_MATKEY_COLOR_AMBIENT);
+        namedColorParams.put("colorDiffuse", Assimp.AI_MATKEY_COLOR_DIFFUSE);
+        namedColorParams.put("colorEmissive", Assimp.AI_MATKEY_COLOR_EMISSIVE);
+        namedColorParams.put("colorReflective", Assimp.AI_MATKEY_COLOR_REFLECTIVE);
+        namedColorParams.put("colorSpecular", Assimp.AI_MATKEY_COLOR_SPECULAR);
+        namedColorParams.put("colorTransparent", Assimp.AI_MATKEY_COLOR_TRANSPARENT);
+
+        namedProps = new HashMap<>();
+        namedProps.put("propAlpha", Assimp.AI_MATKEY_OPACITY);
+        namedProps.put("propReflectivity", Assimp.AI_MATKEY_REFLECTIVITY);
+        namedProps.put("propMetallic", Assimp.AI_MATKEY_METALLIC_FACTOR);
+        namedProps.put("propTransparency", Assimp.AI_MATKEY_TRANSPARENCYFACTOR);
+        namedProps.put("propShininess", Assimp.AI_MATKEY_SHININESS);
+        namedProps.put("propShadingModel", Assimp.AI_MATKEY_SHADING_MODEL);
+        namedProps.put("propRoughness", Assimp.AI_MATKEY_ROUGHNESS_FACTOR);
+        namedProps.put("propTwoSided", Assimp.AI_MATKEY_TWOSIDED);
+        namedProps.put("propGlossiness", Assimp.AI_MATKEY_GLOSSINESS_FACTOR);
+    }
 
     private ModelPartMaterialData[] materialsData;
     private ModelPartMeshData[] meshesData;
@@ -60,6 +105,8 @@ public class AssetLoaderModel implements AssetLoader<Model> {
                     TextureParameters params = (TextureParameters) dataValue;
                     Texture texture = AssetStore.get(params.path);
                     materialAttributes.put(uniform, texture);
+                } else if (dataValue instanceof Float) {
+                    materialAttributes.put(uniform, dataValue);
                 }
             }
             ModelPartMaterial material = new ModelPartMaterial(materialAttributes);
@@ -84,8 +131,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
             int numMaterials = aiScene.mNumMaterials();
             materialsData = new ModelPartMaterialData[numMaterials];
             for (int i = 0; i < numMaterials; i++) {
-                final ModelPartMaterialData materialData = processMaterial(AIMaterial.create(aiMaterials.get(i)));
-                materialsData[i] = materialData;
+                materialsData[i] = processMaterial(AIMaterial.create(aiMaterials.get(i)));;
             }
 
             PointerBuffer aiMeshes = aiScene.mMeshes();
@@ -117,30 +163,6 @@ public class AssetLoaderModel implements AssetLoader<Model> {
             }
             name.free();
 
-            MapObjectInt<String> namedTextureTypes = new MapObjectInt<>();
-            namedTextureTypes.put("textureBaseColor", Assimp.aiTextureType_BASE_COLOR);
-            namedTextureTypes.put("textureNormal", Assimp.aiTextureType_NORMALS);
-            namedTextureTypes.put("textureDiffuse", Assimp.aiTextureType_DIFFUSE);
-            namedTextureTypes.put("textureNone", Assimp.aiTextureType_NONE);
-            namedTextureTypes.put("textureAmbient", Assimp.aiTextureType_AMBIENT);
-            namedTextureTypes.put("textureAmbientOcclusion", Assimp.aiTextureType_AMBIENT_OCCLUSION);
-            namedTextureTypes.put("textureClearCoat", Assimp.aiTextureType_CLEARCOAT);
-            namedTextureTypes.put("textureDiffuseRoughness", Assimp.aiTextureType_DIFFUSE_ROUGHNESS);
-            namedTextureTypes.put("textureDisplacement", Assimp.aiTextureType_DISPLACEMENT);
-            namedTextureTypes.put("textureEmissionColor", Assimp.aiTextureType_EMISSION_COLOR);
-            namedTextureTypes.put("textureEmissive", Assimp.aiTextureType_EMISSIVE);
-            namedTextureTypes.put("textureHeight", Assimp.aiTextureType_HEIGHT);
-            namedTextureTypes.put("textureLightmap", Assimp.aiTextureType_LIGHTMAP);
-            namedTextureTypes.put("textureMetallic", Assimp.aiTextureType_METALNESS);
-            namedTextureTypes.put("textureReflection", Assimp.aiTextureType_REFLECTION);
-            namedTextureTypes.put("textureSpecular", Assimp.aiTextureType_SPECULAR);
-            namedTextureTypes.put("textureShininess", Assimp.aiTextureType_SHININESS);
-            namedTextureTypes.put("textureNormalCamera", Assimp.aiTextureType_NORMAL_CAMERA);
-            namedTextureTypes.put("textureSheen", Assimp.aiTextureType_SHEEN);
-            namedTextureTypes.put("textureOpacity", Assimp.aiTextureType_OPACITY);
-            namedTextureTypes.put("textureTransmission", Assimp.aiTextureType_TRANSMISSION);
-            namedTextureTypes.put("textureUnknown", Assimp.aiTextureType_UNKNOWN);
-
             for (MapObjectInt.Entry<String> entry : namedTextureTypes) {
                 final String uniform = entry.key;
                 AIString path = AIString.calloc();
@@ -162,14 +184,6 @@ public class AssetLoaderModel implements AssetLoader<Model> {
                 }
             }
 
-
-            Map<String, String> namedColorParams = new HashMap<>();
-            namedColorParams.put("colorAmbient", Assimp.AI_MATKEY_COLOR_AMBIENT);
-            namedColorParams.put("colorDiffuse", Assimp.AI_MATKEY_COLOR_DIFFUSE);
-            namedColorParams.put("colorEmissive", Assimp.AI_MATKEY_COLOR_EMISSIVE);
-            namedColorParams.put("colorReflective", Assimp.AI_MATKEY_COLOR_REFLECTIVE);
-            namedColorParams.put("colorSpecular", Assimp.AI_MATKEY_COLOR_SPECULAR);
-            namedColorParams.put("colorTransparent", Assimp.AI_MATKEY_COLOR_TRANSPARENT);
             AIColor4D colour = AIColor4D.create();
             for (Map.Entry<String, String> colorEntry : namedColorParams.entrySet()) {
                 int result = Assimp.aiGetMaterialColor(aiMaterial, colorEntry.getValue(), Assimp.aiTextureType_NONE, 0, colour);
@@ -179,25 +193,23 @@ public class AssetLoaderModel implements AssetLoader<Model> {
             }
             colour.free();
 
-            Map<String, String> namedProperties = new HashMap<>();
-            namedProperties.put("propAlpha", Assimp.AI_MATKEY_OPACITY);
-            namedProperties.put("propReflectivity", Assimp.AI_MATKEY_REFLECTIVITY);
-            namedProperties.put("propMetallic", Assimp.AI_MATKEY_METALLIC_FACTOR);
-            namedProperties.put("propTransparency", Assimp.AI_MATKEY_TRANSPARENCYFACTOR);
-            namedProperties.put("propShininess", Assimp.AI_MATKEY_SHININESS);
-            namedProperties.put("propShadingModel", Assimp.AI_MATKEY_SHADING_MODEL);
-            namedProperties.put("propRoughness", Assimp.AI_MATKEY_ROUGHNESS_FACTOR);
-            namedProperties.put("propTwoSided", Assimp.AI_MATKEY_TWOSIDED);
-            namedProperties.put("propGlossiness", Assimp.AI_MATKEY_GLOSSINESS_FACTOR);
-
             PointerBuffer pointerBuffer = stack.mallocPointer(1);
-            for (Map.Entry<String, String> namedProp : namedProperties.entrySet()) {
+            for (Map.Entry<String, String> namedProp : namedProps.entrySet()) {
                 int result = Assimp.aiGetMaterialProperty(aiMaterial, namedProp.getValue(), pointerBuffer);
-                System.out.println(namedProp.getKey() + ": " + result);
                 if (result == Assimp.aiReturn_SUCCESS) {
                     AIMaterialProperty property = AIMaterialProperty.create(pointerBuffer.get(0));
-                    //modelPartMaterialData.attributesData.put(namedProp.getKey(), property.mData().asFloatBuffer().get());
-
+                    int dataSize = property.mDataLength();
+                    try {
+                        if (dataSize == 4) {
+                            System.out.println(modelPartMaterialData.attributesData);
+                            System.out.println("put");
+                            modelPartMaterialData.attributesData.put(namedProp.getKey(), property.mData().asFloatBuffer().get());
+                            System.out.println(modelPartMaterialData.attributesData);
+                            System.out.println("\n\n");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 

@@ -41,6 +41,7 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
     public void show() {
         transform3D = ComponentFactory.createTransform3D();
         model = AssetStore.get("assets/models/scene-debug.glb");
+        System.out.println(model.parts[0].material.uniformParams);
         transform3D.matrix4.translateSelfAxis(0,0,-15f);
         cameraTransform = new Matrix4();
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
