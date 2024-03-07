@@ -48,7 +48,8 @@ public class Renderer3D_old {
         GL30.glBindVertexArray(mesh.vaoId);
         {
             for (ModelVertexAttribute attribute : ModelVertexAttribute.values()) if (mesh.hasVertexAttribute(attribute)) GL20.glEnableVertexAttribArray(attribute.slot);
-            GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.vertexCount, GL11.GL_UNSIGNED_INT, 0);
+            if (mesh.indexed) GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.vertexCount, GL11.GL_UNSIGNED_INT, 0);
+            else GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, mesh.vertexCount);
             for (ModelVertexAttribute attribute : ModelVertexAttribute.values()) if (mesh.hasVertexAttribute(attribute)) GL20.glDisableVertexAttribArray(attribute.slot);
         }
         GL30.glBindVertexArray(0);

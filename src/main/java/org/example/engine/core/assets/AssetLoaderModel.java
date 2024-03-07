@@ -194,7 +194,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
                 if (result == Assimp.aiReturn_SUCCESS) {
                     AIMaterialProperty property = AIMaterialProperty.create(pointerBuffer.get(0));
                     //modelPartMaterialData.attributesData.put(namedProp.getKey(), property.mData().asFloatBuffer().get());
-                    // TODO: continue here.
+
                 }
             }
 
@@ -219,7 +219,8 @@ public class AssetLoaderModel implements AssetLoader<Model> {
 
     private int getVertexCount(final AIMesh aiMesh) {
         int faceCount = aiMesh.mNumFaces();
-        return faceCount * 3;
+        if (faceCount > 0) return faceCount * 3;
+        else return aiMesh.mNumVertices();
     }
 
     private float[] getPositions(final AIMesh aiMesh) {
