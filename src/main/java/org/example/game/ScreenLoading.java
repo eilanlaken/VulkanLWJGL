@@ -20,7 +20,7 @@ public class ScreenLoading extends WindowScreen {
     public void show() {
         AssetStore.loadAsset(Texture.class, "assets/textures/yellowSquare.png");
         AssetStore.loadAsset(Debug.class, "assets/text/parent.txt");
-        AssetStore.loadAsset(Model.class, "assets/models/scene-debug.fbx");
+        AssetStore.loadAsset(Model.class, "assets/models/scene-debug.glb");
     }
 
 

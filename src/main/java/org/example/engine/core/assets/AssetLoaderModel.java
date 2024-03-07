@@ -5,6 +5,7 @@ import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.memory.MemoryUtils;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 import org.lwjgl.opengl.GL11;
@@ -72,7 +73,6 @@ public class AssetLoaderModel implements AssetLoader<Model> {
     @Override
     public void asyncLoad(final String path) {
         final int importFlags =
-                Assimp.aiProcess_Triangulate |
                 Assimp.aiProcess_GenNormals |
                 Assimp.aiProcess_CalcTangentSpace |
                 Assimp.aiProcess_RemoveRedundantMaterials;
@@ -194,7 +194,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
                 if (result == Assimp.aiReturn_SUCCESS) {
                     AIMaterialProperty property = AIMaterialProperty.create(pointerBuffer.get(0));
                     //modelPartMaterialData.attributesData.put(namedProp.getKey(), property.mData().asFloatBuffer().get());
-
+                    // TODO: continue here.
                 }
             }
 
@@ -204,7 +204,6 @@ public class AssetLoaderModel implements AssetLoader<Model> {
 
     private ModelPartMeshData processMesh(final AIMesh aiMesh) {
         ModelPartMeshData meshData = new ModelPartMeshData();
-        meshData.vertexCount = aiMesh.mNumVertices();
         meshData.vertexBuffers.put(ModelVertexAttribute.POSITION, getPositions(aiMesh));
         meshData.vertexBuffers.put(ModelVertexAttribute.COLOR, getColors(aiMesh));
         meshData.vertexBuffers.put(ModelVertexAttribute.TEXTURE_COORDINATES0, getTextureCoords0(aiMesh));
@@ -214,13 +213,18 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         meshData.vertexBuffers.put(ModelVertexAttribute.BI_NORMAL, getBiNormals(aiMesh));
         meshData.indices = getIndices(aiMesh);
         meshData.materialIndex = aiMesh.mMaterialIndex();
-        System.out.println("indices: \n" + Arrays.toString(meshData.indices));
+        meshData.vertexCount = getVertexCount(aiMesh);
         return meshData;
     }
 
-    private float[] getPositions(final AIMesh mesh) {
-        AIVector3D.Buffer positionsBuffer = mesh.mVertices();
-        float[] positions = new float[mesh.mVertices().limit() * 3];
+    private int getVertexCount(final AIMesh aiMesh) {
+        int faceCount = aiMesh.mNumFaces();
+        return faceCount * 3;
+    }
+
+    private float[] getPositions(final AIMesh aiMesh) {
+        AIVector3D.Buffer positionsBuffer = aiMesh.mVertices();
+        float[] positions = new float[aiMesh.mVertices().limit() * 3];
         for (int i = 0; i < positionsBuffer.limit(); i++) {
             AIVector3D vector3D = positionsBuffer.get(i);
             positions[3*i] = vector3D.x();
@@ -307,18 +311,22 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         return biNormals;
     }
 
+    // TODO: bug with indices (missing face).
     private int[] getIndices(final AIMesh aiMesh) {
         int faceCount = aiMesh.mNumFaces();
         if (faceCount <= 0) return null;
         AIFace.Buffer faces = aiMesh.mFaces();
-        ArrayInt indices = new ArrayInt(faceCount * 3);
+        int[] indices = new int[faceCount * 3];
+        System.out.println("face count: " + faceCount);
         for (int i = 0; i < faceCount; i++) {
             AIFace aiFace = faces.get(i);
             if (aiFace.mNumIndices() != 3) throw new IllegalArgumentException("Faces were not properly triangulated");
-            for (int j = 0; j < aiFace.mNumIndices(); j++)
-                indices.add(aiFace.mIndices().get(j));
+            indices[3*i] = aiFace.mIndices().get(0);
+            indices[3*i + 1] = aiFace.mIndices().get(1);
+            indices[3*i + 2] = aiFace.mIndices().get(2);
         }
-        return indices.pack().items;
+
+        return indices;
     }
 
     private ModelPartMesh create(final ModelPartMeshData meshData) {

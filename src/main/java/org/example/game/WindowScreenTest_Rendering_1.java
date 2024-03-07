@@ -40,7 +40,7 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
     @Override
     public void show() {
         transform3D = ComponentFactory.createTransform3D();
-        model = AssetStore.get("assets/models/scene-debug.fbx");
+        model = AssetStore.get("assets/models/scene-debug.glb");
         transform3D.matrix4.translateSelfAxis(0,0,-15f);
         cameraTransform = new Matrix4();
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
