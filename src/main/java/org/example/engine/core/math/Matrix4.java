@@ -847,23 +847,45 @@ public class Matrix4 {
         return this;
     }
 
-    public Matrix4 scl(Vector3 scale) {
+    public Matrix4 sclXYZ(Vector3 scale) {
         val[M00] *= scale.x;
         val[M11] *= scale.y;
         val[M22] *= scale.z;
         return this;
     }
 
-    public Matrix4 scl(float x, float y, float z) {
+    public Matrix4 sclXYZ(float x, float y, float z) {
         val[M00] *= x;
         val[M11] *= y;
         val[M22] *= z;
         return this;
     }
 
-    public Matrix4 scl(float scale) {
+    public Matrix4 sclXYZ(float scale) {
         val[M00] *= scale;
         val[M11] *= scale;
+        val[M22] *= scale;
+        return this;
+    }
+
+    // TODO: careful
+    public Matrix4 stretch(float scale) {
+        val[M00] *= scale;
+        val[M10] *= scale;
+        val[M20] *= scale;
+        return this;
+    }
+
+    public Matrix4 elongate(float scale) {
+        val[M01] *= scale;
+        val[M11] *= scale;
+        val[M21] *= scale;
+        return this;
+    }
+
+    public Matrix4 lengthen(float scale) {
+        val[M02] *= scale;
+        val[M12] *= scale;
         val[M22] *= scale;
         return this;
     }
@@ -927,6 +949,15 @@ public class Matrix4 {
      * @return The provided vector for chaining. */
     public Vector3 getScale(Vector3 scale) {
         return scale.set(getScaleX(), getScaleY(), getScaleZ());
+    }
+
+    public Vector3 getScaleSquared(Vector3 scale) {
+        return scale.set(getScaleXSquared(), getScaleYSquared(), getScaleZSquared());
+    }
+
+    // TODO: be careful
+    public float getMaxScale() {
+        return MathUtils.max(val[M00], val[M11], val[M22]);
     }
 
     /** removes the translational part and transposes the matrix. */
@@ -1262,6 +1293,19 @@ public class Matrix4 {
         val[M13] += y;
         val[M23] += z;
         return this;
+    }
+
+    public Matrix4 spin(float degrees) {
+        return rotateSelfAxis(Vector3.X, degrees);
+    }
+
+    public Matrix4 roll(float degrees) {
+        return rotateSelfAxis(Vector3.Y, degrees);
+
+    }
+
+    public Matrix4 turn(float degrees) {
+        return rotateSelfAxis(Vector3.Z, degrees);
     }
 
     /** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x

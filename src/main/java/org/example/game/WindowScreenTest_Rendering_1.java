@@ -40,7 +40,7 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
     @Override
     public void show() {
         transform3D = ComponentFactory.createTransform3D();
-        model = AssetStore.get("assets/models/scene-debug.glb");
+        model = AssetStore.get("assets/models/cube-blue.fbx");
         System.out.println(model.parts[0].material.uniformParams);
         transform3D.matrix4.translateSelfAxis(0,0,-5f);
         cameraTransform = new Matrix4();
@@ -55,6 +55,35 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
         float delta = GraphicsUtils.getDeltaTime();
         cameraController.update(delta);
         float angularSpeed = 200; // degrees per second
+
+        System.out.println(transform3D.matrix4.getScale(new Vector3()));
+
+        // rotate
+        if (Keyboard.isKeyPressed(Keyboard.Key.R)) {
+            transform3D.matrix4.spin(0.5f);
+        }
+        if (Keyboard.isKeyPressed(Keyboard.Key.T)) {
+            transform3D.matrix4.roll(0.5f);
+        }
+        if (Keyboard.isKeyPressed(Keyboard.Key.Y)) {
+            transform3D.matrix4.turn(0.5f);
+        }
+
+        // scale
+        if (Keyboard.isKeyPressed(Keyboard.Key.KEY_1)) {
+            //transform3D.matrix4.sclXYZ(1.01f,1,1);
+            transform3D.matrix4.stretch(0.99f);
+        }
+        if (Keyboard.isKeyPressed(Keyboard.Key.KEY_2)) {
+            transform3D.matrix4.elongate(1.01f);
+            //transform3D.matrix4.elongate(1.01f);
+        }
+        if (Keyboard.isKeyPressed(Keyboard.Key.KEY_3)) {
+            transform3D.matrix4.lengthen(1.01f);
+            //transform3D.matrix4.elongate(1.01f);
+        }
+
+        // translate
         if (Keyboard.isKeyPressed(Keyboard.Key.A)) {
             transform3D.matrix4.translateXYZAxis(-0.1f,0,0);
         }
@@ -101,7 +130,7 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
         renderer3DOld.begin(shader);
         renderer3DOld.setCamera(camera);
         renderer3DOld.setEnvironment(environment);
-        renderer3DOld.draw(model.parts[1], transform3D.matrix4);
+        renderer3DOld.draw(model.parts[0], transform3D.matrix4);
         //renderer3DOld.draw(model.parts[1], transform3D.matrix4);
 
         renderer3DOld.end();

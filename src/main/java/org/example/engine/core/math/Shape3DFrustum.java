@@ -58,14 +58,7 @@ public class Shape3DFrustum implements Shape3D {
         final float x = vector.x;
         final float y = vector.y;
         final float z = vector.z;
-        final float radius = sphere.radius;
-
-//        for (int i = 0; i < planes.length; i++) {
-//            final float signedDistance = planes[i].normal.x * x + planes[i].normal.y * y + planes[i].normal.z * z + planes[i].d;
-//            System.out.println("test: " + (signedDistance-radius));
-//            if (signedDistance + radius > 0) return false;
-//        }
-//
+        final float radius = sphere.scaledRadius;
 
         for (int i = 0; i < planes.length; i++) {
             float signedDistance = planes[i].normal.x * x + planes[i].normal.y * y + planes[i].normal.z * z + planes[i].d;
@@ -73,13 +66,6 @@ public class Shape3DFrustum implements Shape3D {
             if (diff < 0) return false;
         }
         return true;
-
-//        float signedDistance = planes[2].normal.x * x + planes[2].normal.y * y + planes[2].normal.z * z + planes[2].d;
-//        float diff = signedDistance + radius;
-//        System.out.println("diff left: " + diff);
-//            //if ((planes[i].normal.x * x + planes[i].normal.y * y + planes[i].normal.z * z + radius) > planes[i].d) return true;
-//        if (contains(sphere.computeCenter(vector))) return true;
-//        return false;
     }
 
     public boolean intersectsAABB(final Shape3DAABB aabb) {

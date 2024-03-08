@@ -4,7 +4,8 @@ import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.math.Shape3DAABB;
+import org.example.engine.core.math.Shape3DSphere;
+import org.example.engine.core.math.Vector3;
 import org.example.engine.core.memory.MemoryUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
@@ -230,19 +231,33 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         meshData.indices = getIndices(aiMesh);
         meshData.materialIndex = aiMesh.mMaterialIndex();
         meshData.vertexCount = getVertexCount(aiMesh);
-        meshData.boundingBox = getBoundingAABB(aiMesh);
+        meshData.boundingSphere = getBoundingSphere(aiMesh);
         return meshData;
     }
 
-    private Shape3DAABB getBoundingAABB(final AIMesh aiMesh) {
+    private Shape3DSphere getBoundingAABB(final AIMesh aiMesh) {
         AIAABB aiAABB = aiMesh.mAABB();
         AIVector3D min = aiAABB.mMin();
         AIVector3D max = aiAABB.mMax();
-        System.out.println("AABB: ");
-        System.out.println("min: " + min.x() + "," + min.y() + "," + min.z());
-        System.out.println("max: " + max.x() + "," + max.y() + "," + max.z());
-        System.out.println();
-        return new Shape3DAABB(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+
+        Vector3 center = new Vector3();
+        center.add(min.x(), min.y(), min.z());
+        center.add(max.x(), max.y(), max.z());
+        center.scl(0.5f);
+        float radius = Vector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+        return new Shape3DSphere(center, radius);
+    }
+
+    private Shape3DSphere getBoundingSphere(final AIMesh aiMesh) {
+        AIAABB aiAABB = aiMesh.mAABB();
+        AIVector3D min = aiAABB.mMin();
+        AIVector3D max = aiAABB.mMax();
+        Vector3 center = new Vector3();
+        center.add(min.x(), min.y(), min.z());
+        center.add(max.x(), max.y(), max.z());
+        center.scl(0.5f);
+        float radius = Vector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+        return new Shape3DSphere(center, radius);
     }
 
     private int getVertexCount(final AIMesh aiMesh) {
@@ -380,7 +395,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         GL30.glBindVertexArray(0);
         final short bitmask = generateBitmask(attributesCollector);
         final int[] vbos = vbosCollector.pack().items;
-        return new ModelPartMesh(vaoId, meshData.vertexCount, bitmask,meshData.indices != null, meshData.boundingBox, vbos);
+        return new ModelPartMesh(vaoId, meshData.vertexCount, bitmask,meshData.indices != null, meshData.boundingSphere, vbos);
     }
 
     private void storeIndicesBuffer(int[] indices, ArrayInt vbosCollector) {
@@ -420,7 +435,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         public Map<ModelVertexAttribute, Object> vertexBuffers = new HashMap<>();
         public int materialIndex;
         public int[] indices;
-        public Shape3DAABB boundingBox;
+        public Shape3DSphere boundingSphere;
     }
 
     private static class ModelPartMaterialData {
