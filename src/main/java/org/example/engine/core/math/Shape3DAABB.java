@@ -16,8 +16,7 @@ public class Shape3DAABB implements Shape3D {
         this.max = new Vector3(maxX, maxY, maxZ);
     }
 
-    // TODO: fix.
-    public void update(final Matrix4 transform) {
+    public void translate(final Matrix4 transform) {
         transform.getTranslation(offset);
     }
 
@@ -46,7 +45,7 @@ public class Shape3DAABB implements Shape3D {
 
     @Override
     public String toString() {
-        return "min: " + min;
+        return "min: " + min + "\nmax: " + max;
     }
 
     // TODO: implement.

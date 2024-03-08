@@ -40,15 +40,46 @@ public class Shape3DFrustum implements Shape3D {
         planes[5].set(frustumCorners[4], frustumCorners[0], frustumCorners[1]);
     }
 
-    public boolean containsSphere(final Shape3DSphere sphere) {
+
+    @Deprecated public boolean containsSphere(final Shape3DSphere sphere) {
         final float x = sphere.center.x;
         final float y = sphere.center.y;
         final float z = sphere.center.z;
         final float radius = sphere.radius;
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 8; i++) {
             if ((planes[i].normal.x * x + planes[i].normal.y * y + planes[i].normal.z * z) < (-radius - planes[i].d)) return false;
         }
         return true;
+    }
+
+    // TODO: test
+    public boolean intersectsSphere(final Shape3DSphere sphere) {
+        sphere.computeCenter(vector);
+        final float x = vector.x;
+        final float y = vector.y;
+        final float z = vector.z;
+        final float radius = sphere.radius;
+
+//        for (int i = 0; i < planes.length; i++) {
+//            final float signedDistance = planes[i].normal.x * x + planes[i].normal.y * y + planes[i].normal.z * z + planes[i].d;
+//            System.out.println("test: " + (signedDistance-radius));
+//            if (signedDistance + radius > 0) return false;
+//        }
+//
+
+        for (int i = 0; i < planes.length; i++) {
+            float signedDistance = planes[i].normal.x * x + planes[i].normal.y * y + planes[i].normal.z * z + planes[i].d;
+            float diff = signedDistance + radius;
+            if (diff < 0) return false;
+        }
+        return true;
+
+//        float signedDistance = planes[2].normal.x * x + planes[2].normal.y * y + planes[2].normal.z * z + planes[2].d;
+//        float diff = signedDistance + radius;
+//        System.out.println("diff left: " + diff);
+//            //if ((planes[i].normal.x * x + planes[i].normal.y * y + planes[i].normal.z * z + radius) > planes[i].d) return true;
+//        if (contains(sphere.computeCenter(vector))) return true;
+//        return false;
     }
 
     public boolean intersectsAABB(final Shape3DAABB aabb) {

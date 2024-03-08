@@ -40,13 +40,13 @@ public class Renderer3D_old {
     }
 
     public void draw(final ModelPart modelPart, final Matrix4 transform) {
-        // TODO: fix this frustum and bounding box not working shit.
-        modelPart.mesh.boundingBox.update(transform);
-        // cull?
-        System.out.println(modelPart.mesh.boundingBox);
-        if (camera.lens.frustum.intersectsAABB(modelPart.mesh.boundingBox)) {
-            System.out.println("don't");
-            System.out.println(modelPart.mesh.boundingBox);
+        modelPart.mesh.boundingBox.translate(transform);
+        modelPart.mesh.boundingSphere.translate(transform);
+        //System.out.println(modelPart.mesh.boundingSphere);
+        //System.out.println(modelPart.mesh.boundingBox);
+        if (camera.lens.frustum.intersectsSphere(modelPart.mesh.boundingSphere)) {
+        //if (camera.lens.frustum.intersectsAABB(modelPart.mesh.boundingBox)) {
+            System.out.println("intersects");
         } else {
             System.out.println("CULLING");
         }

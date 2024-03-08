@@ -42,11 +42,11 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
         transform3D = ComponentFactory.createTransform3D();
         model = AssetStore.get("assets/models/scene-debug.glb");
         System.out.println(model.parts[0].material.uniformParams);
-        transform3D.matrix4.translateSelfAxis(0,0,-15f);
+        transform3D.matrix4.translateSelfAxis(0,0,-5f);
         cameraTransform = new Matrix4();
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
         environment.add(new EnvironmentLightPoint(new Color(1,0.2f,0,1), 1f, 0, 0, -3));
-        transform3D.matrix4.rotateSelfAxis(Vector3.Y, 30);
+        //transform3D.matrix4.rotateSelfAxis(Vector3.Y, 30);
     }
 
 
@@ -56,11 +56,19 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
         cameraController.update(delta);
         float angularSpeed = 200; // degrees per second
         if (Keyboard.isKeyPressed(Keyboard.Key.A)) {
-            transform3D.matrix4.translateXYZAxis(-1,0,0);
+            transform3D.matrix4.translateXYZAxis(-0.1f,0,0);
         }
         if (Keyboard.isKeyPressed(Keyboard.Key.D)) {
             //transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
-            transform3D.matrix4.translateXYZAxis(1,0,0);
+            transform3D.matrix4.translateXYZAxis(0.1f,0,0);
+        }
+        if (Keyboard.isKeyPressed(Keyboard.Key.W)) {
+            //transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
+            transform3D.matrix4.translateXYZAxis(0f,0.1f,0);
+        }
+        if (Keyboard.isKeyPressed(Keyboard.Key.S)) {
+            //transform3D.matrix4.rotateSelfAxis(Vector3.X, angularSpeed * delta);
+            transform3D.matrix4.translateXYZAxis(0f,-0.1f,0);
         }
         if (Keyboard.isKeyPressed(Keyboard.Key.RIGHT)) {
             cameraTransform.translateSelfAxis(0,0,-1*delta);
@@ -93,7 +101,7 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
         renderer3DOld.begin(shader);
         renderer3DOld.setCamera(camera);
         renderer3DOld.setEnvironment(environment);
-        renderer3DOld.draw(model.parts[0], transform3D.matrix4);
+        renderer3DOld.draw(model.parts[1], transform3D.matrix4);
         //renderer3DOld.draw(model.parts[1], transform3D.matrix4);
 
         renderer3DOld.end();
