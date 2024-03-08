@@ -3,7 +3,7 @@ package org.example.engine.core.math;
 public class Shape3DSphere implements Shape3D {
 
     public final Vector3 center;
-    public float radius;
+    public final float radius;
     public Vector3 offset;
     public float scaledRadius;
 
@@ -35,7 +35,7 @@ public class Shape3DSphere implements Shape3D {
     }
 
     public String toString() {
-        return "center: " + center.toString() + "\nr: " + radius;
+        return "Sphere: <center: " + center + ", r: " + radius + ">";
     }
 
     // TODO: revise

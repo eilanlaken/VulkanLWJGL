@@ -80,7 +80,7 @@ public class Shape3DPlane implements Shape3D {
     }
 
     public String toString () {
-        return "<Plane: " + normal.toString() + " | " + d + ">";
+        return "Plane: <normal:" + normal + ", d: " + d + ">";
     }
 
     @Override

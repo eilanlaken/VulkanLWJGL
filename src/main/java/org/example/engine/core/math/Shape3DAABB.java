@@ -1,6 +1,7 @@
 package org.example.engine.core.math;
 
 // AABB = axis aligned bonding box
+// TODO: take care of scale.
 public class Shape3DAABB implements Shape3D {
 
     public Vector3 offset = new Vector3();
@@ -45,7 +46,7 @@ public class Shape3DAABB implements Shape3D {
 
     @Override
     public String toString() {
-        return "min: " + min + "\nmax: " + max;
+        return "AABB: <min: " + min + ", max: " + max + ">";
     }
 
     // TODO: implement.

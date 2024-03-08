@@ -40,19 +40,6 @@ public class Shape3DFrustum implements Shape3D {
         planes[5].set(frustumCorners[4], frustumCorners[0], frustumCorners[1]);
     }
 
-
-    @Deprecated public boolean containsSphere(final Shape3DSphere sphere) {
-        final float x = sphere.center.x;
-        final float y = sphere.center.y;
-        final float z = sphere.center.z;
-        final float radius = sphere.radius;
-        for (int i = 0; i < 8; i++) {
-            if ((planes[i].normal.x * x + planes[i].normal.y * y + planes[i].normal.z * z) < (-radius - planes[i].d)) return false;
-        }
-        return true;
-    }
-
-    // TODO: test
     public boolean intersectsSphere(final Shape3DSphere sphere) {
         sphere.computeCenter(vector);
         final float x = vector.x;
@@ -60,8 +47,8 @@ public class Shape3DFrustum implements Shape3D {
         final float z = vector.z;
         final float radius = sphere.scaledRadius;
 
-        for (int i = 0; i < planes.length; i++) {
-            float signedDistance = planes[i].normal.x * x + planes[i].normal.y * y + planes[i].normal.z * z + planes[i].d;
+        for (Shape3DPlane plane : planes) {
+            float signedDistance = plane.normal.x * x + plane.normal.y * y + plane.normal.z * z + plane.d;
             float diff = signedDistance + radius;
             if (diff < 0) return false;
         }
@@ -109,14 +96,13 @@ public class Shape3DFrustum implements Shape3D {
 
     @Override
     public String toString () {
-        return "<Frustum: \n" +
-                "near: " + planes[0] + "\n" +
-                "far: " + planes[1] + "\n" +
-                "left: " + planes[2] + "\n" +
-                "right: " + planes[3] + "\n" +
-                "top: " + planes[4] + "\n" +
-                "bottom: " + planes[5] + "\n"
-                + "\n>";
+        return "Frustum: <" +
+                "near: " + planes[0] + ", " +
+                "far: " + planes[1] + ", " +
+                "left: " + planes[2] + ", " +
+                "right: " + planes[3] + ", " +
+                "top: " + planes[4] + ", " +
+                "bottom: " + planes[5] + ">";
     }
 
 }
