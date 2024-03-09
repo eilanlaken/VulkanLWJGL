@@ -29,7 +29,9 @@ public class Shape3DSphere implements Shape3D {
         scaledRadius = radius * MathUtils.max(scaleX, scaleY, scaleZ);
     }
 
-    public Vector3 computeCenter(Vector3 result) {
+
+
+    @Deprecated public Vector3 computeCenter(Vector3 result) {
         return result.set(center.x + offset.x, center.y + offset.y, center.z + offset.z);
     }
 

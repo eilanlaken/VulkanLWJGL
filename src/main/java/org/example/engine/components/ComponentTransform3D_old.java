@@ -6,7 +6,7 @@ import org.example.engine.core.math.Vector3;
 
 public class ComponentTransform3D_old extends Component {
 
-    public static final ComponentCategory CATEGORY = ComponentCategory.TRANSFORM;
+    public static final Category CATEGORY = Category.TRANSFORM;
 
     public Matrix4 matrix4 = new Matrix4();
 

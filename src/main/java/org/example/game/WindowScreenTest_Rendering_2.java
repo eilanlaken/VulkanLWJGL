@@ -1,6 +1,6 @@
 package org.example.game;
 
-import org.example.engine.components.ComponentFactory;
+import org.example.engine.components.Component;
 import org.example.engine.components.ComponentTransform;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
@@ -39,7 +39,7 @@ public class WindowScreenTest_Rendering_2 extends WindowScreen {
 
     @Override
     public void show() {
-        transform = ComponentFactory.createTransform();
+        transform = Component.Factory.createTransform();
         transform.z = -15;
         model = AssetStore.get("assets/models/cube-blue.fbx");
         System.out.println(model.parts[0].material.uniformParams);
@@ -100,7 +100,7 @@ public class WindowScreenTest_Rendering_2 extends WindowScreen {
         renderer3DOld.begin(shader);
         renderer3DOld.setCamera(camera);
         renderer3DOld.setEnvironment(environment);
-        renderer3DOld.draw(model.parts[0], transform.local);
+        renderer3DOld.draw(model.parts[0], transform);
         //renderer3DOld.draw(model.parts[1], transform3D.matrix4);
 
         renderer3DOld.end();

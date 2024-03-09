@@ -5,7 +5,7 @@ import org.example.engine.core.math.Quaternion;
 
 public class ComponentTransform extends Component {
 
-    public static final ComponentCategory CATEGORY = ComponentCategory.TRANSFORM;
+    public static final Category CATEGORY = Category.TRANSFORM;
 
     public boolean isStatic;
     public float x, y, z;
