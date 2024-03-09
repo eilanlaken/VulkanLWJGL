@@ -905,6 +905,20 @@ public class Matrix4 {
         return rotation.setFromMatrix(normalizeAxes, this);
     }
 
+    // TODO: remove
+    public Matrix4 scaleSelf_test(float scale) {
+        Quaternion r = getRotation(new Quaternion());
+        Matrix4 rot = new Matrix4(r);
+        Matrix4 rotInv = new Matrix4(r);
+        rotInv.inv();
+        Matrix4 s = new Matrix4();
+        s.sclXYZ(scale,1,1);
+        Matrix4 m = new Matrix4(rotInv);
+        m.mul(s);
+        m.mul(rot);
+        return this.mul(m);
+    }
+
     /** Gets the rotation of this matrix.
      * @param rotation The {@link Quaternion} to receive the rotation
      * @return The provided {@link Quaternion} for chaining. */
@@ -1299,10 +1313,7 @@ public class Matrix4 {
         return rotateSelfAxis(Vector3.X, degrees);
     }
 
-    public Matrix4 roll(float degrees) {
-        return rotateSelfAxis(Vector3.Y, degrees);
-
-    }
+    public Matrix4 roll(float degrees) { return rotateSelfAxis(Vector3.Y, degrees); }
 
     public Matrix4 turn(float degrees) {
         return rotateSelfAxis(Vector3.Z, degrees);

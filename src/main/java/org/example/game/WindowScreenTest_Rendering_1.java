@@ -75,8 +75,8 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
             transform3D.matrix4.stretch(0.99f);
         }
         if (Keyboard.isKeyPressed(Keyboard.Key.KEY_2)) {
-            transform3D.matrix4.elongate(1.01f);
             //transform3D.matrix4.elongate(1.01f);
+            transform3D.matrix4.elongate(1.01f);
         }
         if (Keyboard.isKeyPressed(Keyboard.Key.KEY_3)) {
             transform3D.matrix4.lengthen(1.01f);
@@ -85,6 +85,7 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
 
         // translate
         if (Keyboard.isKeyPressed(Keyboard.Key.A)) {
+            //transform3D.matrix4.translateSelfAxis(0,0.01f,0);
             transform3D.matrix4.translateXYZAxis(-0.1f,0,0);
         }
         if (Keyboard.isKeyPressed(Keyboard.Key.D)) {

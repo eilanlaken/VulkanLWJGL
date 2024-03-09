@@ -163,7 +163,6 @@ public class AssetLoaderModel implements AssetLoader<Model> {
             if (Assimp.aiGetMaterialString(aiMaterial, Assimp.AI_MATKEY_NAME, 0, 0, name) == Assimp.aiReturn_SUCCESS) {
                 modelPartMaterialData.name = name.dataString();
             }
-            name.free();
 
             for (MapObjectInt.Entry<String> entry : namedTextureTypes) {
                 final String uniform = entry.key;
@@ -193,7 +192,6 @@ public class AssetLoaderModel implements AssetLoader<Model> {
                     modelPartMaterialData.attributesData.put(colorEntry.getKey(), new Color(colour.r(), colour.g(), colour.b(), colour.a()));
                 }
             }
-            colour.free();
 
             PointerBuffer pointerBuffer = stack.mallocPointer(1);
             for (Map.Entry<String, String> namedProp : namedProps.entrySet()) {
