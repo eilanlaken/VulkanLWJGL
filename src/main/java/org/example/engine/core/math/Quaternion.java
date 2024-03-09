@@ -101,11 +101,11 @@ public class Quaternion {
     }
 
     /** Sets the quaternion to the given euler angles in radians.
-     * @param yaw the rotation around the y axis in radians
-     * @param pitch the rotation around the x axis in radians
-     * @param roll the rotation around the z axis in radians
+     * @param pitch the rotation around the x-axis in radians
+     * @param yaw the rotation around the y-axis in radians
+     * @param roll the rotation around the z-axis in radians
      * @return this quaternion */
-    public Quaternion setEulerAnglesRad (float yaw, float pitch, float roll) {
+    public Quaternion setEulerAnglesRad(float pitch, float yaw, float roll) {
         final float hr = roll * 0.5f;
         final float shr = (float)Math.sin(hr);
         final float chr = (float)Math.cos(hr);

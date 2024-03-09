@@ -6,7 +6,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-public class Renderer3D_old {
+// TODO: this is SystemRenderer territory.
+@Deprecated public class Renderer3D_old {
 
     public final RendererFixedPipelineParamSetter paramSetter;
     private boolean drawing;
