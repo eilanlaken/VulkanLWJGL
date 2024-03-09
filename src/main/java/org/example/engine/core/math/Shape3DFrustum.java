@@ -41,10 +41,9 @@ public class Shape3DFrustum implements Shape3D {
     }
 
     public boolean intersectsSphere(final Shape3DSphere sphere) {
-        sphere.computeCenter(vector);
-        final float x = vector.x;
-        final float y = vector.y;
-        final float z = vector.z;
+        final float x = sphere.translatedCenter.x;
+        final float y = sphere.translatedCenter.y;
+        final float z = sphere.translatedCenter.z;
         final float radius = sphere.scaledRadius;
 
         for (Shape3DPlane plane : planes) {
