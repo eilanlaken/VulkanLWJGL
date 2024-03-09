@@ -10,11 +10,12 @@ import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
 import org.lwjgl.opengl.GL11;
 
-public class WindowScreenTest_Rendering_1 extends WindowScreen {
+public class WindowScreenTest_Rendering_2 extends WindowScreen {
 
     private Renderer3D_old renderer3DOld;
     private Model model;
     private ShaderProgram shader;
+    // TODO: make new
     private ComponentTransform3D_old transform3D;
     private Camera camera;
     private Environment environment;
@@ -23,7 +24,7 @@ public class WindowScreenTest_Rendering_1 extends WindowScreen {
     // debug
     private BlenderCameraController cameraController;
 
-    public WindowScreenTest_Rendering_1() {
+    public WindowScreenTest_Rendering_2() {
         this.renderer3DOld = new Renderer3D_old();
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default.vert");

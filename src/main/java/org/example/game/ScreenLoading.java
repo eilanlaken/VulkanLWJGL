@@ -1,16 +1,9 @@
 package org.example.game;
 
-import org.example.engine.components.ComponentFactory;
-import org.example.engine.components.ComponentTransform3D;
 import org.example.engine.core.application.Application;
-import org.example.engine.core.assets.AssetLoaderTexture;
 import org.example.engine.core.assets.AssetStore;
-import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.assets.Debug;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.Keyboard;
-import org.example.engine.core.math.Matrix4;
-import org.example.engine.core.math.Vector3;
 import org.lwjgl.opengl.GL11;
 
 public class ScreenLoading extends WindowScreen {
@@ -27,7 +20,7 @@ public class ScreenLoading extends WindowScreen {
     @Override
     protected void refresh() {
         if (!AssetStore.isLoadingInProgress()) {
-            Application.switchScreen(new WindowScreenTest_Rendering_1());
+            Application.switchScreen(new WindowScreenTest_Rendering_2());
         }
 
         // frame update

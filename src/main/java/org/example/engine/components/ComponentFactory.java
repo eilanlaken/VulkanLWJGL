@@ -7,11 +7,11 @@ public final class ComponentFactory {
     // Transform 2D
 
     // Transform 3D
-    public static ComponentTransform3D createTransform3D() {
-        return new ComponentTransform3D(null);
+    public static ComponentTransform3D_old createTransform3D() {
+        return new ComponentTransform3D_old(null);
     }
-    public static ComponentTransform3D createTransform3D(Matrix4 matrix4) {
-        return new ComponentTransform3D(matrix4);
+    public static ComponentTransform3D_old createTransform3D(Matrix4 matrix4) {
+        return new ComponentTransform3D_old(matrix4);
     }
 
 }
