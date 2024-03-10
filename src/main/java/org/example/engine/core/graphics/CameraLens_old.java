@@ -5,7 +5,7 @@ import org.example.engine.core.math.Quaternion;
 import org.example.engine.core.math.Shape3DFrustum;
 import org.example.engine.core.math.Vector3;
 
-public class CameraLens {
+public class CameraLens_old {
 
     private final Vector3[] clipSpacePlanePoints = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
             new Vector3(-1, -1, -1), new Vector3(1, -1, -1), new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clipping plane corners
@@ -24,7 +24,7 @@ public class CameraLens {
     public Matrix4 invProjectionView = new Matrix4();
     public float near = 0.1f;
     public float far = 100;
-    public float fov = 67;
+    public float fieldOfView = 67;
     public float zoom = 1;
     public float viewportWidth = GraphicsUtils.getWindowWidth();
     public float viewportHeight = GraphicsUtils.getWindowHeight();
@@ -34,28 +34,24 @@ public class CameraLens {
     public Vector3 left;
     public Shape3DFrustum frustum;
 
-    public CameraLens(CameraLensProjectionType type, float viewportWidth, float viewportHeight, float zoom, float near, float far, float fov) {
+    // TODO: change
+    public CameraLens_old(CameraLensProjectionType type) {
         this.projectionType = type;
-        this.viewportWidth = viewportWidth;
-        this.viewportHeight = viewportHeight;
-        this.zoom = zoom;
-        this.near = near;
-        this.far = far;
-        this.fov = fov;
         this.position = new Vector3(0,0,0);
         this.direction = new Vector3(0,0,-1);
         this.up = new Vector3(0,1,0);
+        this.left = new Vector3(this.up);
+        this.left.crs(this.direction);
+        this.frustum = new Shape3DFrustum();
+        update();
+    }
 
-        // if orthographic
-        // TODO: see what is up.
-        if (type == CameraLensProjectionType.ORTHOGRAPHIC_PROJECTION) {
-            up.set(0, 1, 0);
-            direction.set(0, 0, -1);
-            position.set(zoom * viewportWidth / 2.0f, zoom * viewportHeight / 2.0f, 0);
-            //position.set(0f, 0f, 0);
-
-        }
-
+    @Deprecated
+    public CameraLens_old() {
+        this.projectionType = CameraLensProjectionType.PERSPECTIVE_PROJECTION;
+        this.position = new Vector3(0,0,0);
+        this.direction = new Vector3(0,0,-1);
+        this.up = new Vector3(0,1,0);
         this.left = new Vector3(this.up);
         this.left.crs(this.direction);
         this.frustum = new Shape3DFrustum();
@@ -66,7 +62,7 @@ public class CameraLens {
         switch (projectionType) {
             case PERSPECTIVE_PROJECTION: {
                 float aspect = viewportWidth / viewportHeight;
-                projection.setToPerspectiveProjection(Math.abs(near), Math.abs(far), fov, aspect);
+                projection.setToPerspectiveProjection(Math.abs(near), Math.abs(far), fieldOfView, aspect);
                 view.setToLookAt(position, tmp.set(position).add(direction), up);
                 combined.set(projection);
                 Matrix4.mul(combined.val, view.val);
@@ -75,11 +71,7 @@ public class CameraLens {
                 left.set(up).crs(direction);
             }
             case ORTHOGRAPHIC_PROJECTION: {
-                projection.setToOrtho(zoom * -viewportWidth / 2, zoom * (viewportWidth / 2), zoom * -(viewportHeight / 2),
-                        zoom * viewportHeight / 2, near, far);
-                view.setToLookAt(position, tmp.set(position).add(direction), up);
-                combined.set(projection);
-                Matrix4.mul(combined.val, view.val);
+                // TODO: implement
             }
         }
         updateFrustum(invProjectionView);
@@ -92,16 +84,6 @@ public class CameraLens {
             frustumCorners[i].prj(invPrjView);
         }
         frustum.set(frustumCorners);
-    }
-
-    // TODO: implement
-    public void switchToOrthographicMode() {
-
-    }
-
-    // TODO: implement
-    public void switchToPerspectiveMode() {
-
     }
 
     public void lookAt(float x, float y, float z) {

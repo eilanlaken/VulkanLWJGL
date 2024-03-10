@@ -1,14 +1,14 @@
 package org.example.game;
 
 import org.example.engine.core.graphics.Camera;
-import org.example.engine.core.graphics.CameraLens;
+import org.example.engine.core.graphics.CameraLens_old;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
 import org.example.engine.core.math.Vector3;
 
 public class BlenderCameraController {
 
-    public CameraLens lens;
+    public CameraLens_old lens;
     private Vector3 zoom;
     private Vector3 pan;
 
