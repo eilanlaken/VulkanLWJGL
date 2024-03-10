@@ -1,5 +1,6 @@
 package org.example.engine.core.graphics;
 
+// TODO: revise.
 public class WindowAttributes {
 
     public int posX = -1;

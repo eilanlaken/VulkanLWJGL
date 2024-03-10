@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL11;
 // TODO: finish
 public class Texture implements Resource {
 
-    protected int glHandle;
+    protected int handle;
     public final int width;
     public final int height;
     public TextureParamFilter magFilter;
@@ -17,11 +17,11 @@ public class Texture implements Resource {
     protected float anisotropicFilterLevel = 1.0f;
     private static float maxAnisotropicFilterLevel = 0;
 
-    public Texture(int glHandle,
+    public Texture(int handle,
                    final int width, final int height,
                    TextureParamFilter magFilter, TextureParamFilter minFilter,
                    TextureParamWrap uWrap, TextureParamWrap vWrap) {
-        this.glHandle = glHandle;
+        this.handle = handle;
         this.width = width;
         this.height = height;
         this.minFilter = minFilter;
@@ -32,8 +32,8 @@ public class Texture implements Resource {
 
     @Override
     public void free() {
-        GL11.glDeleteTextures(glHandle);
-        glHandle = 0;
+        GL11.glDeleteTextures(handle);
+        handle = 0;
     }
 
 }
