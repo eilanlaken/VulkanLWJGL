@@ -6,78 +6,96 @@ import org.example.engine.core.collections.ArrayShort;
 // TODO: test
 // https://stackoverflow.com/questions/5247994/simple-2d-polygon-triangulation
 // libgdx: EarClippingTriangulator
+// must always be counter clockwise
 public class Shape2DPolygon implements Shape2D {
 
     private boolean isUpdated;
-    public Array<Vector2> localPoints;
-    public Array<Vector2> worldPoints;
-    public ArrayShort indices; // indices created in the triangulation step.
+    public final int vertexCount;
+    public final float[] localPoints;
+    private float[] worldPoints;
+    public final short[] indices; // indices created in the triangulation step.
 
     private float x, y;
     private float angle;
     private float scaleX, scaleY;
 
-    public Shape2DPolygon(Vector2 ... localPoints) {
-        if (localPoints.length < 3) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon. Given: " + localPoints.length);
+    public Shape2DPolygon(float[] points) {
+        if (points.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + points.length);
+        if (points.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0,x1,y1,...].");
+        this.vertexCount = points.length / 2;
         this.x = 0;
         this.y = 0;
         this.angle = 0;
         this.scaleX = 1;
         this.scaleY = 1;
-        this.localPoints = new Array<>(localPoints.length);
-        for (Vector2 point : localPoints) {
-            this.localPoints.add(point);
-        }
-        this.worldPoints = new Array<>(this.localPoints.size);
-        isUpdated = true;
-        triangulate();
-    }
-
-    private void triangulate() {
-
+        this.localPoints = points;
+        if (Algorithms.isPolygonClockwise(localPoints)) reverseVertices();
+        this.indices = Algorithms.triangulatePolygon(localPoints);
+        isUpdated = false;
     }
 
     public void updateWorldPoints() {
         if (isUpdated) return;
+        if (worldPoints == null) worldPoints = new float[localPoints.length];
         final float cos = MathUtils.cos(angle);
         final float sin = MathUtils.cos(angle);
-        for (int i = 0; i < localPoints.size; i++) {
-            Vector2 localPoint = localPoints.get(i);
-            float worldX = localPoint.x;
-            float worldY = localPoint.y;
-
-            if (scaleX != 1) worldX *= scaleX;
-            if (scaleY != 1) worldY *= scaleY;
-
+        for (int i = 0; i < localPoints.length; i += 2) {
+            float localX = localPoints[i];
+            float localY = localPoints[i+1];
+            if (scaleX != 1) localX *= scaleX;
+            if (scaleY != 1) localY *= scaleY;
             if (angle != 0) {
-                float oldX = worldX;
-                worldX = cos * worldX - sin * worldY;
-                worldY = sin * oldX + cos * worldY;
+                float oldX = localX;
+                localX = cos * localX - sin * localY;
+                localY = sin * oldX + cos * localY;
             }
-
-            worldPoints.items[i].x = worldX + x;
-            worldPoints.items[i].y = worldY + y;
+            worldPoints[i] = localX + x;
+            worldPoints[i+1] = localY + y;
         }
         isUpdated = true;
     }
 
-    @Override
-    // TODO: this is wrong - does not take concave polys into account
-    public boolean contains(float x, float y) {
-        return false;
+    public float[] getWorldPoints() {
+        updateWorldPoints();
+        return worldPoints;
     }
 
     @Override
-    // TODO: this is wrong - does not take concave polys into account
+    public boolean contains(float x, float y) {
+        updateWorldPoints();
+        final float[] vertices = worldPoints;
+        final int numFloats = vertices.length;
+        int intersects = 0;
+        for (int i = 0; i < numFloats; i += 2) {
+            float x1 = vertices[i];
+            float y1 = vertices[i + 1];
+            float x2 = vertices[(i + 2) % numFloats];
+            float y2 = vertices[(i + 3) % numFloats];
+            if (((y1 <= y && y < y2) || (y2 <= y && y < y1)) && x < ((x2 - x1) / (y2 - y1) * (y - y1) + x1)) intersects++;
+        }
+        return (intersects & 1) == 1;
+    }
+
+    @Override
     public float getArea() {
-        return 0;
+        updateWorldPoints();
+        float area = 0;
+        int last = worldPoints.length - 2;
+        float x1 = worldPoints[last], y1 = worldPoints[last + 1];
+        for (int i = 0; i <= last; i += 2) {
+            float x2 = worldPoints[i], y2 = worldPoints[i + 1];
+            area += x1 * y2 - x2 * y1;
+            x1 = x2;
+            y1 = y2;
+        }
+        return area * 0.5f;
     }
 
     @Override
     public float getPerimeter() {
         float perimeter = 0;
-        for (int i = 0; i < worldPoints.size - 1; i++) {
-            perimeter += Vector2.dist(worldPoints.items[i], worldPoints.items[i+1]);
+        for (int i = 0; i < worldPoints.length - 2; i += 2) {
+            perimeter += Vector2.dist(worldPoints[i], worldPoints[i+1], worldPoints[i+2], worldPoints[i+3]);
         }
         return perimeter;
     }
@@ -101,4 +119,18 @@ public class Shape2DPolygon implements Shape2D {
         this.scaleY = scaleY;
         isUpdated = false;
     }
+
+    private void reverseVertices() {
+        int lastX = localPoints.length - 2;
+        for (int i = 0, n = localPoints.length / 2; i < n; i += 2) {
+            int other = lastX - i;
+            float x = localPoints[i];
+            float y = localPoints[i + 1];
+            localPoints[i] = localPoints[other];
+            localPoints[i + 1] = localPoints[other + 1];
+            localPoints[other] = x;
+            localPoints[other + 1] = y;
+        }
+    }
+
 }
