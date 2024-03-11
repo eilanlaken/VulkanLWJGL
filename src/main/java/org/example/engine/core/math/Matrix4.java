@@ -539,7 +539,7 @@ public class Matrix4 {
      * @param height The height
      * @return This matrix for the purpose of chaining methods together. */
     public Matrix4 setToOrtho2D(float x, float y, float width, float height) {
-        setToOrtho(x, x + width, y, y + height, 0, 1);
+        setToOrthographicProjection(x, x + width, y, y + height, 0, 1);
         return this;
     }
 
@@ -553,7 +553,7 @@ public class Matrix4 {
      * @param far The far plane
      * @return This matrix for the purpose of chaining methods together. */
     public Matrix4 setToOrtho2D(float x, float y, float width, float height, float near, float far) {
-        setToOrtho(x, x + width, y, y + height, near, far);
+        setToOrthographicProjection(x, x + width, y, y + height, near, far);
         return this;
     }
 
@@ -566,7 +566,7 @@ public class Matrix4 {
      * @param near The near clipping plane
      * @param far The far clipping plane
      * @return This matrix for the purpose of chaining methods together. */
-    public Matrix4 setToOrtho(float left, float right, float bottom, float top, float near, float far) {
+    public Matrix4 setToOrthographicProjection(float left, float right, float bottom, float top, float near, float far) {
         float x_orth = 2 / (right - left);
         float y_orth = 2 / (top - bottom);
         float z_orth = -2 / (far - near);

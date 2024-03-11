@@ -1,6 +1,5 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.components.ComponentGraphicsCamera;
 import org.example.engine.components.ComponentTransform;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
@@ -8,13 +7,13 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-// TODO: this is SystemRenderer territory.
-@Deprecated public class Renderer3D {
+// TODO: improve to handle whatever.
+public class Renderer3D {
 
     public final RendererFixedPipelineParamSetter paramSetter;
     private boolean drawing;
     private ShaderProgram currentShader;
-    private ComponentGraphicsCamera camera;
+    private Camera camera;
 
     public Renderer3D() {
         this.paramSetter = new RendererFixedPipelineParamSetter();
@@ -26,7 +25,7 @@ import org.lwjgl.opengl.GL30;
         this.currentShader.bind();
     }
 
-    public void setCamera(final ComponentGraphicsCamera camera) {
+    public void setCamera(final Camera camera) {
         //this.currentShader.bindUniform("camera_position", camera.lens.position);
         this.currentShader.bindUniform("camera_combined", camera.lens.combined);
         this.camera = camera;

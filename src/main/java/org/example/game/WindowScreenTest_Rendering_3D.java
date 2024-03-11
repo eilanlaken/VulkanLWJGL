@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 public class WindowScreenTest_Rendering_3D extends WindowScreen {
 
-    private Renderer3D_old renderer3DOld;
+    private Renderer3D renderer3DOld;
     private Model model;
     private ShaderProgram shader;
     // TODO: make new
@@ -24,7 +24,7 @@ public class WindowScreenTest_Rendering_3D extends WindowScreen {
     private BlenderCameraController cameraController;
 
     public WindowScreenTest_Rendering_3D() {
-        this.renderer3DOld = new Renderer3D_old();
+        this.renderer3DOld = new Renderer3D();
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default.frag");

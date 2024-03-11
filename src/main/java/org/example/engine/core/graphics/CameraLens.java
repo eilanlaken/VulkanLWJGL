@@ -75,7 +75,7 @@ public class CameraLens {
                 left.set(up).crs(direction);
             }
             case ORTHOGRAPHIC_PROJECTION: {
-                projection.setToOrtho(zoom * -viewportWidth / 2, zoom * (viewportWidth / 2), zoom * -(viewportHeight / 2),
+                projection.setToOrthographicProjection(zoom * -viewportWidth / 2, zoom * (viewportWidth / 2), zoom * -(viewportHeight / 2),
                         zoom * viewportHeight / 2, near, far);
                 view.setToLookAt(position, tmp.set(position).add(direction), up);
                 combined.set(projection);
