@@ -13,7 +13,7 @@ public class ScreenLoading extends WindowScreen {
     public void show() {
         AssetStore.loadAsset(Texture.class, "assets/textures/yellowSquare.png");
         AssetStore.loadAsset(Debug.class, "assets/text/parent.txt");
-        AssetStore.loadAsset(Model.class, "assets/models/cube-blue.fbx");
+        //AssetStore.loadAsset(Model.class, "assets/models/cube-blue.fbx");
     }
 
 

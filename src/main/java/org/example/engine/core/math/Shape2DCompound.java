@@ -2,6 +2,7 @@ package org.example.engine.core.math;
 
 import org.example.engine.core.collections.Array;
 
+// TODO: finish implementing
 public class Shape2DCompound implements Shape2D {
 
     public Array<Shape2D> shapes;
@@ -40,4 +41,18 @@ public class Shape2DCompound implements Shape2D {
         return perimeter;
     }
 
+    @Override
+    public void translate(float dx, float dy) {
+
+    }
+
+    @Override
+    public void rotate(float degrees) {
+
+    }
+
+    @Override
+    public void scale(float scaleX, float scaleY) {
+
+    }
 }

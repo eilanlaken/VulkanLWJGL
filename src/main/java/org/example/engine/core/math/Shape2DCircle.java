@@ -1,5 +1,6 @@
 package org.example.engine.core.math;
 
+// TODO: finish implementing
 public class Shape2DCircle implements Shape2D {
 
     public Vector2 center;
@@ -25,4 +26,18 @@ public class Shape2DCircle implements Shape2D {
         return (float) (2.0 * Math.PI * radius);
     }
 
+    @Override
+    public void translate(float dx, float dy) {
+
+    }
+
+    @Override
+    public void rotate(float degrees) {
+
+    }
+
+    @Override
+    public void scale(float scaleX, float scaleY) {
+
+    }
 }

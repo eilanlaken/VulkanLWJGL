@@ -26,4 +26,18 @@ public class Shape2DAABB implements Shape2D {
         return 2 * (max.y - min.y + max.x - min.x);
     }
 
+    @Override
+    public void translate(float dx, float dy) {
+
+    }
+
+    @Override
+    public void rotate(float degrees) {
+        throw new UnsupportedOperationException("Cannot rotate an AABB: must remain aligned to axis.");
+    }
+
+    @Override
+    public void scale(float scaleX, float scaleY) {
+
+    }
 }

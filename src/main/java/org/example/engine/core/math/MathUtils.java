@@ -4,12 +4,38 @@ import java.util.Random;
 
 public final class MathUtils {
 
-    public static final float FLOAT_ROUNDING_ERROR = 1.0E-6F;
-    public static final float PI = (float)Math.PI;
-    public static final float PI2 = PI * 2;
-    public static  final float HALF_PI = PI / 2;
-    public static final float radiansToDegrees = 57.295776f;
-    public static final float degreesToRadians = 0.017453292f;
+    static public final float nanoToSec = 1 / 1000000000f;
+
+    // ---
+    static public final float FLOAT_ROUNDING_ERROR = 0.000001f; // 32 bits
+    static public final float PI = (float)Math.PI;
+    static public final float PI2 = PI * 2;
+    static public final float HALF_PI = PI / 2;
+    static public final float E = (float)Math.E;
+    static private final int SIN_BITS = 14; // 16KB. Adjust for accuracy.
+    static private final int SIN_MASK = ~(-1 << SIN_BITS);
+    static private final int SIN_COUNT = SIN_MASK + 1;
+    static private final float radFull = PI2;
+    static private final float degFull = 360;
+    static private final float radToIndex = SIN_COUNT / radFull;
+    static private final float degToIndex = SIN_COUNT / degFull;
+    static public final float radiansToDegrees = 180f / PI;
+    static public final float radDeg = radiansToDegrees;
+    static public final float degreesToRadians = PI / 180;
+    static public final float degRad = degreesToRadians;
+
+    static private class Sin {
+        static final float[] lookup = new float[SIN_COUNT];
+
+        static {
+            for (int i = 0; i < SIN_COUNT; i++) lookup[i] = (float)Math.sin((i + 0.5f) / SIN_COUNT * radFull);
+            lookup[0] = 0f;
+            lookup[(int)(90 * degToIndex) & SIN_MASK] = 1f;
+            lookup[(int)(180 * degToIndex) & SIN_MASK] = 0f;
+            lookup[(int)(270 * degToIndex) & SIN_MASK] = -1f;
+        }
+    }
+
 
     private static final Random random = new Random();
 
@@ -90,16 +116,26 @@ public final class MathUtils {
         return x + y; // returns 0 for 0,0 or NaN if either y or x is NaN
     }
 
-    public static float areaTriangle(Vector2 a, Vector2 b, Vector2 c) {
-        return 0.5f * Math.abs((a.x - c.x) * (b.y - a.y) - (a.x - b.x) * (c.y - a.y));
-    }
+    public static float areaTriangle(Vector2 a, Vector2 b, Vector2 c) { return 0.5f * Math.abs((a.x - c.x) * (b.y - a.y) - (a.x - b.x) * (c.y - a.y)); }
 
-    public static float areaTriangle(float x1, float y1, float x2, float y2, float x3, float y3) {
-        return 0.5f * Math.abs((x1 - x3) * (y2 - y2) - (x1 - x2) * (y3 - y1));
-    }
+    public static float areaTriangle(float x1, float y1, float x2, float y2, float x3, float y3) { return 0.5f * Math.abs((x1 - x3) * (y2 - y2) - (x1 - x2) * (y3 - y1)); }
 
     public static float max(float a, float b, float c) {
         return Math.max(a, Math.max(b, c));
     }
+
+    static public float sin(float radians) {
+        return Sin.lookup[(int)(radians * radToIndex) & SIN_MASK];
+    }
+
+    static public float cos(float radians) {
+        return Sin.lookup[(int)((radians + HALF_PI) * radToIndex) & SIN_MASK];
+    }
+
+    static public float sinDeg(float degrees) {
+        return Sin.lookup[(int)(degrees * degToIndex) & SIN_MASK];
+    }
+
+    static public float cosDeg(float degrees) { return Sin.lookup[(int)((degrees + 90) * degToIndex) & SIN_MASK]; }
 
 }
