@@ -15,5 +15,5 @@ out vec2 uv;
 void main() {
     color = a_color;
     uv = a_texCoord0;
-    gl_Position = u_camera_combined * a_position;
+    gl_Position = u_camera_combined * vec4(a_position, 1.0);
 }

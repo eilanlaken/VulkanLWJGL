@@ -17,7 +17,7 @@ public class WindowScreenTest_Rendering_3D extends WindowScreen {
     // TODO: make new
     private ComponentTransform transform;
     private Camera camera;
-    private Environment environment;
+    private Lights lights;
     private Matrix4 cameraTransform;
 
     // debug
@@ -32,7 +32,7 @@ public class WindowScreenTest_Rendering_3D extends WindowScreen {
 
 
         this.camera = new Camera();
-        this.environment = new Environment();
+        this.lights = new Lights();
 
         cameraController = new BlenderCameraController(camera);
     }
@@ -45,7 +45,7 @@ public class WindowScreenTest_Rendering_3D extends WindowScreen {
         System.out.println(model.parts[0].material.uniformParams);
         cameraTransform = new Matrix4();
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
-        environment.add(new EnvironmentLightPoint(new Color(1,0.2f,0,1), 1f, 0, 0, -3));
+        lights.add(new LightPoint(new Color(1,0.2f,0,1), 1f, 0, 0, -3));
         //transform3D.matrix4.rotateSelfAxis(Vector3.Y, 30);
     }
 
@@ -99,7 +99,7 @@ public class WindowScreenTest_Rendering_3D extends WindowScreen {
         GL11.glClearColor(0,0,0,1);
         renderer3DOld.begin(shader);
         renderer3DOld.setCamera(camera);
-        renderer3DOld.setEnvironment(environment);
+        renderer3DOld.setEnvironment(lights);
         renderer3DOld.draw(model.parts[0], transform);
         //renderer3DOld.draw(model.parts[1], transform3D.matrix4);
 

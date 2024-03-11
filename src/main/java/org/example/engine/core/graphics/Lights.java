@@ -2,30 +2,29 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Vector3;
 
-public class Environment {
+public class Lights {
 
     private final Color finalAmbient = new Color(0,0,0,1);
     private final Vector3 totalAmbient = new Vector3(0,0,0);
-    public Array<EnvironmentLightAmbient> ambientLights = new Array<>();
-    public Array<EnvironmentLightDirectional> directionalLights = new Array<>();
-    public Array<EnvironmentLightPoint> pointLights = new Array<>();
-    public Array<EnvironmentLightSpot> spotLights = new Array<>();
+    public Array<LightAmbient> ambientLights = new Array<>();
+    public Array<LightDirectional> directionalLights = new Array<>();
+    public Array<LightPoint> pointLights = new Array<>();
+    public Array<LightSpot> spotLights = new Array<>();
 
-    public void add(final EnvironmentLight light) {
-        if (light instanceof EnvironmentLightPoint) pointLights.add((EnvironmentLightPoint) light);
-        else if (light instanceof EnvironmentLightSpot) spotLights.add((EnvironmentLightSpot) light);
-        else if (light instanceof EnvironmentLightAmbient) ambientLights.add((EnvironmentLightAmbient) light);
-        else if (light instanceof EnvironmentLightDirectional) directionalLights.add((EnvironmentLightDirectional) light);
+    public void add(final Light light) {
+        if (light instanceof LightPoint) pointLights.add((LightPoint) light);
+        else if (light instanceof LightSpot) spotLights.add((LightSpot) light);
+        else if (light instanceof LightAmbient) ambientLights.add((LightAmbient) light);
+        else if (light instanceof LightDirectional) directionalLights.add((LightDirectional) light);
     }
 
     public Color getTotalAmbient() {
         float totalRed = 0;
         float totalGreen = 0;
         float totalBlue = 0;
-        for (EnvironmentLightAmbient ambient : ambientLights) {
+        for (LightAmbient ambient : ambientLights) {
             totalRed += ambient.color.r * ambient.intensity;
             totalGreen += ambient.color.g * ambient.intensity;
             totalBlue += ambient.color.b * ambient.intensity;

@@ -3,7 +3,6 @@ package org.example.engine.core.graphics;
 import org.example.engine.components.ComponentTransform;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.Matrix4;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
@@ -33,13 +32,13 @@ import org.lwjgl.opengl.GL30;
     }
 
     // TODO: implement. Don't forget about the lights transform.
-    public void setEnvironment(final Environment environment) {
+    public void setEnvironment(final Lights lights) {
         // bind all lights.
         // ambient light
         //this.currentShader.bindUniform("ambient", environment.getTotalAmbient());
-        this.currentShader.bindUniform("pointLightPos", environment.pointLights.get(0).position);
-        this.currentShader.bindUniform("pointLightColor", environment.pointLights.get(0).color);
-        this.currentShader.bindUniform("pointLightIntensity", environment.pointLights.get(0).intensity);
+        this.currentShader.bindUniform("pointLightPos", lights.pointLights.get(0).position);
+        this.currentShader.bindUniform("pointLightColor", lights.pointLights.get(0).color);
+        this.currentShader.bindUniform("pointLightIntensity", lights.pointLights.get(0).intensity);
     }
 
     public void draw(final ModelPart modelPart, final ComponentTransform transform) {
