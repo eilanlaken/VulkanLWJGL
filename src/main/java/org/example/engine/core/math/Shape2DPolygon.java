@@ -1,8 +1,5 @@
 package org.example.engine.core.math;
 
-import org.example.engine.core.collections.Array;
-import org.example.engine.core.collections.ArrayShort;
-
 // TODO: test
 // https://stackoverflow.com/questions/5247994/simple-2d-polygon-triangulation
 // libgdx: EarClippingTriangulator

@@ -1,13 +1,9 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.memory.MemoryUtils;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-
-import java.nio.IntBuffer;
 
 public class Renderer2D implements Resource {
 
@@ -65,6 +61,7 @@ public class Renderer2D implements Resource {
 
     }
 
+    // flush()
     private void drawCurrentBatch() {
         GL30.glBindVertexArray(vaoId);
         {

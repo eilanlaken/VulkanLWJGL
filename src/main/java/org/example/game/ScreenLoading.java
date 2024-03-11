@@ -3,7 +3,8 @@ package org.example.game;
 import org.example.engine.core.application.Application;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.Debug;
-import org.example.engine.core.graphics.*;
+import org.example.engine.core.graphics.Texture;
+import org.example.engine.core.graphics.WindowScreen;
 import org.lwjgl.opengl.GL11;
 
 public class ScreenLoading extends WindowScreen {

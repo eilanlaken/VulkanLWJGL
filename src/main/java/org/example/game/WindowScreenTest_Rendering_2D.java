@@ -4,7 +4,9 @@ import org.example.engine.components.Component;
 import org.example.engine.components.ComponentGraphicsCamera;
 import org.example.engine.components.ComponentTransform;
 import org.example.engine.core.assets.AssetUtils;
-import org.example.engine.core.graphics.*;
+import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.ShaderProgram;
+import org.example.engine.core.graphics.WindowScreen;
 import org.lwjgl.opengl.GL11;
 
 public class WindowScreenTest_Rendering_2D extends WindowScreen {

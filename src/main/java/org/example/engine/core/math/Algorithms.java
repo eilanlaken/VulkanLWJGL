@@ -1,8 +1,5 @@
 package org.example.engine.core.math;
 
-import org.example.engine.core.collections.Array;
-import org.example.engine.core.collections.ArrayShort;
-
 // look at:
 // libgdx GeometryUtils.java
 // libgdx EarClippingTriangulator.java

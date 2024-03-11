@@ -1,9 +1,9 @@
 package org.example.engine.core.application;
 
 import org.example.engine.core.assets.AssetStore;
+import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.async.AsyncUtils;
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Window;
 import org.example.engine.core.graphics.WindowAttributes;

@@ -1,9 +1,6 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.collections.ArrayInt;
-import org.example.engine.core.math.Shape3DAABB;
 import org.example.engine.core.math.Shape3DSphere;
-import org.example.engine.core.math.Vector3;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL30;
 
