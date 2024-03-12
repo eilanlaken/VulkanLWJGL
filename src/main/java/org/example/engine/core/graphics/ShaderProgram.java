@@ -197,10 +197,12 @@ public class ShaderProgram implements Resource {
                 "to sample " + sampledTextures + ". The allowed maximum on this hardware is " + maxSampledTextures);
     }
 
-    public void bind() {
+    // use ShaderProgramBinder
+    @Deprecated public void bind() {
         GL20.glUseProgram(program);
     }
 
+    // use ShaderProgramBinder
     public void unbind() {
         GL20.glUseProgram(0);
     }
