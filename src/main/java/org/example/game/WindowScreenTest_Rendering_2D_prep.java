@@ -4,26 +4,24 @@ import org.example.engine.components.Component;
 import org.example.engine.components.ComponentGraphicsCamera;
 import org.example.engine.components.ComponentTransform;
 import org.example.engine.core.assets.AssetUtils;
-import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.graphics.Renderer2D;
-import org.example.engine.core.graphics.ShaderProgram;
-import org.example.engine.core.graphics.WindowScreen;
+import org.example.engine.core.graphics.*;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 public class WindowScreenTest_Rendering_2D_prep extends WindowScreen {
 
-    private Renderer2D renderer2D;
     private ShaderProgram shader;
     private ComponentTransform transform;
     private ComponentGraphicsCamera camera;
 
     // create and modify quad dynamically
+    int vao;
 
     public WindowScreenTest_Rendering_2D_prep() {
-        this.renderer2D = new Renderer2D();
 
-        final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d.vert");
-        final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d.frag");
+        final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-prep.vert");
+        final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-prep.frag");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
         this.camera = Component.Factory.createCamera2D(GraphicsUtils.getWindowWidth(),GraphicsUtils.getWindowHeight());
@@ -32,17 +30,34 @@ public class WindowScreenTest_Rendering_2D_prep extends WindowScreen {
 
     @Override
     public void show() {
+        float[] vertices = {
+                -0.5f,0.5f,0,	//V0
+                -0.5f,-0.5f,0,	//V1
+                0.5f,-0.5f,0,	//V2
+                0.5f,0.5f,0		//V3
+        };
 
+        int[] indices = {
+                0,1,3,	//Top left triangle (V0,V1,V3)
+                3,1,2	//Bottom right triangle (V3,V1,V2)
+        };
+
+        vao = ModelBuilder.loadToVAO(vertices, indices);
     }
 
 
     @Override
     protected void refresh() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glClearColor(1,0,0,1);
+        GL11.glClearColor(1,1,0,0);
 
-        System.out.println("prep");
-
+        shader.bind();
+        GL30.glBindVertexArray(vao);
+        GL20.glEnableVertexAttribArray(0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, 6, GL11.GL_UNSIGNED_INT, 0);
+        GL20.glDisableVertexAttribArray(0);
+        GL30.glBindVertexArray(0);
+        shader.unbind();
     }
 
     @Override

@@ -1,2 +1,46 @@
-package org.example.engine.core.graphics;public class ModelBuilder {
+package org.example.engine.core.graphics;
+
+import org.example.engine.core.memory.MemoryUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
+
+public final class ModelBuilder {
+
+    public static int loadToVAO(float[] positions, int[] indices){
+        int vaoID = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(vaoID);
+
+        bindIndicesBuffer(indices);
+        storeDataInAttributeList(0,positions);
+
+        GL30.glBindVertexArray(0);
+
+        return vaoID;
+    }
+
+    private static int bindIndicesBuffer(int[] indices){
+        int vbo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vbo);
+        IntBuffer buffer = MemoryUtils.store(indices);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+        return vbo;
+    }
+
+    private static void storeDataInAttributeList(int attributeNumber, float[] data){
+        int vbo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        FloatBuffer buffer = MemoryUtils.store(data);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+        GL20.glVertexAttribPointer(attributeNumber,3, GL11.GL_FLOAT,false,0,0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+    }
+
+
+
 }
