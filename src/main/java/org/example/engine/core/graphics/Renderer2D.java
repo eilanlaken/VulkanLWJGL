@@ -1,7 +1,6 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.assets.AssetUtils;
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL11;
@@ -12,7 +11,9 @@ import java.util.HashMap;
 
 public class Renderer2D implements Resource {
 
-    private static final int BATCH_SIZE = 2000;
+    private static final int BATCH_VERTICES_CAPACITY = 4000;
+    private static final int VERTEX_SIZE = 5;
+    private static final int BATCH_TRIANGLES_CAPACITY = BATCH_VERTICES_CAPACITY * 2;
 
     private final ShaderProgram defaultShader;
     private ShaderProgram currentShader;
@@ -24,16 +25,20 @@ public class Renderer2D implements Resource {
     private float invTexHeight = 0;
     private boolean drawing = false;
     private int drawCalls = 0;
-    private int shaderSwitches = 0;
+    private int shaderSwaps = 0;
+    private int textureSwaps = 0;
 
     private int vertexIndex = 0;
     private int triangleIndex = 0;
     private final int vaoId;
     private final ArrayInt vbos = new ArrayInt();
-    private float[] positions;
-    private float[] colors;
-    private float[] textureCoords0s;
-    private short[] triangles;
+
+    //private float[] positions;
+    //private float[] colors;
+    //private float[] textureCoords0s;
+    // try with interleaving first
+    private float[] vertices;
+    private short[] triangleIndices;
     // VertexBufferObjectWithVAO
 
     public Renderer2D() {
@@ -47,16 +52,18 @@ public class Renderer2D implements Resource {
                     AssetUtils.getFileContent("assets/shaders/default-2d.frag"));
         else this.defaultShader = new ShaderProgram(defaultVertexShader, defaultFragmentShader);
         this.vaoId = GL30.glGenVertexArrays();
-        this.positions = new float[BATCH_SIZE * 2];
-        this.colors = new float[BATCH_SIZE * 4];
-        this.textureCoords0s = new float[BATCH_SIZE * 2];
-        this.triangles = new short[BATCH_SIZE * 2 * 3];
+
+        //this.positions = new float[BATCH_SIZE * 2];
+        //this.colors = new float[BATCH_SIZE * 4];
+        //this.textureCoords0s = new float[BATCH_SIZE * 2];
+        this.vertices = new float[BATCH_VERTICES_CAPACITY * 5]; // x,y,color (as single float, auto unpacked by opengl),u,v
+        this.triangleIndices = new short[BATCH_TRIANGLES_CAPACITY * 3];
     }
 
     public void begin(CameraLens lens) {
         if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D.class.getSimpleName() + ".end() before calling begin().");
         this.drawCalls = 0;
-        this.shaderSwitches = 0;
+        this.shaderSwaps = 0;
         this.lens = lens;
         drawing = true;
     }
@@ -86,6 +93,18 @@ public class Renderer2D implements Resource {
 
     }
 
+    private void swapTextures() {
+
+    }
+
+    private void swapShaders() {
+
+    }
+
+    private void swapCustomAttributes() {
+
+    }
+
     // contains the logic that sends everything to the GPU for rendering
     private void flush() {
         if (this.vertexIndex == 0) return;
@@ -98,7 +117,7 @@ public class Renderer2D implements Resource {
             currentShader.bindUniform("u_camera_combined", lens.combined);
             currentShader.bindUniform("u_texture", lastTexture);
             if (currentShader != defaultShader) currentShader.bindUniforms(currentCustomAttributes);
-            shaderSwitches++;
+            shaderSwaps++;
         }
 
         GL30.glBindVertexArray(vaoId);
@@ -129,8 +148,8 @@ public class Renderer2D implements Resource {
         return drawCalls;
     }
 
-    public int getShaderSwitches() {
-        return shaderSwitches;
+    public int getShaderSwaps() {
+        return shaderSwaps;
     }
 
     @Override

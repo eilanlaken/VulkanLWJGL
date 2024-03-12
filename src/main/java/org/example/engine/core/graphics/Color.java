@@ -239,6 +239,7 @@ public class Color {
     }
 
     /** Returns the color encoded as hex string with the format RRGGBBAA. */
+    @Override
     public String toString() {
         String value = Integer
                 .toHexString(((int)(255 * r) << 24) | ((int)(255 * g) << 16) | ((int)(255 * b) << 8) | ((int)(255 * a)));
@@ -297,6 +298,11 @@ public class Color {
 
     public static int rgba8888(float r, float g, float b, float a) {
         return ((int)(r * 255) << 24) | ((int)(g * 255) << 16) | ((int)(b * 255) << 8) | (int)(a * 255);
+    }
+
+    public static float asSingleFloat(final Color color) {
+        int bits = ((int)(255 * color.a) << 24) | ((int)(255 * color.b) << 16) | ((int)(255 * color.g) << 8) | ((int)(255 * color.r));
+        return Float.intBitsToFloat(bits & 0xfeffffff);
     }
 
     public static int argb8888(float a, float r, float g, float b) {

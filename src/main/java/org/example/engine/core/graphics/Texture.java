@@ -9,6 +9,8 @@ public class Texture implements Resource {
     protected int handle;
     public final int width;
     public final int height;
+    public final float invWidth;
+    public final float invHeight;
     public TextureParamFilter magFilter;
     public TextureParamFilter minFilter;
     public TextureParamWrap uWrap;
@@ -24,6 +26,8 @@ public class Texture implements Resource {
         this.handle = handle;
         this.width = width;
         this.height = height;
+        this.invWidth = 1.0f / width;
+        this.invHeight = 1.0f / height;
         this.minFilter = minFilter;
         this.magFilter = magFilter;
         this.uWrap = uWrap;
