@@ -4,6 +4,7 @@ import org.example.engine.components.Component;
 import org.example.engine.components.ComponentGraphicsCamera;
 import org.example.engine.components.ComponentTransform;
 import org.example.engine.core.assets.AssetUtils;
+import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.WindowScreen;
@@ -23,7 +24,7 @@ public class WindowScreenTest_Rendering_2D extends WindowScreen {
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d.frag");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
-        this.camera = Component.Factory.createCamera2D(20,20);
+        this.camera = Component.Factory.createCamera2D(GraphicsUtils.getWindowWidth(),GraphicsUtils.getWindowHeight());
 
     }
 

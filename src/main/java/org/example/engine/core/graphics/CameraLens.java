@@ -51,8 +51,8 @@ public class CameraLens {
         if (type == CameraLensProjectionType.ORTHOGRAPHIC_PROJECTION) {
             up.set(0, 1, 0);
             direction.set(0, 0, -1);
-            position.set(zoom * viewportWidth / 2.0f, zoom * viewportHeight / 2.0f, 0);
-            //position.set(0f, 0f, 0);
+            //position.set(zoom * viewportWidth / 2.0f, zoom * viewportHeight / 2.0f, 0);
+            position.set(0f, 0f, 0);
 
         }
 

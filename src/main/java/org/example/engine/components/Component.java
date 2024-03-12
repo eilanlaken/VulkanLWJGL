@@ -45,7 +45,7 @@ public class Component {
         }
 
         public static ComponentGraphicsCamera createCamera2D(float viewportWidth, float viewportHeight) {
-            CameraLens lens = new CameraLens(CameraLensProjectionType.ORTHOGRAPHIC_PROJECTION, viewportWidth, viewportHeight, 1, 0f, 100, 67);
+            CameraLens lens = new CameraLens(CameraLensProjectionType.ORTHOGRAPHIC_PROJECTION, viewportWidth, viewportHeight, 1, 0f, 1, 67);
 
             return new ComponentGraphicsCamera(lens);
         }
