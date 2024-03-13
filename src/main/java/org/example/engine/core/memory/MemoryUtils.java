@@ -2,9 +2,7 @@ package org.example.engine.core.memory;
 
 import org.lwjgl.system.MemoryUtil;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
+import java.nio.*;
 
 public final class MemoryUtils {
 
@@ -24,6 +22,22 @@ public final class MemoryUtils {
         ShortBuffer buffer = MemoryUtil.memAllocShort(data.length);
         buffer.put(data).flip();
         return buffer;
+    }
+
+    public static FloatBuffer createFloatBuffer(final int capacity) {
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(capacity * Float.BYTES);
+        byteBuffer.order(ByteOrder.nativeOrder()); // Set the byte order to native (usually little-endian or big-endian)
+        return byteBuffer.asFloatBuffer();
+    }
+
+    public static FloatBuffer store(final float[] data, FloatBuffer target) {
+        target.put(data);
+        return target.flip();
+    }
+
+    public static FloatBuffer store(final float[] data, int offset, int count, FloatBuffer target) {
+        target.put(data, offset, count);
+        return target.flip();
     }
 
 }

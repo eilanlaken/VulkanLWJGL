@@ -12,25 +12,30 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class SceneRendering2D_4 extends WindowScreen {
+// TODO: pretty good solution here:
+//  http://forum.lwjgl.org/index.php?topic=5789.0
+public class SceneRendering2D_5 extends WindowScreen {
 
     private ShaderProgram shader;
-    private ComponentTransform transform;
-    private ComponentGraphicsCamera camera;
 
     // create and modify quad dynamically
     int vao;
+    FloatBuffer floatBuffer = MemoryUtils.createFloatBuffer(8000);
+    float[] vertices = new float[8000];
+    float size = 0;
+    int BATCH_VERTICES = 8000;
+    int VERTEX_SIZE = 5;
 
-    public SceneRendering2D_4() {
+    public SceneRendering2D_5() {
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-prep.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-prep.frag");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
-
-        this.camera = Component.Factory.createCamera2D(GraphicsUtils.getWindowWidth(),GraphicsUtils.getWindowHeight());
 
     }
 
