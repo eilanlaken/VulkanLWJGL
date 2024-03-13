@@ -37,18 +37,11 @@ public class SceneRendering2D_3 extends WindowScreen {
     @Override
     public void show() {
 
-//        float[] vertices = {
-//                -0.5f,0.5f, 1,0,0,1,
-//                -0.5f,-0.5f, 0,1,0,1,
-//                0.5f,-0.5f, 0,0,0,1,
-//                0.5f,0.5f, 0,0,0,1
-//        };
-
         float[] vertices = {
-                -0.5f,0.5f, Color.asSingleFloat(new Color(1,0,0,1)),
-                -0.5f,-0.5f, Color.asSingleFloat(new Color(1,1,0,1)),
-                0.5f,-0.5f, Color.asSingleFloat(new Color(1,0,0,1)),
-                0.5f,0.5f, Color.asSingleFloat(new Color(1,0,0,1)),
+                -0.5f,0.5f, new Color(1,1,0,1).toIntBits(),
+                -0.5f,-0.5f, new Color(1,0,0,1).toIntBits(),
+                0.5f,-0.5f, new Color(0,0,0,1).toIntBits(),
+                0.5f,0.5f, new Color(0,1,0,0).toIntBits(),
         };
 
         int[] indices = {
@@ -56,48 +49,46 @@ public class SceneRendering2D_3 extends WindowScreen {
                 3,1,2	//Bottom right triangle (V3,V1,V2)
         };
 
-
-
         vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
+        {
+            int vbo = GL15.glGenBuffers();
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+            FloatBuffer interleavedBuffer = BufferUtils.createFloatBuffer(vertices.length);
+            interleavedBuffer.put(vertices).flip();
+            GL15.glBufferData(GL15.GL_ARRAY_BUFFER, interleavedBuffer, GL15.GL_STATIC_DRAW);
 
-        int vbo = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-        FloatBuffer interleavedBuffer = BufferUtils.createFloatBuffer(vertices.length);
-        interleavedBuffer.put(vertices).flip();
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, interleavedBuffer, GL15.GL_STATIC_DRAW);
+            int vertexSize = 2 * Float.BYTES + 4;
+            GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, vertexSize, 0);
+            GL20.glVertexAttribPointer(1, 1, GL11.GL_UNSIGNED_BYTE, true, vertexSize, Float.BYTES * 2);
+            GL20.glEnableVertexAttribArray(0);
+            GL20.glEnableVertexAttribArray(1);
 
-        int vertexSize = 2 * Float.BYTES + Integer.BYTES;
-        GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, vertexSize, 0);
-        GL20.glVertexAttribPointer(1, 4, GL11.GL_UNSIGNED_INT, true, vertexSize, Float.BYTES * 2);
-
-        GL20.glEnableVertexAttribArray(0);
-        GL20.glEnableVertexAttribArray(1);
-
-
-        int ebo = GL15.glGenBuffers();
-        IntBuffer indicesBuffer = MemoryUtils.store(indices);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
-        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
-
+            int ebo = GL15.glGenBuffers();
+            IntBuffer indicesBuffer = MemoryUtils.store(indices);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
+            GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
+        }
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL30.glBindVertexArray(0);
-
     }
 
 
     @Override
     protected void refresh() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glClearColor(0,1,1,0);
+        GL11.glClearColor(1,1,0,1);
+
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         ShaderProgramBinder.bind(shader);
         GL30.glBindVertexArray(vao);
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL11.glDrawElements(GL11.GL_TRIANGLES, 6, GL11.GL_UNSIGNED_INT, 0);
-        GL20.glDisableVertexAttribArray(ModelVertexAttribute.POSITION_2D.slot);
-        GL20.glDisableVertexAttribArray(ModelVertexAttribute.COLOR_PACKED.slot);
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
         GL30.glBindVertexArray(0);
         ShaderProgramBinder.unbind();
     }

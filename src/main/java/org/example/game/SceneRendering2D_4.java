@@ -5,11 +5,17 @@ import org.example.engine.components.ComponentGraphicsCamera;
 import org.example.engine.components.ComponentTransform;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
+import org.example.engine.core.memory.MemoryUtils;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-public class SceneRendering2D extends WindowScreen {
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
+public class SceneRendering2D_4 extends WindowScreen {
 
     private ShaderProgram shader;
     private ComponentTransform transform;
@@ -18,7 +24,7 @@ public class SceneRendering2D extends WindowScreen {
     // create and modify quad dynamically
     int vao;
 
-    public SceneRendering2D() {
+    public SceneRendering2D_4() {
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-prep.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-prep.frag");
@@ -30,11 +36,16 @@ public class SceneRendering2D extends WindowScreen {
 
     @Override
     public void show() {
+
+        float c0 = new Color(0f,1,0,1).toFloatBits();
+        float c1 = new Color(1f,0,0,1).toFloatBits();
+
+
         float[] vertices = {
-                -0.5f,0.5f,	//V0
-                -0.5f,-0.5f,	//V1
-                0.5f,-0.5f,	//V2
-                0.5f,0.5f		//V3
+                -0.5f,0.5f, c0,
+                -0.5f,-0.5f, c1,
+                0.5f,-0.5f, c1,
+                0.5f,0.5f, c1,
         };
 
         int[] indices = {
@@ -42,26 +53,46 @@ public class SceneRendering2D extends WindowScreen {
                 3,1,2	//Bottom right triangle (V3,V1,V2)
         };
 
-        float[] colors = {
-                new Color(1,0,0,1).toFloatBits(),
-                new Color(0,1,0,1).toFloatBits(),
-                new Color(0,0,0,1).toFloatBits(),
-                new Color(0,0,0,1).toFloatBits(),
-        };
+        vao = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(vao);
 
-        vao = ModelBuilder.buildMesh(vertices, colors, indices);
+        int vbo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        FloatBuffer interleavedBuffer = BufferUtils.createFloatBuffer(vertices.length);
+        interleavedBuffer.put(vertices).flip();
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, interleavedBuffer, GL15.GL_STATIC_DRAW);
+
+        int vertexSize = 3 * Float.BYTES;
+        GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, vertexSize, 0);
+        GL20.glVertexAttribPointer(1, 4, GL11.GL_UNSIGNED_BYTE, true, vertexSize, Float.BYTES * 2L);
+
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(1);
+
+
+        int ebo = GL15.glGenBuffers();
+        IntBuffer indicesBuffer = MemoryUtils.store(indices);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL30.glBindVertexArray(0);
+
     }
 
 
     @Override
     protected void refresh() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glClearColor(1,1,0,0);
+        GL11.glClearColor(1,1,1,0);
+
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         ShaderProgramBinder.bind(shader);
         GL30.glBindVertexArray(vao);
-        GL20.glEnableVertexAttribArray(ModelVertexAttribute.POSITION_2D.slot);
-        GL20.glEnableVertexAttribArray(ModelVertexAttribute.COLOR_PACKED.slot);
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(1);
         GL11.glDrawElements(GL11.GL_TRIANGLES, 6, GL11.GL_UNSIGNED_INT, 0);
         GL20.glDisableVertexAttribArray(ModelVertexAttribute.POSITION_2D.slot);
         GL20.glDisableVertexAttribArray(ModelVertexAttribute.COLOR_PACKED.slot);

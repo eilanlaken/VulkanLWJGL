@@ -38,18 +38,16 @@ public class SceneRendering2D_2 extends WindowScreen {
     public void show() {
 
         float[] vertices = {
-                -0.5f,0.5f, 1,0,0,1,
-                -0.5f,-0.5f, 0,1,0,1,
-                0.5f,-0.5f, 0,0,0,1,
-                0.5f,0.5f, 0,0,0,1
+                -0.5f,0.5f, 1f,1f,0f,1f,
+                -0.5f,-0.5f, 0f,1f,0f,1f,
+                0.5f,-0.5f, 0f,0f,0f,1f,
+                0.5f,0.5f, 0f,0f,0f,0f
         };
 
         int[] indices = {
                 0,1,3,	//Top left triangle (V0,V1,V3)
                 3,1,2	//Bottom right triangle (V3,V1,V2)
         };
-
-
 
         vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
@@ -83,6 +81,9 @@ public class SceneRendering2D_2 extends WindowScreen {
     protected void refresh() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(1,1,1,0);
+
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         ShaderProgramBinder.bind(shader);
         GL30.glBindVertexArray(vao);

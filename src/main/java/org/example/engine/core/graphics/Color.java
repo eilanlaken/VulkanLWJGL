@@ -232,6 +232,15 @@ public class Color {
         return toIntBits() == color.toIntBits();
     }
 
+    /** Packs the color components into a 32-bit integer with the format ABGR and then converts it to a float. Alpha is compressed
+     * from 0-255 to use only even numbers between 0-254 to avoid using float bits in the NaN range (see
+     * {@link #intToFloatColor(int)}). Converting a color to a float and back can be lossy for alpha.
+     * @return the packed color as a 32-bit float */
+    public float toFloatBits() {
+        int color = ((int)(255 * a) << 24) | ((int)(255 * b) << 16) | ((int)(255 * g) << 8) | ((int)(255 * r));
+        return intToFloatColor(color);
+    }
+
     /** Packs the color components into a 32-bit integer with the format ABGR.
      * @return the packed color as a 32-bit int. */
     public int toIntBits() {
@@ -298,11 +307,6 @@ public class Color {
 
     public static int rgba8888(float r, float g, float b, float a) {
         return ((int)(r * 255) << 24) | ((int)(g * 255) << 16) | ((int)(b * 255) << 8) | (int)(a * 255);
-    }
-
-    public static float asSingleFloat(final Color color) {
-        int bits = ((int)(255 * color.a) << 24) | ((int)(255 * color.b) << 16) | ((int)(255 * color.g) << 8) | ((int)(255 * color.r));
-        return Float.intBitsToFloat(bits & 0xfeffffff);
     }
 
     public static int argb8888(float a, float r, float g, float b) {
@@ -394,6 +398,32 @@ public class Color {
         color.b = ((value & 0x00ff0000) >>> 16) / 255f;
         color.g = ((value & 0x0000ff00) >>> 8) / 255f;
         color.r = ((value & 0x000000ff)) / 255f;
+    }
+
+    /** Sets the Color components using the specified float value in the format ABGR8888.
+     * @param color The Color to be modified. */
+    public static void abgr8888ToColor (Color color, float value) {
+        int c = floatToIntColor(value);
+        color.a = ((c & 0xff000000) >>> 24) / 255f;
+        color.b = ((c & 0x00ff0000) >>> 16) / 255f;
+        color.g = ((c & 0x0000ff00) >>> 8) / 255f;
+        color.r = ((c & 0x000000ff)) / 255f;
+    }
+
+    /** Converts the color from a float ABGR encoding to an int ABGR encoding. The alpha is expanded from 0-254 in the float
+     * encoding (see {@link #intToFloatColor(int)}) to 0-255, which means converting from int to float and back to int can be
+     * lossy. */
+    public static int floatToIntColor(float value) {
+        int intBits = Float.floatToRawIntBits(value);
+        intBits |= (int)((intBits >>> 24) * (255f / 254f)) << 24;
+        return intBits;
+    }
+
+    /** Encodes the ABGR int color as a float. The alpha is compressed to use only even numbers between 0-254 to avoid using bits
+     * in the NaN range (see {@link Float#intBitsToFloat(int)} javadocs). Rendering which uses colors encoded as floats should
+     * expand the 0-254 back to 0-255, else colors cannot be fully opaque. */
+    public static float intToFloatColor(int value) {
+        return Float.intBitsToFloat(value & 0xfeffffff);
     }
 
     /** Sets the RGB Color components using the specified Hue-Saturation-Value. Note that HSV components are voluntary not clamped
