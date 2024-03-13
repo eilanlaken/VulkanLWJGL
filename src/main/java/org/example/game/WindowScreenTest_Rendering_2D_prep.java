@@ -31,10 +31,10 @@ public class WindowScreenTest_Rendering_2D_prep extends WindowScreen {
     @Override
     public void show() {
         float[] vertices = {
-                -0.5f,0.5f,0,	//V0
-                -0.5f,-0.5f,0,	//V1
-                0.5f,-0.5f,0,	//V2
-                0.5f,0.5f,0		//V3
+                -0.5f,0.5f,	//V0
+                -0.5f,-0.5f,	//V1
+                0.5f,-0.5f,	//V2
+                0.5f,0.5f		//V3
         };
 
         int[] indices = {
@@ -42,7 +42,14 @@ public class WindowScreenTest_Rendering_2D_prep extends WindowScreen {
                 3,1,2	//Bottom right triangle (V3,V1,V2)
         };
 
-        vao = ModelBuilder.loadToVAO(vertices, indices);
+        float[] colors = {
+                Color.asSingleFloat(new Color(1,0,0,1)),
+                Color.asSingleFloat(new Color(0,1,0,1)),
+                Color.asSingleFloat(new Color(0,0,0,1)),
+                Color.asSingleFloat(new Color(0,0,0,1)),
+        };
+
+        vao = ModelBuilder.loadToVAO(vertices, colors, indices);
     }
 
 
@@ -53,9 +60,12 @@ public class WindowScreenTest_Rendering_2D_prep extends WindowScreen {
 
         shader.bind();
         GL30.glBindVertexArray(vao);
-        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(ModelVertexAttribute.POSITION_2D.slot);
+        GL20.glEnableVertexAttribArray(ModelVertexAttribute.COLOR_PACKED.slot);
         GL11.glDrawElements(GL11.GL_TRIANGLES, 6, GL11.GL_UNSIGNED_INT, 0);
-        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(ModelVertexAttribute.POSITION_2D.slot);
+        GL20.glDisableVertexAttribArray(ModelVertexAttribute.COLOR_PACKED.slot);
+
         GL30.glBindVertexArray(0);
         shader.unbind();
     }

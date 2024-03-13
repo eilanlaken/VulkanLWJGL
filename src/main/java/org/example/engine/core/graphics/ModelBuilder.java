@@ -1,23 +1,23 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.memory.MemoryUtils;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 
 public final class ModelBuilder {
 
-    public static int loadToVAO(float[] positions, int[] indices){
+    public static int loadToVAO(float[] positions, float[] colors, int[] indices){
         int vaoID = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vaoID);
 
         bindIndicesBuffer(indices);
-        storeDataInAttributeList(0,positions);
+        storeDataInAttributeList(ModelVertexAttribute.POSITION_2D, positions);
+        storeDataInAttributeList(ModelVertexAttribute.COLOR_PACKED, colors);
+
 
         GL30.glBindVertexArray(0);
 
@@ -32,15 +32,24 @@ public final class ModelBuilder {
         return vbo;
     }
 
-    private static void storeDataInAttributeList(int attributeNumber, float[] data){
+    private static int storeDataInAttributeList(final ModelVertexAttribute attribute, float[] data){
         int vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
         FloatBuffer buffer = MemoryUtils.store(data);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
-        GL20.glVertexAttribPointer(attributeNumber,3, GL11.GL_FLOAT,false,0,0);
+        GL20.glVertexAttribPointer(attribute.slot, attribute.length, attribute.type, attribute.normalized,0,0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        return vbo;
     }
 
-
+    private static int storeDataInAttributeList(int slot, int length, int type, boolean normalized, float[] data){
+        int vbo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        FloatBuffer buffer = MemoryUtils.store(data);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+        GL20.glVertexAttribPointer(slot,length, type,normalized,0,0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        return vbo;
+    }
 
 }

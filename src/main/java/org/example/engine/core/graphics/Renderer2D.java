@@ -122,13 +122,13 @@ public class Renderer2D implements Resource {
 
         GL30.glBindVertexArray(vaoId);
         {
-            GL20.glEnableVertexAttribArray(ModelVertexAttribute.POSITION.slot);
+            GL20.glEnableVertexAttribArray(ModelVertexAttribute.POSITION_3D.slot);
             GL20.glEnableVertexAttribArray(ModelVertexAttribute.COLOR.slot);
             GL20.glEnableVertexAttribArray(ModelVertexAttribute.TEXTURE_COORDINATES0.slot);
             GL11.glDrawElements(GL11.GL_TRIANGLES, triangleIndex, GL11.GL_UNSIGNED_INT, 0);
             GL20.glDisableVertexAttribArray(ModelVertexAttribute.TEXTURE_COORDINATES0.slot);
             GL20.glDisableVertexAttribArray(ModelVertexAttribute.COLOR.slot);
-            GL20.glDisableVertexAttribArray(ModelVertexAttribute.POSITION.slot);
+            GL20.glDisableVertexAttribArray(ModelVertexAttribute.POSITION_3D.slot);
         }
         GL30.glBindVertexArray(0);
         vertexIndex = 0;
