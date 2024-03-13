@@ -49,7 +49,7 @@ public class WindowScreenTest_Rendering_2D_prep extends WindowScreen {
                 Color.asSingleFloat(new Color(0,0,0,1)),
         };
 
-        vao = ModelBuilder.loadToVAO(vertices, colors, indices);
+        vao = ModelBuilder.buildMesh(vertices, colors, indices);
     }
 
 
@@ -58,16 +58,15 @@ public class WindowScreenTest_Rendering_2D_prep extends WindowScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(1,1,0,0);
 
-        shader.bind();
+        ShaderProgramBinder.bind(shader);
         GL30.glBindVertexArray(vao);
         GL20.glEnableVertexAttribArray(ModelVertexAttribute.POSITION_2D.slot);
         GL20.glEnableVertexAttribArray(ModelVertexAttribute.COLOR_PACKED.slot);
         GL11.glDrawElements(GL11.GL_TRIANGLES, 6, GL11.GL_UNSIGNED_INT, 0);
         GL20.glDisableVertexAttribArray(ModelVertexAttribute.POSITION_2D.slot);
         GL20.glDisableVertexAttribArray(ModelVertexAttribute.COLOR_PACKED.slot);
-
         GL30.glBindVertexArray(0);
-        shader.unbind();
+        ShaderProgramBinder.unbind();
     }
 
     @Override

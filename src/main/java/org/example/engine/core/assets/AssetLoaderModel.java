@@ -220,7 +220,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
     private ModelPartMeshData processMesh(final AIMesh aiMesh) {
         ModelPartMeshData meshData = new ModelPartMeshData();
         meshData.vertexBuffers.put(ModelVertexAttribute.POSITION_3D, getPositions(aiMesh));
-        meshData.vertexBuffers.put(ModelVertexAttribute.COLOR, getColors(aiMesh));
+        meshData.vertexBuffers.put(ModelVertexAttribute.COLOR, getColors(aiMesh)); // TODO: change to color packed.
         meshData.vertexBuffers.put(ModelVertexAttribute.TEXTURE_COORDINATES0, getTextureCoords0(aiMesh));
         meshData.vertexBuffers.put(ModelVertexAttribute.TEXTURE_COORDINATES1, getTextureCoords1(aiMesh));
         meshData.vertexBuffers.put(ModelVertexAttribute.NORMAL, getNormals(aiMesh));

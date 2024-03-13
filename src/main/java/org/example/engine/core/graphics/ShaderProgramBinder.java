@@ -13,6 +13,9 @@ public class ShaderProgramBinder {
         return true;
     }
 
-    public static void unbind() { GL20.glUseProgram(0); }
+    public static void unbind() {
+        GL20.glUseProgram(0);
+        boundProgram = -1;
+    }
 
 }

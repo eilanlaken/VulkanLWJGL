@@ -10,7 +10,25 @@ import java.nio.IntBuffer;
 
 public final class ModelBuilder {
 
-    public static int loadToVAO(float[] positions, float[] colors, int[] indices){
+    // TODO: implement.
+    public static ModelPartMesh buildMesh(float[] positions,
+                                          float[] colors,
+                                          float[] textCoords0,
+                                          float[] textCoords1,
+                                          float[] normals,
+                                          float[] tangents,
+                                          float[] biNormals,
+                                          float[] boneWeight0,
+                                          float[] boneWeight1,
+                                          float[] boneWeight2,
+                                          float[] boneWeight3,
+                                          float[] boneWeight4,
+                                          float[] boneWeight5) {
+
+        return null;
+    }
+
+    public static int buildMesh(float[] positions, float[] colors, int[] indices){
         int vaoID = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vaoID);
 
@@ -42,12 +60,12 @@ public final class ModelBuilder {
         return vbo;
     }
 
-    private static int storeDataInAttributeList(int slot, int length, int type, boolean normalized, float[] data){
+    @Deprecated private static int storeDataInAttributeList(int slot, int length, int type, boolean normalized, float[] data){
         int vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
         FloatBuffer buffer = MemoryUtils.store(data);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
-        GL20.glVertexAttribPointer(slot,length, type,normalized,0,0);
+        GL20.glVertexAttribPointer(slot,length, type, normalized,0,0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         return vbo;
     }
