@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Date;
 
 public final class AssetUtils {
 
@@ -58,5 +61,18 @@ public final class AssetUtils {
         Path filePath = Paths.get(path);
         return Files.size(filePath);
     }
+
+    public static synchronized Date getLastModifiedDate(final String filepath) {
+        Path p = Paths.get(filepath);
+        BasicFileAttributes view;
+        try {
+            view = Files.getFileAttributeView(p, BasicFileAttributeView.class)
+            .readAttributes();
+        } catch (IOException e) {
+            return null; // file does not exist or whatever
+        }
+        return new Date(view.lastModifiedTime().toMillis());
+    }
+
 
 }

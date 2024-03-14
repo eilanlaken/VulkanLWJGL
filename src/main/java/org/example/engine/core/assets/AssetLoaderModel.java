@@ -20,6 +20,8 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO: recreate interleaved model building to minimize vbo count;
+// TODO: move stuff to model builder;
 public class AssetLoaderModel implements AssetLoader<Model> {
 
     private static final MapObjectInt<String> namedTextureTypes;
@@ -88,6 +90,8 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         return dependencies;
     }
 
+    // TODO: use ModelBuilder for this part.
+    // TODO: use interleaved vertices.
     @Override
     public Model create() {
         ModelPart[] parts = new ModelPart[partsData.length];

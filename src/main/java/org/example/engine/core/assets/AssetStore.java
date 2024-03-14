@@ -135,10 +135,6 @@ public final class AssetStore {
         loaders.put(Model.class, AssetLoaderModel.class);
         loaders.put(ShaderProgram.class, AssetLoaderShaderProgram.class);
 
-        // TODO: delete
-        loaders.put(Debug.class, AssetLoaderDebug.class);
-        loaders.put(DebugDependency.class, AssetLoaderDebugDependency.class);
-
         return loaders;
     }
 
