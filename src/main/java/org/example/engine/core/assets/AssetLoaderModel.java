@@ -102,7 +102,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
                 final Object dataValue = materialDataEntry.getValue();
                 if (dataValue instanceof Color) {
                     Color color = (Color) dataValue;
-                    materialAttributes.put(uniform, new Color(color.r(), color.g(), color.b(), color.a()));
+                    materialAttributes.put(uniform, new Color(color.r, color.g, color.b, color.a));
                 } else if (dataValue instanceof TextureParameters) {
                     TextureParameters params = (TextureParameters) dataValue;
                     Texture texture = AssetStore.get(params.path);
