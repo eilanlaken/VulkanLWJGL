@@ -1,4 +1,4 @@
 package org.example.engine.components;
 
-public class ComponentGraphicsDecal {
+public class ComponentGraphics3DDecal {
 }
