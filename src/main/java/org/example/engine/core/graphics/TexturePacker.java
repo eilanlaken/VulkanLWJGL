@@ -1,6 +1,5 @@
 package org.example.engine.core.graphics;
 
-import com.google.gson.Gson;
 import org.example.engine.core.assets.AssetUtils;
 
 import java.io.File;
@@ -24,17 +23,15 @@ public class TexturePacker {
         if (!AssetUtils.directoryExists(directory)) throw new IllegalArgumentException("The provided path: " + directory + " does not exist, or is not a directory");
 
 
-        Options options = new Options();
-        options.outputName = outputName;
+        return new TexturePack(null, null, null, null);
+    }
+
+    public static TexturePack packTextures(final String directory, final String outputName, final String ...texturePaths) {
 
         return new TexturePack(null, null, null, null);
     }
 
-    public static TexturePack packTextures(final String outputName, final String ...texturePaths) {
-
-        return new TexturePack(null, null, null, null);
-    }
-
+    // TODO: implement.
     private static boolean alreadyPacked(final Options options, final String ...texturePaths) {
         final String outputDirectory = options.outputDirectory;
         // check if the output directory or the texture map file is missing
@@ -55,13 +52,29 @@ public class TexturePacker {
 
     public static final class Options {
 
-        public String outputDirectory;
-        public String outputName;
-        public TextureParamFilter filter;
-        public TextureParamWrap wrap;
-        public int extrude; // extrude REPEATS the border i.e. adding colors.
-        public int padding;
+        public final String outputDirectory;
+        public final String outputName;
+        public final TextureParamFilter magFilter;
+        public final TextureParamFilter minFilter;
+        public final TextureParamWrap uWrap;
+        public final TextureParamWrap vWrap;
+        public final int extrude; // extrude REPEATS the border i.e. adding colors.
+        public final int padding;
 
+        public Options(String outputDirectory, String outputName) {
+            this(outputDirectory, outputName, TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE, 1,1);
+        }
+
+        public Options(String outputDirectory, String outputName, TextureParamFilter magFilter, TextureParamFilter minFilter, TextureParamWrap uWrap, TextureParamWrap vWrap, int extrude, int padding) {
+            this.outputDirectory = outputDirectory;
+            this.outputName = outputName;
+            this.magFilter = magFilter;
+            this.minFilter = minFilter;
+            this.uWrap = uWrap;
+            this.vWrap = vWrap;
+            this.extrude = extrude;
+            this.padding = padding;
+        }
     }
 
 
