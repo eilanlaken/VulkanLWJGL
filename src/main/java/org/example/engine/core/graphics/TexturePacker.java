@@ -10,29 +10,29 @@ public class TexturePacker {
     // TODO: implement
     public static TexturePack packDirectory(final Options options, final String directory) {
 
-        return new TexturePack(null, null, null);
+        return new TexturePack(null, null, null, null);
     }
 
     // TODO: implement
     public static TexturePack packTextures(final Options options, final String ...texturePaths) {
 
-        return new TexturePack(null, null, null);
+        return new TexturePack(null, null, null, null);
     }
 
     public static TexturePack packDirectory(final String outputName, final String directory, final boolean recursive) {
-        if (directory == null) throw new IllegalArgumentException("Must provide valid directory name");
+        if (directory == null) throw new IllegalArgumentException("Must provide non-null directory name.");
         if (!AssetUtils.directoryExists(directory)) throw new IllegalArgumentException("The provided path: " + directory + " does not exist, or is not a directory");
 
 
         Options options = new Options();
         options.outputName = outputName;
 
-        return new TexturePack(null, null, null);
+        return new TexturePack(null, null, null, null);
     }
 
     public static TexturePack packTextures(final String outputName, final String ...texturePaths) {
 
-        return new TexturePack(null, null, null);
+        return new TexturePack(null, null, null, null);
     }
 
     private static boolean alreadyPacked(final Options options, final String ...texturePaths) {
@@ -46,7 +46,6 @@ public class TexturePacker {
         String contents = AssetUtils.getFileContent(mapPath);
         // contents should be a json string.
         // get all the textures names and the options object.
-        Gson gson = new Gson();
         // TODO: continue.
 
 
@@ -58,10 +57,10 @@ public class TexturePacker {
 
         public String outputDirectory;
         public String outputName;
-        public boolean createDebugRectangles;
         public TextureParamFilter filter;
         public TextureParamWrap wrap;
-        public boolean extrude;
+        public int extrude; // extrude REPEATS the border i.e. adding colors.
+        public int padding;
 
     }
 

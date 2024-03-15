@@ -160,6 +160,7 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- LWJGL Dependencies -->
         <dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
@@ -554,11 +555,16 @@
             <artifactId>steamworks4j-server</artifactId>
             <version>${steamworks4j-server.version}</version>
         </dependency>
-
+        <!-- Format Parsings Dependencies -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.2</version>
         </dependency>
     </dependencies>
 
