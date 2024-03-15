@@ -1,18 +1,35 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.collections.Array;
+import java.util.HashMap;
 
-// TODO: implement
+// can contain duplicates.
+// example:
+// named regions: <my_anim_1->region1, my_anim_2->region2>
+// named animations: <my_anim->[region1,region2]>
 public class TexturePack {
 
-    public final Texture[] textures;
-    public final Array<TexturePackRegion> regions;
+    protected final Texture[] textures;
     protected final TexturePacker.Options options;
+    protected final HashMap<String, TexturePackRegion> namedRegions;
+    protected final HashMap<String, TexturePackRegion[]> namedAnimations;
 
-    protected TexturePack(final Texture[] textures, final Array<TexturePackRegion> regions, final TexturePacker.Options options) {
+    protected TexturePack(final Texture[] textures, final TexturePacker.Options options, final HashMap<String, TexturePackRegion> namedRegions, final HashMap<String, TexturePackRegion[]> namedAnimations) {
         this.textures = textures;
-        this.regions = regions;
         this.options = options;
+        this.namedRegions = namedRegions;
+        this.namedAnimations = namedAnimations;
+    }
+
+    public TexturePackRegion getRegion(final String name) {
+        final TexturePackRegion region = namedRegions.get(name);
+        if (region == null) throw new RuntimeException(TexturePack.class.getSimpleName() + " " + this.options.outputName + " does not contain a region named " + name);
+        return region;
+    }
+
+    public TexturePackRegion[] getAnimationFrames(final String name) {
+        final TexturePackRegion[] regions = namedAnimations.get(name);
+        if (regions == null) throw new RuntimeException(TexturePack.class.getSimpleName() + " " + this.options.outputName + " does not contain an animation named " + name);
+        return regions;
     }
 
 }
