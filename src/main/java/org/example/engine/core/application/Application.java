@@ -29,12 +29,12 @@ public class Application {
         GLFWErrorCallback.createPrint(System.err).set();
         if (!GLFW.glfwInit()) throw new RuntimeException("Unable to initialize GLFW.");
         window = new Window(attributes);
+        GL.createCapabilities();
         GraphicsUtils.init(window);
         AssetUtils.init(window);
         Mouse.init(window);
         Keyboard.init(window);
         // init OpenGL Context
-        GL.createCapabilities();
         initialized = true;
     }
 

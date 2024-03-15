@@ -19,10 +19,12 @@ public class GraphicsUtils {
     private static int targetFps = 120;
     private static int prevTargetFps = targetFps;
     private static int idleFps = 10;
+    private static int maxTextureSize;
 
     public static void init(final Window window) {
         if (initialized) throw new IllegalStateException(GraphicsUtils.class.getSimpleName() + " instance already initialized.");
         GraphicsUtils.window = window;
+        maxTextureSize = GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
         initialized = true;
     }
 
@@ -71,7 +73,7 @@ public class GraphicsUtils {
     }
 
     public static int getMaxTextureSize() {
-        return GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
+        return maxTextureSize;
     }
 
     public static int getFrameCount() {
