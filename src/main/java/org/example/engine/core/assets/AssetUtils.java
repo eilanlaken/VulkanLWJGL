@@ -75,15 +75,27 @@ public final class AssetUtils {
         return new Date(view.lastModifiedTime().toMillis());
     }
 
-    public static synchronized boolean directoryExists(final String dirPath) {
-        File directory = new File(dirPath);
+    public static synchronized boolean filesExist(final String ...filepaths) {
+        for (String filepath : filepaths) {
+            if (!fileExists(filepath)) return false;
+        }
+        return true;
+    }
+
+    public static synchronized boolean fileExists(final String filepath) {
+        File file = new File(filepath);
+        return file.exists() && file.isFile();
+    }
+
+    public static synchronized boolean directoryExists(final String dirpath) {
+        File directory = new File(dirpath);
         return directory.exists() && directory.isDirectory();
     }
 
-    public static synchronized Array<String> getDirectoryFiles(final String dirPath, final boolean recursive, final String ...extensions) {
-        if (!directoryExists(dirPath)) throw new IllegalArgumentException("Path: " + dirPath + " does not exist or is not a directory.");
+    public static synchronized Array<String> getDirectoryFiles(final String dirpath, final boolean recursive, final String ...extensions) {
+        if (!directoryExists(dirpath)) throw new IllegalArgumentException("Path: " + dirpath + " does not exist or is not a directory.");
         Array<String> paths = new Array<>();
-        File directory = new File(dirPath);
+        File directory = new File(dirpath);
         File[] children = directory.listFiles();
         for (File child : children) {
             if (child.isFile() && hasExtension(child, extensions)) paths.add(child.getPath());
@@ -92,8 +104,8 @@ public final class AssetUtils {
         return paths;
     }
 
-    private static synchronized void getDirectoryFiles(final String dirPath, final String[] extensions, Array<String> collector) {
-        File directory = new File(dirPath);
+    private static synchronized void getDirectoryFiles(final String dirpath, final String[] extensions, Array<String> collector) {
+        File directory = new File(dirpath);
         File[] children = directory.listFiles();
         for (File child : children) {
             if (child.isFile() && hasExtension(child, extensions)) collector.add(child.getPath());
