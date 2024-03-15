@@ -12,7 +12,15 @@ public class TextureMapRegion {
     public final int width;
     public final int height;
 
-    public TextureMapRegion(final Texture texture,
+    public String name;
+    public float offsetX;
+    public float offsetY;
+    public int packedWidth;
+    public int packedHeight;
+    public int originalWidth;
+    public int originalHeight;
+
+    protected TextureMapRegion(final Texture texture,
                             final float u, final float v,
                             final float u2, final float v2) {
         this.texture = texture;
@@ -26,7 +34,7 @@ public class TextureMapRegion {
         this.y = Math.round(v * (float) texture.height);
     }
 
-    public TextureMapRegion(final Texture texture,
+    protected TextureMapRegion(final Texture texture,
                             final int x, final int y,
                             final int width, final int height) {
         this.texture = texture;

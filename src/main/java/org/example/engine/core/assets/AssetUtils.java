@@ -4,6 +4,7 @@ import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.Window;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -74,5 +75,38 @@ public final class AssetUtils {
         return new Date(view.lastModifiedTime().toMillis());
     }
 
+    public static synchronized boolean directoryExists(final String dirPath) {
+        File directory = new File(dirPath);
+        return directory.exists() && directory.isDirectory();
+    }
+
+    public static synchronized Array<String> getDirectoryFiles(final String dirPath, final boolean recursive, final String ...extensions) {
+        if (!directoryExists(dirPath)) throw new IllegalArgumentException("Path: " + dirPath + " does not exist or is not a directory.");
+        Array<String> paths = new Array<>();
+        File directory = new File(dirPath);
+        File[] children = directory.listFiles();
+        for (File child : children) {
+            if (child.isFile() && hasExtension(child, extensions)) paths.add(child.getPath());
+            else if (child.isDirectory() && recursive) getDirectoryFiles(child.getPath(), extensions, paths);
+        }
+        return paths;
+    }
+
+    private static synchronized void getDirectoryFiles(final String dirPath, final String[] extensions, Array<String> collector) {
+        File directory = new File(dirPath);
+        File[] children = directory.listFiles();
+        for (File child : children) {
+            if (child.isFile() && hasExtension(child, extensions)) collector.add(child.getPath());
+            else if (child.isDirectory()) getDirectoryFiles(child.getPath(), extensions, collector);
+        }
+    }
+
+    private static boolean hasExtension(final File file, final String ...extensions) {
+        if (extensions == null || extensions.length == 0) return true;
+        for (String extension : extensions) {
+            if (file.getName().endsWith(extension)) return true;
+        }
+        return false;
+    }
 
 }
