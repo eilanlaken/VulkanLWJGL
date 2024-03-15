@@ -5,21 +5,21 @@ import org.example.engine.core.assets.AssetUtils;
 
 import java.io.File;
 
-public class TextureMapGenerator {
+public class TexturePacker {
 
     // TODO: implement
-    public static TextureMap packDirectory(final Options options, final String directory) {
+    public static TexturePack packDirectory(final Options options, final String directory) {
 
-        return new TextureMap(null, null, null);
+        return new TexturePack(null, null, null);
     }
 
     // TODO: implement
-    public static TextureMap packTextures(final Options options, final String ...texturePaths) {
+    public static TexturePack packTextures(final Options options, final String ...texturePaths) {
 
-        return new TextureMap(null, null, null);
+        return new TexturePack(null, null, null);
     }
 
-    public static TextureMap packDirectory(final String outputName, final String directory, final boolean recursive) {
+    public static TexturePack packDirectory(final String outputName, final String directory, final boolean recursive) {
         if (directory == null) throw new IllegalArgumentException("Must provide valid directory name");
         if (!AssetUtils.directoryExists(directory)) throw new IllegalArgumentException("The provided path: " + directory + " does not exist, or is not a directory");
 
@@ -27,12 +27,12 @@ public class TextureMapGenerator {
         Options options = new Options();
         options.outputName = outputName;
 
-        return new TextureMap(null, null, null);
+        return new TexturePack(null, null, null);
     }
 
-    public static TextureMap packTextures(final String outputName, final String ...texturePaths) {
+    public static TexturePack packTextures(final String outputName, final String ...texturePaths) {
 
-        return new TextureMap(null, null, null);
+        return new TexturePack(null, null, null);
     }
 
     private static boolean alreadyPacked(final Options options, final String ...texturePaths) {
