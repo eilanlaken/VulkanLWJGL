@@ -3,6 +3,7 @@ package org.example;
 import org.example.engine.core.application.Application;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.graphics.TexturePacker;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.game.ScreenLoading;
 import org.lwjgl.stb.STBRPContext;
@@ -22,10 +23,14 @@ import java.nio.FloatBuffer;
 public class Main {
 
     public static void main(String[] args) {
+        estimateSize();
 
-        pack();
-        copy();
-        trim();
+        TexturePacker.Options options = new TexturePacker.Options("assets/atlases", "output");
+        try {
+            TexturePacker.packTextures(options, "assets/textures/yellowSquare.png", "assets/textures/pinkSpot.png");
+
+        } catch (Exception e) {
+        }
 //        WindowAttributes config = new WindowAttributes();
 //        Application.createSingleWindowApplication(config);
 //        Application.launch(new ScreenLoading());
@@ -33,8 +38,8 @@ public class Main {
 
     private static void estimateSize() {
         boolean packed = false;
-        int contextWidth = 2;
-        int contextHeight = 2;
+        int contextWidth = 128;
+        int contextHeight = 128;
         while (!packed) {
             STBRPContext context = STBRPContext.create();
             STBRPNode.Buffer nodes = STBRPNode.create(contextWidth); // Number of nodes can be context width
@@ -42,13 +47,21 @@ public class Main {
 
             // Populate your rects here based on current textures
             STBRPRect.Buffer rects = STBRPRect.create(5);
-            // Initialize rects...
-            context.free();
+            for (int i = 0; i < rects.capacity(); i++) {
+                rects.position(i);
+                rects.id(i);
+                rects.w(1280);
+                rects.h(720);
+            }
+            rects.position(0);
+
             if (STBRectPack.stbrp_pack_rects(context, rects) != 0) {
+                System.out.println("ok");
                 packed = true;
                 // Proceed with using the packed rects
             } else {
                 // Increase context size and try again
+                System.out.println("not packed");
                 contextWidth *= 2;
                 contextHeight *= 2;
             }

@@ -11,20 +11,13 @@ import java.util.Map;
 
 public class TexturePacker {
 
-    // TODO: implement
-    public static void packDirectory(final Options options, final String directory) {
+    public static synchronized void packDirectory(final Options options, final String directory) {
 
     }
-
-    // TODO: implement
-
-    public static void packDirectory(final String outputName, final String directory, final boolean recursive) {
+    public static synchronized void packDirectory(final String outputName, final String directory, final boolean recursive) {
         if (directory == null) throw new IllegalArgumentException("Must provide non-null directory name.");
         if (!AssetUtils.directoryExists(directory)) throw new IllegalArgumentException("The provided path: " + directory + " does not exist, or is not a directory");
-
-
     }
-
     public static synchronized void packTextures(final String directory, final String outputName, final String ...texturePaths) throws IOException {
         final Options options = new Options(directory, outputName);
         packTextures(options, texturePaths);
@@ -40,10 +33,13 @@ public class TexturePacker {
             packedRegionsData[i] = getPackedRegionData(options, texturePath, sourceImage);
         }
         Arrays.sort(packedRegionsData);
+        for (PackedRegionData regionData : packedRegionsData) {
+            System.out.println(regionData.texturePath + ": " + regionData.offsetX);
+        }
     }
 
     // TODO: implement? This can cause major slowdowns.
-    private static boolean areIdentical(BufferedImage a, BufferedImage b) {
+    private static synchronized boolean areIdentical(BufferedImage a, BufferedImage b) {
 
         return false;
     }
@@ -71,10 +67,10 @@ public class TexturePacker {
         int packedHeight = maxY - minY + 1 + options.extrude + options.padding;
         int offsetX = minX;
         int offsetY = minY;
-        return new PackedRegionData(sourceImage,path,packedWidth,packedHeight,offsetX,offsetY);
+        return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY);
     }
 
-    private static synchronized void generateMapFile() {
+    private static synchronized void generateMapFile(final Options options, PackedRegionData[] regionsData) {
 
     }
 
@@ -88,7 +84,7 @@ public class TexturePacker {
     }
 
     // TODO: implement.
-    private static boolean alreadyPacked(final Options options, final String ...texturePaths) {
+    private static synchronized boolean alreadyPacked(final Options options, final String ...texturePaths) {
         final String outputDirectory = options.outputDirectory;
         // check if the output directory or the texture map file is missing
         if (!AssetUtils.directoryExists(outputDirectory)) return false;
@@ -136,6 +132,7 @@ public class TexturePacker {
         public int compareTo(PackedRegionData o) {
             return Integer.compare(this.totalPixels, o.totalPixels);
         }
+
     }
 
     public static final class Options {
@@ -158,14 +155,14 @@ public class TexturePacker {
         public Options(String outputDirectory, String outputName, TextureParamFilter magFilter, TextureParamFilter minFilter, TextureParamWrap uWrap, TextureParamWrap vWrap, int extrude, int padding, int maxTextureWidth, int maxTextureHeight) {
             this.outputDirectory = outputDirectory;
             this.outputName = outputName;
-            this.magFilter = magFilter;
-            this.minFilter = minFilter;
-            this.uWrap = uWrap;
-            this.vWrap = vWrap;
-            this.extrude = extrude;
-            this.padding = padding;
-            this.maxTextureWidth = maxTextureWidth;
-            this.maxTextureHeight = maxTextureHeight;
+            this.magFilter = magFilter == null ? TextureParamFilter.MIP_MAP_NEAREST_NEAREST : magFilter;
+            this.minFilter = minFilter == null ? TextureParamFilter.MIP_MAP_NEAREST_NEAREST : minFilter;
+            this.uWrap = uWrap == null ? TextureParamWrap.CLAMP_TO_EDGE : uWrap;
+            this.vWrap = vWrap == null ? TextureParamWrap.CLAMP_TO_EDGE : vWrap;
+            this.extrude = Math.max(extrude, 0);
+            this.padding = Math.max(padding, 0);
+            this.maxTextureWidth = Math.min(Math.max(maxTextureWidth, 1), GraphicsUtils.getMaxTextureSize() / 4);
+            this.maxTextureHeight = Math.min(Math.max(maxTextureHeight, 1), GraphicsUtils.getMaxTextureSize() / 4);
         }
 
     }
