@@ -16,9 +16,6 @@ import java.util.Map;
 
 public class TexturePacker {
 
-    public static synchronized void packDirectory(final TexturePackerOptions options, final String directory) {
-
-    }
     public static synchronized void packDirectory(final String outputName, final String directory, final boolean recursive) {
         if (directory == null) throw new IllegalArgumentException("Must provide non-null directory name.");
         if (!AssetUtils.directoryExists(directory)) throw new IllegalArgumentException("The provided path: " + directory + " does not exist, or is not a directory");
@@ -36,7 +33,7 @@ public class TexturePacker {
             File sourceImageFile = new File(texturePath);
             BufferedImage sourceImage = ImageIO.read(sourceImageFile);
             PackedRegionData regionData = getPackedRegionData(options, texturePath, sourceImage);
-            if (regionData.packedWidth > options.textureSize || regionData.packedHeight > options.textureSize) throw new IOException("Input texture file: " + regionData.texturePath + " cannot be packed - it's dimensions are bigger than the allowed maximum: width = " + regionData.packedWidth + ", height: " + regionData.packedHeight + ", maximum: " + options.textureSize + ".");
+            if (regionData.packedWidth > options.maxTexturesSize || regionData.packedHeight > options.maxTexturesSize) throw new IOException("Input texture file: " + regionData.texturePath + " cannot be packed - it's dimensions are bigger than the allowed maximum: width = " + regionData.packedWidth + ", height: " + regionData.packedHeight + ", maximum: " + options.maxTexturesSize + ".");
             regionsData.add(regionData);
         }
         regionsData.sort();
@@ -49,10 +46,7 @@ public class TexturePacker {
         }
         // print:
         for (Map.Entry<BufferedImage, Array<PackedRegionData>> entry : texturePack.entrySet()) {
-            Array<PackedRegionData> values = entry.getValue();
-            for (PackedRegionData data : values) {
-                System.out.println(data.x);
-            }
+            System.out.println(entry.getKey().getWidth());
         }
     }
 
@@ -60,7 +54,7 @@ public class TexturePacker {
         if (last < 0) return true;
         int size = 1;
         System.out.println("last: " + last);
-        while (size <= options.textureSize) {
+        while (size <= options.maxTexturesSize) {
             System.out.println(remaining.size + ": " + "<" + size + ">");
             STBRPContext context = STBRPContext.create();
             STBRPNode.Buffer nodes = STBRPNode.create(size); // Number of nodes can be context width

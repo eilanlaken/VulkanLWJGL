@@ -19,7 +19,7 @@ public class Main {
         try {
             TexturePackerOptions options = new TexturePackerOptions("assets/atlases", "assets/textures/pinkSpot.png",
                     null, null, null, null,
-                    1,3, TexturePackerOptions.Size.MEDIUM);
+                    1,3, TexturePackerOptions.Size.SMALL_512);
             TexturePacker.packTextures(options, "assets/textures/pinkSpot.png", "assets/textures/yellowSquare.png", "assets/textures/yellowSquare2.png");
         } catch (Exception e) {
             e.printStackTrace();
