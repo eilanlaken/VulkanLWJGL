@@ -1,11 +1,7 @@
 package org.example;
 
-import org.example.engine.core.application.Application;
-import org.example.engine.core.assets.AssetUtils;
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.TexturePacker;
-import org.example.engine.core.graphics.WindowAttributes;
-import org.example.game.ScreenLoading;
+import org.example.engine.core.graphics.TexturePackerOptions;
 import org.lwjgl.stb.STBRPContext;
 import org.lwjgl.stb.STBRPNode;
 import org.lwjgl.stb.STBRPRect;
@@ -16,21 +12,19 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 
 public class Main {
 
     public static void main(String[] args) {
-        //estimateSize();
-        pack();
-        TexturePacker.Options options = new TexturePacker.Options("assets/atlases", "output");
         try {
-            TexturePacker.packTextures(options, "assets/textures/yellowSquare.png", "assets/textures/pinkSpot.png");
-
+            TexturePackerOptions options = new TexturePackerOptions("assets/atlases", "assets/textures/pinkSpot.png",
+                    null, null, null, null,
+                    1,3, TexturePackerOptions.Size.MEDIUM);
+            TexturePacker.packTextures(options, "assets/textures/pinkSpot.png", "assets/textures/yellowSquare.png", "assets/textures/yellowSquare2.png");
         } catch (Exception e) {
+            e.printStackTrace();
         }
+
 //        WindowAttributes config = new WindowAttributes();
 //        Application.createSingleWindowApplication(config);
 //        Application.launch(new ScreenLoading());

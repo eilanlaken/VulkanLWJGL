@@ -9,11 +9,11 @@ import java.util.HashMap;
 public class TexturePack {
 
     protected final Texture[] textures;
-    protected final TexturePacker.Options options;
+    protected final TexturePackerOptions options;
     protected final HashMap<String, TexturePackRegion> namedRegions;
     protected final HashMap<String, TexturePackRegion[]> namedAnimations;
 
-    protected TexturePack(final Texture[] textures, final TexturePacker.Options options, final HashMap<String, TexturePackRegion> namedRegions, final HashMap<String, TexturePackRegion[]> namedAnimations) {
+    protected TexturePack(final Texture[] textures, final TexturePackerOptions options, final HashMap<String, TexturePackRegion> namedRegions, final HashMap<String, TexturePackRegion[]> namedAnimations) {
         this.textures = textures;
         this.options = options;
         this.namedRegions = namedRegions;

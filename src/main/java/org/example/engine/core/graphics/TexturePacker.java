@@ -2,19 +2,21 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.collections.Array;
+import org.lwjgl.stb.STBRPContext;
+import org.lwjgl.stb.STBRPNode;
 import org.lwjgl.stb.STBRPRect;
+import org.lwjgl.stb.STBRectPack;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class TexturePacker {
 
-    public static synchronized void packDirectory(final Options options, final String directory) {
+    public static synchronized void packDirectory(final TexturePackerOptions options, final String directory) {
 
     }
     public static synchronized void packDirectory(final String outputName, final String directory, final boolean recursive) {
@@ -22,52 +24,82 @@ public class TexturePacker {
         if (!AssetUtils.directoryExists(directory)) throw new IllegalArgumentException("The provided path: " + directory + " does not exist, or is not a directory");
     }
     public static synchronized void packTextures(final String directory, final String outputName, final String ...texturePaths) throws IOException {
-        final Options options = new Options(directory, outputName);
+        final TexturePackerOptions options = new TexturePackerOptions(directory, outputName);
         packTextures(options, texturePaths);
     }
 
-    public static synchronized void packTextures(final Options options, final String ...texturePaths) throws IOException {
+    public static synchronized void packTextures(final TexturePackerOptions options, final String ...texturePaths) throws IOException {
         if (alreadyPacked(options, texturePaths)) return;
-        PackedRegionData[] packedRegionsData = new PackedRegionData[texturePaths.length];
+        Array<PackedRegionData> regionsData = new Array<>(texturePaths.length);
         for (int i = 0; i < texturePaths.length; i++) {
             String texturePath = texturePaths[i];
             File sourceImageFile = new File(texturePath);
             BufferedImage sourceImage = ImageIO.read(sourceImageFile);
-            packedRegionsData[i] = getPackedRegionData(options, texturePath, sourceImage);
+            PackedRegionData regionData = getPackedRegionData(options, texturePath, sourceImage);
+            if (regionData.packedWidth > options.textureSize || regionData.packedHeight > options.textureSize) throw new IOException("Input texture file: " + regionData.texturePath + " cannot be packed - it's dimensions are bigger than the allowed maximum: width = " + regionData.packedWidth + ", height: " + regionData.packedHeight + ", maximum: " + options.textureSize + ".");
+            regionsData.add(regionData);
         }
-        Arrays.sort(packedRegionsData);
-        try (STBRPRect.Buffer rects = STBRPRect.create(packedRegionsData.length)) {
+        regionsData.sort();
+
+        Map<BufferedImage, Array<PackedRegionData>> texturePack = new HashMap<>();
+        while (regionsData.size > 0) {
+            System.out.println("size: " + regionsData.size);
+            int last = regionsData.size - 1;
+            while (!pack(options, texturePack, regionsData, last)) last--;
+        }
+        // print:
+        for (Map.Entry<BufferedImage, Array<PackedRegionData>> entry : texturePack.entrySet()) {
+            Array<PackedRegionData> values = entry.getValue();
+            for (PackedRegionData data : values) {
+                System.out.println(data.x);
+            }
+        }
+    }
+
+    private static synchronized boolean pack(TexturePackerOptions options, Map<BufferedImage, Array<PackedRegionData>> texturePack, Array<PackedRegionData> remaining, int last) {
+        if (last < 0) return true;
+        int size = 1;
+        System.out.println("last: " + last);
+        while (size <= options.textureSize) {
+            System.out.println(remaining.size + ": " + "<" + size + ">");
+            STBRPContext context = STBRPContext.create();
+            STBRPNode.Buffer nodes = STBRPNode.create(size); // Number of nodes can be context width
+            STBRectPack.stbrp_init_target(context, size, size, nodes);
+            STBRPRect.Buffer rects = STBRPRect.create(last + 1);
             for (int i = 0; i < rects.capacity(); i++) {
                 rects.position(i);
                 rects.id(i);
-                rects.w(packedRegionsData[i].packedWidth);
-                rects.h(packedRegionsData[i].packedHeight);
+                rects.w(remaining.get(i).packedWidth);
+                rects.h(remaining.get(i).packedHeight);
             }
             rects.position(0);
-            // the rectangles are sorted from the smallest area to the biggest
+            int result = STBRectPack.stbrp_pack_rects(context, rects);
+            if (result != 0) {
+                System.out.println("packed!");
+                BufferedImage bufferedImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                Array<PackedRegionData> regionsData = new Array<>();
+                rects.position(0);
+                for (int i = 0; i < rects.capacity(); i++) {
+                    rects.position(i);
+                    PackedRegionData item = remaining.get(i);
+                    item.x = rects.x();
+                    item.y = rects.y();
+                    regionsData.add(item);
+                }
+                texturePack.put(bufferedImage, regionsData);
+                remaining.removeAll(regionsData, true);
+                return true;
+            } else {
+                size *= 2;
+            }
         }
-    }
-
-    private static synchronized void createPack(
-            Map<BufferedImage, Array<PackedRegionData>> textureRegionsMap,
-            PackedRegionData[] regions,
-            int offset) {
-        if (offset >= regions.length) return;
-        boolean packed = false;
-        int contextWidth = 1;
-        int contextHeight = 1;
-        while (!packed) {
-
-        }
-    }
-
-    // TODO: implement? This can cause major slowdowns.
-    private static synchronized boolean areIdentical(BufferedImage a, BufferedImage b) {
-
         return false;
     }
 
-    private static synchronized PackedRegionData getPackedRegionData(final Options options, final String path, final BufferedImage sourceImage) {
+    // TODO: implement? This can cause major slowdowns.
+    private static synchronized boolean areIdentical(BufferedImage a, BufferedImage b) { return false; }
+
+    private static synchronized PackedRegionData getPackedRegionData(final TexturePackerOptions options, final String path, final BufferedImage sourceImage) {
         int originalWidth = sourceImage.getWidth();
         int originalHeight = sourceImage.getHeight();
         int minX = originalWidth;
@@ -93,16 +125,16 @@ public class TexturePacker {
         return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY);
     }
 
-    private static synchronized void generateMapFile(final Options options, PackedRegionData[] regionsData) {
+    private static synchronized void generatePackFile(final TexturePackerOptions options, PackedRegionData[] regionsData) {
 
     }
 
-    private static synchronized void generateMapTextures(final Options options, Map<BufferedImage, PackedRegionData[]> partition) {
+    private static synchronized void generatePackTextureFiles(final TexturePackerOptions options, Map<BufferedImage, PackedRegionData[]> partition) {
 
     }
 
     // TODO: implement.
-    private static synchronized boolean alreadyPacked(final Options options, final String ...texturePaths) {
+    private static synchronized boolean alreadyPacked(final TexturePackerOptions options, final String ...texturePaths) {
         final String outputDirectory = options.outputDirectory;
         // check if the output directory or the texture map file is missing
         if (!AssetUtils.directoryExists(outputDirectory)) return false;
@@ -149,38 +181,6 @@ public class TexturePacker {
         @Override
         public int compareTo(PackedRegionData o) {
             return Integer.compare(o.area, this.area);
-        }
-
-    }
-
-    public static final class Options {
-
-        public final String outputDirectory;
-        public final String outputName;
-        public final TextureParamFilter magFilter;
-        public final TextureParamFilter minFilter;
-        public final TextureParamWrap uWrap;
-        public final TextureParamWrap vWrap;
-        public final int extrude; // extrude REPEATS the border i.e. adding colors.
-        public final int padding;
-        public final int maxTextureWidth;
-        public final int maxTextureHeight;
-
-        public Options(String outputDirectory, String outputName) {
-            this(outputDirectory, outputName, TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE, 1,1, GraphicsUtils.getMaxTextureSize() / 4, GraphicsUtils.getMaxTextureSize() / 4);
-        }
-
-        public Options(String outputDirectory, String outputName, TextureParamFilter magFilter, TextureParamFilter minFilter, TextureParamWrap uWrap, TextureParamWrap vWrap, int extrude, int padding, int maxTextureWidth, int maxTextureHeight) {
-            this.outputDirectory = outputDirectory;
-            this.outputName = outputName;
-            this.magFilter = magFilter == null ? TextureParamFilter.MIP_MAP_NEAREST_NEAREST : magFilter;
-            this.minFilter = minFilter == null ? TextureParamFilter.MIP_MAP_NEAREST_NEAREST : minFilter;
-            this.uWrap = uWrap == null ? TextureParamWrap.CLAMP_TO_EDGE : uWrap;
-            this.vWrap = vWrap == null ? TextureParamWrap.CLAMP_TO_EDGE : vWrap;
-            this.extrude = Math.max(extrude, 0);
-            this.padding = Math.max(padding, 0);
-            this.maxTextureWidth = Math.min(Math.max(maxTextureWidth, 1), GraphicsUtils.getMaxTextureSize() / 4);
-            this.maxTextureHeight = Math.min(Math.max(maxTextureHeight, 1), GraphicsUtils.getMaxTextureSize() / 4);
         }
 
     }
