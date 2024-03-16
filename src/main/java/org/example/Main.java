@@ -23,8 +23,8 @@ import java.nio.FloatBuffer;
 public class Main {
 
     public static void main(String[] args) {
-        estimateSize();
-
+        //estimateSize();
+        pack();
         TexturePacker.Options options = new TexturePacker.Options("assets/atlases", "output");
         try {
             TexturePacker.packTextures(options, "assets/textures/yellowSquare.png", "assets/textures/pinkSpot.png");
@@ -85,14 +85,13 @@ public class Main {
             rects.h(720);
         }
         rects.position(0);
-
         int result = STBRectPack.stbrp_pack_rects(context, rects);
         if (result == 0) System.out.println("packing failed.");
         else {
             // interpret the result
             for (int i = 0; i < rects.capacity(); i++) {
                 STBRPRect rect = rects.get(i);
-                System.out.println("Rectangle " + rect.id() + ": <" + rect.x() + ", " + rect.y() + ">.");
+                System.out.println("Rectangle " + rect.id() + ": <" + rect.x() + ", " + rect.y() + ">." + " packed? " + rect.was_packed());
             }
         }
     }

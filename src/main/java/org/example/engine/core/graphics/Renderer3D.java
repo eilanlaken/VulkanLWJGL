@@ -10,13 +10,11 @@ import org.lwjgl.opengl.GL30;
 // TODO: improve to handle whatever.
 public class Renderer3D {
 
-    public final RendererFixedPipelineParamSetter paramSetter;
     private boolean drawing;
     private ShaderProgram currentShader;
     private Camera camera;
 
     public Renderer3D() {
-        this.paramSetter = new RendererFixedPipelineParamSetter();
         this.drawing = false;
     }
 

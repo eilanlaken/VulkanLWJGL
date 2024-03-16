@@ -1,12 +1,15 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.assets.AssetUtils;
+import org.example.engine.core.collections.Array;
+import org.lwjgl.stb.STBRPRect;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 public class TexturePacker {
@@ -33,8 +36,28 @@ public class TexturePacker {
             packedRegionsData[i] = getPackedRegionData(options, texturePath, sourceImage);
         }
         Arrays.sort(packedRegionsData);
-        for (PackedRegionData regionData : packedRegionsData) {
-            System.out.println(regionData.texturePath + ": " + regionData.offsetX);
+        try (STBRPRect.Buffer rects = STBRPRect.create(packedRegionsData.length)) {
+            for (int i = 0; i < rects.capacity(); i++) {
+                rects.position(i);
+                rects.id(i);
+                rects.w(packedRegionsData[i].packedWidth);
+                rects.h(packedRegionsData[i].packedHeight);
+            }
+            rects.position(0);
+            // the rectangles are sorted from the smallest area to the biggest
+        }
+    }
+
+    private static synchronized void createPack(
+            Map<BufferedImage, Array<PackedRegionData>> textureRegionsMap,
+            PackedRegionData[] regions,
+            int offset) {
+        if (offset >= regions.length) return;
+        boolean packed = false;
+        int contextWidth = 1;
+        int contextHeight = 1;
+        while (!packed) {
+
         }
     }
 
@@ -78,11 +101,6 @@ public class TexturePacker {
 
     }
 
-    private static synchronized Map<BufferedImage, PackedRegionData[]> getPartition(PackedRegionData[] allRegions, int fromIndex) {
-
-        return null;
-    }
-
     // TODO: implement.
     private static synchronized boolean alreadyPacked(final Options options, final String ...texturePaths) {
         final String outputDirectory = options.outputDirectory;
@@ -110,7 +128,7 @@ public class TexturePacker {
         private final int packedHeight;
         private final int offsetX;
         private final int offsetY;
-        private final int totalPixels;
+        private final int area;
 
         private int x;
         private int y;
@@ -123,14 +141,14 @@ public class TexturePacker {
             this.originalHeight = sourceImage.getHeight();
             this.packedWidth = packedWidth;
             this.packedHeight = packedHeight;
-            this.totalPixels = packedWidth * packedHeight;
+            this.area = packedWidth * packedHeight;
             this.offsetX = offsetX;
             this.offsetY = offsetY;
         }
 
         @Override
         public int compareTo(PackedRegionData o) {
-            return Integer.compare(this.totalPixels, o.totalPixels);
+            return Integer.compare(o.area, this.area);
         }
 
     }

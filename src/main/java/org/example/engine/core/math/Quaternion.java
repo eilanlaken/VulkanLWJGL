@@ -17,18 +17,18 @@ public class Quaternion {
      * @param y The y-component
      * @param z The z-component
      * @param w The w-component */
-    public Quaternion (float x, float y, float z, float w) {
+    public Quaternion(float x, float y, float z, float w) {
         this.set(x, y, z, w);
     }
 
-    public Quaternion () {
+    public Quaternion() {
         idt();
     }
 
     /** Constructor, sets the quaternion components from the given quaternion.
      *
      * @param quaternion The quaternion to copy. */
-    public Quaternion (Quaternion quaternion) {
+    public Quaternion(Quaternion quaternion) {
         this.set(quaternion);
     }
 
@@ -36,7 +36,7 @@ public class Quaternion {
      *
      * @param axis The axis
      * @param angle The angle in degrees. */
-    public Quaternion (Vector3 axis, float angle) {
+    public Quaternion(Vector3 axis, float angle) {
         this.set(axis, angle);
     }
 
@@ -46,7 +46,7 @@ public class Quaternion {
      * @param z The z-component
      * @param w The w-component
      * @return This quaternion for chaining */
-    public Quaternion set (float x, float y, float z, float w) {
+    public Quaternion set(float x, float y, float z, float w) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -57,7 +57,7 @@ public class Quaternion {
     /** Sets the quaternion components from the given quaternion.
      * @param quaternion The quaternion.
      * @return This quaternion for chaining. */
-    public Quaternion set (Quaternion quaternion) {
+    public Quaternion set(Quaternion quaternion) {
         return this.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
     }
 
@@ -66,12 +66,12 @@ public class Quaternion {
      * @param axis The axis
      * @param angle The angle in degrees
      * @return This quaternion for chaining. */
-    public Quaternion set (Vector3 axis, float angle) {
+    public Quaternion set(Vector3 axis, float angle) {
         return setFromAxis(axis.x, axis.y, axis.z, angle);
     }
 
     /** @return a copy of this quaternion */
-    public Quaternion cpy () {
+    public Quaternion cpy() {
         return new Quaternion(this);
     }
 
@@ -81,21 +81,21 @@ public class Quaternion {
     }
 
     /** @return the euclidean length of this quaternion */
-    public float len () {
+    public float len() {
         return (float)Math.sqrt(x * x + y * y + z * z + w * w);
     }
 
     @Override
-    public String toString () {
+    public String toString() {
         return "[" + x + "|" + y + "|" + z + "|" + w + "]";
     }
 
     /** Sets the quaternion to the given euler angles in degrees.
-     * @param yaw the rotation around the y axis in degrees
-     * @param pitch the rotation around the x axis in degrees
+     * @param yaw the rotation around the y-axis in degrees
+     * @param pitch the rotation around the x-axis in degrees
      * @param roll the rotation around the z axis degrees
      * @return this quaternion */
-    public Quaternion setEulerAngles (float yaw, float pitch, float roll) {
+    public Quaternion setEulerAngles(float yaw, float pitch, float roll) {
         return setEulerAnglesRad(yaw * MathUtils.degreesToRadians, pitch * MathUtils.degreesToRadians,
                 roll * MathUtils.degreesToRadians);
     }
@@ -129,14 +129,14 @@ public class Quaternion {
 
     /** Get the pole of the gimbal lock, if any.
      * @return positive (+1) for north pole, negative (-1) for south pole, zero (0) when no gimbal lock */
-    public int getGimbalPole () {
+    public int getGimbalPole() {
         final float t = y * x + z * w;
         return t > 0.499f ? 1 : (t < -0.499f ? -1 : 0);
     }
 
     /** Get the roll euler angle in radians, which is the rotation around the z axis. Requires that this quaternion is normalized.
      * @return the rotation around the z axis in radians (between -PI and +PI) */
-    public float getRollRad () {
+    public float getRollRad() {
         final int pole = getGimbalPole();
         return pole == 0 ? MathUtils.atan2(2f * (w * z + y * x), 1f - 2f * (x * x + z * z))
                 : (float)pole * 2f * MathUtils.atan2(y, w);
@@ -144,47 +144,47 @@ public class Quaternion {
 
     /** Get the roll euler angle in degrees, which is the rotation around the z axis. Requires that this quaternion is normalized.
      * @return the rotation around the z axis in degrees (between -180 and +180) */
-    public float getRoll () {
+    public float getRoll() {
         return getRollRad() * MathUtils.radiansToDegrees;
     }
 
     /** Get the pitch euler angle in radians, which is the rotation around the x axis. Requires that this quaternion is normalized.
-     * @return the rotation around the x axis in radians (between -(PI/2) and +(PI/2)) */
-    public float getPitchRad () {
+     * @return the rotation around the x-axis in radians (between -(PI/2) and +(PI/2)) */
+    public float getPitchRad() {
         final int pole = getGimbalPole();
         return pole == 0 ? (float)Math.asin(MathUtils.clamp(2f * (w * x - z * y), -1f, 1f)) : (float)pole * MathUtils.PI * 0.5f;
     }
 
     /** Get the pitch euler angle in degrees, which is the rotation around the x axis. Requires that this quaternion is normalized.
-     * @return the rotation around the x axis in degrees (between -90 and +90) */
-    public float getPitch () {
+     * @return the rotation around the x-axis in degrees (between -90 and +90) */
+    public float getPitch() {
         return getPitchRad() * MathUtils.radiansToDegrees;
     }
 
     /** Get the yaw euler angle in radians, which is the rotation around the y axis. Requires that this quaternion is normalized.
-     * @return the rotation around the y axis in radians (between -PI and +PI) */
-    public float getYawRad () {
+     * @return the rotation around the y-axis in radians (between -PI and +PI) */
+    public float getYawRad() {
         return getGimbalPole() == 0 ? MathUtils.atan2(2f * (y * w + x * z), 1f - 2f * (y * y + x * x)) : 0f;
     }
 
     /** Get the yaw euler angle in degrees, which is the rotation around the y axis. Requires that this quaternion is normalized.
-     * @return the rotation around the y axis in degrees (between -180 and +180) */
-    public float getYaw () {
+     * @return the rotation around the y-axis in degrees (between -180 and +180) */
+    public float getYaw() {
         return getYawRad() * MathUtils.radiansToDegrees;
     }
 
-    public final static float len2 (final float x, final float y, final float z, final float w) {
+    public final static float len2(final float x, final float y, final float z, final float w) {
         return x * x + y * y + z * z + w * w;
     }
 
     /** @return the length of this quaternion without square root */
-    public float len2 () {
+    public float len2() {
         return x * x + y * y + z * z + w * w;
     }
 
     /** Normalizes this quaternion to unit length
      * @return the quaternion for chaining */
-    public Quaternion nor () {
+    public Quaternion nor() {
         float len2 = len2();
         if (len2 != 0.f && len2 != 1f) {
             final float len = (float)Math.sqrt(len2);
@@ -199,7 +199,7 @@ public class Quaternion {
     /** Conjugate the quaternion.
      *
      * @return This quaternion for chaining */
-    public Quaternion conjugate () {
+    public Quaternion conjugate() {
         x = -x;
         y = -y;
         z = -z;
@@ -210,7 +210,7 @@ public class Quaternion {
     /** Transforms the given vector using this quaternion
      *
      * @param v Vector to transform */
-    public Vector3 transform (Vector3 v) {
+    public Vector3 transform(Vector3 v) {
         tmp2.set(this);
         tmp2.conjugate();
         tmp2.mulLeft(tmp1.set(v.x, v.y, v.z, 0)).mulLeft(this);
@@ -225,7 +225,7 @@ public class Quaternion {
      *
      * @param other Quaternion to multiply with
      * @return This quaternion for chaining */
-    public Quaternion mul (final Quaternion other) {
+    public Quaternion mul(final Quaternion other) {
         final float newX = this.w * other.x + this.x * other.w + this.y * other.z - this.z * other.y;
         final float newY = this.w * other.y + this.y * other.w + this.z * other.x - this.x * other.z;
         final float newZ = this.w * other.z + this.z * other.w + this.x * other.y - this.y * other.x;
@@ -244,7 +244,7 @@ public class Quaternion {
      * @param z the z component of the other quaternion to multiply with
      * @param w the w component of the other quaternion to multiply with
      * @return This quaternion for chaining */
-    public Quaternion mul (final float x, final float y, final float z, final float w) {
+    public Quaternion mul(final float x, final float y, final float z, final float w) {
         final float newX = this.w * x + this.x * w + this.y * z - this.z * y;
         final float newY = this.w * y + this.y * w + this.z * x - this.x * z;
         final float newZ = this.w * z + this.z * w + this.x * y - this.y * x;
@@ -260,7 +260,7 @@ public class Quaternion {
      *
      * @param other Quaternion to multiply with
      * @return This quaternion for chaining */
-    public Quaternion mulLeft (Quaternion other) {
+    public Quaternion mulLeft(Quaternion other) {
         final float newX = other.w * this.x + other.x * this.w + other.y * this.z - other.z * this.y;
         final float newY = other.w * this.y + other.y * this.w + other.z * this.x - other.x * this.z;
         final float newZ = other.w * this.z + other.z * this.w + other.x * this.y - other.y * this.x;
@@ -279,7 +279,7 @@ public class Quaternion {
      * @param z the z component of the other quaternion to multiply with
      * @param w the w component of the other quaternion to multiply with
      * @return This quaternion for chaining */
-    public Quaternion mulLeft (final float x, final float y, final float z, final float w) {
+    public Quaternion mulLeft(final float x, final float y, final float z, final float w) {
         final float newX = w * this.x + x * this.w + y * this.z - z * this.y;
         final float newY = w * this.y + y * this.w + z * this.x - x * this.z;
         final float newZ = w * this.z + z * this.w + x * this.y - y * this.x;
@@ -292,7 +292,7 @@ public class Quaternion {
     }
 
     /** Add the x,y,z,w components of the passed in quaternion to the ones of this quaternion */
-    public Quaternion add (Quaternion quaternion) {
+    public Quaternion add(Quaternion quaternion) {
         this.x += quaternion.x;
         this.y += quaternion.y;
         this.z += quaternion.z;
@@ -301,7 +301,7 @@ public class Quaternion {
     }
 
     /** Add the x,y,z,w components of the passed in quaternion to the ones of this quaternion */
-    public Quaternion add (float qx, float qy, float qz, float qw) {
+    public Quaternion add(float qx, float qy, float qz, float qw) {
         this.x += qx;
         this.y += qy;
         this.z += qz;
@@ -314,7 +314,7 @@ public class Quaternion {
     /** Fills a 4x4 matrix with the rotation matrix represented by this quaternion.
      *
      * @param matrix Matrix to fill */
-    public void toMatrix (final float[] matrix) {
+    public void toMatrix(final float[] matrix) {
         final float xx = x * x;
         final float xy = x * y;
         final float xz = x * z;
@@ -350,7 +350,7 @@ public class Quaternion {
     }
 
     /** @return If this quaternion is an identity Quaternion */
-    public boolean isIdentity () {
+    public boolean isIdentity() {
         return x == 0 && y == 0 && z == 0 && w == 1f;
     }
 
@@ -367,7 +367,7 @@ public class Quaternion {
      * @param axis The axis
      * @param degrees The angle in degrees
      * @return This quaternion for chaining. */
-    public Quaternion setFromAxis (final Vector3 axis, final float degrees) {
+    public Quaternion setFromAxis(final Vector3 axis, final float degrees) {
         return setFromAxis(axis.x, axis.y, axis.z, degrees);
     }
 
@@ -376,7 +376,7 @@ public class Quaternion {
      * @param axis The axis
      * @param radians The angle in radians
      * @return This quaternion for chaining. */
-    public Quaternion setFromAxisRad (final Vector3 axis, final float radians) {
+    public Quaternion setFromAxisRad(final Vector3 axis, final float radians) {
         return setFromAxisRad(axis.x, axis.y, axis.z, radians);
     }
 
@@ -386,7 +386,7 @@ public class Quaternion {
      * @param z Z direction of the axis
      * @param degrees The angle in degrees
      * @return This quaternion for chaining. */
-    public Quaternion setFromAxis (final float x, final float y, final float z, final float degrees) {
+    public Quaternion setFromAxis(final float x, final float y, final float z, final float degrees) {
         return setFromAxisRad(x, y, z, degrees * MathUtils.degreesToRadians);
     }
 
@@ -396,7 +396,7 @@ public class Quaternion {
      * @param z Z direction of the axis
      * @param radians The angle in radians
      * @return This quaternion for chaining. */
-    public Quaternion setFromAxisRad (final float x, final float y, final float z, final float radians) {
+    public Quaternion setFromAxisRad(final float x, final float y, final float z, final float radians) {
         float d = Vector3.len(x, y, z);
         if (d == 0f) return idt();
         d = 1f / d;
@@ -407,14 +407,14 @@ public class Quaternion {
     }
 
     /** Sets the Quaternion from the given matrix, optionally removing any scaling. */
-    public Quaternion setFromMatrix (boolean normalizeAxes, Matrix4 matrix) {
+    public Quaternion setFromMatrix(boolean normalizeAxes, Matrix4 matrix) {
         return setFromAxes(normalizeAxes, matrix.val[Matrix4.M00], matrix.val[Matrix4.M01], matrix.val[Matrix4.M02],
                 matrix.val[Matrix4.M10], matrix.val[Matrix4.M11], matrix.val[Matrix4.M12], matrix.val[Matrix4.M20],
                 matrix.val[Matrix4.M21], matrix.val[Matrix4.M22]);
     }
 
     /** Sets the Quaternion from the given rotation matrix, which must not contain scaling. */
-    public Quaternion setFromMatrix (Matrix4 matrix) {
+    public Quaternion setFromMatrix(Matrix4 matrix) {
         return setFromMatrix(false, matrix);
     }
 
@@ -451,7 +451,7 @@ public class Quaternion {
      * @param zx z-axis x-coordinate
      * @param zy z-axis y-coordinate
      * @param zz z-axis z-coordinate */
-    public Quaternion setFromAxes (float xx, float xy, float xz, float yx, float yy, float yz, float zx, float zy, float zz) {
+    public Quaternion setFromAxes(float xx, float xy, float xz, float yx, float yy, float yz, float zx, float zy, float zz) {
         return setFromAxes(false, xx, xy, xz, yx, yy, yz, zx, zy, zz);
     }
 
@@ -475,7 +475,7 @@ public class Quaternion {
      * @param zx z-axis x-coordinate
      * @param zy z-axis y-coordinate
      * @param zz z-axis z-coordinate */
-    public Quaternion setFromAxes (boolean normalizeAxes, float xx, float xy, float xz, float yx, float yy, float yz, float zx,
+    public Quaternion setFromAxes(boolean normalizeAxes, float xx, float xy, float xz, float yx, float yy, float yz, float zx,
                                    float zy, float zz) {
         if (normalizeAxes) {
             final float lx = 1f / Vector3.len(xx, xy, xz);
@@ -533,7 +533,7 @@ public class Quaternion {
      * @param v1 The base vector, which should be normalized.
      * @param v2 The target vector, which should be normalized.
      * @return This quaternion for chaining */
-    public Quaternion setFromCross (final Vector3 v1, final Vector3 v2) {
+    public Quaternion setFromCross(final Vector3 v1, final Vector3 v2) {
         final float dot = MathUtils.clamp(v1.dot(v2), -1f, 1f);
         final float angle = (float)Math.acos(dot);
         return setFromAxisRad(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x, angle);
@@ -547,7 +547,7 @@ public class Quaternion {
      * @param y2 The target vector y value, which should be normalized.
      * @param z2 The target vector z value, which should be normalized.
      * @return This quaternion for chaining */
-    public Quaternion setFromCross (final float x1, final float y1, final float z1, final float x2, final float y2,
+    public Quaternion setFromCross(final float x1, final float y1, final float z1, final float x2, final float y2,
                                     final float z2) {
         final float dot = MathUtils.clamp(Vector3.dot(x1, y1, z1, x2, y2, z2), -1f, 1f);
         final float angle = (float)Math.acos(dot);
@@ -559,7 +559,7 @@ public class Quaternion {
      * @param end the end quaternion
      * @param alpha alpha in the range [0,1]
      * @return this quaternion for chaining */
-    public Quaternion slerp (Quaternion end, float alpha) {
+    public Quaternion slerp(Quaternion end, float alpha) {
         final float d = this.x * end.x + this.y * end.y + this.z * end.z + this.w * end.w;
         float absDot = d < 0.f ? -d : d;
 
@@ -597,7 +597,7 @@ public class Quaternion {
      * previously inside the elements of q. result = (q_1^w_1)*(q_2^w_2)* ... *(q_n^w_n) where w_i=1/n.
      * @param q List of quaternions
      * @return This quaternion for chaining */
-    public Quaternion slerp (Quaternion[] q) {
+    public Quaternion slerp(Quaternion[] q) {
 
         // Calculate exponents and multiply everything from left to right
         final float w = 1.0f / q.length;
@@ -614,7 +614,7 @@ public class Quaternion {
      * @param q List of quaternions
      * @param w List of weights
      * @return This quaternion for chaining */
-    public Quaternion slerp (Quaternion[] q, float[] w) {
+    public Quaternion slerp(Quaternion[] q, float[] w) {
 
         // Calculate exponents and multiply everything from left to right
         set(q[0]).exp(w[0]);
@@ -628,7 +628,7 @@ public class Quaternion {
      * http://en.wikipedia.org/wiki/Quaternion#Exponential.2C_logarithm.2C_and_power
      * @param alpha Exponent
      * @return This quaternion for chaining */
-    public Quaternion exp (float alpha) {
+    public Quaternion exp(float alpha) {
 
         // Calculate |q|^alpha
         float norm = len();
@@ -658,7 +658,7 @@ public class Quaternion {
     }
 
     @Override
-    public boolean equals (Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -685,7 +685,7 @@ public class Quaternion {
      * @param z2 the z component of the second quaternion
      * @param w2 the w component of the second quaternion
      * @return the dot product between the first and second quaternion. */
-    public final static float dot (final float x1, final float y1, final float z1, final float w1, final float x2, final float y2,
+    public final static float dot(final float x1, final float y1, final float z1, final float w1, final float x2, final float y2,
                                    final float z2, final float w2) {
         return x1 * x2 + y1 * y2 + z1 * z2 + w1 * w2;
     }
@@ -693,7 +693,7 @@ public class Quaternion {
     /** Get the dot product between this and the other quaternion (commutative).
      * @param other the other quaternion.
      * @return the dot product of this and the other quaternion. */
-    public float dot (final Quaternion other) {
+    public float dot(final Quaternion other) {
         return this.x * other.x + this.y * other.y + this.z * other.z + this.w * other.w;
     }
 
@@ -703,14 +703,14 @@ public class Quaternion {
      * @param z the z component of the other quaternion
      * @param w the w component of the other quaternion
      * @return the dot product of this and the other quaternion. */
-    public float dot (final float x, final float y, final float z, final float w) {
+    public float dot(final float x, final float y, final float z, final float w) {
         return this.x * x + this.y * y + this.z * z + this.w * w;
     }
 
     /** Multiplies the components of this quaternion with the given scalar.
      * @param scalar the scalar.
      * @return this quaternion for chaining. */
-    public Quaternion mul (float scalar) {
+    public Quaternion mul(float scalar) {
         this.x *= scalar;
         this.y *= scalar;
         this.z *= scalar;
@@ -729,7 +729,7 @@ public class Quaternion {
      * @return the angle in degrees
      * @see <a href="http://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation">wikipedia</a>
      * @see <a href="http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle">calculation</a> */
-    public float getAxisAngle (Vector3 axis) {
+    public float getAxisAngle(Vector3 axis) {
         return getAxisAngleRad(axis) * MathUtils.radiansToDegrees;
     }
 
@@ -744,7 +744,7 @@ public class Quaternion {
      * @return the angle in radians
      * @see <a href="http://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation">wikipedia</a>
      * @see <a href="http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle">calculation</a> */
-    public float getAxisAngleRad (Vector3 axis) {
+    public float getAxisAngleRad(Vector3 axis) {
         if (this.w > 1) this.nor(); // if w>1 acos and sqrt will produce errors, this cant happen if quaternion is normalised
         float angle = (float)(2.0 * Math.acos(this.w));
         double s = Math.sqrt(1 - this.w * this.w); // assuming quaternion normalised then w is less than 1, so term always positive.
@@ -766,14 +766,14 @@ public class Quaternion {
      * {@link #getAxisAngleRad(Vector3)} to get both the axis and the angle of this rotation. Use
      * {@link #getAngleAroundRad(Vector3)} to get the angle around a specific axis.
      * @return the angle in radians of the rotation */
-    public float getAngleRad () {
+    public float getAngleRad() {
         return (float)(2.0 * Math.acos((this.w > 1) ? (this.w / len()) : this.w));
     }
 
     /** Get the angle in degrees of the rotation this quaternion represents. Use {@link #getAxisAngle(Vector3)} to get both the
      * axis and the angle of this rotation. Use {@link #getAngleAround(Vector3)} to get the angle around a specific axis.
      * @return the angle in degrees of the rotation */
-    public float getAngle () {
+    public float getAngle() {
         return getAngleRad() * MathUtils.radiansToDegrees;
     }
 
@@ -789,7 +789,7 @@ public class Quaternion {
      * @param swing will receive the swing rotation: the rotation around an axis perpendicular to the specified axis
      * @param twist will receive the twist rotation: the rotation around the specified axis
      * @see <a href="http://www.euclideanspace.com/maths/geometry/rotations/for/decomposition">calculation</a> */
-    public void getSwingTwist (final float axisX, final float axisY, final float axisZ, final Quaternion swing,
+    public void getSwingTwist(final float axisX, final float axisY, final float axisZ, final Quaternion swing,
                                final Quaternion twist) {
         final float d = Vector3.dot(this.x, this.y, this.z, axisX, axisY, axisZ);
         twist.set(axisX * d, axisY * d, axisZ * d, this.w).nor();
@@ -807,7 +807,7 @@ public class Quaternion {
      * @param swing will receive the swing rotation: the rotation around an axis perpendicular to the specified axis
      * @param twist will receive the twist rotation: the rotation around the specified axis
      * @see <a href="http://www.euclideanspace.com/maths/geometry/rotations/for/decomposition">calculation</a> */
-    public void getSwingTwist (final Vector3 axis, final Quaternion swing, final Quaternion twist) {
+    public void getSwingTwist(final Vector3 axis, final Quaternion swing, final Quaternion twist) {
         getSwingTwist(axis.x, axis.y, axis.z, swing, twist);
     }
 
@@ -816,7 +816,7 @@ public class Quaternion {
      * @param axisY the y component of the normalized axis for which to get the angle
      * @param axisZ the z component of the normalized axis for which to get the angle
      * @return the angle in radians of the rotation around the specified axis */
-    public float getAngleAroundRad (final float axisX, final float axisY, final float axisZ) {
+    public float getAngleAroundRad(final float axisX, final float axisY, final float axisZ) {
         final float d = Vector3.dot(this.x, this.y, this.z, axisX, axisY, axisZ);
         final float l2 = Quaternion.len2(axisX * d, axisY * d, axisZ * d, this.w);
         return l2 == 0 ? 0f
@@ -826,7 +826,7 @@ public class Quaternion {
     /** Get the angle in radians of the rotation around the specified axis. The axis must be normalized.
      * @param axis the normalized axis for which to get the angle
      * @return the angle in radians of the rotation around the specified axis */
-    public float getAngleAroundRad (final Vector3 axis) {
+    public float getAngleAroundRad(final Vector3 axis) {
         return getAngleAroundRad(axis.x, axis.y, axis.z);
     }
 
@@ -835,14 +835,14 @@ public class Quaternion {
      * @param axisY the y component of the normalized axis for which to get the angle
      * @param axisZ the z component of the normalized axis for which to get the angle
      * @return the angle in degrees of the rotation around the specified axis */
-    public float getAngleAround (final float axisX, final float axisY, final float axisZ) {
+    public float getAngleAround(final float axisX, final float axisY, final float axisZ) {
         return getAngleAroundRad(axisX, axisY, axisZ) * MathUtils.radiansToDegrees;
     }
 
     /** Get the angle in degrees of the rotation around the specified axis. The axis must be normalized.
      * @param axis the normalized axis for which to get the angle
      * @return the angle in degrees of the rotation around the specified axis */
-    public float getAngleAround (final Vector3 axis) {
+    public float getAngleAround(final Vector3 axis) {
         return getAngleAround(axis.x, axis.y, axis.z);
     }
 
