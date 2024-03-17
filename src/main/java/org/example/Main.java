@@ -17,10 +17,12 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            TexturePackerOptions options = new TexturePackerOptions("assets/atlases", "assets/textures/pinkSpot.png",
+            TexturePackerOptions options = new TexturePackerOptions("assets/atlases", "pack",
                     null, null, null, null,
-                    1,3, TexturePackerOptions.Size.SMALL_512);
-            TexturePacker.packTextures(options, "assets/textures/pinkSpot.png", "assets/textures/yellowSquare.png", "assets/textures/yellowSquare2.png");
+                    0,0, TexturePackerOptions.Size.XX_LARGE_8192);
+            //TexturePacker.packTextures(options, "assets/textures/pinkSpot.png", "assets/textures/yellowSquare.png", "assets/textures/yellowSquare2.png");
+            TexturePacker.packTextures(options, "assets/textures/pattern.png");
+
         } catch (Exception e) {
             e.printStackTrace();
         }

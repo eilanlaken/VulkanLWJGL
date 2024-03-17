@@ -1,20 +1,44 @@
 package org.example.engine.core.graphics;
 
+import com.google.gson.Gson;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.collections.Array;
 import org.lwjgl.stb.STBRPContext;
 import org.lwjgl.stb.STBRPNode;
 import org.lwjgl.stb.STBRPRect;
 import org.lwjgl.stb.STBRectPack;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.introspector.Property;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.representer.Representer;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class TexturePacker {
+
+    // TODO: refactor the yaml and json to a higher level usage.
+    private static final Yaml yaml;
+    private static final Gson gson = new Gson();
+
+    static {
+        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Representer representer = new Representer(dumperOptions) {
+            @Override
+            protected MappingNode representJavaBean(Set<Property> properties, Object obj) {
+                if (!classTags.containsKey(obj.getClass())) addClassTag(obj.getClass(), Tag.MAP);
+                return super.representJavaBean(properties, obj);
+            }
+        };
+        yaml = new Yaml(representer);
+    }
 
     public static synchronized void packDirectory(final String outputName, final String directory, final boolean recursive) {
         if (directory == null) throw new IllegalArgumentException("Must provide non-null directory name.");
@@ -44,10 +68,16 @@ public class TexturePacker {
             int last = regionsData.size - 1;
             while (!pack(options, texturePack, regionsData, last)) last--;
         }
-        // print:
+
+        int i = 0;
         for (Map.Entry<BufferedImage, Array<PackedRegionData>> entry : texturePack.entrySet()) {
-            System.out.println(entry.getKey().getWidth());
+            Array<PackedRegionData> regions = entry.getValue();
+            for (PackedRegionData regionData : regions) regionData.textureIndex = i;
+            i++;
         }
+
+        generatePackFile(options, texturePack);
+        generatePackTextureFiles(options, texturePack);
     }
 
     private static synchronized boolean pack(TexturePackerOptions options, Map<BufferedImage, Array<PackedRegionData>> texturePack, Array<PackedRegionData> remaining, int last) {
@@ -90,9 +120,6 @@ public class TexturePacker {
         return false;
     }
 
-    // TODO: implement? This can cause major slowdowns.
-    private static synchronized boolean areIdentical(BufferedImage a, BufferedImage b) { return false; }
-
     private static synchronized PackedRegionData getPackedRegionData(final TexturePackerOptions options, final String path, final BufferedImage sourceImage) {
         int originalWidth = sourceImage.getWidth();
         int originalHeight = sourceImage.getHeight();
@@ -115,15 +142,48 @@ public class TexturePacker {
         int packedWidth = maxX - minX + 1 + options.extrude + options.padding;
         int packedHeight = maxY - minY + 1 + options.extrude + options.padding;
         int offsetX = minX;
-        int offsetY = minY;
+        int offsetY = originalHeight - packedHeight - minY;
+        System.out.println("orig: w, h: " + originalWidth + ", " + originalHeight);
+        System.out.println("packed: w, h: " + packedWidth + ", " + packedHeight);
+        System.out.println("offset x, y: " + offsetX + ", " + offsetY);
         return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY);
     }
 
-    private static synchronized void generatePackFile(final TexturePackerOptions options, PackedRegionData[] regionsData) {
+    private static synchronized void generatePackFile(final TexturePackerOptions options, Map<BufferedImage, Array<PackedRegionData>> texturePack) {
+        String outputName = options.outputName;
+        //Map<String, Object> texturesData = new LinkedHashMap<String, Object>();
+        //texturesData.put("k", new int[] {1,2,3});
+        TextureData[] texturesData = new TextureData[texturePack.size()];
+        int i = 0;
+        for (BufferedImage bufferedImage : texturePack.keySet()) {
+            texturesData[i] = new TextureData();
+            texturesData[i].file = outputName + "_" + i + ".png";
+            texturesData[i].width = bufferedImage.getWidth();
+            texturesData[i].height = bufferedImage.getHeight();
+        }
+        List<TextureData> list = List.of(texturesData);
 
+        Map<String, Object> optionsData = new LinkedHashMap<String, Object>();
+        optionsData.put("extrude", options.extrude);
+        optionsData.put("padding", options.padding);
+        optionsData.put("maxTextureSize", options.maxTexturesSize);
+        optionsData.put("magFilter", options.magFilter.name());
+        optionsData.put("minFilter", options.minFilter.name());
+        optionsData.put("uWrap", options.uWrap.name());
+        optionsData.put("vWrap", options.vWrap.name());
+
+
+        Map<String, Object> yamlData = new LinkedHashMap<String, Object>();
+
+        yamlData.put("textures", list);
+        yamlData.put("options", optionsData);
+
+
+        String s = yaml.dump(yamlData);
+        System.out.println(s);
     }
 
-    private static synchronized void generatePackTextureFiles(final TexturePackerOptions options, Map<BufferedImage, PackedRegionData[]> partition) {
+    private static synchronized void generatePackTextureFiles(final TexturePackerOptions options, Map<BufferedImage, Array<PackedRegionData>> texturePack) {
 
     }
 
@@ -179,5 +239,17 @@ public class TexturePacker {
 
     }
 
+    private static final class TextureData {
+        public String file;
+        public int width;
+        public int height;
+
+        @Override
+        public String toString() {
+            return "TextureData{"+"file="+file+
+                    ",width="+width+
+                    ",height="+height+"}";
+        }
+    }
 
 }
