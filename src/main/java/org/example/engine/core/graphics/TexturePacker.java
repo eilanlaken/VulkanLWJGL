@@ -11,7 +11,6 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 
@@ -57,30 +56,24 @@ public class TexturePacker {
             File sourceImageFile = new File(texturePath);
             BufferedImage sourceImage = ImageIO.read(sourceImageFile);
             PackedRegionData regionData = getPackedRegionData(options, texturePath, sourceImage);
-            if (regionData.packedWidth > options.maxTexturesSize || regionData.packedHeight > options.maxTexturesSize) throw new IOException("Input texture file: " + regionData.texturePath + " cannot be packed - it's dimensions are bigger than the allowed maximum: width = " + regionData.packedWidth + ", height: " + regionData.packedHeight + ", maximum: " + options.maxTexturesSize + ".");
+            if (regionData.packedWidth > options.maxTexturesSize || regionData.packedHeight > options.maxTexturesSize) throw new IOException("Input texture file: " + regionData.name + " cannot be packed - it's dimensions are bigger than the allowed maximum: width = " + regionData.packedWidth + ", height: " + regionData.packedHeight + ", maximum: " + options.maxTexturesSize + ".");
             regionsData.add(regionData);
         }
         regionsData.sort();
 
-        Map<BufferedImage, Array<PackedRegionData>> texturePack = new HashMap<>();
+        Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack = new HashMap<>();
+        int index = 0;
         while (regionsData.size > 0) {
-            System.out.println("size: " + regionsData.size);
             int last = regionsData.size - 1;
-            while (!pack(options, texturePack, regionsData, last)) last--;
-        }
-
-        int i = 0;
-        for (Map.Entry<BufferedImage, Array<PackedRegionData>> entry : texturePack.entrySet()) {
-            Array<PackedRegionData> regions = entry.getValue();
-            for (PackedRegionData regionData : regions) regionData.textureIndex = i;
-            i++;
+            while (!pack(options, texturePack, regionsData, last, index)) last--;
+            index++;
         }
 
         generatePackFile(options, texturePack);
         generatePackTextureFiles(options, texturePack);
     }
 
-    private static synchronized boolean pack(TexturePackerOptions options, Map<BufferedImage, Array<PackedRegionData>> texturePack, Array<PackedRegionData> remaining, int last) {
+    private static synchronized boolean pack(TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack, Array<PackedRegionData> remaining, int last, int currentImageIndex) {
         if (last < 0) return true;
         int size = 1;
         System.out.println("last: " + last);
@@ -100,7 +93,8 @@ public class TexturePacker {
             int result = STBRectPack.stbrp_pack_rects(context, rects);
             if (result != 0) {
                 System.out.println("packed!");
-                BufferedImage bufferedImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                //BufferedImage bufferedImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                IndexedBufferedImage bufferedImage = new IndexedBufferedImage(currentImageIndex, size, size);
                 Array<PackedRegionData> regionsData = new Array<>();
                 rects.position(0);
                 for (int i = 0; i < rects.capacity(); i++) {
@@ -108,6 +102,7 @@ public class TexturePacker {
                     PackedRegionData item = remaining.get(i);
                     item.x = rects.x();
                     item.y = rects.y();
+                    item.textureIndex = currentImageIndex;
                     regionsData.add(item);
                 }
                 texturePack.put(bufferedImage, regionsData);
@@ -149,21 +144,19 @@ public class TexturePacker {
         return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY);
     }
 
-    private static synchronized void generatePackFile(final TexturePackerOptions options, Map<BufferedImage, Array<PackedRegionData>> texturePack) {
+    private static synchronized void generatePackFile(final TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) {
         String outputName = options.outputName;
-        //Map<String, Object> texturesData = new LinkedHashMap<String, Object>();
-        //texturesData.put("k", new int[] {1,2,3});
         TextureData[] texturesData = new TextureData[texturePack.size()];
         int i = 0;
-        for (BufferedImage bufferedImage : texturePack.keySet()) {
+        for (IndexedBufferedImage img : texturePack.keySet()) {
             texturesData[i] = new TextureData();
-            texturesData[i].file = outputName + "_" + i + ".png";
-            texturesData[i].width = bufferedImage.getWidth();
-            texturesData[i].height = bufferedImage.getHeight();
+            texturesData[i].file = outputName + "_" + img.index + ".png";
+            texturesData[i].width = img.getWidth();
+            texturesData[i].height = img.getHeight();
         }
-        List<TextureData> list = List.of(texturesData);
 
-        Map<String, Object> optionsData = new LinkedHashMap<String, Object>();
+
+        Map<String, Object> optionsData = new HashMap<>();
         optionsData.put("extrude", options.extrude);
         optionsData.put("padding", options.padding);
         optionsData.put("maxTextureSize", options.maxTexturesSize);
@@ -172,18 +165,27 @@ public class TexturePacker {
         optionsData.put("uWrap", options.uWrap.name());
         optionsData.put("vWrap", options.vWrap.name());
 
+        Array<PackedRegionData> allRegions = new Array<>();
+        for (Map.Entry<IndexedBufferedImage, Array<PackedRegionData>> imageRegions : texturePack.entrySet()) {
+            allRegions.addAll(imageRegions.getValue());
+        }
+        allRegions.pack();
 
-        Map<String, Object> yamlData = new LinkedHashMap<String, Object>();
-
-        yamlData.put("textures", list);
+        Map<String, Object> yamlData = new HashMap<>();
+        yamlData.put("regions", allRegions.items);
         yamlData.put("options", optionsData);
+        yamlData.put("textures", texturesData);
 
-
-        String s = yaml.dump(yamlData);
-        System.out.println(s);
+        String content = yaml.dump(yamlData);
+        try {
+            AssetUtils.saveFile(options.outputDirectory, options.outputName + ".txp", content);
+        } catch (Exception e) {
+            // TODO: take care as part of the error handling branch
+            // ignored for now
+        }
     }
 
-    private static synchronized void generatePackTextureFiles(final TexturePackerOptions options, Map<BufferedImage, Array<PackedRegionData>> texturePack) {
+    private static synchronized void generatePackTextureFiles(final TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) {
 
     }
 
@@ -206,23 +208,21 @@ public class TexturePacker {
 
     private static final class PackedRegionData implements Comparable<PackedRegionData> {
 
-        private final BufferedImage sourceImage;
-        private final String texturePath;
-        private final int originalWidth;
-        private final int originalHeight;
-        private final int packedWidth;
-        private final int packedHeight;
-        private final int offsetX;
-        private final int offsetY;
+        public final String name;
+        public final int originalWidth;
+        public final int originalHeight;
+        public final int packedWidth;
+        public final int packedHeight;
+        public final int offsetX;
+        public final int offsetY;
+        public int x;
+        public int y;
+        public int textureIndex;
+
         private final int area;
 
-        private int x;
-        private int y;
-        private int textureIndex;
-
-        public PackedRegionData(BufferedImage sourceImage, String texturePath, int packedWidth, int packedHeight, int offsetX, int offsetY) {
-            this.sourceImage = sourceImage;
-            this.texturePath = texturePath;
+        public PackedRegionData(BufferedImage sourceImage, String name, int packedWidth, int packedHeight, int offsetX, int offsetY) {
+            this.name = name;
             this.originalWidth = sourceImage.getWidth();
             this.originalHeight = sourceImage.getHeight();
             this.packedWidth = packedWidth;
@@ -243,13 +243,17 @@ public class TexturePacker {
         public String file;
         public int width;
         public int height;
+    }
 
-        @Override
-        public String toString() {
-            return "TextureData{"+"file="+file+
-                    ",width="+width+
-                    ",height="+height+"}";
+    public static final class IndexedBufferedImage extends BufferedImage {
+
+        private int index;
+
+        private IndexedBufferedImage(int index, int width, int height) {
+            super(width, height, BufferedImage.TYPE_INT_ARGB);
+            this.index = index;
         }
+
     }
 
 }

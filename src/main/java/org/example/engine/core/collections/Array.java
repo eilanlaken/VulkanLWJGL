@@ -261,7 +261,7 @@ public class Array<T> implements Iterable<T> {
         size = 0;
     }
 
-    public T[] shrink() {
+    public T[] pack() {
         if (items.length != size) resize(size);
         return items;
     }

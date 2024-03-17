@@ -3,10 +3,7 @@ package org.example.engine.core.assets;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.Window;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -119,6 +116,23 @@ public final class AssetUtils {
             if (file.getName().endsWith(extension)) return true;
         }
         return false;
+    }
+
+    public static boolean saveFile(final String dirpath, final String filename, final String content) throws IOException {
+        if (!directoryExists(dirpath)) throw new IOException("Directory " + dirpath + " does not exist.");
+        String filePath = dirpath + File.separator + filename;
+        File file = new File(filePath);
+        boolean fileExists = file.exists();
+        try {
+            FileWriter fileWriter = new FileWriter(file, false);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(content);
+            bufferedWriter.close();
+            fileWriter.close();
+            return fileExists;
+        } catch (IOException e) {
+            throw e;
+        }
     }
 
 }
