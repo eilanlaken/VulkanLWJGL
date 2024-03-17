@@ -9,6 +9,8 @@ import org.lwjgl.opengl.GL30;
 
 import java.util.HashMap;
 
+// The Cherno:
+// https://github.com/TheCherno/Hazel/blob/master/Hazelnut/assets/shaders/Renderer2D_Quad.glsl
 public class Renderer2D implements Resource {
 
     private static final int BATCH_VERTICES_CAPACITY = 4000;

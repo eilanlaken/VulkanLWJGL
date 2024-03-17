@@ -1,7 +1,14 @@
 package org.example.engine.core.assets;
 
+import com.google.gson.Gson;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.Window;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.introspector.Property;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -10,11 +17,27 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
+import java.util.Set;
 
 public final class AssetUtils {
 
     private static boolean initialized = false;
     private static Window window;
+    public static final Yaml yaml;
+    public static final Gson gson;
+    static {
+        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Representer representer = new Representer(dumperOptions) {
+            @Override
+            protected MappingNode representJavaBean(Set<Property> properties, Object obj) {
+                if (!classTags.containsKey(obj.getClass())) addClassTag(obj.getClass(), Tag.MAP);
+                return super.representJavaBean(properties, obj);
+            }
+        };
+        yaml = new Yaml(representer);
+        gson = new Gson();
+    }
 
     public static void init(final Window window) {
         if (initialized) throw new IllegalStateException(AssetUtils.class.getSimpleName() + " instance already initialized.");

@@ -15,29 +15,13 @@ import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 public class TexturePacker {
-
-    // TODO: refactor the yaml and json to a higher level usage.
-    private static final Yaml yaml;
-    private static final Gson gson = new Gson();
-
-    static {
-        DumperOptions dumperOptions = new DumperOptions();
-        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        Representer representer = new Representer(dumperOptions) {
-            @Override
-            protected MappingNode representJavaBean(Set<Property> properties, Object obj) {
-                if (!classTags.containsKey(obj.getClass())) addClassTag(obj.getClass(), Tag.MAP);
-                return super.representJavaBean(properties, obj);
-            }
-        };
-        yaml = new Yaml(representer);
-    }
 
     public static synchronized void packDirectory(final String outputName, final String directory, final boolean recursive) {
         if (directory == null) throw new IllegalArgumentException("Must provide non-null directory name.");
@@ -100,8 +84,8 @@ public class TexturePacker {
                 for (int i = 0; i < rects.capacity(); i++) {
                     rects.position(i);
                     PackedRegionData item = remaining.get(i);
-                    item.x = rects.x();
-                    item.y = rects.y();
+                    item.x = rects.x() + options.extrude + options.padding;
+                    item.y = rects.y() + options.extrude + options.padding;
                     item.textureIndex = currentImageIndex;
                     regionsData.add(item);
                 }
@@ -134,8 +118,8 @@ public class TexturePacker {
                 }
             }
         }
-        int packedWidth = maxX - minX + 1 + options.extrude + options.padding;
-        int packedHeight = maxY - minY + 1 + options.extrude + options.padding;
+        int packedWidth = maxX - minX + 1;// + options.extrude + options.padding;
+        int packedHeight = maxY - minY + 1;// + options.extrude + options.padding;
         int offsetX = minX;
         int offsetY = originalHeight - packedHeight - minY;
         System.out.println("orig: w, h: " + originalWidth + ", " + originalHeight);
@@ -154,7 +138,6 @@ public class TexturePacker {
             texturesData[i].width = img.getWidth();
             texturesData[i].height = img.getHeight();
         }
-
 
         Map<String, Object> optionsData = new HashMap<>();
         optionsData.put("extrude", options.extrude);
@@ -176,7 +159,7 @@ public class TexturePacker {
         yamlData.put("options", optionsData);
         yamlData.put("textures", texturesData);
 
-        String content = yaml.dump(yamlData);
+        String content = AssetUtils.yaml.dump(yamlData);
         try {
             AssetUtils.saveFile(options.outputDirectory, options.outputName + ".txp", content);
         } catch (Exception e) {
@@ -185,8 +168,16 @@ public class TexturePacker {
         }
     }
 
-    private static synchronized void generatePackTextureFiles(final TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) {
+    private static synchronized void generatePackTextureFiles(final TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) throws IOException {
+        for (Map.Entry<IndexedBufferedImage, Array<PackedRegionData>> imageRegions : texturePack.entrySet()) {
+            BufferedImage texturePackImage = imageRegions.getKey();
+            Graphics2D graphics = texturePackImage.createGraphics();
+            for (PackedRegionData packedRegionData : imageRegions.getValue()) {
+                File sourceImageFile = new File(packedRegionData.name);
+                BufferedImage sourceImage = ImageIO.read(sourceImageFile);
 
+            }
+        }
     }
 
     // TODO: implement.
