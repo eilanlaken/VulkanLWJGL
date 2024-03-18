@@ -1,6 +1,7 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.ArrayFloat;
+import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Quaternion;
@@ -166,15 +167,14 @@ public class ShaderProgram implements Resource {
                 "\nIf you have defined the uniform but have not used it, the GLSL compiler discarded it.\n");
         final int type = uniformTypes.get(name, -1);
         switch (type) {
+
             case GL20.GL_SAMPLER_2D:
                 if (value instanceof Texture) {
-                    System.out.println("works 2");
                     Texture texture = (Texture) value;
                     int slot = TextureBinder.bindTexture(texture);
                     GL20.glUniform1i(location, slot);
                 } else if (value instanceof Iterable) {
                     Iterable<Texture> textures = (Iterable<Texture>) value;
-                    System.out.println("works it");
                     for (Texture texture : textures) {
                         int slot = TextureBinder.bindTexture(texture);
                         intBuffer.put(slot);
@@ -183,10 +183,40 @@ public class ShaderProgram implements Resource {
                     GL20.glUniform1iv(location, intBuffer);
                 } else if (value instanceof Texture[]) {
                     Texture[] textures = (Texture[]) value;
-                    System.out.println("works arr");
                     for (Texture texture : textures) {
                         int slot = TextureBinder.bindTexture(texture);
                         intBuffer.put(slot);
+                    }
+                    intBuffer.flip();
+                    GL20.glUniform1iv(location, intBuffer);
+                }
+                break;
+
+            case GL20.GL_INT:
+                if (value instanceof Integer) {
+                    int i = (Integer) value;
+                    GL20.glUniform1i(location, i);
+                } else if (value instanceof int[]) {
+                    int[] is = (int[]) value;
+                    GL20.glUniform1iv(location, is);
+                } else if (value instanceof Integer[]) {
+                    Integer[] is = (Integer[]) value;
+                    for (Integer i : is) {
+                        intBuffer.put(i);
+                    }
+                    intBuffer.flip();
+                    GL20.glUniform1iv(location, intBuffer);
+                } else if (value instanceof Iterable) {
+                    Iterable<Integer> is = (Iterable<Integer>) value;
+                    for (Integer i : is) {
+                        intBuffer.put(i);
+                    }
+                    intBuffer.flip();
+                    GL20.glUniform1iv(location, intBuffer);
+                } else if (value instanceof ArrayInt) {
+                    ArrayInt is = (ArrayInt) value;
+                    for (int i = 0; i < is.size; i++) {
+                        intBuffer.put(is.items[i]);
                     }
                     intBuffer.flip();
                     GL20.glUniform1iv(location, intBuffer);
@@ -228,24 +258,24 @@ public class ShaderProgram implements Resource {
                 Matrix4 matrix4 = (Matrix4) value;
                 GL20.glUniformMatrix4fv(location, false, matrix4.val);
                 break;
+
             case GL20.GL_FLOAT_VEC3:
                 Vector3 vector3 = (Vector3) value;
                 GL20.glUniform3f(location, vector3.x, vector3.y, vector3.z);
                 break;
+
             case GL20.GL_FLOAT_VEC4:
                 if (value instanceof Color) {
                     Color color = (Color) value;
                     GL20.glUniform4f(location, color.r, color.g, color.b, color.a);
-                    break;
                 } else if (value instanceof Vector4) {
                     Vector4 vector4 = (Vector4) value;
                     GL20.glUniform4f(location, vector4.x, vector4.y, vector4.z, vector4.w);
-                    break;
                 } else if (value instanceof Quaternion) {
                     Quaternion quaternion = (Quaternion) value;
                     GL20.glUniform4f(location, quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-                    break;
                 }
+                break;
         }
     }
 
