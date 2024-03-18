@@ -3,7 +3,6 @@ package org.example.game;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.memory.MemoryUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -19,7 +18,7 @@ import java.nio.IntBuffer;
 // TODO: https://www.cppstories.com/2015/01/persistent-mapped-buffers-in-opengl/#persistence
 // Note: glBufferData invalidates and reallocates the whole buffer. Use glBufferSubData to only update the data inside.
 // https://stackoverflow.com/questions/72648980/opengl-sampler2d-array
-public class SceneRendering2D_6 extends WindowScreen {
+public class SceneRendering2D_7 extends WindowScreen {
 
     private ShaderProgram shader;
 
@@ -29,7 +28,7 @@ public class SceneRendering2D_6 extends WindowScreen {
     Texture texture = AssetStore.get("assets/textures/yellowSquare.png");
     int vbo;
 
-    public SceneRendering2D_6() {
+    public SceneRendering2D_7() {
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-new.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-new.frag");
@@ -103,7 +102,7 @@ public class SceneRendering2D_6 extends WindowScreen {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         ShaderProgramBinder.bind(shader);
-        shader.bindUniform("u_texture", texture);
+        shader.bindUniform("u_textures_0", texture);
 
         GL30.glBindVertexArray(vao);
 

@@ -1,4 +1,4 @@
-#version 330
+#version 450
 
 // attributes
 layout(location = 0) in vec2 a_position;
