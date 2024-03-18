@@ -1,9 +1,25 @@
 regions:
-- maxX: 115
-  maxY: 112
-  minX: 0
-  minY: 40
-  name: assets/textures/pattern2.png
+- name: assets/textures/yellowSquare2.png
+  offsetX: 0
+  offsetY: 0
+  originalHeight: 256
+  originalWidth: 256
+  packedHeight: 256
+  packedWidth: 256
+  textureIndex: 0
+  x: 25
+  y: 25
+- name: assets/textures/pinkSpot.png
+  offsetX: 26
+  offsetY: 1
+  originalHeight: 128
+  originalWidth: 128
+  packedHeight: 112
+  packedWidth: 102
+  textureIndex: 0
+  x: 331
+  y: 25
+- name: assets/textures/pattern2.png
   offsetX: 0
   offsetY: 16
   originalHeight: 128
@@ -11,17 +27,17 @@ regions:
   packedHeight: 72
   packedWidth: 115
   textureIndex: 0
-  x: 10
-  y: 10
+  x: 331
+  y: 187
 textures:
 - file: pack_0.png
-  height: 256
-  width: 256
+  height: 512
+  width: 512
 options:
-  padding: 4
+  padding: 5
   minFilter: MIP_MAP_NEAREST_NEAREST
   uWrap: CLAMP_TO_EDGE
-  extrude: 6
+  extrude: 20
   vWrap: CLAMP_TO_EDGE
   maxTextureSize: 8192
   magFilter: MIP_MAP_NEAREST_NEAREST

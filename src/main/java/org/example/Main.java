@@ -20,9 +20,9 @@ public class Main {
         try {
             TexturePackerOptions options = new TexturePackerOptions("assets/atlases", "pack",
                     null, null, null, null,
-                    6,4, TexturePackerOptions.Size.XX_LARGE_8192);
+                    20,5, TexturePackerOptions.Size.XX_LARGE_8192);
             //TexturePacker.packTextures(options, "assets/textures/pinkSpot.png", "assets/textures/yellowSquare.png", "assets/textures/yellowSquare2.png");
-            TexturePacker.packTextures(options, "assets/textures/pattern2.png");
+            TexturePacker.packTextures(options, "assets/textures/pattern2.png", "assets/textures/yellowSquare2.png", "assets/textures/pinkSpot.png");
 
         } catch (Exception e) {
             e.printStackTrace();

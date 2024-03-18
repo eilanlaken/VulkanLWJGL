@@ -128,7 +128,7 @@ public class TexturePacker {
         System.out.println("orig: w, h: " + originalWidth + ", " + originalHeight);
         System.out.println("packed: w, h: " + packedWidth + ", " + packedHeight);
         System.out.println("offset x, y: " + offsetX + ", " + offsetY);
-        return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY, minX, maxX, minY, maxY);
+        return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY, minX, minY);
     }
 
     private static synchronized void generatePackFile(final TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) {
@@ -178,39 +178,47 @@ public class TexturePacker {
             for (PackedRegionData region : imageRegions.getValue()) {
                 File sourceImageFile = new File(region.name);
                 BufferedImage sourceImage = ImageIO.read(sourceImageFile);
-                System.out.println("X: " + region.x);
-                System.out.println("Y: " + region.y);
 
-                System.out.println("minX: " + region.minX);
-                System.out.println("maxX: " + region.maxX);
-                System.out.println("minY: " + region.minY);
-                System.out.println("maxY: " + region.maxY);
-
-                System.out.println("target w h:" + texturePackImage.getWidth() + ", " + texturePackImage.getHeight());
-
-                int startX = region.x;
-                int startY = region.y;
-
-                for (int y = 0; y <= region.maxY - region.minY + options.extrude * 2; y++) {
-                    for (int x = 0; x <= region.maxX - region.minX + options.extrude * 2; x++) {
+                // copy non-transparent region
+                for (int y = region.y; y < region.y + region.packedHeight; y++) {
+                    for (int x = region.x; x < region.x + region.packedWidth; x++) {
                         int color = 0;
-                        if (y < options.extrude) color = sourceImage.getRGB(x+region.minX, 0);
-                        else if (y > region.maxY - region.minY + options.extrude) color = sourceImage.getRGB(x+region.minX, region.originalHeight-1);
-                        else if (x < options.extrude) color = sourceImage.getRGB(0, y+region.minY);
-                        else if (x > region.maxX - region.minX + options.extrude) color = sourceImage.getRGB(region.originalWidth-1,y+region.minY);
-                        else color = sourceImage.getRGB(x+region.minX,y+region.minY);
-
-                        //texturePackImage.setRGB(x+region.x-options.extrude,y+region.y-options.extrude,sourceImage.getRGB(x+region.minX,y+region.minY));
-                        texturePackImage.setRGB(x+region.x-options.extrude,y+region.y-options.extrude,color);
-
+                        color = sourceImage.getRGB(region.minX + x - region.x, region.minY + y - region.y);
+                        texturePackImage.setRGB(x,y,color);
                     }
                 }
-
-
-                //graphics.drawImage(sourceImage, packedRegionData.x, packedRegionData.y, null);
-
-                // apply extrude
-
+                // extrude up
+                for (int y = region.y - options.extrude; y < region.y; y++) {
+                    for (int x = region.x; x < region.x + region.packedWidth; x++) {
+                        int color = 0;
+                        color = sourceImage.getRGB(region.minX + x - region.x, 0);
+                        texturePackImage.setRGB(x,y,color);
+                    }
+                }
+                // extrude down
+                for (int y = region.y + region.packedHeight; y < region.y + region.packedHeight + options.extrude; y++) {
+                    for (int x = region.x; x < region.x + region.packedWidth; x++) {
+                        int color = 0;
+                        color = sourceImage.getRGB(region.minX + x - region.x, region.originalHeight - 1);
+                        texturePackImage.setRGB(x,y,color);
+                    }
+                }
+                // extrude left
+                for (int x = region.x - options.extrude; x < region.x; x++) {
+                    for (int y = region.y; y < region.y + region.packedHeight; y++) {
+                        int color = 0;
+                        color = sourceImage.getRGB(0, region.minY + y - region.y);
+                        texturePackImage.setRGB(x,y,color);
+                    }
+                }
+                // extrude right
+                for (int x = region.x + region.packedWidth; x < region.x + region.packedWidth + options.extrude; x++) {
+                    for (int y = region.y; y < region.y + region.packedHeight; y++) {
+                        int color = 0;
+                        color = sourceImage.getRGB(region.originalWidth - 1, region.minY + y - region.y);
+                        texturePackImage.setRGB(x,y,color);
+                    }
+                }
             }
             File outputFile = new File(options.outputDirectory + File.separator + options.outputName + "_" + texturePackImage.index + ".png");
             ImageIO.write(texturePackImage, "png", outputFile);
@@ -244,15 +252,15 @@ public class TexturePacker {
         public final int packedHeight;
         public final int offsetX;
         public final int offsetY;
-        public final int minX, maxX;
-        public final int minY, maxY;
+        private final int minX;
+        private final int minY;
         public int x;
         public int y;
         public int textureIndex;
 
         private final int area;
 
-        public PackedRegionData(BufferedImage sourceImage, String name, int packedWidth, int packedHeight, int offsetX, int offsetY, int minX, int maxX, int minY, int maxY) {
+        public PackedRegionData(BufferedImage sourceImage, String name, int packedWidth, int packedHeight, int offsetX, int offsetY, int minX, int minY) {
             this.name = name;
             this.originalWidth = sourceImage.getWidth();
             this.originalHeight = sourceImage.getHeight();
@@ -262,9 +270,7 @@ public class TexturePacker {
             this.offsetX = offsetX;
             this.offsetY = offsetY;
             this.minX = minX;
-            this.maxX = maxX;
             this.minY = minY;
-            this.maxY = maxY;
         }
 
         @Override
