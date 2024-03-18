@@ -7,17 +7,23 @@ public enum ModelVertexAttribute {
     // TODO: add position_2 / position_3, change to colorPacked.
     POSITION_2D("a_position", 2, GL11.GL_FLOAT, false, 0),
     POSITION_3D("a_position", 3, GL11.GL_FLOAT, false, 0),
-    COLOR("a_color", 4, GL11.GL_FLOAT, false, 1), // TODO: change to unsigned something, true.
+    @Deprecated COLOR("a_color", 4, GL11.GL_FLOAT, false, 1), // TODO: change to unsigned something, true.
 
     // TODO: see how things work here.
     COLOR_PACKED("a_color", 4, GL11.GL_UNSIGNED_BYTE, true, 1), // TODO: change to unsigned something, true.
 
-
+    // TODO turn into a single unsigned int
     TEXTURE_COORDINATES0("a_textCoords0", 2, GL11.GL_FLOAT , false,2),
+    // TODO turn into a single unsigned int
     TEXTURE_COORDINATES1("a_textCoords1", 2, GL11.GL_FLOAT , false,3),
+    // TODO: use compact form
     NORMAL("a_normal", 3, GL11.GL_FLOAT , false,4),
+    // TODO: use compact form
     TANGENT("a_tangent",3, GL11.GL_FLOAT , false,5),
+    // TODO: use compact form
     BI_NORMAL("a_biNormal",3, GL11.GL_FLOAT , false,6),
+
+
     BONE_WEIGHT0("a_boneWeight0",2, GL11.GL_FLOAT , false,7),
     BONE_WEIGHT1("a_boneWeight1",2, GL11.GL_FLOAT , false,8),
     BONE_WEIGHT2("a_boneWeight2",2, GL11.GL_FLOAT , false,9),
