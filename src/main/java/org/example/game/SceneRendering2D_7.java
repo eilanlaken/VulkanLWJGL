@@ -11,6 +11,8 @@ import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.HashSet;
+import java.util.Set;
 
 // TODO: pretty good solution here:
 //  TODO: http://forum.lwjgl.org/index.php?topic=5789.0
@@ -30,6 +32,9 @@ public class SceneRendering2D_7 extends WindowScreen {
     int vbo;
 
     public SceneRendering2D_7() {
+
+        System.out.println("max fragment textures: " + GraphicsUtils.getMaxFragmentShaderTextureUnits());
+        System.out.println("max textures: " + GraphicsUtils.getMaxBoundTextureUnits());
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-new.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-new.frag");
@@ -104,7 +109,22 @@ public class SceneRendering2D_7 extends WindowScreen {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         ShaderProgramBinder.bind(shader);
-        shader.bindUniform("u_textures_0", texture);
+        //shader.bindUniform("u_textures_1", texture);
+
+        Texture[] t = {texture2, texture};
+        shader.bindUniform("u_textures[0]", t);
+
+
+        //shader.bindUniform("u_textures[1]", texture2);
+
+
+        float[] f = {1f,0.6f,1f,0.5f};
+        Set<Float> fs = new HashSet<>();
+        fs.add(0.2f);
+        fs.add(0.3f);
+        fs.add(0.4f);
+        fs.add(0.7f);
+        shader.bindUniform("v[0]", fs);
 
         GL30.glBindVertexArray(vao);
 

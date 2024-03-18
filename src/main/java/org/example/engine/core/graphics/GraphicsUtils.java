@@ -1,7 +1,11 @@
 package org.example.engine.core.graphics;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+
+import java.nio.IntBuffer;
 
 public class GraphicsUtils {
 
@@ -108,6 +112,18 @@ public class GraphicsUtils {
         int refreshRate = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor()).refreshRate();
         setTargetFps(refreshRate);
         window.setVSync(true);
+    }
+
+    public static int getMaxFragmentShaderTextureUnits() {
+        IntBuffer intBuffer = BufferUtils.createIntBuffer(1);
+        GL11.glGetIntegerv(GL20.GL_MAX_TEXTURE_IMAGE_UNITS, intBuffer);
+        return intBuffer.get(0);
+    }
+
+    public static int getMaxBoundTextureUnits() {
+        IntBuffer intBuffer = BufferUtils.createIntBuffer(1);
+        GL11.glGetIntegerv(GL20.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, intBuffer);
+        return intBuffer.get(0);
     }
 
     public static void disableVSync() {

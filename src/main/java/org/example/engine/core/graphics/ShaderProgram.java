@@ -1,5 +1,6 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.collections.ArrayFloat;
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Quaternion;
@@ -10,7 +11,9 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +34,8 @@ public class ShaderProgram implements Resource {
     private final MapObjectInt<String> attributeTypes;
     private final MapObjectInt<String> attributeSizes;
     private String[] attributeNames;
+    private IntBuffer intBuffer = BufferUtils.createIntBuffer(32);
+    private FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(32);
 
     public ShaderProgram(final String vertexShaderSource, final String fragmentShaderSource) {
         if (vertexShaderSource == null) throw new IllegalArgumentException("Vertex shader cannot be null.");
@@ -54,6 +59,17 @@ public class ShaderProgram implements Resource {
         fetchAttributes();
         fetchUniforms();
         validate();
+        System.out.println("types:");
+        for (MapObjectInt.Entry<String> s : uniformTypes) {
+            System.out.println(uniformTypes.get(s.key, -5));
+        }
+        System.out.println("names:");
+        for (String s : uniformNames) {
+            System.out.println(s);
+        }
+        for (MapObjectInt.Entry<String> s : uniformSizes) {
+            System.out.println(s.key + " " + uniformSizes.get(s.key, -5));
+        }
     }
 
     private int createVertexShader(final String shaderCode) {
@@ -151,14 +167,63 @@ public class ShaderProgram implements Resource {
         final int type = uniformTypes.get(name, -1);
         switch (type) {
             case GL20.GL_SAMPLER_2D:
-                Texture texture = (Texture) value;
-                int slot = TextureBinder.bindTexture(texture);
-                GL20.glUniform1i(location, slot);
+                if (value instanceof Texture) {
+                    System.out.println("works 2");
+                    Texture texture = (Texture) value;
+                    int slot = TextureBinder.bindTexture(texture);
+                    GL20.glUniform1i(location, slot);
+                } else if (value instanceof Iterable) {
+                    Iterable<Texture> textures = (Iterable<Texture>) value;
+                    System.out.println("works it");
+                    for (Texture texture : textures) {
+                        int slot = TextureBinder.bindTexture(texture);
+                        intBuffer.put(slot);
+                    }
+                    intBuffer.flip();
+                    GL20.glUniform1iv(location, intBuffer);
+                } else if (value instanceof Texture[]) {
+                    Texture[] textures = (Texture[]) value;
+                    System.out.println("works arr");
+                    for (Texture texture : textures) {
+                        int slot = TextureBinder.bindTexture(texture);
+                        intBuffer.put(slot);
+                    }
+                    intBuffer.flip();
+                    GL20.glUniform1iv(location, intBuffer);
+                }
                 break;
+
             case GL20.GL_FLOAT:
-                float f = (Float) value;
-                GL20.glUniform1f(location, f);
+                if (value instanceof Float) {
+                    float f = (Float) value;
+                    GL20.glUniform1f(location, f);
+                } else if (value instanceof float[]) {
+                    float[] fs = (float []) value;
+                    GL20.glUniform1fv(location, fs);
+                } else if (value instanceof Float[]) {
+                    Float[] fs = (Float []) value;
+                    for (Float f : fs) {
+                        floatBuffer.put(f);
+                    }
+                    floatBuffer.flip();
+                    GL20.glUniform1fv(location, floatBuffer);
+                } else if (value instanceof Iterable) {
+                    Iterable<Float> fs = (Iterable<Float>) value;
+                    for (Float f : fs) {
+                        floatBuffer.put(f);
+                    }
+                    floatBuffer.flip();
+                    GL20.glUniform1fv(location, floatBuffer);
+                } else if (value instanceof ArrayFloat) {
+                    ArrayFloat fs = (ArrayFloat) value;
+                    for (int i = 0; i < fs.size; i++) {
+                        floatBuffer.put(fs.items[i]);
+                    }
+                    floatBuffer.flip();
+                    GL20.glUniform1fv(location, floatBuffer);
+                }
                 break;
+
             case GL20.GL_FLOAT_MAT4:
                 Matrix4 matrix4 = (Matrix4) value;
                 GL20.glUniformMatrix4fv(location, false, matrix4.val);
