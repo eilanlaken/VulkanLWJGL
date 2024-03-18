@@ -70,8 +70,8 @@ public class TexturePacker {
             for (int i = 0; i < rects.capacity(); i++) {
                 rects.position(i);
                 rects.id(i);
-                rects.w(remaining.get(i).packedWidth);
-                rects.h(remaining.get(i).packedHeight);
+                rects.w(remaining.get(i).packedWidth + 2 * (options.extrude + options.padding));
+                rects.h(remaining.get(i).packedHeight + 2 * (options.extrude + options.padding));
             }
             rects.position(0);
             int result = STBRectPack.stbrp_pack_rects(context, rects);

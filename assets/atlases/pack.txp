@@ -1,18 +1,18 @@
 regions:
-- name: assets/textures/redGreenHalf.png
-  offsetX: 3
-  offsetY: 0
-  originalHeight: 16
-  originalWidth: 16
-  packedHeight: 16
-  packedWidth: 13
+- name: assets/textures/pattern2.png
+  offsetX: 0
+  offsetY: 16
+  originalHeight: 128
+  originalWidth: 128
+  packedHeight: 72
+  packedWidth: 115
   textureIndex: 0
   x: 5
   y: 5
 textures:
 - file: pack_0.png
-  height: 16
-  width: 16
+  height: 128
+  width: 128
 options:
   padding: 1
   minFilter: MIP_MAP_NEAREST_NEAREST
