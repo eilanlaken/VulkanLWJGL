@@ -20,7 +20,7 @@ public class Main {
         try {
             TexturePackerOptions options = new TexturePackerOptions("assets/atlases", "pack",
                     null, null, null, null,
-                    4,1, TexturePackerOptions.Size.XX_LARGE_8192);
+                    6,4, TexturePackerOptions.Size.XX_LARGE_8192);
             //TexturePacker.packTextures(options, "assets/textures/pinkSpot.png", "assets/textures/yellowSquare.png", "assets/textures/yellowSquare2.png");
             TexturePacker.packTextures(options, "assets/textures/pattern2.png");
 

@@ -1,5 +1,9 @@
 regions:
-- name: assets/textures/pattern2.png
+- maxX: 115
+  maxY: 112
+  minX: 0
+  minY: 40
+  name: assets/textures/pattern2.png
   offsetX: 0
   offsetY: 16
   originalHeight: 128
@@ -7,17 +11,17 @@ regions:
   packedHeight: 72
   packedWidth: 115
   textureIndex: 0
-  x: 5
-  y: 5
+  x: 10
+  y: 10
 textures:
 - file: pack_0.png
-  height: 128
-  width: 128
+  height: 256
+  width: 256
 options:
-  padding: 1
+  padding: 4
   minFilter: MIP_MAP_NEAREST_NEAREST
   uWrap: CLAMP_TO_EDGE
-  extrude: 4
+  extrude: 6
   vWrap: CLAMP_TO_EDGE
   maxTextureSize: 8192
   magFilter: MIP_MAP_NEAREST_NEAREST

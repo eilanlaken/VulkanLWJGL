@@ -3,6 +3,7 @@ package org.example.engine.core.graphics;
 import com.google.gson.Gson;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.math.MathUtils;
 import org.lwjgl.stb.STBRPContext;
 import org.lwjgl.stb.STBRPNode;
 import org.lwjgl.stb.STBRPRect;
@@ -118,14 +119,16 @@ public class TexturePacker {
                 }
             }
         }
-        int packedWidth = maxX - minX + 1;// + options.extrude + options.padding;
-        int packedHeight = maxY - minY + 1;// + options.extrude + options.padding;
+        maxX++;
+        maxY++;
+        int packedWidth = maxX - minX;// + options.extrude + options.padding;
+        int packedHeight = maxY - minY;// + options.extrude + options.padding;
         int offsetX = minX;
         int offsetY = originalHeight - packedHeight - minY;
         System.out.println("orig: w, h: " + originalWidth + ", " + originalHeight);
         System.out.println("packed: w, h: " + packedWidth + ", " + packedHeight);
         System.out.println("offset x, y: " + offsetX + ", " + offsetY);
-        return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY);
+        return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY, minX, maxX, minY, maxY);
     }
 
     private static synchronized void generatePackFile(final TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) {
@@ -170,13 +173,48 @@ public class TexturePacker {
 
     private static synchronized void generatePackTextureFiles(final TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) throws IOException {
         for (Map.Entry<IndexedBufferedImage, Array<PackedRegionData>> imageRegions : texturePack.entrySet()) {
-            BufferedImage texturePackImage = imageRegions.getKey();
+            IndexedBufferedImage texturePackImage = imageRegions.getKey();
             Graphics2D graphics = texturePackImage.createGraphics();
-            for (PackedRegionData packedRegionData : imageRegions.getValue()) {
-                File sourceImageFile = new File(packedRegionData.name);
+            for (PackedRegionData region : imageRegions.getValue()) {
+                File sourceImageFile = new File(region.name);
                 BufferedImage sourceImage = ImageIO.read(sourceImageFile);
+                System.out.println("X: " + region.x);
+                System.out.println("Y: " + region.y);
+
+                System.out.println("minX: " + region.minX);
+                System.out.println("maxX: " + region.maxX);
+                System.out.println("minY: " + region.minY);
+                System.out.println("maxY: " + region.maxY);
+
+                System.out.println("target w h:" + texturePackImage.getWidth() + ", " + texturePackImage.getHeight());
+
+                int startX = region.x;
+                int startY = region.y;
+
+                for (int y = 0; y <= region.maxY - region.minY + options.extrude * 2; y++) {
+                    for (int x = 0; x <= region.maxX - region.minX + options.extrude * 2; x++) {
+                        int color = 0;
+                        if (y < options.extrude) color = sourceImage.getRGB(x+region.minX, 0);
+                        else if (y > region.maxY - region.minY + options.extrude) color = sourceImage.getRGB(x+region.minX, region.originalHeight-1);
+                        else if (x < options.extrude) color = sourceImage.getRGB(0, y+region.minY);
+                        else if (x > region.maxX - region.minX + options.extrude) color = sourceImage.getRGB(region.originalWidth-1,y+region.minY);
+                        else color = sourceImage.getRGB(x+region.minX,y+region.minY);
+
+                        //texturePackImage.setRGB(x+region.x-options.extrude,y+region.y-options.extrude,sourceImage.getRGB(x+region.minX,y+region.minY));
+                        texturePackImage.setRGB(x+region.x-options.extrude,y+region.y-options.extrude,color);
+
+                    }
+                }
+
+
+                //graphics.drawImage(sourceImage, packedRegionData.x, packedRegionData.y, null);
+
+                // apply extrude
 
             }
+            File outputFile = new File(options.outputDirectory + File.separator + options.outputName + "_" + texturePackImage.index + ".png");
+            ImageIO.write(texturePackImage, "png", outputFile);
+            graphics.dispose();
         }
     }
 
@@ -206,13 +244,15 @@ public class TexturePacker {
         public final int packedHeight;
         public final int offsetX;
         public final int offsetY;
+        public final int minX, maxX;
+        public final int minY, maxY;
         public int x;
         public int y;
         public int textureIndex;
 
         private final int area;
 
-        public PackedRegionData(BufferedImage sourceImage, String name, int packedWidth, int packedHeight, int offsetX, int offsetY) {
+        public PackedRegionData(BufferedImage sourceImage, String name, int packedWidth, int packedHeight, int offsetX, int offsetY, int minX, int maxX, int minY, int maxY) {
             this.name = name;
             this.originalWidth = sourceImage.getWidth();
             this.originalHeight = sourceImage.getHeight();
@@ -221,6 +261,10 @@ public class TexturePacker {
             this.area = packedWidth * packedHeight;
             this.offsetX = offsetX;
             this.offsetY = offsetY;
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minY = minY;
+            this.maxY = maxY;
         }
 
         @Override
