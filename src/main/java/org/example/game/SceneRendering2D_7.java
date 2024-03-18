@@ -26,6 +26,7 @@ public class SceneRendering2D_7 extends WindowScreen {
     int vao;
     FloatBuffer floatBuffer = MemoryUtils.createFloatBuffer(8000);
     Texture texture = AssetStore.get("assets/textures/yellowSquare.png");
+    Texture texture2 = AssetStore.get("assets/textures/pattern2.png");
     int vbo;
 
     public SceneRendering2D_7() {
@@ -40,6 +41,7 @@ public class SceneRendering2D_7 extends WindowScreen {
     public void show() {
 
         int tIndex = TextureBinder.bindTexture(texture);
+
         System.out.println("tIndex: " + tIndex);
 
         float c0 = new Color(0f,1,0,1).toFloatBits();
