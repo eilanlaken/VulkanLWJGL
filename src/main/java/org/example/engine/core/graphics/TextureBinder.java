@@ -15,27 +15,26 @@ public class TextureBinder {
     public static int bindTexture(final Texture texture) {
         if (texture.handle == 0) throw new IllegalStateException("Trying to bind " + Texture.class.getSimpleName() + " that was already freed.");
         int index = TextureBinder.lookForTexture(texture);
+        final int slot;
         if (index == -1) {  // texture not found in boundTextures cache
-            roundRobinIndex = (roundRobinIndex + 1) % availableTextureSlots;
-            boundTextures[roundRobinIndex] = texture;
-            final int slot = roundRobinIndex + OFFSET;
+            slot = roundRobinIndex + OFFSET;
             GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
             GL11.glBindTexture(GL20.GL_TEXTURE_2D, texture.handle);
             updateTextureParameters(texture);
-            return slot;
+            boundTextures[roundRobinIndex] = texture;
+            roundRobinIndex = (roundRobinIndex + 1) % availableTextureSlots;
         } else { // texture was found in boundTextures cache
             // activate unit but no need to rebind
-            final int slot = index + OFFSET;
+            slot = index + OFFSET;
             GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
             updateTextureParameters(texture);
-            return slot;
         }
+        return slot;
     }
 
     private static int lookForTexture(final Texture texture) {
         for (int i = 0; i < availableTextureSlots; i++) {
-            final int slot = (roundRobinIndex + i) % availableTextureSlots;
-            if (boundTextures[slot] == texture) return slot;
+            if (boundTextures[i] == texture) return i;
         }
         return -1;
     }

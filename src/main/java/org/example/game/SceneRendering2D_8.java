@@ -20,7 +20,7 @@ import java.util.Set;
 // TODO: https://www.cppstories.com/2015/01/persistent-mapped-buffers-in-opengl/#persistence
 // Note: glBufferData invalidates and reallocates the whole buffer. Use glBufferSubData to only update the data inside.
 // https://stackoverflow.com/questions/72648980/opengl-sampler2d-array
-public class SceneRendering2D_7 extends WindowScreen {
+public class SceneRendering2D_8 extends WindowScreen {
 
     private ShaderProgram shader;
 
@@ -31,13 +31,13 @@ public class SceneRendering2D_7 extends WindowScreen {
     Texture texture2 = AssetStore.get("assets/textures/pattern2.png");
     int vbo;
 
-    public SceneRendering2D_7() {
+    public SceneRendering2D_8() {
 
         System.out.println("max fragment textures: " + GraphicsUtils.getMaxFragmentShaderTextureUnits());
         System.out.println("max textures: " + GraphicsUtils.getMaxBoundTextureUnits());
 
-        final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-new.vert");
-        final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-new.frag");
+        final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-new-2.vert");
+        final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default-2d-new-2.frag");
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
     }
@@ -45,25 +45,20 @@ public class SceneRendering2D_7 extends WindowScreen {
     @Override
     public void show() {
 
-        int tIndex = TextureBinder.bindTexture(texture);
-        int tIndex2 = TextureBinder.bindTexture(texture2);
-
-        System.out.println("tIndex: " + tIndex);
-
         float c0 = new Color(0f,1,1,1).toFloatBits();
         float c1 = new Color(1f,1,0,1).toFloatBits();
         float c2 = new Color(1f,1,1,0.1f).toFloatBits();
 
         float[] vertices = {
-                -0.5f,0.5f, c0, 0, 0, tIndex,
-                -0.5f,-0.5f, c0, 0, 1, tIndex,
-                0.5f,-0.5f, c0, 1, 1, tIndex,
-                0.5f,0.5f, c0, 1, 0, tIndex,
+                -0.5f,0.5f, c0, 0, 0, 0,
+                -0.5f,-0.5f, c0, 0, 1, 0,
+                0.5f,-0.5f, c0, 1, 1, 0,
+                0.5f,0.5f, c0, 1, 0, 0,
 
-                -1.5f,-0.5f, c0, 0, 0, tIndex2,
-                -1.5f,-1.5f, c0, 0, 1, tIndex2,
-                -0.5f,-1.5f, c0, 1, 1, tIndex2,
-                -0.5f,-0.5f, c0, 1, 0, tIndex2,
+                -1.5f,-0.5f, c0, 0, 0, 1,
+                -1.5f,-1.5f, c0, 0, 1, 1,
+                -0.5f,-1.5f, c0, 1, 1, 1,
+                -0.5f,-0.5f, c0, 1, 0, 1,
         };
 
         int[] indices = {
@@ -112,30 +107,15 @@ public class SceneRendering2D_7 extends WindowScreen {
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, floatBuffer);
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glClearColor(0,0,1,0);
+        GL11.glClearColor(1,0,1,0);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         ShaderProgramBinder.bind(shader);
-        //shader.bindUniform("u_textures_1", texture);
-
-        Texture[] t = {texture2, texture};
-        shader.bindUniform("u_textures[0]", t);
-
-
-        //shader.bindUniform("u_textures[1]", texture2);
-
-
-        float[] f = {1f,0.6f,1f,0.5f};
-        Set<Float> fs = new HashSet<>();
-        fs.add(0.2f);
-        fs.add(0.3f);
-        fs.add(0.4f);
-        fs.add(0.7f);
-        //shader.bindUniform("v[0]", fs);
+        shader.bindUniform("u_textures_0", texture);
+        shader.bindUniform("u_textures_1", texture2);
 
         GL30.glBindVertexArray(vao);
-
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL20.glEnableVertexAttribArray(2);

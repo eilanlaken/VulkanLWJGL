@@ -21,7 +21,7 @@ public class ScreenLoading extends WindowScreen {
     protected void refresh() {
         if (!AssetStore.isLoadingInProgress()) {
             //Application.switchScreen(new SceneRendering2D_3());
-            Application.switchScreen(new SceneRendering2D_7());
+            Application.switchScreen(new SceneRendering2D_8());
         }
 
         // frame update

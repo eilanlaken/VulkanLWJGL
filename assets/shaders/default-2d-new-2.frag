@@ -5,14 +5,8 @@ in vec4 color;
 in vec2 uv;
 flat in int texIndex;
 
-uniform sampler2D u_textures[32];
 uniform sampler2D u_textures_0;
 uniform sampler2D u_textures_1;
-
-uniform float v[10];
-
-
-//uniform sampler2D u_texture;
 
 // outputs
 layout (location = 0) out vec4 out_color;
@@ -23,9 +17,14 @@ void main() {
     vec4 texColor;
     switch(int(texIndex))
     {
-        case  0: texColor = texture(u_textures_0, uv); break;
-        case  1: texColor = texture(u_textures_0, uv); break;
-//        case  2: texColor = texture(u_textures[ 2], uv); break;
+        //case  0: texColor = texture(u_textures_0, uv); break;
+        case 0: texColor = vec4(1,0,0,1); break;
+        case 1: texColor = vec4(0,1,0,1); break;
+        case 2: texColor = vec4(0,0,1,1); break;
+
+
+        case  12: texColor = texture(u_textures_1, uv); break;
+        case  23: texColor = texture(u_textures_0, uv); break;
 //        case  3: texColor = texture(u_textures[ 3], uv); break;
 //        case  4: texColor = texture(u_textures[ 4], uv); break;
 //        case  5: texColor = texture(u_textures[ 5], uv); break;
@@ -61,7 +60,10 @@ void main() {
     //out_color = color * texture(u_textures[texIndex], uv);
 
     //out_color = color * texture(u_textures_1, uv); // TODO: WORKS!
-    out_color = color * texture(u_textures[texIndex-1], uv);
+    //out_color = color * texColor;
+    out_color = texture(u_textures_1, uv);
+
+    //out_color = vec4(texIndex, texIndex, texIndex, 1.0);
     //out_color = color * texture(u_textures_1, uv); // TODO: BLANCK
 
     //out_color = color * texColor;

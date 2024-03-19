@@ -132,6 +132,7 @@ public class ShaderProgram implements Resource {
         }
     }
 
+    // TODO: overhaul.
     private void fetchUniforms() {
         IntBuffer params = BufferUtils.createIntBuffer(1);
         IntBuffer type = BufferUtils.createIntBuffer(1);
@@ -172,6 +173,7 @@ public class ShaderProgram implements Resource {
                 if (value instanceof Texture) {
                     Texture texture = (Texture) value;
                     int slot = TextureBinder.bindTexture(texture);
+                    System.out.println("slot: " + slot);
                     GL20.glUniform1i(location, slot);
                 } else if (value instanceof Iterable) {
                     Iterable<Texture> textures = (Iterable<Texture>) value;
@@ -298,7 +300,7 @@ public class ShaderProgram implements Resource {
     }
 
     // use ShaderProgramBinder
-    public void unbind() {
+    @Deprecated public void unbind() {
         GL20.glUseProgram(0);
     }
 
