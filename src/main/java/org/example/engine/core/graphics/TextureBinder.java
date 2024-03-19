@@ -14,7 +14,7 @@ public class TextureBinder {
 
     public static int bind(final Texture texture) {
         if (texture.handle == 0) throw new IllegalStateException("Trying to bind " + Texture.class.getSimpleName() + " that was already freed.");
-        if (texture.getSlot() != -1) return texture.getSlot();
+        if (texture.getSlot() >= 0) return texture.getSlot();
         int slot = roundRobinCounter + RESERVED_OFFSET;
         if (boundTextures[slot] != null) unbind(boundTextures[slot]);
         GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
@@ -27,6 +27,7 @@ public class TextureBinder {
     }
 
     protected static void unbind(Texture texture) {
+        if (texture.handle == 0) throw new IllegalStateException("Trying to unbind " + Texture.class.getSimpleName() + " that was already freed.");
         int slot = texture.getSlot();
         if (slot < 0) return;
         GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
