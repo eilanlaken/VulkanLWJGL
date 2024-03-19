@@ -132,7 +132,7 @@ public class ShaderProgram implements Resource {
     }
 
     // TODO: overhaul.
-    private void fetchUniforms() {
+    @Deprecated private void fetchUniforms() {
         IntBuffer params = BufferUtils.createIntBuffer(1);
         IntBuffer type = BufferUtils.createIntBuffer(1);
         GL20.glGetProgramiv(this.program, GL20.GL_ACTIVE_UNIFORMS, params);
@@ -156,7 +156,6 @@ public class ShaderProgram implements Resource {
         IntBuffer type = BufferUtils.createIntBuffer(1);
         GL20.glGetProgramiv(this.program, GL20.GL_ACTIVE_UNIFORMS, params);
         int uniformSymbolsCount = params.get(0);
-        //this.uniformNames = new String[uniformSymbolsCount];
         for (int i = 0; i < uniformSymbolsCount; i++) {
             params.clear();
             params.put(0, 1);
@@ -168,11 +167,9 @@ public class ShaderProgram implements Resource {
             this.uniformTypes.put(name, type.get(0));
             this.uniformLocations.put(name, location);
             if (size > 1) {
-                System.out.println("name is: " + name);
                 String prefix = name.replaceAll("\\[.*?]", "");;
                 for (int k = 1; k < size; k++) {
                     String nextName = prefix + "[" + k + "]";
-                    System.out.println("next: " + nextName);
                     this.uniformSizes.put(nextName, size);
                     this.uniformTypes.put(nextName, type.get(0));
                     this.uniformLocations.put(nextName, ++location);
@@ -185,8 +182,6 @@ public class ShaderProgram implements Resource {
             this.uniformNames[i] = entry.key;
             i++;
         }
-
-        System.out.println(Arrays.toString(uniformNames));
     }
 
     protected final void bindUniforms(final HashMap<String, Object> uniforms) {
@@ -213,89 +208,19 @@ public class ShaderProgram implements Resource {
         switch (type) {
 
             case GL20.GL_SAMPLER_2D:
-                if (value instanceof Texture) {
-                    Texture texture = (Texture) value;
-                    int slot = TextureBinder.bindTexture(texture);
-                    GL20.glUniform1i(location, slot);
-                } else if (value instanceof Iterable) {
-                    Iterable<Texture> textures = (Iterable<Texture>) value;
-                    for (Texture texture : textures) {
-                        int slot = TextureBinder.bindTexture(texture);
-                        intBuffer.put(slot);
-                    }
-                    intBuffer.flip();
-                    GL20.glUniform1iv(location, intBuffer);
-                } else if (value instanceof Texture[]) {
-                    Texture[] textures = (Texture[]) value;
-                    for (Texture texture : textures) {
-                        int slot = TextureBinder.bindTexture(texture);
-                        intBuffer.put(slot);
-                    }
-                    intBuffer.flip();
-                    GL20.glUniform1iv(location, intBuffer);
-                }
+                Texture texture = (Texture) value;
+                int slot = TextureBinder.bindTexture(texture);
+                GL20.glUniform1i(location, slot);
                 break;
 
             case GL20.GL_INT:
-                if (value instanceof Integer) {
-                    int i = (Integer) value;
-                    GL20.glUniform1i(location, i);
-                } else if (value instanceof int[]) {
-                    int[] is = (int[]) value;
-                    GL20.glUniform1iv(location, is);
-                } else if (value instanceof Integer[]) {
-                    Integer[] is = (Integer[]) value;
-                    for (Integer i : is) {
-                        intBuffer.put(i);
-                    }
-                    intBuffer.flip();
-                    GL20.glUniform1iv(location, intBuffer);
-                } else if (value instanceof Iterable) {
-                    Iterable<Integer> is = (Iterable<Integer>) value;
-                    for (Integer i : is) {
-                        intBuffer.put(i);
-                    }
-                    intBuffer.flip();
-                    GL20.glUniform1iv(location, intBuffer);
-                } else if (value instanceof ArrayInt) {
-                    ArrayInt is = (ArrayInt) value;
-                    for (int i = 0; i < is.size; i++) {
-                        intBuffer.put(is.items[i]);
-                    }
-                    intBuffer.flip();
-                    GL20.glUniform1iv(location, intBuffer);
-                }
+                int i = (Integer) value;
+                GL20.glUniform1i(location, i);
                 break;
 
             case GL20.GL_FLOAT:
-                if (value instanceof Float) {
-                    float f = (Float) value;
-                    GL20.glUniform1f(location, f);
-                } else if (value instanceof float[]) {
-                    float[] fs = (float []) value;
-                    GL20.glUniform1fv(location, fs);
-                } else if (value instanceof Float[]) {
-                    Float[] fs = (Float []) value;
-                    for (Float f : fs) {
-                        floatBuffer.put(f);
-                    }
-                    floatBuffer.flip();
-                    GL20.glUniform1fv(location, floatBuffer);
-                } else if (value instanceof Iterable) {
-                    Iterable<Float> fs = (Iterable<Float>) value;
-                    for (Float f : fs) {
-                        floatBuffer.put(f);
-                    }
-                    floatBuffer.flip();
-                    GL20.glUniform1fv(location, floatBuffer);
-                } else if (value instanceof ArrayFloat) {
-                    ArrayFloat fs = (ArrayFloat) value;
-                    for (int i = 0; i < fs.size; i++) {
-                        floatBuffer.put(fs.items[i]);
-                    }
-                    floatBuffer.flip();
-                    GL20.glUniform1fv(location, floatBuffer);
-                }
+                float f = (Float) value;
+                GL20.glUniform1f(location, f);
                 break;
 
             case GL20.GL_FLOAT_MAT4:
