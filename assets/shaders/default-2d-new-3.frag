@@ -6,6 +6,7 @@ in vec2 uv;
 flat in float texIndex;
 
 uniform sampler2D u_textures[32];
+uniform float x;
 //uniform sampler2D u_textures_0;
 //uniform sampler2D u_textures_1;
 
@@ -35,7 +36,7 @@ void main() {
         case 2: textureColor = texture(u_textures[2], uv); break;
     }
 
-    out_color = color * textureColor;
+    out_color = color * textureColor + vec4(x);
     //out_color = texture(u_textures[texIndex], uv);
 
     //out_color += texture(u_textures_0, uv);

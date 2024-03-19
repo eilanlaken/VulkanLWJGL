@@ -154,17 +154,17 @@ public class ShaderProgram implements Resource {
             type.clear();
             String name = GL20.glGetActiveUniform(this.program, i, params, type);
             int size = params.get(0);
+            final int location = GL20.glGetUniformLocation(this.program, name);
             this.uniformSizes.put(name, size);
-            int location = GL20.glGetUniformLocation(this.program, name);
             this.uniformTypes.put(name, type.get(0));
             this.uniformLocations.put(name, location);
-            if (size > 1) {
+            if (size > 1) { // array of uniforms.
                 String prefix = name.replaceAll("\\[.*?]", "");;
                 for (int k = 1; k < size; k++) {
                     String nextName = prefix + "[" + k + "]";
                     this.uniformSizes.put(nextName, size);
                     this.uniformTypes.put(nextName, type.get(0));
-                    this.uniformLocations.put(nextName, ++location);
+                    this.uniformLocations.put(nextName, location + k);
                 }
             }
         }
