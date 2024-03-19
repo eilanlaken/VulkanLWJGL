@@ -161,6 +161,12 @@ public class ShaderProgram implements Resource {
         }
     }
 
+    public void bindUniform(final int location, final Object value) {
+        Texture texture = (Texture) value;
+        int slot = TextureBinder.bindTexture(texture);
+        GL20.glUniform1i(location, slot);
+    }
+
     public void bindUniform(final String name, final Object value) {
         final int location = uniformLocations.get(name, -1);
         // TODO: remove. Good only for debugging, but prevents custom flexible shading.
@@ -173,7 +179,6 @@ public class ShaderProgram implements Resource {
                 if (value instanceof Texture) {
                     Texture texture = (Texture) value;
                     int slot = TextureBinder.bindTexture(texture);
-                    System.out.println("slot: " + slot);
                     GL20.glUniform1i(location, slot);
                 } else if (value instanceof Iterable) {
                     Iterable<Texture> textures = (Iterable<Texture>) value;
