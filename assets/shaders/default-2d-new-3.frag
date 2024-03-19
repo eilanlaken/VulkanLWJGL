@@ -35,7 +35,7 @@ void main() {
         case 2: textureColor = texture(u_textures[2], uv); break;
     }
 
-    out_color = textureColor;
+    out_color = color * textureColor;
     //out_color = texture(u_textures[texIndex], uv);
 
     //out_color += texture(u_textures_0, uv);

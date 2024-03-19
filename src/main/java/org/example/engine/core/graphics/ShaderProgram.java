@@ -1,8 +1,5 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.collections.Array;
-import org.example.engine.core.collections.ArrayFloat;
-import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Quaternion;
@@ -13,9 +10,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,8 +31,6 @@ public class ShaderProgram implements Resource {
     private final MapObjectInt<String> attributeTypes;
     private final MapObjectInt<String> attributeSizes;
     private String[] attributeNames;
-    private IntBuffer intBuffer = BufferUtils.createIntBuffer(32);
-    private FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(32);
 
     public ShaderProgram(final String vertexShaderSource, final String fragmentShaderSource) {
         if (vertexShaderSource == null) throw new IllegalArgumentException("Vertex shader cannot be null.");
@@ -58,8 +51,7 @@ public class ShaderProgram implements Resource {
         this.vertexShaderId = createVertexShader(vertexShaderSource);
         this.fragmentShaderId = createFragmentShader(fragmentShaderSource);
         link();
-        fetchAttributes();
-        ///fetchUniforms();
+        registerAttributes();
         registerUniforms();
         validate();
         System.out.println("types:");
@@ -112,7 +104,7 @@ public class ShaderProgram implements Resource {
             throw new RuntimeException("Could not validate shader code: " + GL20.glGetProgramInfoLog(program, 1024));
     }
 
-    private void fetchAttributes() {
+    private void registerAttributes() {
         IntBuffer params = BufferUtils.createIntBuffer(1);
         IntBuffer type = BufferUtils.createIntBuffer(1);
         GL20.glGetProgramiv(this.program, GL20.GL_ACTIVE_ATTRIBUTES, params);
@@ -131,7 +123,7 @@ public class ShaderProgram implements Resource {
         }
     }
 
-    // TODO: overhaul.
+    // TODO: remove
     @Deprecated private void fetchUniforms() {
         IntBuffer params = BufferUtils.createIntBuffer(1);
         IntBuffer type = BufferUtils.createIntBuffer(1);
@@ -193,12 +185,6 @@ public class ShaderProgram implements Resource {
         }
     }
 
-    public void bindUniform(final int location, final Object value) {
-        Texture texture = (Texture) value;
-        int slot = TextureBinder.bindTexture(texture);
-        GL20.glUniform1i(location, slot);
-    }
-
     public void bindUniform(final String name, final Object value) {
         final int location = uniformLocations.get(name, -1);
         // TODO: remove. Good only for debugging, but prevents custom flexible shading.
@@ -245,6 +231,7 @@ public class ShaderProgram implements Resource {
                     GL20.glUniform4f(location, quaternion.x, quaternion.y, quaternion.z, quaternion.w);
                 }
                 break;
+
         }
     }
 
