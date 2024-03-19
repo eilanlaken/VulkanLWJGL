@@ -97,9 +97,6 @@ public class SceneRendering2D_9 extends WindowScreen {
         GL30.glBindVertexArray(0);
 
 
-        String n = "u_textures[-1]";
-        int location = GL20.glGetUniformLocation(this.shader.program, n);
-        System.out.println("location: " + location);
 
     }
 

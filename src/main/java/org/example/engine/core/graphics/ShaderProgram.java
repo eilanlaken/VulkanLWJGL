@@ -1,5 +1,6 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayFloat;
 import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.MapObjectInt;
@@ -58,7 +59,8 @@ public class ShaderProgram implements Resource {
         this.fragmentShaderId = createFragmentShader(fragmentShaderSource);
         link();
         fetchAttributes();
-        fetchUniforms();
+        ///fetchUniforms();
+        registerUniforms();
         validate();
         System.out.println("types:");
         for (MapObjectInt.Entry<String> s : uniformTypes) {
@@ -67,9 +69,6 @@ public class ShaderProgram implements Resource {
         System.out.println("names:");
         for (String s : uniformNames) {
             System.out.println(s);
-        }
-        for (MapObjectInt.Entry<String> s : uniformSizes) {
-            System.out.println(s.key + " " + uniformSizes.get(s.key, -5));
         }
     }
 
@@ -150,6 +149,44 @@ public class ShaderProgram implements Resource {
             this.uniformSizes.put(name, params.get(0));
             this.uniformNames[i] = name;
         }
+    }
+
+    private void registerUniforms() {
+        IntBuffer params = BufferUtils.createIntBuffer(1);
+        IntBuffer type = BufferUtils.createIntBuffer(1);
+        GL20.glGetProgramiv(this.program, GL20.GL_ACTIVE_UNIFORMS, params);
+        int uniformSymbolsCount = params.get(0);
+        //this.uniformNames = new String[uniformSymbolsCount];
+        for (int i = 0; i < uniformSymbolsCount; i++) {
+            params.clear();
+            params.put(0, 1);
+            type.clear();
+            String name = GL20.glGetActiveUniform(this.program, i, params, type);
+            int size = params.get(0);
+            this.uniformSizes.put(name, size);
+            int location = GL20.glGetUniformLocation(this.program, name);
+            this.uniformTypes.put(name, type.get(0));
+            this.uniformLocations.put(name, location);
+            if (size > 1) {
+                System.out.println("name is: " + name);
+                String prefix = name.replaceAll("\\[.*?]", "");;
+                for (int k = 1; k < size; k++) {
+                    String nextName = prefix + "[" + k + "]";
+                    System.out.println("next: " + nextName);
+                    this.uniformSizes.put(nextName, size);
+                    this.uniformTypes.put(nextName, type.get(0));
+                    this.uniformLocations.put(nextName, ++location);
+                }
+            }
+        }
+        this.uniformNames = new String[uniformLocations.size];
+        int i = 0;
+        for(MapObjectInt.Entry<String> entry : uniformLocations) {
+            this.uniformNames[i] = entry.key;
+            i++;
+        }
+
+        System.out.println(Arrays.toString(uniformNames));
     }
 
     protected final void bindUniforms(final HashMap<String, Object> uniforms) {
