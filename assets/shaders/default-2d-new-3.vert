@@ -4,7 +4,7 @@
 layout(location = 0) in vec2 a_position;
 layout(location = 1) in vec4 a_color;
 layout(location = 2) in vec2 a_texCoord0;
-layout(location = 3) in int a_texIndex;
+layout(location = 3) in float a_texIndex;
 
 // uniforms
 //uniform mat4 u_camera_combined;
@@ -12,7 +12,7 @@ layout(location = 3) in int a_texIndex;
 // outputs
 out vec4 color;
 out vec2 uv;
-flat out int texIndex;
+flat out float texIndex;
 
 void main() {
     color = a_color;

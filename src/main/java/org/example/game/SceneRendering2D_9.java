@@ -27,6 +27,8 @@ public class SceneRendering2D_9 extends WindowScreen {
     FloatBuffer floatBuffer = MemoryUtils.createFloatBuffer(8000);
     Texture texture = AssetStore.get("assets/textures/yellowSquare.png");
     Texture texture2 = AssetStore.get("assets/textures/pattern2.png");
+    Texture texture3 = AssetStore.get("assets/textures/redGreenHalf.png");
+
     int vbo;
 
     public SceneRendering2D_9() {
@@ -57,6 +59,11 @@ public class SceneRendering2D_9 extends WindowScreen {
                 -1.5f,-1.5f, c0, 0, 1, 0,
                 -0.5f,-1.5f, c0, 1, 1, 0,
                 -0.5f,-0.5f, c0, 1, 0, 0,
+
+                0.5f,1.5f, c0, 0, 0, 2,
+                0.5f,0.5f, c0, 0, 1, 2,
+                1.5f,0.5f, c0, 1, 1, 2,
+                1.5f,1.5f, c0, 1, 0, 2,
         };
 
         int[] indices = {
@@ -65,6 +72,9 @@ public class SceneRendering2D_9 extends WindowScreen {
 
                 4,5,7,
                 7,5,6,
+
+                8,9,11,
+                11,9,10
         };
 
         vao = GL30.glGenVertexArrays();
@@ -79,7 +89,7 @@ public class SceneRendering2D_9 extends WindowScreen {
         GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, vertexSize, 0);
         GL20.glVertexAttribPointer(1, 4, GL11.GL_UNSIGNED_BYTE, true, vertexSize, Float.BYTES * 2L);
         GL20.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, true, vertexSize, Float.BYTES * 3L);
-        GL20.glVertexAttribPointer(3, 1, GL11.GL_INT, true, vertexSize, Float.BYTES * 5L);
+        GL20.glVertexAttribPointer(3, 1, GL11.GL_FLOAT, true, vertexSize, Float.BYTES * 5L);
 
 
         GL20.glEnableVertexAttribArray(0);
@@ -112,8 +122,9 @@ public class SceneRendering2D_9 extends WindowScreen {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         ShaderProgramBinder.bind(shader);
-        shader.bindUniform(0, texture);
-        shader.bindUniform(1, texture2);
+        shader.bindUniform("u_textures[0]", texture);
+        shader.bindUniform("u_textures[1]", texture2);
+        shader.bindUniform("u_textures[2]", texture3);
 
 
         GL30.glBindVertexArray(vao);
@@ -122,7 +133,7 @@ public class SceneRendering2D_9 extends WindowScreen {
         GL20.glEnableVertexAttribArray(2);
         GL20.glEnableVertexAttribArray(3);
 
-        GL11.glDrawElements(GL11.GL_TRIANGLES, 12, GL11.GL_UNSIGNED_INT, 0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, 18, GL11.GL_UNSIGNED_INT, 0);
 
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
