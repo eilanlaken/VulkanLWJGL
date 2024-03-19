@@ -128,9 +128,6 @@ public class SceneRendering2D_10 extends WindowScreen {
         shader.bindUniform("u_textures[0]", texture);
         shader.bindUniform("u_textures[1]", texture2);
         shader.bindUniform("u_textures[2]", texture3);
-        shader.bindUniform("x", 0.3f);
-        TextureBinder g;
-
 
 
         GL30.glBindVertexArray(vao);
