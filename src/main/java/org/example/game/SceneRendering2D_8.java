@@ -50,15 +50,15 @@ public class SceneRendering2D_8 extends WindowScreen {
         float c2 = new Color(1f,1,1,0.1f).toFloatBits();
 
         float[] vertices = {
-                -0.5f,0.5f, c0, 0, 0, 0,
-                -0.5f,-0.5f, c0, 0, 1, 0,
-                0.5f,-0.5f, c0, 1, 1, 0,
-                0.5f,0.5f, c0, 1, 0, 0,
+                -0.5f,0.5f, c0, 0, 0, 1,
+                -0.5f,-0.5f, c0, 0, 1, 1,
+                0.5f,-0.5f, c0, 1, 1, 1,
+                0.5f,0.5f, c0, 1, 0, 1,
 
-                -1.5f,-0.5f, c0, 0, 0, 1,
-                -1.5f,-1.5f, c0, 0, 1, 1,
-                -0.5f,-1.5f, c0, 1, 1, 1,
-                -0.5f,-0.5f, c0, 1, 0, 1,
+                -1.5f,-0.5f, c0, 0, 0, 0,
+                -1.5f,-1.5f, c0, 0, 1, 0,
+                -0.5f,-1.5f, c0, 1, 1, 0,
+                -0.5f,-0.5f, c0, 1, 0, 0,
         };
 
         int[] indices = {
@@ -112,8 +112,8 @@ public class SceneRendering2D_8 extends WindowScreen {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         ShaderProgramBinder.bind(shader);
-        shader.bindUniform("u_textures_0", texture);
-        shader.bindUniform("u_textures_1", texture2);
+        //shader.bindUniform("u_textures_0", texture);
+        //shader.bindUniform("u_textures_1", texture2);
 
         GL30.glBindVertexArray(vao);
         GL20.glEnableVertexAttribArray(0);
