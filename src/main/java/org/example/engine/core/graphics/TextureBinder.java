@@ -28,7 +28,7 @@ public class TextureBinder {
 
     protected static void unbind(Texture texture) {
         int slot = texture.getSlot();
-        if (slot <= 0) return;
+        if (slot < 0) return;
         GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
         GL11.glBindTexture(GL20.GL_TEXTURE_2D, 0);
         boundTextures[slot] = null;
