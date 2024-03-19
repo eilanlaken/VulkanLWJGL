@@ -16,10 +16,31 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
 
 public class Main {
 
     public static void main(String[] args) {
+        short[] x = new short[1_000_000];
+
+
+        long nanos1 = System.nanoTime();
+        for (int i = 0; i < x.length; i++) {
+            x[i] = 2;
+        }
+        long nanos2 = System.nanoTime();
+        long diff1 = nanos2 - nanos1;
+
+        long nanos3 = System.nanoTime();
+        for (int i = x.length - 1; i >= 0; i--) {
+            x[i] = 2;
+        }
+        long nanos4 = System.nanoTime();
+        long diff2 = nanos4 - nanos3;
+
+        System.out.println("diff1 " + diff1);
+
+        System.out.println("diff2 " + diff2);
         //copy();
 //        try {
 //            TexturePackerOptions options = new TexturePackerOptions("assets/atlases", "pack",

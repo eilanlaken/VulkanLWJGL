@@ -7,36 +7,32 @@ import org.lwjgl.opengl.GL20;
 // REFERENCE TODO: DefaultTextureBinder (libGDX)
 public class TextureBinder {
 
-    private static final int OFFSET = 0; // we will begin binding from slots OFFSET, OFFSET + 1,... leaving slots 0... OFFSET - 1 for texture loading and manipulation?
-    private static final int availableTextureSlots = GL11.glGetInteger(GL20.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) - OFFSET;
-    private static Texture[] boundTextures = new Texture[availableTextureSlots];
-    private static int roundRobinIndex = 0;
+    private static final int RESERVED_OFFSET = 0; // we will begin binding from slots OFFSET, OFFSET + 1,... leaving slots 0... OFFSET - 1 for texture loading and manipulation?
+    private static final int availableTextureSlots = GraphicsUtils.getMaxBoundTextureUnits() - RESERVED_OFFSET;
+    private static final Texture[] boundTextures = new Texture[availableTextureSlots + RESERVED_OFFSET];
+    private static int roundRobinCounter = 0;
 
-    public static int bindTexture(final Texture texture) {
+    public static int bind(final Texture texture) {
         if (texture.handle == 0) throw new IllegalStateException("Trying to bind " + Texture.class.getSimpleName() + " that was already freed.");
-        int index = TextureBinder.lookForTexture(texture);
-        final int slot;
-        if (index == -1) {  // texture not found in boundTextures cache
-            slot = roundRobinIndex + OFFSET;
-            GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
-            GL11.glBindTexture(GL20.GL_TEXTURE_2D, texture.handle);
-            updateTextureParameters(texture);
-            boundTextures[roundRobinIndex] = texture;
-            roundRobinIndex = (roundRobinIndex + 1) % availableTextureSlots;
-        } else { // texture was found in boundTextures cache
-            // activate unit but no need to rebind
-            slot = index + OFFSET;
-            GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
-            updateTextureParameters(texture);
-        }
+        if (texture.getSlot() != -1) return texture.getSlot();
+        int slot = roundRobinCounter + RESERVED_OFFSET;
+        if (boundTextures[slot] != null) unbind(boundTextures[slot]);
+        GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
+        GL11.glBindTexture(GL20.GL_TEXTURE_2D, texture.handle);
+        updateTextureParameters(texture);
+        boundTextures[slot] = texture;
+        roundRobinCounter = (roundRobinCounter + 1) % availableTextureSlots;
+        texture.setSlot(slot);
         return slot;
     }
 
-    private static int lookForTexture(final Texture texture) {
-        for (int i = 0; i < availableTextureSlots; i++) {
-            if (boundTextures[i] == texture) return i;
-        }
-        return -1;
+    protected static void unbind(Texture texture) {
+        int slot = texture.getSlot();
+        if (slot <= 0) return;
+        GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
+        GL11.glBindTexture(GL20.GL_TEXTURE_2D, 0);
+        boundTextures[slot] = null;
+        texture.setSlot(-1);
     }
 
 

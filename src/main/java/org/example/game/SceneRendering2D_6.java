@@ -3,7 +3,6 @@ package org.example.game;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.memory.MemoryUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -40,7 +39,7 @@ public class SceneRendering2D_6 extends WindowScreen {
     @Override
     public void show() {
 
-        int tIndex = TextureBinder.bindTexture(texture);
+        int tIndex = TextureBinder.bind(texture);
         System.out.println("tIndex: " + tIndex);
 
         float c0 = new Color(0f,1,0,1).toFloatBits();
