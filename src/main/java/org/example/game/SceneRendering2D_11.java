@@ -3,7 +3,9 @@ package org.example.game;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
+import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.memory.MemoryUtils;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
@@ -18,7 +20,7 @@ import java.nio.IntBuffer;
 // TODO: https://www.cppstories.com/2015/01/persistent-mapped-buffers-in-opengl/#persistence
 // Note: glBufferData invalidates and reallocates the whole buffer. Use glBufferSubData to only update the data inside.
 // https://stackoverflow.com/questions/72648980/opengl-sampler2d-array
-public class SceneRendering2D_10 extends WindowScreen {
+public class SceneRendering2D_11 extends WindowScreen {
 
     Texture[] texturesToBind = new Texture[16];
 
@@ -26,14 +28,17 @@ public class SceneRendering2D_10 extends WindowScreen {
 
     // create and modify quad dynamically
     int vao;
-    FloatBuffer floatBuffer = MemoryUtils.createFloatBuffer(8000);
+    FloatBuffer floatBuffer = MemoryUtils.createFloatBuffer(2000 * 6);
+    IntBuffer intBuffer = BufferUtils.createIntBuffer(2000 * 2 * 3);
     Texture texture = AssetStore.get("assets/textures/yellowSquare.png");
     Texture texture2 = AssetStore.get("assets/textures/pattern2.png");
     Texture texture3 = AssetStore.get("assets/textures/redGreenHalf.png");
+    float c0 = new Color(1f,0.2f,1,0.8f).toFloatBits();
 
     int vbo;
+    int ebo;
 
-    public SceneRendering2D_10() {
+    public SceneRendering2D_11() {
 
         System.out.println("max fragment textures: " + GraphicsUtils.getMaxFragmentShaderTextureUnits());
         System.out.println("max textures: " + GraphicsUtils.getMaxBoundTextureUnits());
@@ -47,9 +52,6 @@ public class SceneRendering2D_10 extends WindowScreen {
     @Override
     public void show() {
 
-        float c0 = new Color(0f,1,1,1).toFloatBits();
-        float c1 = new Color(1f,1,0,1).toFloatBits();
-        float c2 = new Color(1f,1,1,0.1f).toFloatBits();
 
         float[] vertices = {
                 -0.5f,0.5f, c0, 0, 0, 1,
@@ -81,42 +83,73 @@ public class SceneRendering2D_10 extends WindowScreen {
 
         vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
+        {
+            vbo = GL15.glGenBuffers();
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+            GL15.glBufferData(GL15.GL_ARRAY_BUFFER, 1024 * 6, GL15.GL_DYNAMIC_DRAW);
+            int vertexSize = 6 * Float.BYTES;
+            GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, vertexSize, 0);
+            GL20.glVertexAttribPointer(1, 4, GL11.GL_UNSIGNED_BYTE, true, vertexSize, Float.BYTES * 2L);
+            GL20.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, true, vertexSize, Float.BYTES * 3L);
+            GL20.glVertexAttribPointer(3, 1, GL11.GL_FLOAT, true, vertexSize, Float.BYTES * 5L);
+            GL20.glEnableVertexAttribArray(0);
+            GL20.glEnableVertexAttribArray(1);
+            GL20.glEnableVertexAttribArray(2);
+            GL20.glEnableVertexAttribArray(3);
 
-        vbo = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertices, GL15.GL_STATIC_DRAW);
+//            ebo = GL15.glGenBuffers();
+//            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
+//            GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, 1024 * 2 * 3, GL15.GL_DYNAMIC_DRAW);
 
-        //int vertexSize = 9 * Float.BYTES;
-        int vertexSize = 6 * Float.BYTES;
-        GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, vertexSize, 0);
-        GL20.glVertexAttribPointer(1, 4, GL11.GL_UNSIGNED_BYTE, true, vertexSize, Float.BYTES * 2L);
-        GL20.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, true, vertexSize, Float.BYTES * 3L);
-        GL20.glVertexAttribPointer(3, 1, GL11.GL_FLOAT, true, vertexSize, Float.BYTES * 5L);
+            int ebo = GL15.glGenBuffers();
+            IntBuffer indicesBuffer = MemoryUtils.store(indices);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
+            GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
 
-
-        GL20.glEnableVertexAttribArray(0);
-        GL20.glEnableVertexAttribArray(1);
-        GL20.glEnableVertexAttribArray(2);
-        GL20.glEnableVertexAttribArray(3);
-
-
-        int ebo = GL15.glGenBuffers();
-        IntBuffer indicesBuffer = MemoryUtils.store(indices);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
-        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
-
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        }
         GL30.glBindVertexArray(0);
-
-
-
     }
 
 
     @Override
     protected void refresh() {
+
+        // update vbos
+        float change = Keyboard.isKeyPressed(Keyboard.Key.Q) ? 0.01f : 0;
+
+        floatBuffer
+                .put(-0.5f + change).put(0.5f).put(c0).put(0).put(0).put(1)
+                .put(-0.5f).put(-0.5f).put(c0).put(0).put(1).put(1)
+                .put(0.5f).put(-0.5f).put(c0).put(1).put(1).put(1)
+                .put(0.5f).put(0.5f).put(c0).put(1).put(0).put(1)
+
+                .put(-1.5f + change).put(-0.5f).put(c0).put(0).put(0).put(0)
+                .put(-1.5f).put(-1.5f).put(c0).put(0).put(1).put(0)
+                .put(-0.5f).put(-1.5f).put(c0).put(1).put(1).put(0)
+                .put(-0.5f).put(-0.5f).put(c0).put(1).put(0).put(0)
+
+                .put(0.5f + change).put(1.5f).put(c0).put(0).put(0).put(2)
+                .put(0.5f).put(0.5f).put(c0).put(0).put(1).put(2)
+                .put(1.5f).put(0.5f).put(c0).put(1).put(1).put(2)
+                .put(1.5f).put(1.5f).put(c0).put(1).put(0).put(2)
+                ;
+        floatBuffer.flip();
+
+        intBuffer
+                .put(0).put(1).put(3)
+                .put(3).put(1).put(2)
+
+                .put(4).put(5).put(7)
+                .put(7).put(5).put(6)
+
+                .put(8).put(9).put(11)
+                .put(11).put(9).put(10)
+                ;
+        intBuffer.flip();
+
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, floatBuffer);
+        GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 0, intBuffer);
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(1,0,1,0);

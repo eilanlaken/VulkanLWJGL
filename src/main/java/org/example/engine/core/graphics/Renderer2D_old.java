@@ -1,50 +1,53 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.assets.AssetUtils;
+import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.memory.Resource;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.HashMap;
 
 // The Cherno:
 // https://github.com/TheCherno/Hazel/blob/master/Hazelnut/assets/shaders/Renderer2D_Quad.glsl
-public class Renderer2D implements Resource {
+public class Renderer2D_old implements Resource {
 
-    private static final int BATCH_SIZE = 2000;
-    private static final int VERTEX_SIZE = 6;
-    private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
-    private static final int TRIANGLE_INDICES = 3;
+    private static final int BATCH_VERTICES_CAPACITY = 4000;
+    private static final int VERTEX_SIZE = 5;
+    private static final int BATCH_TRIANGLES_CAPACITY = BATCH_VERTICES_CAPACITY * 2;
 
-    // state management
     private final ShaderProgram defaultShader;
     private ShaderProgram currentShader;
     private ShaderProgram lastShader;
     private HashMap<String, Object> currentCustomAttributes;
     private CameraLens lens;
+    private Texture lastTexture = null;
+    private float invTexWidth = 0;
+    private float invTexHeight = 0;
     private boolean drawing = false;
-    private int vertexIndex = 0;
-    private int triangleIndex = 0;
-    private final int vaoId;
-    private int vbo, ebo;
-    private FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * VERTEX_SIZE);
-    private IntBuffer indicesBuffer = BufferUtils.createIntBuffer(BATCH_TRIANGLES_CAPACITY * TRIANGLE_INDICES);
-
-    // profiling
     private int drawCalls = 0;
     private int shaderSwaps = 0;
     private int textureSwaps = 0;
-    private int customAttributesBinds = 0;
 
-    public Renderer2D() {
+    private int vertexIndex = 0;
+    private int triangleIndex = 0;
+    private final int vaoId;
+    private final ArrayInt vbos = new ArrayInt();
+
+    //private float[] positions;
+    //private float[] colors;
+    //private float[] textureCoords0s;
+    // try with interleaving first
+    private float[] vertices;
+    private short[] triangleIndices;
+    // VertexBufferObjectWithVAO
+
+    public Renderer2D_old() {
         this(null,null);
     }
 
-    public Renderer2D(final String defaultVertexShader, final String defaultFragmentShader) {
+    public Renderer2D_old(final String defaultVertexShader, final String defaultFragmentShader) {
         // TODO: for debugging only; later, inline the shader source code here.
         if (defaultVertexShader == null || defaultFragmentShader == null)
             this.defaultShader = new ShaderProgram(AssetUtils.getFileContent("assets/shaders/default-2d.vert"),
@@ -52,13 +55,14 @@ public class Renderer2D implements Resource {
         else this.defaultShader = new ShaderProgram(defaultVertexShader, defaultFragmentShader);
         this.vaoId = GL30.glGenVertexArrays();
 
+        this.vertices = new float[BATCH_VERTICES_CAPACITY * 5]; // x,y,color (as single float, auto unpacked by opengl),u,v
+        this.triangleIndices = new short[BATCH_TRIANGLES_CAPACITY * 3];
     }
 
     public void begin(CameraLens lens) {
-        if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D.class.getSimpleName() + ".end() before calling begin().");
+        if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D_old.class.getSimpleName() + ".end() before calling begin().");
         this.drawCalls = 0;
         this.shaderSwaps = 0;
-        this.customAttributesBinds = 0;
         this.lens = lens;
         drawing = true;
     }
@@ -105,13 +109,12 @@ public class Renderer2D implements Resource {
         if (this.vertexIndex == 0) return;
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         // perform shader switch
         if (currentShader != lastShader) {
             ShaderProgramBinder.bind(currentShader);
             lastShader = currentShader;
             currentShader.bindUniform("u_camera_combined", lens.combined);
+            currentShader.bindUniform("u_texture", lastTexture);
             if (currentShader != defaultShader) currentShader.bindUniforms(currentCustomAttributes);
             shaderSwaps++;
         }
@@ -133,7 +136,7 @@ public class Renderer2D implements Resource {
     }
 
     public void end() {
-        if (!drawing) throw new IllegalStateException("Called " + Renderer2D.class.getSimpleName() + ".end() without calling " + Renderer2D.class.getSimpleName() + ".begin() first.");
+        if (!drawing) throw new IllegalStateException("Called " + Renderer2D_old.class.getSimpleName() + ".end() without calling " + Renderer2D_old.class.getSimpleName() + ".begin() first.");
         flush();
         GL20.glDepthMask(true);
         GL11.glEnable(GL11.GL_CULL_FACE);
