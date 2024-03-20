@@ -97,15 +97,9 @@ public class SceneRendering2D_11 extends WindowScreen {
             GL20.glEnableVertexAttribArray(2);
             GL20.glEnableVertexAttribArray(3);
 
-//            ebo = GL15.glGenBuffers();
-//            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
-//            GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, 1024 * 2 * 3, GL15.GL_DYNAMIC_DRAW);
-
-            int ebo = GL15.glGenBuffers();
-            IntBuffer indicesBuffer = MemoryUtils.store(indices);
+            ebo = GL15.glGenBuffers();
             GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
-            GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
-
+            GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, 1024 * 2 * 3, GL15.GL_DYNAMIC_DRAW);
         }
         GL30.glBindVertexArray(0);
     }
@@ -149,6 +143,7 @@ public class SceneRendering2D_11 extends WindowScreen {
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, floatBuffer);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
         GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 0, intBuffer);
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
@@ -168,7 +163,9 @@ public class SceneRendering2D_11 extends WindowScreen {
         GL20.glEnableVertexAttribArray(2);
         GL20.glEnableVertexAttribArray(3);
 
-        GL11.glDrawElements(GL11.GL_TRIANGLES, 18, GL11.GL_UNSIGNED_INT, 0);
+        System.out.println(intBuffer.limit());
+
+        GL11.glDrawElements(GL11.GL_TRIANGLES, intBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
 
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
