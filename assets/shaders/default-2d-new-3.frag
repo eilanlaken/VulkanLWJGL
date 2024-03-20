@@ -12,14 +12,17 @@ layout (location = 0) out vec4 out_color;
 
 void main() {
 
-    vec4 textureColor;
+    vec4 finalColor;
 
     switch (int(texIndex)) {
-        case 0: textureColor = texture(u_textures[0], uv); break;
-        case 1: textureColor = texture(u_textures[1], uv); break;
-        case 2: textureColor = texture(u_textures[2], uv); break;
+        case 0: finalColor = color * texture(u_textures[0], uv); break;
+        case 1: finalColor = color * texture(u_textures[1], uv); break;
+        case 2: finalColor = color * texture(u_textures[2], uv); break;
+        case 3: finalColor = color * texture(u_textures[3], uv); break;
     }
 
-    out_color = color * textureColor;
+    if (finalColor.a == 0) discard;
+
+    out_color = finalColor;
 
 }
