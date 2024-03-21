@@ -1,22 +1,8 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
-import org.example.engine.core.graphics.TexturePacker;
-import org.example.engine.core.graphics.TexturePackerOptions;
 import org.example.engine.core.graphics.WindowAttributes;
-import org.example.engine.core.math.MathUtils;
 import org.example.game.ScreenLoading;
-import org.lwjgl.stb.STBRPContext;
-import org.lwjgl.stb.STBRPNode;
-import org.lwjgl.stb.STBRPRect;
-import org.lwjgl.stb.STBRectPack;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Timer;
 
 public class Main {
 

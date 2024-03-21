@@ -1,19 +1,11 @@
 package org.example.engine.core.graphics;
 
-import com.google.gson.Gson;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.math.MathUtils;
 import org.lwjgl.stb.STBRPContext;
 import org.lwjgl.stb.STBRPNode;
 import org.lwjgl.stb.STBRPRect;
 import org.lwjgl.stb.STBRectPack;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.introspector.Property;
-import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.nodes.Tag;
-import org.yaml.snakeyaml.representer.Representer;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -22,18 +14,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class TexturePacker {
+public class TexturePackGenerator {
 
     public static synchronized void packDirectory(final String outputName, final String directory, final boolean recursive) {
         if (directory == null) throw new IllegalArgumentException("Must provide non-null directory name.");
         if (!AssetUtils.directoryExists(directory)) throw new IllegalArgumentException("The provided path: " + directory + " does not exist, or is not a directory");
     }
     public static synchronized void packTextures(final String directory, final String outputName, final String ...texturePaths) throws IOException {
-        final TexturePackerOptions options = new TexturePackerOptions(directory, outputName);
+        final Options options = new Options(directory, outputName);
         packTextures(options, texturePaths);
     }
 
-    public static synchronized void packTextures(final TexturePackerOptions options, final String ...texturePaths) throws IOException {
+    public static synchronized void packTextures(final Options options, final String ...texturePaths) throws IOException {
         if (alreadyPacked(options, texturePaths)) return;
         Array<PackedRegionData> regionsData = new Array<>(texturePaths.length);
         for (int i = 0; i < texturePaths.length; i++) {
@@ -58,7 +50,7 @@ public class TexturePacker {
         generatePackTextureFiles(options, texturePack);
     }
 
-    private static synchronized boolean pack(TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack, Array<PackedRegionData> remaining, int last, int currentImageIndex) {
+    private static synchronized boolean pack(Options options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack, Array<PackedRegionData> remaining, int last, int currentImageIndex) {
         if (last < 0) return true;
         int size = 1;
         System.out.println("last: " + last);
@@ -100,7 +92,7 @@ public class TexturePacker {
         return false;
     }
 
-    private static synchronized PackedRegionData getPackedRegionData(final TexturePackerOptions options, final String path, final BufferedImage sourceImage) {
+    private static synchronized PackedRegionData getPackedRegionData(final Options options, final String path, final BufferedImage sourceImage) {
         int originalWidth = sourceImage.getWidth();
         int originalHeight = sourceImage.getHeight();
         int minX = originalWidth;
@@ -131,7 +123,7 @@ public class TexturePacker {
         return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY, minX, minY);
     }
 
-    private static synchronized void generatePackFile(final TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) {
+    private static synchronized void generatePackFile(final Options options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) {
         String outputName = options.outputName;
         TextureData[] texturesData = new TextureData[texturePack.size()];
         int i = 0;
@@ -171,7 +163,7 @@ public class TexturePacker {
         }
     }
 
-    private static synchronized void generatePackTextureFiles(final TexturePackerOptions options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) throws IOException {
+    private static synchronized void generatePackTextureFiles(final Options options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) throws IOException {
         for (Map.Entry<IndexedBufferedImage, Array<PackedRegionData>> imageRegions : texturePack.entrySet()) {
             IndexedBufferedImage texturePackImage = imageRegions.getKey();
             Graphics2D graphics = texturePackImage.createGraphics();
@@ -227,7 +219,7 @@ public class TexturePacker {
     }
 
     // TODO: implement.
-    private static synchronized boolean alreadyPacked(final TexturePackerOptions options, final String ...texturePaths) {
+    private static synchronized boolean alreadyPacked(final Options options, final String ...texturePaths) {
         final String outputDirectory = options.outputDirectory;
         // check if the output directory or the texture map file is missing
         if (!AssetUtils.directoryExists(outputDirectory)) return false;
@@ -297,4 +289,52 @@ public class TexturePacker {
 
     }
 
+    public static final class Options {
+
+        public enum Size {
+
+            XX_SMALL_128(128),
+            X_SMALL_256(256),
+            SMALL_512(512),
+            MEDIUM_1024(1024),
+            LARGE_2048(2048),
+            X_LARGE_4096(4096),
+            XX_LARGE_8192(8192),
+            ;
+
+            public final int value;
+
+            Size(int value) {
+                this.value = value;
+            }
+
+        }
+
+        public final String outputDirectory;
+        public final String outputName;
+        public final TextureParamFilter magFilter;
+        public final TextureParamFilter minFilter;
+        public final TextureParamWrap uWrap;
+        public final TextureParamWrap vWrap;
+        public final int extrude; // extrude REPEATS the border i.e. adding colors.
+        public final int padding;
+        public final int maxTexturesSize;
+
+        public Options(String outputDirectory, String outputName) {
+            this(outputDirectory, outputName, TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE, 1,1, Size.XX_LARGE_8192);
+        }
+
+        public Options(String outputDirectory, String outputName, TextureParamFilter magFilter, TextureParamFilter minFilter, TextureParamWrap uWrap, TextureParamWrap vWrap, int extrude, int padding, Size size) {
+            this.outputDirectory = outputDirectory;
+            this.outputName = outputName;
+            this.magFilter = magFilter == null ? TextureParamFilter.MIP_MAP_NEAREST_NEAREST : magFilter;
+            this.minFilter = minFilter == null ? TextureParamFilter.MIP_MAP_NEAREST_NEAREST : minFilter;
+            this.uWrap = uWrap == null ? TextureParamWrap.CLAMP_TO_EDGE : uWrap;
+            this.vWrap = vWrap == null ? TextureParamWrap.CLAMP_TO_EDGE : vWrap;
+            this.extrude = Math.max(extrude, 0);
+            this.padding = Math.max(padding, 0);
+            this.maxTexturesSize = size.value;
+        }
+
+    }
 }

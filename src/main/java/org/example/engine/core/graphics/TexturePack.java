@@ -9,25 +9,25 @@ import java.util.HashMap;
 public class TexturePack {
 
     protected final Texture[] textures;
-    protected final TexturePackerOptions options;
-    protected final HashMap<String, TexturePackRegion> namedRegions;
-    protected final HashMap<String, TexturePackRegion[]> namedAnimations;
+    protected final TexturePackGenerator.Options options;
+    protected final HashMap<String, TextureRegion> namedRegions;
+    protected final HashMap<String, TextureRegion[]> namedAnimations;
 
-    protected TexturePack(final Texture[] textures, final TexturePackerOptions options, final HashMap<String, TexturePackRegion> namedRegions, final HashMap<String, TexturePackRegion[]> namedAnimations) {
+    protected TexturePack(final Texture[] textures, final TexturePackGenerator.Options options, final HashMap<String, TextureRegion> namedRegions, final HashMap<String, TextureRegion[]> namedAnimations) {
         this.textures = textures;
         this.options = options;
         this.namedRegions = namedRegions;
         this.namedAnimations = namedAnimations;
     }
 
-    public TexturePackRegion getRegion(final String name) {
-        final TexturePackRegion region = namedRegions.get(name);
+    public TextureRegion getRegion(final String name) {
+        final TextureRegion region = namedRegions.get(name);
         if (region == null) throw new RuntimeException(TexturePack.class.getSimpleName() + " " + this.options.outputName + " does not contain a region named " + name);
         return region;
     }
 
-    public TexturePackRegion[] getAnimationFrames(final String name) {
-        final TexturePackRegion[] regions = namedAnimations.get(name);
+    public TextureRegion[] getAnimationFrames(final String name) {
+        final TextureRegion[] regions = namedAnimations.get(name);
         if (regions == null) throw new RuntimeException(TexturePack.class.getSimpleName() + " " + this.options.outputName + " does not contain an animation named " + name);
         return regions;
     }

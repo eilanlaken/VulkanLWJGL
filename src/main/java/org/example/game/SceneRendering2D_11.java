@@ -20,23 +20,22 @@ import java.nio.IntBuffer;
 // TODO: https://www.cppstories.com/2015/01/persistent-mapped-buffers-in-opengl/#persistence
 // Note: glBufferData invalidates and reallocates the whole buffer. Use glBufferSubData to only update the data inside.
 // https://stackoverflow.com/questions/72648980/opengl-sampler2d-array
+// libGDX PolygonSpriteBatch.java line 772 draw()
 public class SceneRendering2D_11 extends WindowScreen {
 
     Texture[] texturesToBind = new Texture[16];
-
     private ShaderProgram shader;
 
-    // create and modify quad dynamically
     int vao;
-    FloatBuffer floatBuffer = MemoryUtils.createFloatBuffer(2000 * 6);
-    IntBuffer intBuffer = BufferUtils.createIntBuffer(2000 * 2 * 3);
+    int vbo;
+    int ebo;
+    FloatBuffer verticesBuffer = MemoryUtils.createFloatBuffer(2000 * 6);
+    IntBuffer triangleIndicesBuffer = BufferUtils.createIntBuffer(2000 * 2 * 3);
+
     Texture texture = AssetStore.get("assets/textures/yellowSquare.png");
     Texture texture2 = AssetStore.get("assets/textures/pattern2.png");
     Texture texture3 = AssetStore.get("assets/textures/redGreenHalf.png");
     float c0 = new Color(1f,0.2f,1,0.8f).toFloatBits();
-
-    int vbo;
-    int ebo;
 
     public SceneRendering2D_11() {
 
@@ -51,36 +50,6 @@ public class SceneRendering2D_11 extends WindowScreen {
 
     @Override
     public void show() {
-
-
-        float[] vertices = {
-                -0.5f,0.5f, c0, 0, 0, 1,
-                -0.5f,-0.5f, c0, 0, 1, 1,
-                0.5f,-0.5f, c0, 1, 1, 1,
-                0.5f,0.5f, c0, 1, 0, 1,
-
-                -1.5f,-0.5f, c0, 0, 0, 0,
-                -1.5f,-1.5f, c0, 0, 1, 0,
-                -0.5f,-1.5f, c0, 1, 1, 0,
-                -0.5f,-0.5f, c0, 1, 0, 0,
-
-                0.5f,1.5f, c0, 0, 0, 2,
-                0.5f,0.5f, c0, 0, 1, 2,
-                1.5f,0.5f, c0, 1, 1, 2,
-                1.5f,1.5f, c0, 1, 0, 2,
-        };
-
-        int[] indices = {
-                0,1,3,	//Top left triangle (V0,V1,V3)
-                3,1,2,	//Bottom right triangle (V3,V1,V2)
-
-                4,5,7,
-                7,5,6,
-
-                8,9,11,
-                11,9,10
-        };
-
         vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
         {
@@ -111,7 +80,7 @@ public class SceneRendering2D_11 extends WindowScreen {
         // update vbos
         float change = Keyboard.isKeyPressed(Keyboard.Key.Q) ? 0.01f : 0;
 
-        floatBuffer
+        verticesBuffer
                 .put(-0.5f + change).put(0.5f).put(c0).put(0).put(0).put(1)
                 .put(-0.5f).put(-0.5f).put(c0).put(0).put(1).put(1)
                 .put(0.5f).put(-0.5f).put(c0).put(1).put(1).put(1)
@@ -127,9 +96,9 @@ public class SceneRendering2D_11 extends WindowScreen {
                 .put(1.5f).put(0.5f).put(c0).put(1).put(1).put(2)
                 .put(1.5f).put(1.5f).put(c0).put(1).put(0).put(2)
                 ;
-        floatBuffer.flip();
+        verticesBuffer.flip();
 
-        intBuffer
+        triangleIndicesBuffer
                 .put(0).put(1).put(3)
                 .put(3).put(1).put(2)
 
@@ -139,12 +108,12 @@ public class SceneRendering2D_11 extends WindowScreen {
                 .put(8).put(9).put(11)
                 .put(11).put(9).put(10)
                 ;
-        intBuffer.flip();
+        triangleIndicesBuffer.flip();
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, floatBuffer);
+        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, verticesBuffer);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
-        GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 0, intBuffer);
+        GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 0, triangleIndicesBuffer);
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(1,0,1,0);
@@ -163,9 +132,7 @@ public class SceneRendering2D_11 extends WindowScreen {
         GL20.glEnableVertexAttribArray(2);
         GL20.glEnableVertexAttribArray(3);
 
-        System.out.println(intBuffer.limit());
-
-        GL11.glDrawElements(GL11.GL_TRIANGLES, intBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, triangleIndicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
 
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);

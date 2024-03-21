@@ -1,9 +1,11 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.assets.AssetUtils;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
@@ -19,6 +21,7 @@ public class Renderer2D implements Resource {
     private static final int VERTEX_SIZE = 6;
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
     private static final int TRIANGLE_INDICES = 3;
+    private static final int TEXTURES_CAPACITY = 5;
 
     // state management
     private final ShaderProgram defaultShader;
@@ -26,10 +29,12 @@ public class Renderer2D implements Resource {
     private ShaderProgram lastShader;
     private HashMap<String, Object> currentCustomAttributes;
     private CameraLens lens;
+    private Array<Texture> usedTextures = new Array<>(TEXTURES_CAPACITY);
+
     private boolean drawing = false;
     private int vertexIndex = 0;
     private int triangleIndex = 0;
-    private final int vaoId;
+    private final int vao;
     private int vbo, ebo;
     private FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * VERTEX_SIZE);
     private IntBuffer indicesBuffer = BufferUtils.createIntBuffer(BATCH_TRIANGLES_CAPACITY * TRIANGLE_INDICES);
@@ -41,21 +46,37 @@ public class Renderer2D implements Resource {
     private int customAttributesBinds = 0;
 
     public Renderer2D() {
-        this(null,null);
-    }
-
-    public Renderer2D(final String defaultVertexShader, final String defaultFragmentShader) {
         // TODO: for debugging only; later, inline the shader source code here.
-        if (defaultVertexShader == null || defaultFragmentShader == null)
-            this.defaultShader = new ShaderProgram(AssetUtils.getFileContent("assets/shaders/default-2d.vert"),
-                    AssetUtils.getFileContent("assets/shaders/default-2d.frag"));
-        else this.defaultShader = new ShaderProgram(defaultVertexShader, defaultFragmentShader);
-        this.vaoId = GL30.glGenVertexArrays();
+        this.defaultShader = new ShaderProgram(AssetUtils.getFileContent("assets/shaders/default-2d-new-3.vert"), AssetUtils.getFileContent("assets/shaders/default-2d-new-3.frag"));
+        this.vao = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(vao);
+        {
+            vbo = GL15.glGenBuffers();
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+            GL15.glBufferData(GL15.GL_ARRAY_BUFFER, verticesBuffer.capacity(), GL15.GL_DYNAMIC_DRAW);
+            int vertexSizeBytes = VERTEX_SIZE * Float.BYTES;
+            GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, vertexSizeBytes, 0);
+            GL20.glVertexAttribPointer(1, 4, GL11.GL_UNSIGNED_BYTE, true, vertexSizeBytes, Float.BYTES * 2L);
+            GL20.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, true, vertexSizeBytes, Float.BYTES * 3L);
+            GL20.glVertexAttribPointer(3, 1, GL11.GL_FLOAT, true, vertexSizeBytes, Float.BYTES * 5L);
+            GL20.glEnableVertexAttribArray(0);
+            GL20.glEnableVertexAttribArray(1);
+            GL20.glEnableVertexAttribArray(2);
+            GL20.glEnableVertexAttribArray(3);
 
+            ebo = GL15.glGenBuffers();
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
+            GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.capacity(), GL15.GL_DYNAMIC_DRAW);
+        }
+        GL30.glBindVertexArray(0);
     }
 
     public void begin(CameraLens lens) {
         if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D.class.getSimpleName() + ".end() before calling begin().");
+        GL20.glDepthMask(false);
+        GL11.glDisable(GL11.GL_CULL_FACE);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         this.drawCalls = 0;
         this.shaderSwaps = 0;
         this.customAttributesBinds = 0;
@@ -63,19 +84,7 @@ public class Renderer2D implements Resource {
         drawing = true;
     }
 
-    // PolygonSpriteBatch.java --> line 360
-    // public void draw (Texture texture, float x, float y, float originX, float originY, float width, float height, float scaleX,
-    public void pushTexture(Texture texture, Color color,
-                            float u1, float v1,
-                            float u2, float v2,
-                            ShaderProgram customShader, HashMap<String, Object> customAttributes,
-                            float pivotX, float pivotY,
-                            float x, float y, float z,
-                            float angleX, float angleY, float angleZ,
-                            float scaleX, float scaleY) {
-
-    }
-
+    /** Push primitives: TextureRegion, Shape, Light **/
     public void pushTextureRegion() {
 
     }
@@ -88,6 +97,7 @@ public class Renderer2D implements Resource {
 
     }
 
+    /** Swap Operations **/
     private void swapTextures() {
 
     }
@@ -103,28 +113,22 @@ public class Renderer2D implements Resource {
     // contains the logic that sends everything to the GPU for rendering
     private void flush() {
         if (this.vertexIndex == 0) return;
-        GL20.glDepthMask(false);
-        GL11.glDisable(GL11.GL_CULL_FACE);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        // perform shader switch
-        if (currentShader != lastShader) {
-            ShaderProgramBinder.bind(currentShader);
-            lastShader = currentShader;
-            currentShader.bindUniform("u_camera_combined", lens.combined);
-            if (currentShader != defaultShader) currentShader.bindUniforms(currentCustomAttributes);
-            shaderSwaps++;
-        }
-
-        GL30.glBindVertexArray(vaoId);
+        GL30.glBindVertexArray(vao);
         {
-            GL20.glEnableVertexAttribArray(ModelVertexAttribute.POSITION_3D.slot);
-            GL20.glEnableVertexAttribArray(ModelVertexAttribute.COLOR.slot);
-            GL20.glEnableVertexAttribArray(ModelVertexAttribute.TEXTURE_COORDINATES0.slot);
-            GL11.glDrawElements(GL11.GL_TRIANGLES, triangleIndex, GL11.GL_UNSIGNED_INT, 0);
-            GL20.glDisableVertexAttribArray(ModelVertexAttribute.TEXTURE_COORDINATES0.slot);
-            GL20.glDisableVertexAttribArray(ModelVertexAttribute.COLOR.slot);
-            GL20.glDisableVertexAttribArray(ModelVertexAttribute.POSITION_3D.slot);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+            GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, verticesBuffer);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
+            GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 0, indicesBuffer);
+
+            GL20.glEnableVertexAttribArray(0);
+            GL20.glEnableVertexAttribArray(1);
+            GL20.glEnableVertexAttribArray(2);
+            GL20.glEnableVertexAttribArray(3);
+            GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            GL20.glDisableVertexAttribArray(3);
+            GL20.glDisableVertexAttribArray(2);
+            GL20.glDisableVertexAttribArray(1);
+            GL20.glDisableVertexAttribArray(0);
         }
         GL30.glBindVertexArray(0);
         vertexIndex = 0;
