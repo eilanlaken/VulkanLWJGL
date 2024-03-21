@@ -9,7 +9,7 @@ import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.math.Matrix4;
 import org.lwjgl.opengl.GL11;
 
-public class SceneRendering3D extends WindowScreen {
+public class SceneRendering3D_1 extends WindowScreen {
 
     private Renderer3D renderer3DOld;
     private Model model;
@@ -23,7 +23,7 @@ public class SceneRendering3D extends WindowScreen {
     // debug
     private BlenderCameraController cameraController;
 
-    public SceneRendering3D() {
+    public SceneRendering3D_1() {
         this.renderer3DOld = new Renderer3D();
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default.vert");

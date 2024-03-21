@@ -21,7 +21,7 @@ import java.nio.IntBuffer;
 // Note: glBufferData invalidates and reallocates the whole buffer. Use glBufferSubData to only update the data inside.
 // https://stackoverflow.com/questions/72648980/opengl-sampler2d-array
 // libGDX PolygonSpriteBatch.java line 772 draw()
-public class SceneRendering2D_11 extends WindowScreen {
+public class SceneRendering2D_1 extends WindowScreen {
 
     Texture[] texturesToBind = new Texture[16];
     private ShaderProgram shader;
@@ -37,7 +37,7 @@ public class SceneRendering2D_11 extends WindowScreen {
     Texture texture3 = AssetStore.get("assets/textures/redGreenHalf.png");
     float c0 = new Color(1f,0.2f,1,0.8f).toFloatBits();
 
-    public SceneRendering2D_11() {
+    public SceneRendering2D_1() {
 
         System.out.println("max fragment textures: " + GraphicsUtils.getMaxFragmentShaderTextureUnits());
         System.out.println("max textures: " + GraphicsUtils.getMaxBoundTextureUnits());

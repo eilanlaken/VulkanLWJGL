@@ -63,7 +63,6 @@ public class Renderer2D implements Resource {
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
             GL20.glEnableVertexAttribArray(3);
-
             ebo = GL15.glGenBuffers();
             GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
             GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.capacity(), GL15.GL_DYNAMIC_DRAW);
