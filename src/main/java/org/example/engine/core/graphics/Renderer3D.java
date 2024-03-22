@@ -20,7 +20,7 @@ public class Renderer3D {
 
     public void begin(ShaderProgram shader) {
         this.currentShader = shader;
-        this.currentShader.bind();
+        ShaderProgramBinder.bind(shader);
     }
 
     public void setCamera(final Camera camera) {
@@ -66,7 +66,7 @@ public class Renderer3D {
     }
 
     public void end() {
-        this.currentShader.unbind();
+        ShaderProgramBinder.unbind();
     }
 
     private void sort(Array<ModelPart> modelParts) {

@@ -1,4 +1,4 @@
 package org.example.engine.systems;
 
-public class SystemRenderingUtils {
+public class SystemSignals {
 }

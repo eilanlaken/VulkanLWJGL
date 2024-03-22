@@ -1,5 +1,6 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Quaternion;
@@ -31,6 +32,9 @@ public class ShaderProgram implements Resource {
     private final MapObjectInt<String> attributeTypes;
     private final MapObjectInt<String> attributeSizes;
     private String[] attributeNames;
+
+    // TODO: implement and test - but first finish 2d.
+    private Array<Object> cachedUniforms = new Array<>(40);
 
     public ShaderProgram(final String vertexShaderSource, final String fragmentShaderSource) {
         if (vertexShaderSource == null) throw new IllegalArgumentException("Vertex shader cannot be null.");
@@ -112,26 +116,6 @@ public class ShaderProgram implements Resource {
             this.attributeTypes.put(name, type.get(0));
             this.attributeSizes.put(name, params.get(0));
             this.attributeNames[i] = name;
-        }
-    }
-
-    // TODO: remove
-    @Deprecated private void fetchUniforms() {
-        IntBuffer params = BufferUtils.createIntBuffer(1);
-        IntBuffer type = BufferUtils.createIntBuffer(1);
-        GL20.glGetProgramiv(this.program, GL20.GL_ACTIVE_UNIFORMS, params);
-        int numUniforms = params.get(0);
-        this.uniformNames = new String[numUniforms];
-        for(int i = 0; i < numUniforms; ++i) {
-            params.clear();
-            params.put(0, 1);
-            type.clear();
-            String name = GL20.glGetActiveUniform(this.program, i, params, type);
-            int location = GL20.glGetUniformLocation(this.program, name);
-            this.uniformLocations.put(name, location);
-            this.uniformTypes.put(name, type.get(0));
-            this.uniformSizes.put(name, params.get(0));
-            this.uniformNames[i] = name;
         }
     }
 
@@ -228,6 +212,15 @@ public class ShaderProgram implements Resource {
         }
     }
 
+    private void cacheUniform(final int location, final Object value) {
+
+    }
+
+    // TODO: implement
+    private boolean isUniformCached(final int location, final Object value) {
+        return false;
+    }
+
     // TODO: see if this constant: GL_MAX_TEXTURE_IMAGE_UNITS is the right one.
     private void validate() {
         // validate that the number of sampled textures does not exceed the allowed maximum on current GPU
@@ -239,16 +232,6 @@ public class ShaderProgram implements Resource {
         }
         if (sampledTextures > maxSampledTextures) throw new IllegalArgumentException("Error: shader code trying " +
                 "to sample " + sampledTextures + ". The allowed maximum on this hardware is " + maxSampledTextures);
-    }
-
-    // use ShaderProgramBinder
-    @Deprecated public void bind() {
-        GL20.glUseProgram(program);
-    }
-
-    // use ShaderProgramBinder
-    @Deprecated public void unbind() {
-        GL20.glUseProgram(0);
     }
 
     @Override
