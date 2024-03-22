@@ -18,7 +18,6 @@ public class TextureBinder {
     public static synchronized int bind(final Texture texture) {
         if (texture.handle == 0) throw new IllegalStateException("Trying to bind " + Texture.class.getSimpleName() + " that was already freed.");
         if (texture.getSlot() >= 0) return texture.getSlot();
-        System.out.println("binding");
         int slot = roundRobinCounter + RESERVED_OFFSET;
         if (boundTextures[slot] != null) unbind(boundTextures[slot]);
         GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);

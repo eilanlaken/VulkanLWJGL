@@ -51,7 +51,6 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
         GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
         // TODO: we need to see if the anisotropic filtering extension is available. If yes, create that instead of mipmaps.
         STBImage.stbi_image_free(buffer);
-        //TextureBinder.unbind(texture);
         return texture;
     }
 

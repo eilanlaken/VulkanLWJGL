@@ -52,6 +52,7 @@ public class SceneRendering2D_2 extends WindowScreen {
         renderer2D.begin(null);
         renderer2D.pushTexture(texture0, new Color(1,1,1,0.5f), 0,0,1,1,0,0,0,0,0,1,1,null,null);
         renderer2D.pushTexture(texture1, new Color(1,1,1,1f), 0,0,1,1,0,0,0,0,0,1,1,null,null);
+        renderer2D.pushTexture(texture2, new Color(1,1,1,0.3f), 0,0,1,1,0,0,0,0,0,1,1,null,null);
         renderer2D.end();
     }
 

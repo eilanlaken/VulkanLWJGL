@@ -189,7 +189,6 @@ public class ShaderProgram implements Resource {
             case GL20.GL_SAMPLER_2D:
                 Texture texture = (Texture) value;
                 int slot = TextureBinder.bind(texture);
-                System.out.println("slot: " + slot);
                 GL20.glUniform1i(location, slot);
                 break;
 
