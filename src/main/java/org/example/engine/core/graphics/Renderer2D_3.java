@@ -183,8 +183,7 @@ public class Renderer2D_3 implements Resource {
         if (currentShader != shader) {
             flush();
             ShaderProgramBinder.bind(shader);
-            // TODO: bind camera
-            //shader.bindUniform("u_camera_combined", lens.combined);
+            shader.bindUniform("u_camera_combined", lens.combined);
         }
         currentShader = shader;
     }
