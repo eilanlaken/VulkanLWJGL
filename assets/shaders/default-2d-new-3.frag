@@ -16,6 +16,7 @@ void main() {
 
     switch (int(texIndex)) {
         // TODO: problem here: this shit defaults to 0
+        // TODO: ALSO - WHO SAID THE BOUND TEXTURE SLOT WILL BE IN THE RANGE 0-3???
         case 0: finalColor = color * texture(u_textures[0], uv); break;
         case 1: finalColor = color * texture(u_textures[1], uv); break;
         case 2: finalColor = color * texture(u_textures[2], uv); break;
