@@ -6,6 +6,7 @@ import org.example.engine.core.collections.Queue;
 import org.example.engine.core.graphics.Model;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.Texture;
+import org.example.engine.core.graphics.TexturePack;
 import org.example.engine.core.memory.Resource;
 
 import java.lang.reflect.Constructor;
@@ -134,7 +135,7 @@ public final class AssetStore {
         loaders.put(Texture.class, AssetLoaderTexture.class);
         loaders.put(Model.class, AssetLoaderModel.class);
         loaders.put(ShaderProgram.class, AssetLoaderShaderProgram.class);
-
+        loaders.put(TexturePack.class, AssetLoaderTexturePack.class);
         return loaders;
     }
 

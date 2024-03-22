@@ -1,12 +1,14 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.memory.Resource;
+
 import java.util.HashMap;
 
 // can contain duplicates.
 // example:
 // named regions: <my_anim_1->region1, my_anim_2->region2>
 // named animations: <my_anim->[region1,region2]>
-public class TexturePack {
+public class TexturePack implements Resource {
 
     protected final Texture[] textures;
     protected final TexturePackGenerator.Options options;
@@ -32,4 +34,8 @@ public class TexturePack {
         return regions;
     }
 
+    @Override
+    public void free() {
+        // TODO: see how should be implemented.
+    }
 }
