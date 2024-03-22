@@ -5,28 +5,32 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 
 // REFERENCE TODO: DefaultTextureBinder (libGDX)
+// TODO: fix
 public class TextureBinder {
 
     private static final int RESERVED_OFFSET = 0; // we will begin binding from slots OFFSET, OFFSET + 1,... leaving slots 0... OFFSET - 1 for texture loading and manipulation?
-    private static final int availableTextureSlots = GraphicsUtils.getMaxBoundTextureUnits() - RESERVED_OFFSET;
-    private static final Texture[] boundTextures = new Texture[availableTextureSlots + RESERVED_OFFSET];
+    private static final int MAXIMUM_BOUND_TEXTURE_UNITS = GraphicsUtils.getMaxBoundTextureUnits();
+    private static final int AVAILABLE_TEXTURE_SLOTS = MAXIMUM_BOUND_TEXTURE_UNITS - RESERVED_OFFSET;
+    private static final Texture[] boundTextures = new Texture[MAXIMUM_BOUND_TEXTURE_UNITS];
     private static int roundRobinCounter = 0;
 
-    public static int bind(final Texture texture) {
+    // TODO: fix
+    public static synchronized int bind(final Texture texture) {
         if (texture.handle == 0) throw new IllegalStateException("Trying to bind " + Texture.class.getSimpleName() + " that was already freed.");
         if (texture.getSlot() >= 0) return texture.getSlot();
+        System.out.println("binding");
         int slot = roundRobinCounter + RESERVED_OFFSET;
         if (boundTextures[slot] != null) unbind(boundTextures[slot]);
         GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
         GL11.glBindTexture(GL20.GL_TEXTURE_2D, texture.handle);
         updateTextureParameters(texture);
         boundTextures[slot] = texture;
-        roundRobinCounter = (roundRobinCounter + 1) % availableTextureSlots;
+        roundRobinCounter = (roundRobinCounter + 1) % AVAILABLE_TEXTURE_SLOTS;
         texture.setSlot(slot);
         return slot;
     }
 
-    protected static void unbind(Texture texture) {
+    public static synchronized void unbind(Texture texture) {
         if (texture.handle == 0) throw new IllegalStateException("Trying to unbind " + Texture.class.getSimpleName() + " that was already freed.");
         int slot = texture.getSlot();
         if (slot < 0) return;
@@ -36,8 +40,7 @@ public class TextureBinder {
         texture.setSlot(-1);
     }
 
-
-    // TODO: see all texture parameters (formats: RGB, RGBA, ...; packing, etc.)
+    // TODO: see all texture parameters (formats: RGB, RGBA, ...; packing, compression, etc.)
     private static void updateTextureParameters(final Texture texture) {
         GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MIN_FILTER, texture.minFilter.glValue);
         GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MAG_FILTER, texture.magFilter.glValue);

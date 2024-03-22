@@ -15,6 +15,7 @@ void main() {
     vec4 finalColor;
 
     switch (int(texIndex)) {
+        // TODO: problem here: this shit defaults to 0
         case 0: finalColor = color * texture(u_textures[0], uv); break;
         case 1: finalColor = color * texture(u_textures[1], uv); break;
         case 2: finalColor = color * texture(u_textures[2], uv); break;

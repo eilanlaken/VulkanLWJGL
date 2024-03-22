@@ -87,24 +87,37 @@ public class Renderer2D_1 implements Resource {
         useTexture(texture);
         useCustomAttributes(customAttributes);
 
-        indicesBuffer.put(0).put(1).put(3).put(3).put(1).put(2);
+        int startVertex = this.vertexIndex / 6;
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+        ;
+        triangleIndex += 6;
+
+
+        int t = texture.getSlot();
         float c = color.toFloatBits();
 
         // put vertices
         verticesBuffer
-                .put(-0.5f).put(0.5f).put(c).put(0).put(0).put(0)
-                .put(-0.5f).put(-0.5f).put(c).put(0).put(0).put(0)
-                .put(0.5f).put(-0.5f).put(c).put(0).put(0).put(0)
-                .put(0.5f).put(0.5f).put(c).put(0).put(0).put(0)
-                ;
+                .put(-0.5f).put(0.5f).put(c).put(0).put(0).put(t)
+                .put(-0.5f).put(-0.5f).put(c).put(0).put(1).put(t)
+                .put(0.5f).put(-0.5f).put(c).put(1).put(1).put(t)
+                .put(0.5f).put(0.5f).put(c).put(1).put(0).put(t)
+        ;
+        vertexIndex += 24;
     }
 
     public void pushShape() {
-
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     public void pushLight() {
-
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /** Swap Operations **/

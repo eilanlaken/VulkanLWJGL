@@ -43,7 +43,7 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
                 TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamFilter.MIP_MAP_NEAREST_NEAREST,
                 TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE
         );
-        int x = TextureBinder.bind(texture);
+        TextureBinder.bind(texture);
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
         // TODO: here we need to see if we want to: generate mipmaps, use anisotropic filtering, what level of anisotropy etc
         // TODO: For a raw Texture with no TextureMap, use defaults.
@@ -51,6 +51,7 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
         GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
         // TODO: we need to see if the anisotropic filtering extension is available. If yes, create that instead of mipmaps.
         STBImage.stbi_image_free(buffer);
+        //TextureBinder.unbind(texture);
         return texture;
     }
 
