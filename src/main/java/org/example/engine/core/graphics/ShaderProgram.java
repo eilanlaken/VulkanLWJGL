@@ -54,14 +54,6 @@ public class ShaderProgram implements Resource {
         registerAttributes();
         registerUniforms();
         validate();
-        System.out.println("types:");
-        for (MapObjectInt.Entry<String> s : uniformTypes) {
-            System.out.println(uniformTypes.get(s.key, -5));
-        }
-        System.out.println("names:");
-        for (String s : uniformNames) {
-            System.out.println(s);
-        }
     }
 
     private int createVertexShader(final String shaderCode) {
@@ -186,6 +178,7 @@ public class ShaderProgram implements Resource {
     }
 
     public void bindUniform(final String name, final Object value) {
+        if (value == null) return;
         final int location = uniformLocations.get(name, -1);
         // TODO: remove. Good only for debugging, but prevents custom flexible shading.
         if (location == -1) throw new IllegalArgumentException("\n\nError: " + this.getClass().getSimpleName() +  " does not have a uniform named " + name + "." +

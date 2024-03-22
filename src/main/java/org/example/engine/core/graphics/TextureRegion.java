@@ -42,7 +42,8 @@ public class TextureRegion {
         this.originalHeightHalf = originalHeight * 0.5f;
 
         // TODO: set u,v,u2,v2
-        u = v = u2 = v2 = 0;
+        u = v = 0;
+        u2 = v2 = 1;
     }
 
 }

@@ -3,31 +3,24 @@ package org.example;
 import org.example.engine.core.application.Application;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.game.ScreenLoading;
+import org.lwjgl.BufferUtils;
+
+import java.nio.IntBuffer;
 
 public class Main {
 
     public static void main(String[] args) {
-        short[] x = new short[1_000_000];
+        IntBuffer b = BufferUtils.createIntBuffer(400);
+        b.put(4).put(5).put(6);
+        System.out.println(b.position());
+        b.flip();
+        System.out.println(b.get());
+        System.out.println(b.position());
 
+        System.out.println(b.position(0));
+        System.out.println("limit: " + b.limit());
+        System.out.println(b.get());
 
-        long nanos1 = System.nanoTime();
-        for (int i = 0; i < x.length; i++) {
-            x[i] = 2;
-        }
-        long nanos2 = System.nanoTime();
-        long diff1 = nanos2 - nanos1;
-
-        long nanos3 = System.nanoTime();
-        for (int i = x.length - 1; i >= 0; i--) {
-            x[i] = 2;
-        }
-        long nanos4 = System.nanoTime();
-        long diff2 = nanos4 - nanos3;
-
-        System.out.println("diff1 " + diff1);
-
-        System.out.println("diff2 " + diff2);
-        //copy();
 //        try {
 //            TexturePackerOptions options = new TexturePackerOptions("assets/atlases", "pack",
 //                    null, null, null, null,

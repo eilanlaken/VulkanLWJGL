@@ -21,15 +21,14 @@ public class Renderer2D implements Resource {
     private static final int VERTEX_SIZE = 6;
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
     private static final int TRIANGLE_INDICES = 3;
-    private static final int TEXTURES_CAPACITY = 5;
+    private static final int TEXTURES_CAPACITY = 4;
 
     // state management
+    private CameraLens lens;
     private final ShaderProgram defaultShader;
     private ShaderProgram currentShader;
-    private ShaderProgram lastShader;
-    private HashMap<String, Object> currentCustomAttributes;
-    private CameraLens lens;
     private Array<Texture> usedTextures = new Array<>(TEXTURES_CAPACITY);
+    private HashMap<String, Object> currentCustomAttributes;
 
     private boolean drawing = false;
     private int vertexIndex = 0;
@@ -41,9 +40,6 @@ public class Renderer2D implements Resource {
 
     // profiling
     private int drawCalls = 0;
-    private int shaderSwaps = 0;
-    private int textureSwaps = 0;
-    private int customAttributesBinds = 0;
 
     public Renderer2D() {
         // TODO: for debugging only; later, inline the shader source code here.
@@ -77,15 +73,19 @@ public class Renderer2D implements Resource {
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         this.drawCalls = 0;
-        this.shaderSwaps = 0;
-        this.customAttributesBinds = 0;
         this.lens = lens;
+        this.currentShader = null;
         drawing = true;
     }
 
     /** Push primitives: TextureRegion, Shape, Light **/
-    public void pushTextureRegion() {
-
+    // TODO: libGDX PolygonSpriteBatch.java: 772
+    public void pushTexture(Texture texture, float u1, float v1, float u2, float v2, float offsetX, float offsetY, float x, float y, float angle, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
+        useShader(shader);
+        useTexture(texture);
+        useCustomAttributes(customAttributes);
     }
 
     public void pushShape() {
@@ -97,21 +97,47 @@ public class Renderer2D implements Resource {
     }
 
     /** Swap Operations **/
-    private void swapTextures() {
-
+    private void useShader(ShaderProgram shader) {
+        if (shader == null) shader = defaultShader;
+        if (currentShader != shader) {
+            flush();
+            ShaderProgramBinder.bind(shader);
+            // TODO: bind camera
+            //shader.bindUniform("u_camera_combined", lens.combined);
+        }
+        currentShader = shader;
     }
 
-    private void swapShaders() {
-
+    private void useTexture(Texture texture) {
+        if (usedTextures.contains(texture, true)) return;
+        if (usedTextures.size >= TEXTURES_CAPACITY) {
+            flush();
+            usedTextures.clear();
+        }
+        usedTextures.add(texture);
+        TextureBinder.bind(texture);
     }
 
-    private void swapCustomAttributes() {
+    private void useCustomAttributes(HashMap<String, Object> customAttributes) {
+        //flush();
 
     }
 
     // contains the logic that sends everything to the GPU for rendering
     private void flush() {
         if (this.vertexIndex == 0) return;
+        ShaderProgramBinder.bind(currentShader);
+        // TODO: not like this.
+        try {
+            currentShader.bindUniform("u_textures[0]", usedTextures.get(0));
+            currentShader.bindUniform("u_textures[1]", usedTextures.get(1));
+            currentShader.bindUniform("u_textures[2]", usedTextures.get(2));
+            currentShader.bindUniform("u_textures[3]", usedTextures.get(3));
+        } catch (IndexOutOfBoundsException ignored) {
+
+        }
+
+
         GL30.glBindVertexArray(vao);
         {
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
@@ -123,13 +149,15 @@ public class Renderer2D implements Resource {
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
             GL20.glEnableVertexAttribArray(3);
-            GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.position(), GL11.GL_UNSIGNED_INT, 0);
             GL20.glDisableVertexAttribArray(3);
             GL20.glDisableVertexAttribArray(2);
             GL20.glDisableVertexAttribArray(1);
             GL20.glDisableVertexAttribArray(0);
         }
         GL30.glBindVertexArray(0);
+        indicesBuffer.position(0);
+        verticesBuffer.position(0);
         vertexIndex = 0;
         triangleIndex = 0;
         drawCalls++;
@@ -145,10 +173,6 @@ public class Renderer2D implements Resource {
 
     public int getDrawCalls() {
         return drawCalls;
-    }
-
-    public int getShaderSwaps() {
-        return shaderSwaps;
     }
 
     @Override

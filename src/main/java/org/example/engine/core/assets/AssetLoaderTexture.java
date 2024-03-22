@@ -44,7 +44,6 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
                 TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE
         );
         int x = TextureBinder.bind(texture);
-        System.out.println("x is : pppp" + x);
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
         // TODO: here we need to see if we want to: generate mipmaps, use anisotropic filtering, what level of anisotropy etc
         // TODO: For a raw Texture with no TextureMap, use defaults.

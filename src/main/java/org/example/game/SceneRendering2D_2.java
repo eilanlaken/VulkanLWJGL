@@ -45,7 +45,6 @@ public class SceneRendering2D_2 extends WindowScreen {
 
     @Override
     protected void refresh() {
-        System.out.println("HEEELLLOOOOO");
 
     }
 
