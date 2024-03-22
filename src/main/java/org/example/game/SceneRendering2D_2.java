@@ -3,6 +3,7 @@ package org.example.game;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.memory.Resource;
+import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,13 +17,13 @@ import java.util.Map;
 // libGDX PolygonSpriteBatch.java line 772 draw()
 public class SceneRendering2D_2 extends WindowScreen {
 
-    private Renderer2D renderer2D;
+    private Renderer2D_1 renderer2D;
     private Texture texture1;
     private Texture texture2;
     private Texture texture3;
 
     public SceneRendering2D_2() {
-        renderer2D = new Renderer2D();
+        renderer2D = new Renderer2D_1();
     }
 
     @Override
@@ -39,13 +40,17 @@ public class SceneRendering2D_2 extends WindowScreen {
         texture1 = AssetStore.get("assets/textures/yellowSquare.png");
         texture2 = AssetStore.get("assets/textures/pattern2.png");
         texture3 = AssetStore.get("assets/textures/redGreenHalf.png");
-
     }
 
 
     @Override
     protected void refresh() {
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glClearColor(1,0,1,0);
 
+        renderer2D.begin(null);
+        renderer2D.pushTexture(texture1, new Color(1,1,1,1), 0,0,1,1,0,0,0,0,0,1,1,null,null);
+        renderer2D.end();
     }
 
     @Override

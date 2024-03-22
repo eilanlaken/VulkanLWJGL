@@ -5,7 +5,7 @@ in vec4 color;
 in vec2 uv;
 flat in float texIndex;
 
-uniform sampler2D u_textures[32];
+uniform sampler2D u_textures[4];
 
 // outputs
 layout (location = 0) out vec4 out_color;

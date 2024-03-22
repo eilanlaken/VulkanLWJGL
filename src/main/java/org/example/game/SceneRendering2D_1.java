@@ -81,7 +81,7 @@ public class SceneRendering2D_1 extends WindowScreen {
         float change = Keyboard.isKeyPressed(Keyboard.Key.Q) ? 0.01f : 0;
 
         verticesBuffer
-                .put(-0.5f + change).put(0.5f).put(c0).put(0).put(0).put(1)
+                .put(-0.5f).put(0.5f).put(c0).put(0).put(0).put(1)
                 .put(-0.5f).put(-0.5f).put(c0).put(0).put(1).put(1)
                 .put(0.5f).put(-0.5f).put(c0).put(1).put(1).put(1)
                 .put(0.5f).put(0.5f).put(c0).put(1).put(0).put(1)

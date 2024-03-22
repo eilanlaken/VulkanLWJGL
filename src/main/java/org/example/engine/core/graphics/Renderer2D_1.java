@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 // The Cherno:
 // https://github.com/TheCherno/Hazel/blob/master/Hazelnut/assets/shaders/Renderer2D_Quad.glsl
-public class Renderer2D implements Resource {
+public class Renderer2D_1 implements Resource {
 
     private static final int BATCH_SIZE = 2000;
     private static final int VERTEX_SIZE = 6;
@@ -41,7 +41,7 @@ public class Renderer2D implements Resource {
     // profiling
     private int drawCalls = 0;
 
-    public Renderer2D() {
+    public Renderer2D_1() {
         // TODO: for debugging only; later, inline the shader source code here.
         this.defaultShader = new ShaderProgram(AssetUtils.getFileContent("assets/shaders/default-2d-new-3.vert"), AssetUtils.getFileContent("assets/shaders/default-2d-new-3.frag"));
         this.vao = GL30.glGenVertexArrays();
@@ -67,7 +67,7 @@ public class Renderer2D implements Resource {
     }
 
     public void begin(CameraLens lens) {
-        if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D.class.getSimpleName() + ".end() before calling begin().");
+        if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D_1.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND); // TODO: make camera attributes, get as additional parameter to begin()
@@ -87,39 +87,16 @@ public class Renderer2D implements Resource {
         useTexture(texture);
         useCustomAttributes(customAttributes);
 
-        int startVertex = this.vertexIndex / 6;
-        indicesBuffer.put(startVertex);
-        indicesBuffer.put(startVertex + 1);
-        indicesBuffer.put(startVertex + 3);
-        indicesBuffer.put(startVertex + 3);
-        indicesBuffer.put(startVertex + 1);
-        indicesBuffer.put(startVertex + 2);
-        this.triangleIndex += 6;
-
-        float x1,y1,c1,u1,v1,tx1; // V1
-        float x2,y2,c2,u2,v2,tx2; // V2
-        float x3,y3,c3,u3,v3,tx3; // V3
-        float x4,y4,c4,u4,v4,tx4; // V4
-
-        c1 = c2 = c3 = c4 = color.toFloatBits();
-        tx1 = tx2 = tx3 = tx4 = texture.getSlot();
-        u1 = ui; v1 = vf;
-        u2 = ui; v2 = vi;
-        u3 = uf; v3 = vi;
-        u4 = uf; v4 = vf;
-
-        // TODO: calculate corners
-        x1 = -0.5f; y1 = 0.5f;
-        x2 = -0.5f; y2 = -0.5f;
-        x3 = 0.5f; y3 = -0.5f;
-        x4 = 0.5f; y4 = 0.5f;
+        indicesBuffer.put(0).put(1).put(3).put(3).put(1).put(2);
+        float c = color.toFloatBits();
 
         // put vertices
-        verticesBuffer.put(x1).put(y1).put(c1).put(0).put(0).put(tx1);
-        verticesBuffer.put(x2).put(y2).put(c2).put(0).put(1).put(tx2);
-        verticesBuffer.put(x3).put(y3).put(c3).put(1).put(1).put(tx3);
-        verticesBuffer.put(x4).put(y4).put(c4).put(1).put(0).put(tx4);
-        this.vertexIndex += 24;
+        verticesBuffer
+                .put(-0.5f).put(0.5f).put(c).put(0).put(0).put(0)
+                .put(-0.5f).put(-0.5f).put(c).put(0).put(0).put(0)
+                .put(0.5f).put(-0.5f).put(c).put(0).put(0).put(0)
+                .put(0.5f).put(0.5f).put(c).put(0).put(0).put(0)
+                ;
     }
 
     public void pushShape() {
@@ -159,10 +136,7 @@ public class Renderer2D implements Resource {
 
     // contains the logic that sends everything to the GPU for rendering
     private void flush() {
-        System.out.println("vertex Index: " + vertexIndex);
-        System.out.println("used textures: " + usedTextures);
-        System.out.println("indices buffer position: " + indicesBuffer.position());
-        if (this.vertexIndex == 0) return;
+        if (verticesBuffer.position() == 0) return;
         ShaderProgramBinder.bind(currentShader);
         currentShader.bindUniform("u_textures[0]", usedTextures.get(0, null));
         currentShader.bindUniform("u_textures[1]", usedTextures.get(1, null));
@@ -182,7 +156,7 @@ public class Renderer2D implements Resource {
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
             GL20.glEnableVertexAttribArray(3);
-            GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.position(), GL11.GL_UNSIGNED_INT, 0);
+            GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
             GL20.glDisableVertexAttribArray(3);
             GL20.glDisableVertexAttribArray(2);
             GL20.glDisableVertexAttribArray(1);
@@ -197,7 +171,7 @@ public class Renderer2D implements Resource {
     }
 
     public void end() {
-        if (!drawing) throw new IllegalStateException("Called " + Renderer2D.class.getSimpleName() + ".end() without calling " + Renderer2D.class.getSimpleName() + ".begin() first.");
+        if (!drawing) throw new IllegalStateException("Called " + Renderer2D_1.class.getSimpleName() + ".end() without calling " + Renderer2D_1.class.getSimpleName() + ".begin() first.");
         flush();
         GL20.glDepthMask(true);
         GL11.glEnable(GL11.GL_CULL_FACE);
