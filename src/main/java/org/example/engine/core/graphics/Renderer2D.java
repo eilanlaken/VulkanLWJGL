@@ -127,16 +127,10 @@ public class Renderer2D implements Resource {
     private void flush() {
         if (this.vertexIndex == 0) return;
         ShaderProgramBinder.bind(currentShader);
-        // TODO: not like this.
-        try {
-            currentShader.bindUniform("u_textures[0]", usedTextures.get(0));
-            currentShader.bindUniform("u_textures[1]", usedTextures.get(1));
-            currentShader.bindUniform("u_textures[2]", usedTextures.get(2));
-            currentShader.bindUniform("u_textures[3]", usedTextures.get(3));
-        } catch (IndexOutOfBoundsException ignored) {
-
-        }
-
+        currentShader.bindUniform("u_textures[0]", usedTextures.get(0, null));
+        currentShader.bindUniform("u_textures[1]", usedTextures.get(1, null));
+        currentShader.bindUniform("u_textures[2]", usedTextures.get(2, null));
+        currentShader.bindUniform("u_textures[3]", usedTextures.get(3, null));
 
         GL30.glBindVertexArray(vao);
         {

@@ -101,6 +101,11 @@ public class Array<T> implements Iterable<T> {
         return items[index];
     }
 
+    public T get(int index, T defaultValue) {
+        if (index >= size || index < 0) return defaultValue;
+        return items[index];
+    }
+
     public void set(int index, T value) {
         if (index >= size) throw new IndexOutOfBoundsException("index can't be >= size: " + index + " >= " + size);
         items[index] = value;
