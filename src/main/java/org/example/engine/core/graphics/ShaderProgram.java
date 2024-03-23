@@ -152,7 +152,7 @@ public class ShaderProgram implements Resource {
     }
 
     protected final void bindUniforms(final HashMap<String, Object> uniforms) {
-        if (uniforms == null) throw new IllegalArgumentException("Uniforms map cannot be null.");
+        if (uniforms == null) return;
         for (Map.Entry<String, Object> entry : uniforms.entrySet()) {
             final String name = entry.getKey();
             final Object value = uniforms.get(name);
