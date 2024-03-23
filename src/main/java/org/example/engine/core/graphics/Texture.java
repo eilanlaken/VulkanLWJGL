@@ -7,8 +7,7 @@ import org.lwjgl.opengl.GL11;
 public class Texture implements Resource {
 
     protected int handle;
-    // TODO: change to private
-    public int slot;
+    private int slot;
     public final int width;
     public final int height;
     public final float invWidth;
