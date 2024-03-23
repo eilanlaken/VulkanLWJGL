@@ -19,11 +19,6 @@ public class SceneRendering2D_3 extends WindowScreen {
 
     private Renderer2D_3 renderer2D;
     private Texture texture0;
-    private Texture texture1;
-    private Texture texture2;
-
-    private TextureRegion region;
-    private CameraLens lens; // TODO: test .
 
     public SceneRendering2D_3() {
         renderer2D = new Renderer2D_3();
@@ -32,30 +27,31 @@ public class SceneRendering2D_3 extends WindowScreen {
     @Override
     public Map<String, Class<? extends Resource>> getRequiredAssets() {
         Map<String, Class<? extends Resource>> requiredAssets = new HashMap<>();
-        requiredAssets.put("assets/textures/smile.png", Texture.class);
-        requiredAssets.put("assets/textures/pattern2.png", Texture.class);
-        requiredAssets.put("assets/textures/redGreenHalf.png", Texture.class);
+
+        requiredAssets.put("assets/atlases/pack_0.png", Texture.class);
 
         return requiredAssets;
     }
 
     @Override
     public void show() {
-        texture0 = AssetStore.get("assets/textures/smile.png");
-        texture1 = AssetStore.get("assets/textures/pattern2.png");
-        texture2 = AssetStore.get("assets/textures/redGreenHalf.png");
-
-        region = new TextureRegion(texture0);
+        texture0 = AssetStore.get("assets/atlases/pack_0.png");
     }
 
 
     @Override
     protected void refresh() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glClearColor(1,0,1,0);
+        GL11.glClearColor(0,0,1,0);
 
         renderer2D.begin(null);
-        renderer2D.pushTextureRegion(region, new Color(1,1,1,0.5f), 0,0,0,1,1,null,null);
+        float ui = 25f / 512;
+        float vi = 25f / 512;
+        float uf = (25f + 256f) / 512;
+        float vf = (25f + 256) / 512;
+        renderer2D.pushTexture(texture0, new Color(1,1,1,1f), ui,vi,uf,vf,1,0,0,0,0,0,0,null,null);
+        //renderer2D.pushTexture(texture1, new Color(1,1,1,1f), 0,0,0,1,1,0,0,0,0,0,0,null,null);
+
         renderer2D.end();
     }
 

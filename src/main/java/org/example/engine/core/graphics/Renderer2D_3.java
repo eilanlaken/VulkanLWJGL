@@ -1,7 +1,6 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.assets.AssetUtils;
-import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -16,6 +15,8 @@ import java.util.HashMap;
 // The Cherno:
 // https://github.com/TheCherno/Hazel/blob/master/Hazelnut/assets/shaders/Renderer2D_Quad.glsl
 public class Renderer2D_3 implements Resource {
+
+    public static final float DEFAULT_COLOR = new Color(1,1,1,1).toFloatBits();
 
     private static final int BATCH_SIZE = 2000;
     private static final int VERTEX_SIZE = 5;
@@ -75,76 +76,14 @@ public class Renderer2D_3 implements Resource {
         drawing = true;
     }
 
-    public void pushTextureRegion(TextureRegion region, Color color, float x, float y, float angle, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+    /** Push primitives: TextureRegion, Shape, Light **/
+    // TODO: libGDX PolygonSpriteBatch.java: 772
+    @Deprecated public void pushTexture(Texture texture, Color tint, float ui, float vi, float uf, float vf, float offsetX, float offsetY, float x, float y, float angle, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
         useShader(shader);
-        useTexture(region.texture);
+        useTexture(texture);
         useCustomAttributes(customAttributes);
-
-        x = x - region.originalWidthHalf + region.offsetX;
-        y = y - region.originalHeightHalf + region.offsetY;
-        float originX = region.originalWidthHalf - region.offsetX;
-        float originY = region.originalHeightHalf - region.offsetY;
-        float width = region.packedWidth;
-        float height = region.packedHeight;
-        float worldOriginX = x + originX;
-        float worldOriginY = y + originY;
-        float fx = -originX;
-        float fy = -originY;
-        float fx2 = width - originX;
-        float fy2 = height - originY;
-        if (scaleX != 1.0f || scaleY != 1.0f) {
-            fx *= scaleX;
-            fy *= scaleY;
-            fx2 *= scaleX;
-            fy2 *= scaleY;
-        }
-
-        float x1;
-        float y1;
-        float x2;
-        float y2;
-        float x3;
-        float y3;
-        float x4;
-        float y4;
-        float u;
-        float v;
-        if (angle != 0.0f) {
-            float cos = MathUtils.cosDeg(angle);
-            float sin = MathUtils.sinDeg(angle);
-            x1 = cos * fx - sin * fy;
-            y1 = sin * fx + cos * fy;
-            x2 = cos * fx - sin * fy2;
-            y2 = sin * fx + cos * fy2;
-            x3 = cos * fx2 - sin * fy2;
-            y3 = sin * fx2 + cos * fy2;
-            x4 = x1 + (x3 - x2);
-            y4 = y3 - (y2 - y1);
-        } else {
-            x1 = fx;
-            y1 = fy;
-            x2 = fx;
-            y2 = fy2;
-            x3 = fx2;
-            y3 = fy2;
-            x4 = fx2;
-            y4 = fy;
-        }
-
-        x1 += worldOriginX;
-        y1 += worldOriginY;
-        x2 += worldOriginX;
-        y2 += worldOriginY;
-        x3 += worldOriginX;
-        y3 += worldOriginY;
-        x4 += worldOriginX;
-        y4 += worldOriginY;
-        u = region.u;
-        v = region.v2;
-        float u2 = region.u2;
-        float v2 = region.v;
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -159,12 +98,12 @@ public class Renderer2D_3 implements Resource {
         triangleIndex += 6;
 
         // put vertices
-        float c = color.toFloatBits();
+        float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
         verticesBuffer
-                .put(x1).put(y1).put(c).put(u).put(v)
-                .put(x2).put(y2).put(c).put(u).put(v2)
-                .put(x3).put(y3).put(c).put(u2).put(v2)
-                .put(x4).put(y4).put(c).put(u2).put(v)
+                .put(-0.5f).put(0.5f).put(t).put(ui).put(vi)
+                .put(-0.5f).put(-0.5f).put(t).put(ui).put(vf)
+                .put(0.5f).put(-0.5f).put(t).put(uf).put(vf)
+                .put(0.5f).put(0.5f).put(t).put(uf).put(vi)
         ;
         vertexIndex += 20;
     }
@@ -183,7 +122,8 @@ public class Renderer2D_3 implements Resource {
         if (currentShader != shader) {
             flush();
             ShaderProgramBinder.bind(shader);
-            shader.bindUniform("u_camera_combined", lens.combined);
+            // TODO: bind camera
+            //shader.bindUniform("u_camera_combined", lens.combined);
         }
         currentShader = shader;
     }
