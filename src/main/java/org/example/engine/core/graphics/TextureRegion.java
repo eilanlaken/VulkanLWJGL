@@ -42,17 +42,17 @@ public class TextureRegion {
         this.originalHeightHalf = originalHeight * 0.5f;
 
         // TODO: see what is up.
-        float invTexWidth = 1.0F / (float)this.texture.width;
-        float invTexHeight = 1.0F / (float)this.texture.height;
+        float invTexWidth = 1.0f / (float)this.texture.width;
+        float invTexHeight = 1.0f / (float)this.texture.height;
         float u = (float)x * invTexWidth;
         float v = (float)y * invTexHeight;
-        float u2 = (float)(x + originalWidth) * invTexWidth;
-        float v2 = (float)(y + originalHeight) * invTexHeight;
+        float u2 = (float)(x + packedWidth) * invTexWidth;
+        float v2 = (float)(y + packedHeight) * invTexHeight;
         if (this.packedWidth == 1 && this.packedHeight == 1) {
-            float adjustX = 0.25F / (float)texture.width;
+            float adjustX = 0.25f / (float)texture.width;
             u += adjustX;
             u2 -= adjustX;
-            float adjustY = 0.25F / (float)texture.height;
+            float adjustY = 0.25f / (float)texture.height;
             v += adjustY;
             v2 -= adjustY;
         }

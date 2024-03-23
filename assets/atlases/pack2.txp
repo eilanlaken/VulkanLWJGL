@@ -1,0 +1,43 @@
+regions:
+- name: assets/textures/yellowSquare2.png
+  offsetX: 0
+  offsetY: 0
+  originalHeight: 256
+  originalWidth: 256
+  packedHeight: 256
+  packedWidth: 256
+  textureIndex: 0
+  x: 25
+  y: 25
+- name: assets/textures/sphere-colored.png
+  offsetX: 207
+  offsetY: 236
+  originalHeight: 400
+  originalWidth: 400
+  packedHeight: 126
+  packedWidth: 126
+  textureIndex: 0
+  x: 331
+  y: 25
+- name: assets/textures/pinkSpot.png
+  offsetX: 26
+  offsetY: 1
+  originalHeight: 128
+  originalWidth: 128
+  packedHeight: 112
+  packedWidth: 102
+  textureIndex: 0
+  x: 331
+  y: 201
+textures:
+- file: pack2_0.png
+  height: 512
+  width: 512
+options:
+  padding: 5
+  minFilter: MIP_MAP_NEAREST_NEAREST
+  uWrap: CLAMP_TO_EDGE
+  extrude: 20
+  vWrap: CLAMP_TO_EDGE
+  maxTextureSize: 8192
+  magFilter: MIP_MAP_NEAREST_NEAREST

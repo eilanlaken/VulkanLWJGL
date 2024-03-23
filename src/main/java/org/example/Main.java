@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
+import org.example.engine.core.graphics.TexturePackGenerator;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.game.ScreenLoading;
 import org.lwjgl.BufferUtils;
@@ -10,23 +11,14 @@ import java.nio.IntBuffer;
 public class Main {
 
     public static void main(String[] args) {
-        IntBuffer b = BufferUtils.createIntBuffer(400);
-        b.put(4).put(5).put(6);
-        System.out.println(b.position());
-        b.flip();
-        System.out.println(b.get());
-        System.out.println(b.position());
 
-        System.out.println(b.position(0));
-        System.out.println("limit: " + b.limit());
-        System.out.println(b.get());
 
 //        try {
-//            TexturePackerOptions options = new TexturePackerOptions("assets/atlases", "pack",
+//            TexturePackGenerator.Options options = new TexturePackGenerator.Options("assets/atlases", "pack2",
 //                    null, null, null, null,
-//                    20,5, TexturePackerOptions.Size.XX_LARGE_8192);
+//                    20,5, TexturePackGenerator.Options.Size.XX_LARGE_8192);
 //            //TexturePacker.packTextures(options, "assets/textures/pinkSpot.png", "assets/textures/yellowSquare.png", "assets/textures/yellowSquare2.png");
-//            TexturePacker.packTextures(options, "assets/textures/pattern2.png", "assets/textures/yellowSquare2.png", "assets/textures/pinkSpot.png");
+//            TexturePackGenerator.packTextures(options, "assets/textures/sphere-colored.png", "assets/textures/yellowSquare2.png", "assets/textures/pinkSpot.png");
 //
 //        } catch (Exception e) {
 //            e.printStackTrace();
