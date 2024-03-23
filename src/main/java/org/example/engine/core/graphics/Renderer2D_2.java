@@ -108,37 +108,6 @@ public class Renderer2D_2 implements Resource {
         vertexIndex += 20;
     }
 
-    public void pushTextureRegion(TextureRegion region, Color color, float ui, float vi, float uf, float vf, float x, float y, float angle, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
-        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
-        useShader(shader);
-        useTexture(region.texture);
-        useCustomAttributes(customAttributes);
-
-        // put indices
-        int startVertex = this.vertexIndex / VERTEX_SIZE;
-        indicesBuffer
-                .put(startVertex)
-                .put(startVertex + 1)
-                .put(startVertex + 3)
-                .put(startVertex + 3)
-                .put(startVertex + 1)
-                .put(startVertex + 2)
-        ;
-        triangleIndex += 6;
-
-
-        // put vertices
-        float c = color.toFloatBits();
-        verticesBuffer
-                .put(-0.5f).put(0.5f).put(c).put(0).put(0)
-                .put(-0.5f).put(-0.5f).put(c).put(0).put(1)
-                .put(0.5f).put(-0.5f).put(c).put(1).put(1)
-                .put(0.5f).put(0.5f).put(c).put(1).put(0)
-        ;
-        vertexIndex += 20;
-    }
-
     public void pushShape() {
         throw new UnsupportedOperationException("Not implemented yet.");
     }

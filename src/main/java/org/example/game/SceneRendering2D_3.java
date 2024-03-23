@@ -15,15 +15,18 @@ import java.util.Map;
 // Note: glBufferData invalidates and reallocates the whole buffer. Use glBufferSubData to only update the data inside.
 // https://stackoverflow.com/questions/72648980/opengl-sampler2d-array
 // libGDX PolygonSpriteBatch.java line 772 draw()
-public class SceneRendering2D_2 extends WindowScreen {
+public class SceneRendering2D_3 extends WindowScreen {
 
-    private Renderer2D_2 renderer2D;
+    private Renderer2D_3 renderer2D;
     private Texture texture0;
     private Texture texture1;
     private Texture texture2;
 
-    public SceneRendering2D_2() {
-        renderer2D = new Renderer2D_2();
+    private TextureRegion region;
+    private CameraLens lens; // TODO: test .
+
+    public SceneRendering2D_3() {
+        renderer2D = new Renderer2D_3();
     }
 
     @Override
@@ -41,6 +44,8 @@ public class SceneRendering2D_2 extends WindowScreen {
         texture0 = AssetStore.get("assets/textures/smile.png");
         texture1 = AssetStore.get("assets/textures/pattern2.png");
         texture2 = AssetStore.get("assets/textures/redGreenHalf.png");
+
+        region = new TextureRegion(texture0);
     }
 
 
@@ -50,7 +55,7 @@ public class SceneRendering2D_2 extends WindowScreen {
         GL11.glClearColor(1,0,1,0);
 
         renderer2D.begin(null);
-        renderer2D.pushTexture(texture0, new Color(1,1,1,1f), 0,0,0,1,1,0,0,0,0,0,0,null,null);
+        renderer2D.pushTextureRegion(region, new Color(1,1,1,0.5f), 0,0,0,1,1,null,null);
         renderer2D.end();
     }
 
