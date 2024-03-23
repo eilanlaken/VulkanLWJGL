@@ -1521,6 +1521,18 @@ public class Matrix4 {
 //    }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        Matrix4 other = (Matrix4)obj;
+        for (int i = 0; i < val.length; i++) {
+            if (val[i] != other.val[i]) return false;
+        }
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "[" + val[M00] + "|" + val[M01] + "|" + val[M02] + "|" + val[M03] + "]\n" //
                 + "[" + val[M10] + "|" + val[M11] + "|" + val[M12] + "|" + val[M13] + "]\n" //
