@@ -78,9 +78,57 @@ public class Renderer2D_3 implements Resource {
 
     /** Push primitives: TextureRegion, Shape, Light **/
     // TODO: libGDX PolygonSpriteBatch.java: 772
-    @Deprecated public void pushTexture(Texture texture, Color tint, float ui, float vi, float uf, float vf, float offsetX, float offsetY, float x, float y, float angle, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+    @Deprecated public void pushTexture(Texture texture, Color tint, float ui, float vi, float uf, float vf, float offsetX, float offsetY, float pw, float ph, float ow, float oh, float x, float y, float angle, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
+        useShader(shader);
+        useTexture(texture);
+        useCustomAttributes(customAttributes);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+        ;
+        triangleIndex += 6;
+
+        // put vertices
+        float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
+        verticesBuffer
+                .put(-0.5f).put(0.5f).put(t).put(ui).put(vi)
+                .put(-0.5f).put(-0.5f).put(t).put(ui).put(vf)
+                .put(0.5f).put(-0.5f).put(t).put(uf).put(vf)
+                .put(0.5f).put(0.5f).put(t).put(uf).put(vi)
+        ;
+        vertexIndex += 20;
+    }
+
+    // TODO: also consider angleX and angleY
+    public void pushTextureRegion(TextureRegion region, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
+
+        final Texture texture = region.texture;
+        final float ui = region.u;
+        final float vi = region.v;
+        final float uf = region.u2;
+        final float vf = region.v2;
+        final float offsetX = region.offsetX;
+        final float offsetY = region.offsetY;
+        final float packedWidth = region.packedWidth;
+        final float packedHeight = region.packedHeight;
+        final float originalWidth = region.originalWidth;
+        final float originalHeight = region.originalHeight;
+        final float packedWidthHalf = region.packedWidthHalf;
+        final float packedHeightHalf = region.packedHeightHalf;
+        final float originalWidthHalf = region.originalWidthHalf;
+        final float originalHeightHalf = region.originalHeightHalf;
+
         useShader(shader);
         useTexture(texture);
         useCustomAttributes(customAttributes);

@@ -28,14 +28,14 @@ public class SceneRendering2D_3 extends WindowScreen {
     public Map<String, Class<? extends Resource>> getRequiredAssets() {
         Map<String, Class<? extends Resource>> requiredAssets = new HashMap<>();
 
-        requiredAssets.put("assets/atlases/pack_0.png", Texture.class);
+        requiredAssets.put("assets/atlases/pack2_0.png", Texture.class);
 
         return requiredAssets;
     }
 
     @Override
     public void show() {
-        texture0 = AssetStore.get("assets/atlases/pack_0.png");
+        texture0 = AssetStore.get("assets/atlases/pack2_0.png");
     }
 
 
@@ -45,15 +45,18 @@ public class SceneRendering2D_3 extends WindowScreen {
         GL11.glClearColor(0,0,1,0);
 
         renderer2D.begin(null);
-//        float ui = 25f / 512;
-//        float vi = 25f / 512;
-//        float uf = (25f + 256f) / 512;
-//        float vf = (25f + 256) / 512;
-        float ui = 331f / 512;
+        float ui = 25f / 512;
         float vi = 25f / 512;
-        float uf = (331f + 102) / 512;
-        float vf = (25f + 112) / 512;
-        renderer2D.pushTexture(texture0, new Color(1,1,1,1f), ui,vi,uf,vf,1,0,0,0,0,0,0,null,null);
+        float uf = (25f + 256f) / 512;
+        float vf = (25f + 256f) / 512;
+        renderer2D.pushTexture(texture0, new Color(1,1,1,1f), ui,vi,uf,vf,0,0,256,256,256,256,0,0,0, 1, 1,null,null);
+
+        float ui2 = 331f / 512;
+        float vi2 = 25f / 512;
+        float uf2 = (331 + 126f) / 512f;
+        float vf2 = (25f + 126) / 512;
+        renderer2D.pushTexture(texture0, new Color(1,1,1,1f), ui2,vi2,uf2,vf2,207,236,126,126,400,400,0,0,0,0,0,null,null);
+
         //renderer2D.pushTexture(texture1, new Color(1,1,1,1f), 0,0,0,1,1,0,0,0,0,0,0,null,null);
 
         renderer2D.end();
