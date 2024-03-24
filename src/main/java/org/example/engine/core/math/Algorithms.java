@@ -5,10 +5,12 @@ package org.example.engine.core.math;
 // libgdx EarClippingTriangulator.java
 public class Algorithms {
 
+    // TODO: implement
     public static short[] triangulatePolygon(final float[] vertices) {
         throw new UnsupportedOperationException("TODO: implement");
     }
 
+    // TODO: test
     public static boolean isPolygonClockwise(final float[] vertices) {
         if (vertices.length <= 2) return false;
         float area = 0;

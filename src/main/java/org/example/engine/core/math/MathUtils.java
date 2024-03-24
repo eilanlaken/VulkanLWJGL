@@ -24,7 +24,7 @@ public final class MathUtils {
     static public final float degreesToRadians = PI / 180;
     static public final float degRad = degreesToRadians;
 
-    static private class Sin {
+    private static class Sin {
         static final float[] lookup = new float[SIN_COUNT];
 
         static {
@@ -36,6 +36,10 @@ public final class MathUtils {
         }
     }
 
+    public static final Vector3[] canonicalCubeCorners = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
+            new Vector3(-1, -1, -1), new Vector3(1, -1, -1), new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clipping plane corners
+            new Vector3(-1, -1, 1), new Vector3(1, -1, 1), new Vector3(1, 1, 1), new Vector3(-1, 1, 1), // far clipping plane corners
+    };
 
     private static final Random random = new Random();
 

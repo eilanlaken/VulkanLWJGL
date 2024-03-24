@@ -1,7 +1,9 @@
 package org.example.engine.core.math;
 
+import java.util.Arrays;
+
 /**
- * A pyramid with its top sliced off. Mainly used by a camera.
+ * A pyramid with its top sliced off. Used by a camera.
  *      ___
  *    /    \
  *  /_______\
@@ -18,9 +20,11 @@ public class Shape3DFrustum implements Shape3D {
     public static final int PLANE_RIGHT = 3;
     public static final int PLANE_TOP = 4;
     public static final int PLANE_BOTTOM = 5;
-
-    // the 6 clipping planes: near, far, left, right, top, bottom
-    public Shape3DPlane[] planes;
+    public Shape3DPlane[] planes; // the 6 clipping planes: near, far, left, right, top, bottom
+    private Vector3[] frustumCorners = {
+            new Vector3(), new Vector3(), new Vector3(), new Vector3(), // near frustum plane corners
+            new Vector3(), new Vector3(), new Vector3(), new Vector3(), // far frustum plane corners
+    };
 
     public Shape3DFrustum() {
         this.planes = new Shape3DPlane[6];
@@ -29,7 +33,17 @@ public class Shape3DFrustum implements Shape3D {
         }
     }
 
-    public void set(final Vector3[] frustumCorners) {
+    public void update(final Matrix4 invPrjView) {
+        for (int i = 0; i < 8; i++) frustumCorners[i].set(MathUtils.canonicalCubeCorners[i]).prj(invPrjView);
+        planes[0].set(frustumCorners[1], frustumCorners[0], frustumCorners[2]);
+        planes[1].set(frustumCorners[4], frustumCorners[5], frustumCorners[7]);
+        planes[2].set(frustumCorners[0], frustumCorners[4], frustumCorners[3]);
+        planes[3].set(frustumCorners[5], frustumCorners[1], frustumCorners[6]);
+        planes[4].set(frustumCorners[2], frustumCorners[3], frustumCorners[6]);
+        planes[5].set(frustumCorners[4], frustumCorners[0], frustumCorners[1]);
+    }
+
+    @Deprecated public void set(final Vector3[] frustumCorners) {
         if (frustumCorners == null) throw new IllegalArgumentException("Cannot set frustum planes based on null corners array.");
         if (frustumCorners.length != 8) throw new IllegalArgumentException("Must provide exactly 8 points to set frustum planes.");
         planes[0].set(frustumCorners[1], frustumCorners[0], frustumCorners[2]);
@@ -87,8 +101,8 @@ public class Shape3DFrustum implements Shape3D {
 
     @Override
     public boolean contains(float x, float y, float z) {
-        for (int i = 0; i < planes.length; i++) {
-            if (planes[i].distance(x,y,z) < 0) return false;
+        for (Shape3DPlane plane : planes) {
+            if (plane.distance(x, y, z) < 0) return false;
         }
         return true;
     }

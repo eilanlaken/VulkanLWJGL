@@ -7,17 +7,12 @@ import org.example.engine.core.math.Vector3;
 
 public class CameraLens {
 
-    private final Vector3[] clipSpacePlanePoints = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
-            new Vector3(-1, -1, -1), new Vector3(1, -1, -1), new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clipping plane corners
-            new Vector3(-1, -1, 1), new Vector3(1, -1, 1), new Vector3(1, 1, 1), new Vector3(-1, 1, 1), // far clipping plane corners
-    };
-    private Vector3[] frustumCorners = {
-            new Vector3(), new Vector3(), new Vector3(), new Vector3(), // near frustum plane corners
-            new Vector3(), new Vector3(), new Vector3(), new Vector3(), // far frustum plane corners
-    };
-    private final Vector3 tmp = new Vector3();
+    public Vector3 position;
+    public Vector3 direction;
+    public Vector3 up;
+    public Vector3 left;
 
-    private Projection type;
+    public Projection type;
     public Matrix4 projection = new Matrix4();
     public Matrix4 view = new Matrix4();
     public Matrix4 combined = new Matrix4();
@@ -28,11 +23,8 @@ public class CameraLens {
     public float zoom;
     public float viewportWidth;
     public float viewportHeight;
-    public Vector3 position;
-    public Vector3 direction;
-    public Vector3 up;
-    public Vector3 left;
     public Shape3DFrustum frustum;
+    private final Vector3 tmp = new Vector3();
 
     public CameraLens(Projection type, float viewportWidth, float viewportHeight, float zoom, float near, float far, float fov) {
         this.type = type;
@@ -82,16 +74,7 @@ public class CameraLens {
                 Matrix4.mul(combined.val, view.val);
             }
         }
-        updateFrustum(invProjectionView);
-    }
-
-    private void updateFrustum(final Matrix4 invPrjView) {
-        // calculate corners of the frustum by un-projecting the clip space cube using invPrjView
-        for (int i = 0; i < 8; i++) {
-            frustumCorners[i].set(clipSpacePlanePoints[i]);
-            frustumCorners[i].prj(invPrjView);
-        }
-        frustum.set(frustumCorners);
+        frustum.update(invProjectionView);
     }
 
     // TODO: implement
@@ -106,23 +89,13 @@ public class CameraLens {
 
     public void lookAt(float x, float y, float z) {
         tmp.set(x, y, z).sub(position).nor();
-        if (!tmp.isZero()) {
-            float dot = Vector3.dot(tmp, up); // up and direction must ALWAYS be orthonormal vectors
-            if (Math.abs(dot - 1) < 0.000000001f) {
-                // Collinear
-                up.set(direction).scl(-1);
-            } else if (Math.abs(dot + 1) < 0.000000001f) {
-                // Collinear opposite
-                up.set(direction);
-            }
-            direction.set(tmp);
-            normalizeUp();
-            left.set(up).crs(direction);
-        }
-    }
-
-    public void lookAt(Vector3 target) {
-        lookAt(target.x, target.y, target.z);
+        if (tmp.isZero()) return;
+        float dot = Vector3.dot(tmp, up);
+        if (Math.abs(dot - 1) < 0.000000001f) up.set(direction).scl(-1);
+        else if (Math.abs(dot + 1) < 0.000000001f) up.set(direction);
+        direction.set(tmp);
+        normalizeUp();
+        left.set(up).crs(direction);
     }
 
     public void normalizeUp() {
