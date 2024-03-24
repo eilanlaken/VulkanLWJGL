@@ -11,9 +11,7 @@ public final class MathUtils {
     public static final float HALF_PI = PI / 2;
     public static final float E = (float) Math.E;
     public static final float radiansToDegrees = 180f / PI;
-    public static final float radDeg = radiansToDegrees;
     public static final float degreesToRadians = PI / 180;
-    public static final float degRad = degreesToRadians;
 
     private static final int SIN_BITS = 14; // 16KB. Adjust for accuracy.
     private static final int SIN_MASK = ~(-1 << SIN_BITS);
