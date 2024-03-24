@@ -4,37 +4,24 @@ import java.util.Random;
 
 public final class MathUtils {
 
-    static public final float nanoToSec = 1 / 1000000000f;
+    public static final float NANO_TO_SEC = 1 / 1000000000f;
+    public static final float FLOAT_ROUNDING_ERROR = 0.000001f; // 32 bits
+    public static final float PI = (float)Math.PI;
+    public static final float PI2 = PI * 2;
+    public static final float HALF_PI = PI / 2;
+    public static final float E = (float) Math.E;
+    public static final float radiansToDegrees = 180f / PI;
+    public static final float radDeg = radiansToDegrees;
+    public static final float degreesToRadians = PI / 180;
+    public static final float degRad = degreesToRadians;
 
-    // ---
-    static public final float FLOAT_ROUNDING_ERROR = 0.000001f; // 32 bits
-    static public final float PI = (float)Math.PI;
-    static public final float PI2 = PI * 2;
-    static public final float HALF_PI = PI / 2;
-    static public final float E = (float)Math.E;
-    static private final int SIN_BITS = 14; // 16KB. Adjust for accuracy.
-    static private final int SIN_MASK = ~(-1 << SIN_BITS);
-    static private final int SIN_COUNT = SIN_MASK + 1;
-    static private final float radFull = PI2;
-    static private final float degFull = 360;
-    static private final float radToIndex = SIN_COUNT / radFull;
-    static private final float degToIndex = SIN_COUNT / degFull;
-    static public final float radiansToDegrees = 180f / PI;
-    static public final float radDeg = radiansToDegrees;
-    static public final float degreesToRadians = PI / 180;
-    static public final float degRad = degreesToRadians;
-
-    private static class Sin {
-        static final float[] lookup = new float[SIN_COUNT];
-
-        static {
-            for (int i = 0; i < SIN_COUNT; i++) lookup[i] = (float)Math.sin((i + 0.5f) / SIN_COUNT * radFull);
-            lookup[0] = 0f;
-            lookup[(int)(90 * degToIndex) & SIN_MASK] = 1f;
-            lookup[(int)(180 * degToIndex) & SIN_MASK] = 0f;
-            lookup[(int)(270 * degToIndex) & SIN_MASK] = -1f;
-        }
-    }
+    private static final int SIN_BITS = 14; // 16KB. Adjust for accuracy.
+    private static final int SIN_MASK = ~(-1 << SIN_BITS);
+    private static final int SIN_COUNT = SIN_MASK + 1;
+    private static final float RADIANS_FULL = PI2;
+    private static final float DEGREES_FULL = 360;
+    private static final float RADIANS_TO_INDEX = SIN_COUNT / RADIANS_FULL;
+    private static final float DEGREES_TO_INDEX = SIN_COUNT / DEGREES_FULL;
 
     public static final Vector3[] canonicalCubeCorners = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
             new Vector3(-1, -1, -1), new Vector3(1, -1, -1), new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clipping plane corners
@@ -59,26 +46,22 @@ public final class MathUtils {
 
     static public int clamp(int value, int min, int max) {
         if (value < min) return min;
-        if (value > max) return max;
-        return value;
+        return Math.min(value, max);
     }
 
     static public long clamp(long value, long min, long max) {
         if (value < min) return min;
-        if (value > max) return max;
-        return value;
+        return Math.min(value, max);
     }
 
     static public float clamp(float value, float min, float max) {
         if (value < min) return min;
-        if (value > max) return max;
-        return value;
+        return Math.min(value, max);
     }
 
     static public double clamp(double value, double min, double max) {
         if (value < min) return min;
-        if (value > max) return max;
-        return value;
+        return Math.min(value, max);
     }
 
     public static int nextPowerOfTwo(int x) {
@@ -129,17 +112,31 @@ public final class MathUtils {
     }
 
     static public float sin(float radians) {
-        return Sin.lookup[(int)(radians * radToIndex) & SIN_MASK];
+        return Sin.lookup[(int)(radians * RADIANS_TO_INDEX) & SIN_MASK];
     }
 
     static public float cos(float radians) {
-        return Sin.lookup[(int)((radians + HALF_PI) * radToIndex) & SIN_MASK];
+        return Sin.lookup[(int)((radians + HALF_PI) * RADIANS_TO_INDEX) & SIN_MASK];
     }
 
     static public float sinDeg(float degrees) {
-        return Sin.lookup[(int)(degrees * degToIndex) & SIN_MASK];
+        return Sin.lookup[(int)(degrees * DEGREES_TO_INDEX) & SIN_MASK];
     }
 
-    static public float cosDeg(float degrees) { return Sin.lookup[(int)((degrees + 90) * degToIndex) & SIN_MASK]; }
+    static public float cosDeg(float degrees) { return Sin.lookup[(int)((degrees + 90) * DEGREES_TO_INDEX) & SIN_MASK]; }
+
+    private static class Sin {
+
+        private static final float[] lookup = new float[SIN_COUNT];
+
+        static {
+            for (int i = 0; i < SIN_COUNT; i++) lookup[i] = (float)Math.sin((i + 0.5f) / SIN_COUNT * RADIANS_FULL);
+            lookup[0] = 0f;
+            lookup[(int)(90 * DEGREES_TO_INDEX) & SIN_MASK] = 1f;
+            lookup[(int)(180 * DEGREES_TO_INDEX) & SIN_MASK] = 0f;
+            lookup[(int)(270 * DEGREES_TO_INDEX) & SIN_MASK] = -1f;
+        }
+
+    }
 
 }
