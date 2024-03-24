@@ -5,7 +5,7 @@ import org.example.engine.core.math.Quaternion;
 import org.example.engine.core.math.Shape3DFrustum;
 import org.example.engine.core.math.Vector3;
 
-public class CameraLens {
+@Deprecated public class CameraLens_dep {
 
     private final Vector3[] clipSpacePlanePoints = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
             new Vector3(-1, -1, -1), new Vector3(1, -1, -1), new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clipping plane corners
@@ -17,25 +17,25 @@ public class CameraLens {
     };
     private final Vector3 tmp = new Vector3();
 
-    private Projection type;
+    private CameraLensProjectionType projectionType;
     public Matrix4 projection = new Matrix4();
     public Matrix4 view = new Matrix4();
     public Matrix4 combined = new Matrix4();
     public Matrix4 invProjectionView = new Matrix4();
-    public float near;
-    public float far;
-    public float fov;
-    public float zoom;
-    public float viewportWidth;
-    public float viewportHeight;
+    public float near = 0.1f;
+    public float far = 100;
+    public float fov = 67;
+    public float zoom = 1;
+    public float viewportWidth = GraphicsUtils.getWindowWidth();
+    public float viewportHeight = GraphicsUtils.getWindowHeight();
     public Vector3 position;
     public Vector3 direction;
     public Vector3 up;
     public Vector3 left;
     public Shape3DFrustum frustum;
 
-    public CameraLens(Projection type, float viewportWidth, float viewportHeight, float zoom, float near, float far, float fov) {
-        this.type = type;
+    public CameraLens_dep(CameraLensProjectionType type, float viewportWidth, float viewportHeight, float zoom, float near, float far, float fov) {
+        this.projectionType = type;
         this.viewportWidth = viewportWidth;
         this.viewportHeight = viewportHeight;
         this.zoom = zoom;
@@ -48,7 +48,7 @@ public class CameraLens {
 
         // if orthographic
         // TODO: see what is up.
-        if (type == Projection.ORTHOGRAPHIC) {
+        if (type == CameraLensProjectionType.ORTHOGRAPHIC_PROJECTION) {
             up.set(0, 1, 0);
             direction.set(0, 0, -1);
             //position.set(zoom * viewportWidth / 2.0f, zoom * viewportHeight / 2.0f, 0);
@@ -63,8 +63,8 @@ public class CameraLens {
     }
 
     public void update() {
-        switch (type) {
-            case PERSPECTIVE: {
+        switch (projectionType) {
+            case PERSPECTIVE_PROJECTION: {
                 float aspect = viewportWidth / viewportHeight;
                 projection.setToPerspectiveProjection(Math.abs(near), Math.abs(far), fov, aspect);
                 view.setToLookAt(position, tmp.set(position).add(direction), up);
@@ -74,7 +74,7 @@ public class CameraLens {
                 Matrix4.inv(invProjectionView.val);
                 left.set(up).crs(direction);
             }
-            case ORTHOGRAPHIC: {
+            case ORTHOGRAPHIC_PROJECTION: {
                 projection.setToOrthographicProjection(zoom * -viewportWidth / 2, zoom * (viewportWidth / 2), zoom * -(viewportHeight / 2),
                         zoom * viewportHeight / 2, near, far);
                 view.setToLookAt(position, tmp.set(position).add(direction), up);
@@ -199,11 +199,4 @@ public class CameraLens {
         return worldCoordinates;
     }
 
-    public enum Projection {
-
-        ORTHOGRAPHIC,
-        PERSPECTIVE,
-        ;
-
-    }
 }

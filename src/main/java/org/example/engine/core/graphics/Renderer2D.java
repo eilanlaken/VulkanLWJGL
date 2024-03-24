@@ -24,7 +24,7 @@ public class Renderer2D implements Resource {
     private static final int TEXTURES_CAPACITY = 4;
 
     // state management
-    private CameraLens lens;
+    private CameraLens_dep lens;
     private final ShaderProgram defaultShader;
     private ShaderProgram currentShader;
     private Array<Texture> usedTextures = new Array<>(TEXTURES_CAPACITY);
@@ -66,7 +66,7 @@ public class Renderer2D implements Resource {
         GL30.glBindVertexArray(0);
     }
 
-    public void begin(CameraLens lens) {
+    public void begin(CameraLens_dep lens) {
         if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);

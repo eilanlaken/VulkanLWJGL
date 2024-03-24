@@ -1,7 +1,6 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.assets.AssetUtils;
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -23,7 +22,7 @@ public class Renderer2D_2 implements Resource {
     private static final int TRIANGLE_INDICES = 3;
 
     // state management
-    private CameraLens lens;
+    private CameraLens_dep lens;
     private final ShaderProgram defaultShader;
     private ShaderProgram currentShader;
     private Texture lastTexture;
@@ -63,7 +62,7 @@ public class Renderer2D_2 implements Resource {
         GL30.glBindVertexArray(0);
     }
 
-    public void begin(CameraLens lens) {
+    public void begin(CameraLens_dep lens) {
         if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D_2.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);

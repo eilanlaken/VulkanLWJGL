@@ -1,7 +1,6 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.assets.AssetUtils;
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -15,19 +14,20 @@ import java.util.HashMap;
 
 // The Cherno:
 // https://github.com/TheCherno/Hazel/blob/master/Hazelnut/assets/shaders/Renderer2D_Quad.glsl
-public class Renderer2D_1 implements Resource {
+public class Renderer2D_4 implements Resource {
+
+    public static final float DEFAULT_COLOR = new Color(1,1,1,1).toFloatBits();
 
     private static final int BATCH_SIZE = 2000;
-    private static final int VERTEX_SIZE = 6;
+    private static final int VERTEX_SIZE = 5;
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
     private static final int TRIANGLE_INDICES = 3;
-    private static final int TEXTURES_CAPACITY = 4;
 
     // state management
     private CameraLens_dep lens;
     private final ShaderProgram defaultShader;
     private ShaderProgram currentShader;
-    private Array<Texture> usedTextures = new Array<>(TEXTURES_CAPACITY);
+    private Texture lastTexture;
     private HashMap<String, Object> currentCustomAttributes;
 
     private boolean drawing = false;
@@ -41,9 +41,9 @@ public class Renderer2D_1 implements Resource {
     // profiling
     private int drawCalls = 0;
 
-    public Renderer2D_1() {
+    public Renderer2D_4() {
         // TODO: for debugging only; later, inline the shader source code here.
-        this.defaultShader = new ShaderProgram(AssetUtils.getFileContent("assets/shaders/default-2d-new-3.vert"), AssetUtils.getFileContent("assets/shaders/default-2d-new-3.frag"));
+        this.defaultShader = new ShaderProgram(AssetUtils.getFileContent("assets/shaders/default-2d-new-4.vert"), AssetUtils.getFileContent("assets/shaders/default-2d-new-4.frag"));
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
         {
@@ -54,11 +54,9 @@ public class Renderer2D_1 implements Resource {
             GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, vertexSizeBytes, 0);
             GL20.glVertexAttribPointer(1, 4, GL11.GL_UNSIGNED_BYTE, true, vertexSizeBytes, Float.BYTES * 2L);
             GL20.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, true, vertexSizeBytes, Float.BYTES * 3L);
-            GL20.glVertexAttribPointer(3, 1, GL11.GL_FLOAT, true, vertexSizeBytes, Float.BYTES * 5L);
             GL20.glEnableVertexAttribArray(0);
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
-            GL20.glEnableVertexAttribArray(3);
             this.ebo = GL15.glGenBuffers();
             GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
             GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.capacity(), GL15.GL_DYNAMIC_DRAW);
@@ -67,7 +65,7 @@ public class Renderer2D_1 implements Resource {
     }
 
     public void begin(CameraLens_dep lens) {
-        if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D_1.class.getSimpleName() + ".end() before calling begin().");
+        if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D_4.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND); // TODO: make camera attributes, get as additional parameter to begin()
@@ -80,14 +78,15 @@ public class Renderer2D_1 implements Resource {
 
     /** Push primitives: TextureRegion, Shape, Light **/
     // TODO: libGDX PolygonSpriteBatch.java: 772
-    public void pushTexture(Texture texture, Color color, float ui, float vi, float uf, float vf, float offsetX, float offsetY, float x, float y, float angle, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+    @Deprecated public void pushTexture(Texture texture, Color tint, float ui, float vi, float uf, float vf, float offsetX, float offsetY, float pw, float ph, float ow, float oh, float x, float y, float angle, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
         useShader(shader);
         useTexture(texture);
         useCustomAttributes(customAttributes);
 
-        int startVertex = this.vertexIndex / 6;
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
         indicesBuffer
                 .put(startVertex)
                 .put(startVertex + 1)
@@ -98,18 +97,72 @@ public class Renderer2D_1 implements Resource {
         ;
         triangleIndex += 6;
 
+        // put vertices
+        float x1, y1;
+        float x2, y2;
+        float x3, y3;
+        float x4, y4;
 
-        int t = texture.getSlot();
-        float c = color.toFloatBits();
+        x1 = x2 = scaleX * (offsetX - ow / 2);
+        x3 = x4 = x1 + scaleX * pw;
+        //y1 = y2 =
+
+        float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
+        verticesBuffer
+                .put(-0.5f).put(0.5f).put(t).put(ui).put(vi)
+                .put(-0.5f).put(-0.5f).put(t).put(ui).put(vf)
+                .put(0.5f).put(-0.5f).put(t).put(uf).put(vf)
+                .put(0.5f).put(0.5f).put(t).put(uf).put(vi)
+        ;
+        vertexIndex += 20;
+    }
+
+    // TODO: also consider angleX and angleY
+    public void pushTextureRegion(TextureRegion region, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
+
+        final Texture texture = region.texture;
+        final float ui = region.u;
+        final float vi = region.v;
+        final float uf = region.u2;
+        final float vf = region.v2;
+        final float offsetX = region.offsetX;
+        final float offsetY = region.offsetY;
+        final float packedWidth = region.packedWidth;
+        final float packedHeight = region.packedHeight;
+        final float originalWidth = region.originalWidth;
+        final float originalHeight = region.originalHeight;
+        final float packedWidthHalf = region.packedWidthHalf;
+        final float packedHeightHalf = region.packedHeightHalf;
+        final float originalWidthHalf = region.originalWidthHalf;
+        final float originalHeightHalf = region.originalHeightHalf;
+
+        useShader(shader);
+        useTexture(texture);
+        useCustomAttributes(customAttributes);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+        ;
+        triangleIndex += 6;
 
         // put vertices
+        float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
         verticesBuffer
-                .put(-0.5f).put(0.5f).put(c).put(0).put(0).put(t)
-                .put(-0.5f).put(-0.5f).put(c).put(0).put(1).put(t)
-                .put(0.5f).put(-0.5f).put(c).put(1).put(1).put(t)
-                .put(0.5f).put(0.5f).put(c).put(1).put(0).put(t)
+                .put(-0.5f).put(0.5f).put(t).put(ui).put(vi)
+                .put(-0.5f).put(-0.5f).put(t).put(ui).put(vf)
+                .put(0.5f).put(-0.5f).put(t).put(uf).put(vf)
+                .put(0.5f).put(0.5f).put(t).put(uf).put(vi)
         ;
-        vertexIndex += 24;
+        vertexIndex += 20;
     }
 
     public void pushShape() {
@@ -133,13 +186,11 @@ public class Renderer2D_1 implements Resource {
     }
 
     private void useTexture(Texture texture) {
-        if (usedTextures.contains(texture, true)) return;
-        if (usedTextures.size >= TEXTURES_CAPACITY) {
+        if (lastTexture != texture) {
             flush();
-            usedTextures.clear();
         }
-        usedTextures.add(texture);
-        TextureBinder.bind(texture);
+        lastTexture = texture;
+        TextureBinder.bind(lastTexture);
     }
 
     private void useCustomAttributes(HashMap<String, Object> customAttributes) {
@@ -151,10 +202,7 @@ public class Renderer2D_1 implements Resource {
     private void flush() {
         if (verticesBuffer.position() == 0) return;
         ShaderProgramBinder.bind(currentShader);
-        currentShader.bindUniform("u_textures[0]", usedTextures.get(0, null));
-        currentShader.bindUniform("u_textures[1]", usedTextures.get(1, null));
-        currentShader.bindUniform("u_textures[2]", usedTextures.get(2, null));
-        currentShader.bindUniform("u_textures[3]", usedTextures.get(3, null));
+        currentShader.bindUniform("u_texture", lastTexture);
 
         verticesBuffer.flip();
         indicesBuffer.flip();
@@ -168,9 +216,7 @@ public class Renderer2D_1 implements Resource {
             GL20.glEnableVertexAttribArray(0);
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
-            GL20.glEnableVertexAttribArray(3);
             GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
-            GL20.glDisableVertexAttribArray(3);
             GL20.glDisableVertexAttribArray(2);
             GL20.glDisableVertexAttribArray(1);
             GL20.glDisableVertexAttribArray(0);
@@ -184,7 +230,7 @@ public class Renderer2D_1 implements Resource {
     }
 
     public void end() {
-        if (!drawing) throw new IllegalStateException("Called " + Renderer2D_1.class.getSimpleName() + ".end() without calling " + Renderer2D_1.class.getSimpleName() + ".begin() first.");
+        if (!drawing) throw new IllegalStateException("Called " + Renderer2D_4.class.getSimpleName() + ".end() without calling " + Renderer2D_4.class.getSimpleName() + ".begin() first.");
         flush();
         GL20.glDepthMask(true);
         GL11.glEnable(GL11.GL_CULL_FACE);

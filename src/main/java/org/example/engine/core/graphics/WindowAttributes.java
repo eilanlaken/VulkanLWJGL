@@ -5,8 +5,8 @@ public class WindowAttributes {
 
     public int posX = -1;
     public int posY = -1;
-    public int width = 640;
-    public int height = 480;
+    public int width = 640*2;
+    public int height = 480*2;
     public int minWidth = -1;
     public int minHeight = -1;
     public int maxWidth = -1;

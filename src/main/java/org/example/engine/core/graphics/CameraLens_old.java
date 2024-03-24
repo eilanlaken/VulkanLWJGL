@@ -5,7 +5,7 @@ import org.example.engine.core.math.Quaternion;
 import org.example.engine.core.math.Shape3DFrustum;
 import org.example.engine.core.math.Vector3;
 
-public class CameraLens_old {
+@Deprecated public class CameraLens_old {
 
     private final Vector3[] clipSpacePlanePoints = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
             new Vector3(-1, -1, -1), new Vector3(1, -1, -1), new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clipping plane corners

@@ -24,7 +24,7 @@ public class Renderer2D_3 implements Resource {
     private static final int TRIANGLE_INDICES = 3;
 
     // state management
-    private CameraLens lens;
+    private CameraLens_dep lens;
     private final ShaderProgram defaultShader;
     private ShaderProgram currentShader;
     private Texture lastTexture;
@@ -64,7 +64,7 @@ public class Renderer2D_3 implements Resource {
         GL30.glBindVertexArray(0);
     }
 
-    public void begin(CameraLens lens) {
+    public void begin(CameraLens_dep lens) {
         if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D_3.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);
@@ -98,6 +98,15 @@ public class Renderer2D_3 implements Resource {
         triangleIndex += 6;
 
         // put vertices
+        float x1, y1;
+        float x2, y2;
+        float x3, y3;
+        float x4, y4;
+
+        x1 = x2 = scaleX * (offsetX - ow / 2);
+        x3 = x4 = x1 + scaleX * pw;
+        //y1 = y2 =
+
         float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
         verticesBuffer
                 .put(-0.5f).put(0.5f).put(t).put(ui).put(vi)
