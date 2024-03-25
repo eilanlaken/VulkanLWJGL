@@ -31,7 +31,7 @@ public class Camera {
 
     public void update() {
         left.set(up).crs(direction);
-
+        lens.update(position, direction, up);
     }
 
     public void switchToOrthographicMode() {

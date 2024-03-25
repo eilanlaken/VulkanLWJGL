@@ -24,7 +24,7 @@ public class Renderer2D_4 implements Resource {
     private static final int TRIANGLE_INDICES = 3;
 
     // state management
-    private CameraLens_dep lens;
+    private Camera camera;
     private final ShaderProgram defaultShader;
     private ShaderProgram currentShader;
     private Texture lastTexture;
@@ -64,14 +64,14 @@ public class Renderer2D_4 implements Resource {
         GL30.glBindVertexArray(0);
     }
 
-    public void begin(CameraLens_dep lens) {
+    public void begin(Camera camera) {
         if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D_4.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND); // TODO: make camera attributes, get as additional parameter to begin()
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); // TODO: make camera attributes, get as additional parameter to begin()
         this.drawCalls = 0;
-        this.lens = lens;
+        this.camera = camera;
         this.currentShader = null;
         drawing = true;
     }
@@ -109,10 +109,10 @@ public class Renderer2D_4 implements Resource {
 
         float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
         verticesBuffer
-                .put(-0.5f).put(0.5f).put(t).put(ui).put(vi)
-                .put(-0.5f).put(-0.5f).put(t).put(ui).put(vf)
-                .put(0.5f).put(-0.5f).put(t).put(uf).put(vf)
-                .put(0.5f).put(0.5f).put(t).put(uf).put(vi)
+                .put(-256f).put(256f).put(t).put(ui).put(vi)
+                .put(-256f).put(-256f).put(t).put(ui).put(vf)
+                .put(256f).put(-256f).put(t).put(uf).put(vf)
+                .put(256f).put(256f).put(t).put(uf).put(vi)
         ;
         vertexIndex += 20;
     }
@@ -202,6 +202,7 @@ public class Renderer2D_4 implements Resource {
     private void flush() {
         if (verticesBuffer.position() == 0) return;
         ShaderProgramBinder.bind(currentShader);
+        currentShader.bindUniform("u_camera_combined", camera.lens.combined);
         currentShader.bindUniform("u_texture", lastTexture);
 
         verticesBuffer.flip();
