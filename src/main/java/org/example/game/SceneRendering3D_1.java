@@ -16,7 +16,7 @@ public class SceneRendering3D_1 extends WindowScreen {
     private ShaderProgram shader;
     // TODO: make new
     private ComponentTransform transform;
-    private Camera camera;
+    private Camera_old cameraOld;
     private Lights lights;
     private Matrix4 cameraTransform;
 
@@ -31,10 +31,10 @@ public class SceneRendering3D_1 extends WindowScreen {
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
 
-        this.camera = new Camera();
+        this.cameraOld = new Camera_old();
         this.lights = new Lights();
 
-        cameraController = new BlenderCameraController(camera);
+        cameraController = new BlenderCameraController(cameraOld);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class SceneRendering3D_1 extends WindowScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,1);
         renderer3DOld.begin(shader);
-        renderer3DOld.setCamera(camera);
+        renderer3DOld.setCamera(cameraOld);
         renderer3DOld.setEnvironment(lights);
         renderer3DOld.draw(model.parts[0], transform);
         //renderer3DOld.draw(model.parts[1], transform3D.matrix4);

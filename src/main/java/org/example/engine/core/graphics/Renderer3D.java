@@ -12,7 +12,7 @@ public class Renderer3D {
 
     private boolean drawing;
     private ShaderProgram currentShader;
-    private Camera camera;
+    private Camera_old cameraOld;
 
     public Renderer3D() {
         this.drawing = false;
@@ -23,10 +23,10 @@ public class Renderer3D {
         ShaderProgramBinder.bind(shader);
     }
 
-    public void setCamera(final Camera camera) {
+    public void setCamera(final Camera_old cameraOld) {
         //this.currentShader.bindUniform("camera_position", camera.lens.position);
-        this.currentShader.bindUniform("camera_combined", camera.lens.combined);
-        this.camera = camera;
+        this.currentShader.bindUniform("camera_combined", cameraOld.lens.combined);
+        this.cameraOld = cameraOld;
     }
 
     // TODO: implement. Don't forget about the lights transform.
@@ -41,7 +41,7 @@ public class Renderer3D {
 
     public void draw(final ModelPart modelPart, final ComponentTransform transform) {
         modelPart.mesh.boundingSphere.translateAndScale(transform.x, transform.y, transform.z, MathUtils.max(transform.scaleX, transform.scaleY, transform.scaleZ));
-        if (camera.lens.frustum.intersectsSphere(modelPart.mesh.boundingSphere)) {
+        if (cameraOld.lens.frustum.intersectsSphere(modelPart.mesh.boundingSphere)) {
             System.out.println("intersects");
         } else {
             System.out.println("CULLING");

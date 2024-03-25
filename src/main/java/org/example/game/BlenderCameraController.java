@@ -1,6 +1,6 @@
 package org.example.game;
 
-import org.example.engine.core.graphics.Camera;
+import org.example.engine.core.graphics.Camera_old;
 import org.example.engine.core.graphics.CameraLens_old;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
@@ -13,8 +13,8 @@ public class BlenderCameraController {
     private Vector3 pan;
 
 
-    public BlenderCameraController(Camera camera) {
-        this.lens = camera.lens;
+    public BlenderCameraController(Camera_old cameraOld) {
+        this.lens = cameraOld.lens;
         this.zoom = new Vector3();
         this.pan = new Vector3();
     }

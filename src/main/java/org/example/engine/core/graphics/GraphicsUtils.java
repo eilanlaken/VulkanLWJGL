@@ -108,6 +108,15 @@ public class GraphicsUtils {
         return window.attributes.width;
     }
 
+    public static float getMonitorAspectRatio() {
+        return getMonitorWidth() / (float) getMonitorHeight();
+
+    }
+
+    public static float getWindowAspectRatio() {
+        return getWindowWidth() / (float) getWindowHeight();
+    }
+
     public static void enableVSync() {
         int refreshRate = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor()).refreshRate();
         setTargetFps(refreshRate);
