@@ -15,13 +15,15 @@ import java.util.Map;
 // Note: glBufferData invalidates and reallocates the whole buffer. Use glBufferSubData to only update the data inside.
 // https://stackoverflow.com/questions/72648980/opengl-sampler2d-array
 // libGDX PolygonSpriteBatch.java line 772 draw()
-public class SceneRendering2D_5 extends WindowScreen {
+public class SceneRendering2D_6 extends WindowScreen {
 
     private Renderer2D_4 renderer2D;
     private Texture texture0;
     private Camera camera;
 
-    public SceneRendering2D_5() {
+    private TextureRegion region;
+
+    public SceneRendering2D_6() {
         renderer2D = new Renderer2D_4();
     }
 
@@ -29,14 +31,17 @@ public class SceneRendering2D_5 extends WindowScreen {
     public Map<String, Class<? extends Resource>> getRequiredAssets() {
         Map<String, Class<? extends Resource>> requiredAssets = new HashMap<>();
 
-        requiredAssets.put("assets/textures/yellowSquare.png", Texture.class);
+        requiredAssets.put("assets/atlases/pack_0.png", Texture.class);
 
         return requiredAssets;
     }
 
     @Override
     public void show() {
-        texture0 = AssetStore.get("assets/textures/yellowSquare.png");
+        texture0 = AssetStore.get("assets/atlases/pack_0.png");
+        region = new TextureRegion(texture0, 331, 25, 26, 1, 102,112, 128,128);
+
+
         camera = new Camera(640*2,480*2, 1);
         camera.update();
     }
@@ -51,13 +56,13 @@ public class SceneRendering2D_5 extends WindowScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,1,0);
         renderer2D.begin(camera);
-        renderer2D.pushTexture(texture0, new Color(1,1,1,1f), 0,0,1,1,0,0,256,256,256,256,0,0,0, 1, 1,null,null);
+        //renderer2D.pushTexture(texture0, new Color(1,1,1,1f), 0,0,1,1,0,0,256,256,256,256,0,0,0, 1, 1,null,null);
+        renderer2D.pushTextureRegion(region, new Color(1,1,1,1),0,0,0,0,0,1,1,null,null);
         renderer2D.end();
     }
 
     @Override
     public void resize(int width, int height) { }
-
 
     @Override
     public void hide() {

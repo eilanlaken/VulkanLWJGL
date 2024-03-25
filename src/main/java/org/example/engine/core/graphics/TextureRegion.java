@@ -24,7 +24,8 @@ public class TextureRegion {
         this(texture,0,0,0,0, texture.width, texture.height, texture.width, texture.height);
     }
 
-    protected TextureRegion(Texture texture,
+    // TODO: change back to protected.
+    public TextureRegion(Texture texture,
                             int x, int y, int offsetX, int offsetY,
                             int packedWidth, int packedHeight, int originalWidth, int originalHeight) {
         this.texture = texture;
@@ -40,8 +41,6 @@ public class TextureRegion {
         this.packedHeightHalf = packedHeight * 0.5f;
         this.originalWidthHalf = originalWidth * 0.5f;
         this.originalHeightHalf = originalHeight * 0.5f;
-
-        // TODO: see what is up.
         float invTexWidth = 1.0f / (float)this.texture.width;
         float invTexHeight = 1.0f / (float)this.texture.height;
         float u = (float)x * invTexWidth;

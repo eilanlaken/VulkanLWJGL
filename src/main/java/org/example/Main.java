@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
+import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.TexturePackGenerator;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.engine.core.math.Matrix4;
@@ -8,11 +9,16 @@ import org.example.engine.core.math.Shape3DFrustum;
 import org.example.game.ScreenLoading;
 import org.lwjgl.BufferUtils;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.IntBuffer;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
 
     public static void main(String[] args) {
+
 
 //        try {
 //            TexturePackGenerator.Options options = new TexturePackGenerator.Options("assets/atlases", "pack2",
@@ -24,7 +30,7 @@ public class Main {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-
+        //if (true) return;
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);
         Application.launch(new ScreenLoading());

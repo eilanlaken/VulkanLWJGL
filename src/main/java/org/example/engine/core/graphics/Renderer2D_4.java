@@ -109,10 +109,10 @@ public class Renderer2D_4 implements Resource {
 
         float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
         verticesBuffer
-                .put(-256f).put(256f).put(t).put(ui).put(vi)
-                .put(-256f).put(-256f).put(t).put(ui).put(vf)
-                .put(256f).put(-256f).put(t).put(uf).put(vf)
-                .put(256f).put(256f).put(t).put(uf).put(vi)
+                .put(-256f/2).put(256f/2).put(t).put(ui).put(vi)
+                .put(-256f/2).put(-256f/2).put(t).put(ui).put(vf)
+                .put(256f/2).put(-256f/2).put(t).put(uf).put(vf)
+                .put(256f/2).put(256f/2).put(t).put(uf).put(vi)
         ;
         vertexIndex += 20;
     }
@@ -157,10 +157,10 @@ public class Renderer2D_4 implements Resource {
         // put vertices
         float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
         verticesBuffer
-                .put(-0.5f).put(0.5f).put(t).put(ui).put(vi)
-                .put(-0.5f).put(-0.5f).put(t).put(ui).put(vf)
-                .put(0.5f).put(-0.5f).put(t).put(uf).put(vf)
-                .put(0.5f).put(0.5f).put(t).put(uf).put(vi)
+                .put(-packedWidthHalf).put(packedHeightHalf).put(t).put(ui).put(vi)
+                .put(-packedWidthHalf).put(-packedHeightHalf).put(t).put(ui).put(vf)
+                .put(packedWidthHalf).put(-packedHeightHalf).put(t).put(uf).put(vf)
+                .put(packedWidthHalf).put(packedHeightHalf).put(t).put(uf).put(vi)
         ;
         vertexIndex += 20;
     }
