@@ -2,6 +2,7 @@ package org.example.game;
 
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL11;
 
@@ -46,7 +47,7 @@ public class SceneRendering2D_6 extends WindowScreen {
         camera.update();
     }
 
-
+    float time = 0;
     @Override
     protected void refresh() {
 //        GL11.glViewport(0,0, 640, 480);
@@ -57,8 +58,9 @@ public class SceneRendering2D_6 extends WindowScreen {
         GL11.glClearColor(0,0,1,0);
         renderer2D.begin(camera);
         //renderer2D.pushTexture(texture0, new Color(1,1,1,1f), 0,0,1,1,0,0,256,256,256,256,0,0,0, 1, 1,null,null);
-        renderer2D.pushTextureRegion(region, new Color(1,1,1,1),0,0,0,0,0,1.5f,1.5f,null,null);
+        renderer2D.pushTextureRegion(region, new Color(1,1,1,1),0,0,0,0,time,1.5f,1.5f,null,null);
         renderer2D.end();
+        time++;
     }
 
     @Override

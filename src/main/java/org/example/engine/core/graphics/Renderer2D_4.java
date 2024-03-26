@@ -140,6 +140,9 @@ public class Renderer2D_4 implements Resource {
         final float originalWidthHalf = region.originalWidthHalf;
         final float originalHeightHalf = region.originalHeightHalf;
 
+        if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
+        if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
+
         useShader(shader);
         useTexture(texture);
         useCustomAttributes(customAttributes);
@@ -157,32 +160,57 @@ public class Renderer2D_4 implements Resource {
         triangleIndex += 6;
 
         // put vertices
+        float localX1, localY1;
+        float localX2, localY2;
+        float localX3, localY3;
+        float localX4, localY4;
+        localX1 = localX2 = offsetX - originalWidthHalf;
+        localX3 = localX4 = offsetX - originalWidthHalf + packedWidth;
+        localY1 = localY4 = offsetY - originalHeightHalf + packedHeight;
+        localY2 = localY3 = offsetY - originalHeightHalf;
+        if (scaleX != 1.0f) {
+            localX1 *= scaleX;
+            localX2 *= scaleX;
+            localX3 *= scaleX;
+            localX4 *= scaleX;
+        }
+        if (scaleY != 1.0f) {
+            localY1 *= scaleY;
+            localY2 *= scaleY;
+            localY3 *= scaleY;
+            localY4 *= scaleY;
+        }
         float x1, y1;
         float x2, y2;
         float x3, y3;
         float x4, y4;
-        x1 = x2 = offsetX - originalWidthHalf;
-        x3 = x4 = offsetX - originalWidthHalf + packedWidth;
-        y1 = y4 = offsetY - originalHeightHalf + packedHeight;
-        y2 = y3 = offsetY - originalHeightHalf;
-        if (scaleX != 1.0f) {
-            x1 *= scaleX;
-            x2 *= scaleX;
-            x3 *= scaleX;
-            x4 *= scaleX;
-        }
-        if (scaleY != 1.0f) {
-            y1 *= scaleY;
-            y2 *= scaleY;
-            y3 *= scaleY;
-            y4 *= scaleY;
-        }
         if (angleZ != 0.0f) {
             final float sin = MathUtils.sinDeg(angleZ);
             final float cos = MathUtils.cosDeg(angleZ);
+            x1 = localX1 * cos - localY1 * sin;
+            y1 = localX1 * sin + localY1 * cos;
 
+            x2 = localX2 * cos - localY2 * sin;
+            y2 = localX2 * sin + localY2 * cos;
+
+            x3 = localX3 * cos - localY3 * sin;
+            y3 = localX3 * sin + localY3 * cos;
+
+            x4 = localX4 * cos - localY4 * sin;
+            y4 = localX4 * sin + localY4 * cos;
+        } else {
+            x1 = localX1;
+            y1 = localY1;
+
+            x2 = localX2;
+            y2 = localY2;
+
+            x3 = localX3;
+            y3 = localY3;
+
+            x4 = localX4;
+            y4 = localY4;
         }
-
 
         float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
 //        verticesBuffer
