@@ -92,7 +92,7 @@ public class Shape2DPolygon implements Shape2D {
     public float getPerimeter() {
         float perimeter = 0;
         for (int i = 0; i < worldPoints.length - 2; i += 2) {
-            perimeter += Vector2.dist(worldPoints[i], worldPoints[i+1], worldPoints[i+2], worldPoints[i+3]);
+            perimeter += Vector2.dst(worldPoints[i], worldPoints[i+1], worldPoints[i+2], worldPoints[i+3]);
         }
         return perimeter;
     }
