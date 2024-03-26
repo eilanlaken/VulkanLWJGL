@@ -1,14 +1,14 @@
 package org.example.engine.components;
 
-import org.example.engine.core.graphics.CameraLens_dep;
+import org.example.engine.core.graphics.Camera;
 
 public class ComponentGraphicsCamera {
 
-    public CameraLens_dep lens;
+    public Camera camera;
 
     // single all args constructor
-    protected ComponentGraphicsCamera(CameraLens_dep lens) {
-        this.lens = lens;
+    protected ComponentGraphicsCamera(Camera camera) {
+        this.camera = camera;
     }
 
 }

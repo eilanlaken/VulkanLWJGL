@@ -7,21 +7,21 @@ import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.math.Matrix4;
+import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL11;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SceneRendering3D_1 extends WindowScreen {
 
     private Renderer3D renderer3DOld;
     private Model model;
     private ShaderProgram shader;
-    // TODO: make new
     private ComponentTransform transform;
-    private Camera_old cameraOld;
+    private Camera camera;
     private Lights lights;
-    private Matrix4 cameraTransform;
 
-    // debug
-    private BlenderCameraController cameraController;
 
     public SceneRendering3D_1() {
         this.renderer3DOld = new Renderer3D();
@@ -31,10 +31,18 @@ public class SceneRendering3D_1 extends WindowScreen {
         this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
 
-        this.cameraOld = new Camera_old();
+        this.camera = new Camera(100, 100, 1, 0.1f, 100, 70);
         this.lights = new Lights();
 
-        cameraController = new BlenderCameraController(cameraOld);
+    }
+
+    @Override
+    public Map<String, Class<? extends Resource>> getRequiredAssets() {
+        Map<String, Class<? extends Resource>> requiredAssets = new HashMap<>();
+
+        requiredAssets.put("assets/models/cube-blue.fbx", Model.class);
+
+        return requiredAssets;
     }
 
     @Override
@@ -43,7 +51,6 @@ public class SceneRendering3D_1 extends WindowScreen {
         transform.z = -15;
         model = AssetStore.get("assets/models/cube-blue.fbx");
         System.out.println(model.parts[0].material.uniformParams);
-        cameraTransform = new Matrix4();
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
         lights.add(new LightPoint(new Color(1,0.2f,0,1), 1f, 0, 0, -3));
         //transform3D.matrix4.rotateSelfAxis(Vector3.Y, 30);
@@ -52,8 +59,8 @@ public class SceneRendering3D_1 extends WindowScreen {
 
     @Override
     protected void refresh() {
+        System.out.println("refresh");
         float delta = GraphicsUtils.getDeltaTime();
-        cameraController.update(delta);
         float angularSpeed = 200; // degrees per second
 
         Matrix4 m = transform.computeMatrix();
@@ -93,14 +100,26 @@ public class SceneRendering3D_1 extends WindowScreen {
             transform.y -= 0.1f;
         }
 
+        System.out.println("refresh2");
+
 
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,1);
+        System.out.println("refresh3");
+
         renderer3DOld.begin(shader);
-        renderer3DOld.setCamera(cameraOld);
+        System.out.println("refresh4");
+
+        renderer3DOld.setCamera(camera);
+        System.out.println("refresh5");
+
         renderer3DOld.setEnvironment(lights);
+        System.out.println("refresh6");
+
         renderer3DOld.draw(model.parts[0], transform);
+        System.out.println("refresh7");
+
         //renderer3DOld.draw(model.parts[1], transform3D.matrix4);
 
         renderer3DOld.end();

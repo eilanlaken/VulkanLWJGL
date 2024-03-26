@@ -18,7 +18,7 @@ public class CameraLens {
     protected float zoom;
     protected float viewportWidth;
     protected float viewportHeight;
-    private final Shape3DFrustum frustum;
+    protected final Shape3DFrustum frustum;
 
     public CameraLens(Mode mode, float viewportWidth, float viewportHeight, float zoom, float near, float far, float fov) {
         this.mode = mode;

@@ -19,6 +19,7 @@ public class Camera {
         this.up = new Vector3(0,1,0);
         this.left = new Vector3();
         this.lens = new CameraLens(CameraLens.Mode.ORTHOGRAPHIC, viewportWidth, viewportHeight, zoom, near, far, fov);
+        update();
     }
 
     public Camera(float viewportWidth, float viewportHeight, float zoom) {

@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class ScreenLoading extends WindowScreen {
 
-    private WindowScreen screen = new SceneRendering2D_6();
+    private WindowScreen screen = new SceneRendering3D_1();
 
     @Override
     public void show() {
@@ -18,15 +18,14 @@ public class ScreenLoading extends WindowScreen {
         for (Map.Entry<String, Class<? extends Resource>> requiredAsset : requiredAssets.entrySet()) {
             AssetStore.loadAsset(requiredAsset.getValue(), requiredAsset.getKey());
         }
-        //AssetStore.loadAsset(Texture.class, "assets/textures/yellowSquare.png");
-        //AssetStore.loadAsset(Texture.class, "assets/textures/pattern2.png");
-        //AssetStore.loadAsset(Texture.class, "assets/textures/redGreenHalf.png");
-        //AssetStore.loadAsset(Model.class, "assets/models/cube-blue.fbx");
     }
 
     @Override
     protected void refresh() {
+        System.out.println(AssetStore.isLoaded("assets/models/cube-blue.fbx"));
+
         if (!AssetStore.isLoadingInProgress()) {
+            System.out.println(AssetStore.isLoaded("assets/models/cube-blue.fbx"));
             Application.switchScreen(screen);
         }
 

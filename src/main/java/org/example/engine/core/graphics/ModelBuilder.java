@@ -33,8 +33,8 @@ public final class ModelBuilder {
         GL30.glBindVertexArray(vaoID);
 
         bindIndicesBuffer(indices);
-        storeDataInAttributeList(ModelVertexAttribute.POSITION_2D, positions);
-        storeDataInAttributeList(ModelVertexAttribute.COLOR_PACKED, colors);
+        //storeDataInAttributeList(ModelVertexAttribute.POSITION_2D, positions);
+        //storeDataInAttributeList(ModelVertexAttribute.COLOR_PACKED, colors);
 
 
         GL30.glBindVertexArray(0);
