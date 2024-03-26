@@ -133,10 +133,6 @@ public class Renderer2D_4 implements Resource {
         final float offsetY = region.offsetY;
         final float packedWidth = region.packedWidth;
         final float packedHeight = region.packedHeight;
-        final float originalWidth = region.originalWidth;
-        final float originalHeight = region.originalHeight;
-        final float packedWidthHalf = region.packedWidthHalf;
-        final float packedHeightHalf = region.packedHeightHalf;
         final float originalWidthHalf = region.originalWidthHalf;
         final float originalHeightHalf = region.originalHeightHalf;
 
@@ -212,13 +208,19 @@ public class Renderer2D_4 implements Resource {
             y4 = localY4;
         }
 
+        x1 += x;
+        y1 += y;
+
+        x2 += x;
+        y2 += y;
+
+        x3 += x;
+        y3 += y;
+
+        x4 += x;
+        y4 += y;
+
         float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
-//        verticesBuffer
-//                .put(-packedWidthHalf).put(packedHeightHalf).put(t).put(ui).put(vi)
-//                .put(-packedWidthHalf).put(-packedHeightHalf).put(t).put(ui).put(vf)
-//                .put(packedWidthHalf).put(-packedHeightHalf).put(t).put(uf).put(vf)
-//                .put(packedWidthHalf).put(packedHeightHalf).put(t).put(uf).put(vi)
-//        ;
         verticesBuffer
                 .put(x1).put(y1).put(t).put(ui).put(vi)
                 .put(x2).put(y2).put(t).put(ui).put(vf)
