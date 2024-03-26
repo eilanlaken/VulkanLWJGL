@@ -17,7 +17,7 @@ public final class MathUtils {
     private static final int SIN_MASK = ~(-1 << SIN_BITS);
     private static final int SIN_COUNT = SIN_MASK + 1;
     private static final float RADIANS_FULL = PI2;
-    private static final float DEGREES_FULL = 360;
+    private static final float DEGREES_FULL = 360.0f;
     private static final float RADIANS_TO_INDEX = SIN_COUNT / RADIANS_FULL;
     private static final float DEGREES_TO_INDEX = SIN_COUNT / DEGREES_FULL;
 

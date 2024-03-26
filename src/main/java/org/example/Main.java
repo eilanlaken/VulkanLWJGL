@@ -6,6 +6,7 @@ import org.example.engine.core.graphics.TexturePackGenerator;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Shape2DAABB;
+import org.example.engine.core.math.Shape2DRectangle;
 import org.example.engine.core.math.Shape3DFrustum;
 import org.example.game.ScreenLoading;
 import org.lwjgl.BufferUtils;
@@ -19,9 +20,15 @@ import java.util.Map;
 public class Main {
 
     public static void main(String[] args) {
-        Shape2DAABB aabb = new Shape2DAABB(-1,-1,1,1);
-        aabb.scale(3,3);
-        System.out.println(aabb);
+        Shape2DRectangle rect = new Shape2DRectangle(0,0,4,1,90);
+        rect.updateCorners();
+        System.out.println(rect);
+
+        System.out.println(rect.contains(0,0));
+        System.out.println(rect.contains(3,0));
+        System.out.println(rect.contains(1,-5));
+        System.out.println(rect);
+
 
 //        try {
 //            TexturePackGenerator.Options options = new TexturePackGenerator.Options("assets/atlases", "pack2",
@@ -34,9 +41,9 @@ public class Main {
 //            e.printStackTrace();
 //        }
         //if (true) return;
-        WindowAttributes config = new WindowAttributes();
-        Application.createSingleWindowApplication(config);
-        Application.launch(new ScreenLoading());
+//        WindowAttributes config = new WindowAttributes();
+//        Application.createSingleWindowApplication(config);
+//        Application.launch(new ScreenLoading());
     }
 
 }

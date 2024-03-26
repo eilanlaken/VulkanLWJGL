@@ -7,6 +7,7 @@ public class Shape2DCircle implements Shape2D {
     public float radius;
 
     public Shape2DCircle(float x, float y, float r) {
+        if (r < 0) throw new IllegalArgumentException("Radius must be positive. Got: " + r);
         this.center = new Vector2(x, y);
         this.radius = r;
     }
@@ -28,16 +29,17 @@ public class Shape2DCircle implements Shape2D {
 
     @Override
     public void translate(float dx, float dy) {
-
+        center.add(dx, dy);
     }
 
     @Override
     public void rotate(float degrees) {
-
+        // ignore.
     }
 
     @Override
     public void scale(float scaleX, float scaleY) {
-
+        if (scaleX != scaleY) throw new IllegalArgumentException("Must have scaleX == scaleY to maintain circle proportions. Got: scaleX: " + scaleX + " and scaleY: " + scaleX + ".");
+        radius *= scaleX;
     }
 }
