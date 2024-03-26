@@ -1,6 +1,8 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.assets.AssetUtils;
+import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -155,12 +157,45 @@ public class Renderer2D_4 implements Resource {
         triangleIndex += 6;
 
         // put vertices
+        float x1, y1;
+        float x2, y2;
+        float x3, y3;
+        float x4, y4;
+        x1 = x2 = offsetX - originalWidthHalf;
+        x3 = x4 = offsetX - originalWidthHalf + packedWidth;
+        y1 = y4 = offsetY - originalHeightHalf + packedHeight;
+        y2 = y3 = offsetY - originalHeightHalf;
+        if (scaleX != 1.0f) {
+            x1 *= scaleX;
+            x2 *= scaleX;
+            x3 *= scaleX;
+            x4 *= scaleX;
+        }
+        if (scaleY != 1.0f) {
+            y1 *= scaleY;
+            y2 *= scaleY;
+            y3 *= scaleY;
+            y4 *= scaleY;
+        }
+        if (angleZ != 0.0f) {
+            final float sin = MathUtils.sinDeg(angleZ);
+            final float cos = MathUtils.cosDeg(angleZ);
+
+        }
+
+
         float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
+//        verticesBuffer
+//                .put(-packedWidthHalf).put(packedHeightHalf).put(t).put(ui).put(vi)
+//                .put(-packedWidthHalf).put(-packedHeightHalf).put(t).put(ui).put(vf)
+//                .put(packedWidthHalf).put(-packedHeightHalf).put(t).put(uf).put(vf)
+//                .put(packedWidthHalf).put(packedHeightHalf).put(t).put(uf).put(vi)
+//        ;
         verticesBuffer
-                .put(-packedWidthHalf).put(packedHeightHalf).put(t).put(ui).put(vi)
-                .put(-packedWidthHalf).put(-packedHeightHalf).put(t).put(ui).put(vf)
-                .put(packedWidthHalf).put(-packedHeightHalf).put(t).put(uf).put(vf)
-                .put(packedWidthHalf).put(packedHeightHalf).put(t).put(uf).put(vi)
+                .put(x1).put(y1).put(t).put(ui).put(vi)
+                .put(x2).put(y2).put(t).put(ui).put(vf)
+                .put(x3).put(y3).put(t).put(uf).put(vf)
+                .put(x4).put(y4).put(t).put(uf).put(vi)
         ;
         vertexIndex += 20;
     }
