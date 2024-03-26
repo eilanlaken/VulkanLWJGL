@@ -18,17 +18,18 @@ public class Shape2DAABB implements Shape2D {
 
     @Override
     public float getArea() {
-        return (max.x - min.x) * (max.y - min.y);
+        return Math.abs((max.x - min.x) * (max.y - min.y));
     }
 
     @Override
     public float getPerimeter() {
-        return 2 * (max.y - min.y + max.x - min.x);
+        return 2 * (Math.abs(max.y - min.y) + Math.abs(max.x - min.x));
     }
 
     @Override
     public void translate(float dx, float dy) {
-
+        min.add(dx, dy);
+        max.add(dx, dy);
     }
 
     @Override
@@ -38,6 +39,19 @@ public class Shape2DAABB implements Shape2D {
 
     @Override
     public void scale(float scaleX, float scaleY) {
-
+        float centerX = (min.x + max.x) * 0.5f;
+        float centerY = (min.y + max.y) * 0.5f;
+        this.min.sub(centerX, centerY);
+        this.max.sub(centerX, centerY);
+        this.min.scl(scaleX, scaleY);
+        this.max.scl(scaleX, scaleY);
+        this.min.add(centerX, centerY);
+        this.max.add(centerX, centerY);
     }
+
+    @Override
+    public String toString() {
+        return "<" + this.getClass().getSimpleName() + ": " + "min: " + min + ", max: " + max + ">";
+    }
+
 }

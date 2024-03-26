@@ -5,6 +5,7 @@ import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.TexturePackGenerator;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.engine.core.math.Matrix4;
+import org.example.engine.core.math.Shape2DAABB;
 import org.example.engine.core.math.Shape3DFrustum;
 import org.example.game.ScreenLoading;
 import org.lwjgl.BufferUtils;
@@ -18,7 +19,9 @@ import java.util.Map;
 public class Main {
 
     public static void main(String[] args) {
-
+        Shape2DAABB aabb = new Shape2DAABB(-1,-1,1,1);
+        aabb.scale(3,3);
+        System.out.println(aabb);
 
 //        try {
 //            TexturePackGenerator.Options options = new TexturePackGenerator.Options("assets/atlases", "pack2",
