@@ -31,15 +31,15 @@ public class SceneRendering2D_6 extends WindowScreen {
     public Map<String, Class<? extends Resource>> getRequiredAssets() {
         Map<String, Class<? extends Resource>> requiredAssets = new HashMap<>();
 
-        requiredAssets.put("assets/atlases/pack_0.png", Texture.class);
+        requiredAssets.put("assets/atlases/pack2_0.png", Texture.class);
 
         return requiredAssets;
     }
 
     @Override
     public void show() {
-        texture0 = AssetStore.get("assets/atlases/pack_0.png");
-        region = new TextureRegion(texture0, 331, 25, 26, 1, 102,112, 128,128);
+        texture0 = AssetStore.get("assets/atlases/pack2_0.png");
+        region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
 
         camera = new Camera(640*2,480*2, 1);
