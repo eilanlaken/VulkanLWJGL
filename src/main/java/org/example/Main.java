@@ -34,7 +34,7 @@ public class Main {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-        if (true) return;
+        //if (true) return;
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);
         Application.launch(new ScreenLoading());
