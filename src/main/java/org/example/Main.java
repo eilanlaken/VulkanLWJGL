@@ -14,21 +14,17 @@ import org.lwjgl.BufferUtils;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class Main {
 
     public static void main(String[] args) {
-        Shape2DRectangle rect = new Shape2DRectangle(0,0,4,1,90);
-        rect.updateCorners();
-        System.out.println(rect);
-
-        System.out.println(rect.contains(0,0));
-        System.out.println(rect.contains(3,0));
-        System.out.println(rect.contains(1,-5));
-        System.out.println(rect);
-
+        int[] f = {1,2,3,4,5};
+        int[] dest = new int[40];
+        System.arraycopy(f, 0, dest, 0, f.length);
+        System.out.println(Arrays.toString(dest));
 
 //        try {
 //            TexturePackGenerator.Options options = new TexturePackGenerator.Options("assets/atlases", "pack2",
