@@ -24,6 +24,11 @@ public class Shape2DCurve implements Shape2D {
             this.points.add(new Vector2(point));
             this.worldPoints.add(new Vector2(point));
         }
+        this.x = 0;
+        this.y = 0;
+        this.angle = 0;
+        this.scaleX = 1;
+        this.scaleY = 1;
         this.updated = true;
     }
 

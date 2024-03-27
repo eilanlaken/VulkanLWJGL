@@ -6,7 +6,6 @@ package org.example.engine.core.math;
 // must always be counter clockwise
 public class Shape2DPolygon implements Shape2D {
 
-    private boolean isUpdated;
     public final int vertexCount;
     public final float[] localPoints;
     private float[] worldPoints;
@@ -15,6 +14,8 @@ public class Shape2DPolygon implements Shape2D {
     private float x, y;
     private float angle;
     private float scaleX, scaleY;
+
+    private boolean updated;
 
     public Shape2DPolygon(float[] points) {
         if (points.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + points.length);
@@ -28,11 +29,11 @@ public class Shape2DPolygon implements Shape2D {
         this.localPoints = points;
         if (Algorithms.isPolygonClockwise(localPoints)) reverseVertices();
         this.indices = Algorithms.triangulatePolygon(localPoints);
-        isUpdated = false;
+        updated = false;
     }
 
     public void updateWorldPoints() {
-        if (isUpdated) return;
+        if (updated) return;
         if (worldPoints == null) worldPoints = new float[localPoints.length];
         final float cos = MathUtils.cos(angle);
         final float sin = MathUtils.cos(angle);
@@ -49,7 +50,7 @@ public class Shape2DPolygon implements Shape2D {
             worldPoints[i] = localX + x;
             worldPoints[i+1] = localY + y;
         }
-        isUpdated = true;
+        updated = true;
     }
 
     public float[] getWorldPoints() {
@@ -101,20 +102,20 @@ public class Shape2DPolygon implements Shape2D {
     public void translate(float dx, float dy) {
         this.x += dx;
         this.y += dy;
-        isUpdated = false;
+        updated = false;
     }
 
     @Override
     public void rotate(float degrees) {
         this.angle += degrees;
-        isUpdated = false;
+        updated = false;
     }
 
     @Override
     public void scale(float scaleX, float scaleY) {
         this.scaleX = scaleX;
         this.scaleY = scaleY;
-        isUpdated = false;
+        updated = false;
     }
 
     private void reverseVertices() {
