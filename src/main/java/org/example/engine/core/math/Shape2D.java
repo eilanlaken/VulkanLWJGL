@@ -8,7 +8,6 @@ public interface Shape2D {
     boolean contains(float x, float y);
     float getArea();
     float getPerimeter();
-
     void translate(float dx, float dy);
     void rotate(float degrees);
     void scale(float scaleX, float scaleY);

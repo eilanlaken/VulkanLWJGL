@@ -79,6 +79,21 @@ public class Shape3DPlane implements Shape3D {
         d = -(pointX * norX + pointY * norY + pointZ * norZ);
     }
 
+    @Override
+    public float getVolume() {
+        return 0;
+    }
+
+    @Override
+    public float getSurfaceArea() {
+        return 0;
+    }
+
+    @Override
+    public void update(Matrix4 m) {
+
+    }
+
     public String toString () {
         return "Plane: <normal:" + normal + ", d: " + d + ">";
     }

@@ -41,4 +41,19 @@ public class Shape3DCube implements Shape3D {
         if (vector.z > 0.5f || vector.z < -0.5f) return false;
         return true;
     }
+
+    @Override
+    public float getVolume() {
+        return 0;
+    }
+
+    @Override
+    public float getSurfaceArea() {
+        return 0;
+    }
+
+    @Override
+    public void update(Matrix4 m) {
+
+    }
 }

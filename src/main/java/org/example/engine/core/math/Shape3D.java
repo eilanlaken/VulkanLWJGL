@@ -6,5 +6,8 @@ public interface Shape3D {
         return contains(point.x, point.y, point.z);
     }
     boolean contains(float x, float y, float z);
+    float getVolume();
+    float getSurfaceArea();
+    void update(Matrix4 m);
 
 }

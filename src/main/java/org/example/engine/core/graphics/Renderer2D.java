@@ -118,7 +118,6 @@ public class Renderer2D implements Resource {
         vertexIndex += 20;
     }
 
-    // TODO: also consider angleX and angleY
     public void pushTextureRegion(TextureRegion region, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
@@ -243,8 +242,7 @@ public class Renderer2D implements Resource {
         if (currentShader != shader) {
             flush();
             ShaderProgramBinder.bind(shader);
-            // TODO: bind camera
-            //shader.bindUniform("u_camera_combined", lens.combined);
+            shader.bindUniform("u_camera_combined", camera.lens.combined);
         }
         currentShader = shader;
     }
@@ -254,7 +252,7 @@ public class Renderer2D implements Resource {
             flush();
         }
         lastTexture = texture;
-        TextureBinder.bind(lastTexture);
+        currentShader.bindUniform("u_texture", lastTexture);
     }
 
     private void useCustomAttributes(HashMap<String, Object> customAttributes) {
@@ -265,9 +263,6 @@ public class Renderer2D implements Resource {
     // contains the logic that sends everything to the GPU for rendering
     private void flush() {
         if (verticesBuffer.position() == 0) return;
-        ShaderProgramBinder.bind(currentShader);
-        currentShader.bindUniform("u_camera_combined", camera.lens.combined);
-        currentShader.bindUniform("u_texture", lastTexture);
 
         verticesBuffer.flip();
         indicesBuffer.flip();

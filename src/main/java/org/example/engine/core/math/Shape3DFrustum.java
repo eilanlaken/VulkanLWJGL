@@ -25,6 +25,7 @@ public class Shape3DFrustum implements Shape3D {
         }
     }
 
+    @Override
     public void update(final Matrix4 invPrjView) {
         for (int i = 0; i < 8; i++) frustumCorners[i].set(MathUtils.canonicalCubeCorners[i]).prj(invPrjView);
         planes[0].set(frustumCorners[1], frustumCorners[0], frustumCorners[2]); // near
@@ -62,6 +63,16 @@ public class Shape3DFrustum implements Shape3D {
             if (plane.distance(x, y, z) < 0) return false;
         }
         return true;
+    }
+
+    @Override
+    public float getVolume() {
+        return 0;
+    }
+
+    @Override
+    public float getSurfaceArea() {
+        return 0;
     }
 
     @Override

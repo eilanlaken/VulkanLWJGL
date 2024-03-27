@@ -33,5 +33,18 @@ public class Shape3DSphere implements Shape3D {
         return translatedCenter.dst2(x,y,z) <= scaledRadius * scaledRadius;
     }
 
+    @Override
+    public float getVolume() {
+        return 0;
+    }
 
+    @Override
+    public float getSurfaceArea() {
+        return 0;
+    }
+
+    @Override
+    public void update(Matrix4 m) {
+
+    }
 }
