@@ -2,7 +2,6 @@ package org.example.engine.core.math;
 
 import org.example.engine.core.collections.Array;
 
-// TODO: finish implementing
 public class Shape2DCurve implements Shape2D {
 
     private Array<Vector2> points;
@@ -61,6 +60,7 @@ public class Shape2DCurve implements Shape2D {
 
     @Override
     public float getPerimeter() {
+        if (!updated) update();
         float perimeter = 0;
         for (int i = 0; i < worldPoints.size - 1; i++) perimeter += Vector2.dst(worldPoints.items[i], worldPoints.items[i+1]);
         return perimeter;
@@ -71,14 +71,12 @@ public class Shape2DCurve implements Shape2D {
         this.x += dx;
         this.y += dy;
         updated = false;
-        for (Vector2 point : worldPoints) point.add(dx, dy);
     }
 
     @Override
     public void rotate(float degrees) {
         this.angle += degrees;
         updated = false;
-        for (Vector2 point : worldPoints) point.rotateDeg(degrees);
     }
 
     @Override
