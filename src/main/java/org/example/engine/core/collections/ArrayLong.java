@@ -52,6 +52,12 @@ public class ArrayLong {
         return items[index];
     }
 
+    public long getCircular(int index) {
+        if (index >= size) return items[index % size];
+        else if (index < 0) return items[index % size + size];
+        return items[index];
+    }
+
     public boolean contains(long value) {
         int i = size - 1;
         long[] items = this.items;

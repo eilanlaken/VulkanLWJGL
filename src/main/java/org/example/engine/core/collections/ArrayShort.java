@@ -121,6 +121,12 @@ public class ArrayShort {
         return items[index];
     }
 
+    public short getCircular(int index) {
+        if (index >= size) return items[index % size];
+        else if (index < 0) return items[index % size + size];
+        return items[index];
+    }
+
     public void set (int index, short value) {
         if (index >= size) throw new IndexOutOfBoundsException("index can't be >= size: " + index + " >= " + size);
         items[index] = value;

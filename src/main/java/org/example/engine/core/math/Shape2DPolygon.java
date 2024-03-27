@@ -9,7 +9,7 @@ public class Shape2DPolygon implements Shape2D {
     public final int vertexCount;
     public final float[] localPoints;
     private float[] worldPoints;
-    //public final short[] indices; // indices created in the triangulation step.
+    public final int[] indices;
 
     private float x, y;
     private float angle;
@@ -32,7 +32,7 @@ public class Shape2DPolygon implements Shape2D {
         this.worldPoints = new float[points.length];
         System.arraycopy(points, 0, worldPoints, 0, points.length);
         this.area = Algorithms.calculatePolygonSignedArea(this.worldPoints);
-        //this.indices = Algorithms.triangulatePolygon(localPoints);
+        this.indices = Algorithms.triangulatePolygon(localPoints);
         updated = false;
     }
 
@@ -43,6 +43,13 @@ public class Shape2DPolygon implements Shape2D {
             worldPoints[i + 1] = tmp.y;
         }
         updated = true;
+    }
+
+    public Vector2 getVertex(int index, Vector2 output) {
+        if (index >= vertexCount) output.set(worldPoints[(index * 2) % worldPoints.length], worldPoints[(index * 2) % worldPoints.length + 1]);
+        else if (index < 0) output.set(worldPoints[(index * 2) % worldPoints.length + worldPoints.length], worldPoints[(index * 2) % worldPoints.length + worldPoints.length + 1]);
+        else output.set(worldPoints[index * 2], worldPoints[index * 2 + 1]);
+        return output;
     }
 
     @Override
@@ -108,6 +115,13 @@ public class Shape2DPolygon implements Shape2D {
         this.area *= scaleX;
         this.area *= scaleY;
         updated = false;
+    }
+
+    public static void getVertex(float[] points, int index, Vector2 output) {
+        final int vertexCount = points.length / 2;
+        if (index >= vertexCount) output.set(points[(index * 2) % points.length], points[(index * 2) % points.length + 1]);
+        else if (index < 0) output.set(points[(index * 2) % points.length + points.length], points[(index * 2) % points.length + points.length + 1]);
+        else output.set(points[index * 2], points[index * 2 + 1]);
     }
 
 }

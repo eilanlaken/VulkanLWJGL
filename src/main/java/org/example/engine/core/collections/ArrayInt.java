@@ -52,6 +52,12 @@ public class ArrayInt {
         return items[index];
     }
 
+    public int getCircular(int index) {
+        if (index >= size) return items[index % size];
+        else if (index < 0) return items[index % size + size];
+        return items[index];
+    }
+
     public boolean contains(int value) {
         int i = size - 1;
         int[] items = this.items;
