@@ -25,7 +25,7 @@ public class Shape3DFrustum implements Shape3D {
         }
     }
 
-    public void set(final Matrix4 invPrjView) {
+    public void update(final Matrix4 invPrjView) {
         for (int i = 0; i < 8; i++) frustumCorners[i].set(MathUtils.canonicalCubeCorners[i]).prj(invPrjView);
         planes[0].set(frustumCorners[1], frustumCorners[0], frustumCorners[2]); // near
         planes[1].set(frustumCorners[4], frustumCorners[5], frustumCorners[7]); // far

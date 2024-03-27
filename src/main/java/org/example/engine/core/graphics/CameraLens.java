@@ -44,7 +44,7 @@ public class CameraLens {
         Matrix4.mul(combined.val, view.val);
         invProjectionView.set(combined);
         Matrix4.inv(invProjectionView.val);
-        frustum.set(invProjectionView);
+        frustum.update(invProjectionView);
     }
 
     public Vector3 unproject(Vector3 screenCoordinates, float viewportX, float viewportY, float viewportWidth, float viewportHeight) {
