@@ -1,9 +1,5 @@
 package org.example.engine.core.math;
 
-// TODO: test
-// https://stackoverflow.com/questions/5247994/simple-2d-polygon-triangulation
-// libgdx: EarClippingTriangulator
-// must always be counter clockwise
 public class Shape2DPolygon implements Shape2D {
 
     public final int vertexCount;

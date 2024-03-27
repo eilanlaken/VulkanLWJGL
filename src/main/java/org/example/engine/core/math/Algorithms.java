@@ -36,7 +36,6 @@ public class Algorithms {
                 int b = indices.get(i-1);
                 int c = indices.get(i+1);
 
-
                 // test if angle is convex or reflex
                 Shape2DPolygon.getVertex(vertices, a, tmpA);
                 Shape2DPolygon.getVertex(vertices, b, tmpB);
