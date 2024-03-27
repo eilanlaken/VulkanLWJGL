@@ -4,7 +4,9 @@ public class Shape2DRectangle implements Shape2D {
 
     public Vector2 center;
     public float width;
+    private float widthHalf;
     public float height;
+    private float heightHalf;
     public float angle;
     private boolean updated;
 
@@ -21,13 +23,15 @@ public class Shape2DRectangle implements Shape2D {
     private Vector2 c3;
     private Vector2 c4;
 
-    private Vector2 tmp1 = new Vector2();
-    private Vector2 tmp2 = new Vector2();
+    private final Vector2 tmp1 = new Vector2();
+    private final Vector2 tmp2 = new Vector2();
 
     public Shape2DRectangle(float centerX, float centerY, float width, float height, float angle) {
         this.center = new Vector2(centerX, centerY);
         this.width = width;
         this.height = height;
+        this.widthHalf = width * 0.5f;
+        this.heightHalf = height * 0.5f;
         this.angle = angle;
         this.c1 = new Vector2();
         this.c2 = new Vector2();
@@ -40,21 +44,20 @@ public class Shape2DRectangle implements Shape2D {
         this.center = new Vector2();
         this.width = width;
         this.height = height;
+        this.widthHalf = width * 0.5f;
+        this.heightHalf = height * 0.5f;
         this.angle = 0;
         this.updated = false;
     }
 
     @Override
     public boolean contains(float x, float y) {
-        float widthHalf = width * 0.5f;
-        float heightHalf = height * 0.5f;
         if (angle == 0) {
             if (x > center.x + widthHalf || x < center.x - widthHalf) return false;
             if (y > center.y + heightHalf || y < center.y - heightHalf) return false;
             return true;
         }
         if (!updated) updateCorners();
-        // https://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
         tmp1.set(c4).sub(c1);
         tmp2.set(x,y).sub(c1);
         float projection1 = tmp1.dot(tmp2);
@@ -95,15 +98,14 @@ public class Shape2DRectangle implements Shape2D {
     public void scale(float scaleX, float scaleY) {
         this.width *= scaleX;
         this.height *= scaleY;
+        this.widthHalf = width * 0.5f;
+        this.heightHalf = height * 0.5f;
         this.updated = false;
     }
 
     public void updateCorners() {
         float sin = MathUtils.sinDeg(angle);
         float cos = MathUtils.cosDeg(angle);
-
-        float widthHalf = width * 0.5f;
-        float heightHalf = height * 0.5f;
 
         float x1 = -widthHalf * cos - heightHalf * sin;
         float y1 = -widthHalf * sin + heightHalf * cos;

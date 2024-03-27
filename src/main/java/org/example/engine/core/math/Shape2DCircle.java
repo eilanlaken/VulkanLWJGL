@@ -1,6 +1,5 @@
 package org.example.engine.core.math;
 
-// TODO: finish implementing
 public class Shape2DCircle implements Shape2D {
 
     public Vector2 center;

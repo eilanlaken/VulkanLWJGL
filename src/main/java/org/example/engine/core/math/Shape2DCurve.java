@@ -5,27 +5,52 @@ import org.example.engine.core.collections.Array;
 // TODO: finish implementing
 public class Shape2DCurve implements Shape2D {
 
-    public Array<Vector2> points;
+    private Array<Vector2> points;
+    public Array<Vector2> worldPoints;
+
+    private float x, y;
+    private float angle;
+    private float scaleX, scaleY;
+
+    private final Vector2 tmp1 = new Vector2();
+    private final Vector2 tmp2 = new Vector2();
+
+    private boolean updated;
 
     public Shape2DCurve(Vector2 ...points) {
-        if (points.length < 2) throw new IllegalArgumentException("At least 3 points are needed to construct a curve. Given: " + points.length);
+        if (points.length < 2) throw new IllegalArgumentException("At least 2 points are needed to construct a curve. Given: " + points.length);
         this.points = new Array<>();
+        this.worldPoints = new Array<>();
         for (Vector2 point : points) {
-            this.points.add(point);
+            this.points.add(new Vector2(point));
+            this.worldPoints.add(new Vector2(point));
         }
+        this.updated = true;
     }
 
-    // TODO: implement in world system.
+    public void update() {
+        for (int i = 0; i < worldPoints.size; i++) {
+            // reset
+            worldPoints.items[i].set(points.items[i]);
+            // apply scale
+            worldPoints.items[i].scl(scaleX, scaleY);
+            // rotate
+            worldPoints.items[i].rotateDeg(angle);
+            // translate
+            worldPoints.items[i].add(x, y);
+        }
+        updated = true;
+    }
+
     @Override
     public boolean contains(float x, float y) {
-//        boolean contained = false;
-//        for (int i = 0; i < points.size - 1; i++) {
-//            final Vector2 a = points.items[i];
-//            final Vector2 b = points.items[i+1];
-//            contained |= ((b.x - a.x) * (y - a.y) == (x - a.x) * (b.y - a.y) && Math.abs(Float.compare(a.x, x) + Float.compare(b.x, x)) <= 1 && Math.abs(Float.compare(a.y, y) + Float.compare(b.y, y)) <= 1);
-//        }
-//
-//        return contained;
+        if (!updated) update();
+        for (int i = 0; i < worldPoints.size - 1; i++) {
+            if (x > Math.max(worldPoints.get(i).x, worldPoints.get(i+1).x) || x < Math.min(worldPoints.get(i).x, worldPoints.get(i+1).x)) continue;
+            if (y > Math.max(worldPoints.get(i).y, worldPoints.get(i+1).y) || y < Math.min(worldPoints.get(i).y, worldPoints.get(i+1).y)) continue;
+            tmp1.set(worldPoints.get(i+1)).sub(worldPoints.get(i));
+            if (tmp2.set(x, y).isOnLine(tmp1)) return true;
+        }
         return false;
     }
 
@@ -34,29 +59,33 @@ public class Shape2DCurve implements Shape2D {
         return 0;
     }
 
-    // TODO: implement in world system.
     @Override
     public float getPerimeter() {
-//        float perimeter = 0;
-//        for (int i = 0; i < points.size - 1; i++) {
-//            perimeter += Vector2.dist(points.items[i], points.items[i+1]);
-//        }
-//        return perimeter;
-        return 0;
+        float perimeter = 0;
+        for (int i = 0; i < worldPoints.size - 1; i++) perimeter += Vector2.dst(worldPoints.items[i], worldPoints.items[i+1]);
+        return perimeter;
     }
 
     @Override
     public void translate(float dx, float dy) {
-
+        this.x += dx;
+        this.y += dy;
+        updated = false;
+        for (Vector2 point : worldPoints) point.add(dx, dy);
     }
 
     @Override
     public void rotate(float degrees) {
-
+        this.angle += degrees;
+        updated = false;
+        for (Vector2 point : worldPoints) point.rotateDeg(degrees);
     }
 
     @Override
     public void scale(float scaleX, float scaleY) {
-
+        this.scaleX *= scaleX;
+        this.scaleY *= scaleY;
+        updated = false;
     }
+
 }

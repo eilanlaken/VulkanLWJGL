@@ -379,15 +379,21 @@ public class Vector2 {
     }
 
     public static float dst(float x1, float y1, float x2, float y2) {
-        final float x_d = x2 - x1;
-        final float y_d = y2 - y1;
-        return (float)Math.sqrt(x_d * x_d + y_d * y_d);
+        final float dx = x2 - x1;
+        final float dy = y2 - y1;
+        return (float) Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public static float dst(final Vector2 a, final Vector2 b) {
+        final float dx = b.x - a.x;
+        final float dy = b.y - a.y;
+        return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
     public static float dst2(float x1, float y1, float x2, float y2) {
-        final float x_d = x2 - x1;
-        final float y_d = y2 - y1;
-        return x_d * x_d + y_d * y_d;
+        final float dx = x2 - x1;
+        final float dy = y2 - y1;
+        return dx * dx + dy * dy;
     }
 
 }
