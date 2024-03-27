@@ -4,10 +4,7 @@ import org.example.engine.core.application.Application;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.TexturePackGenerator;
 import org.example.engine.core.graphics.WindowAttributes;
-import org.example.engine.core.math.Matrix4;
-import org.example.engine.core.math.Shape2DAABB;
-import org.example.engine.core.math.Shape2DRectangle;
-import org.example.engine.core.math.Shape3DFrustum;
+import org.example.engine.core.math.*;
 import org.example.game.ScreenLoading;
 import org.lwjgl.BufferUtils;
 
@@ -21,10 +18,11 @@ import java.util.Map;
 public class Main {
 
     public static void main(String[] args) {
-        int[] f = {1,2,3,4,5};
-        int[] dest = new int[40];
-        System.arraycopy(f, 0, dest, 0, f.length);
-        System.out.println(Arrays.toString(dest));
+        Shape2DPolygon polygon = new Shape2DPolygon(new float[] {-1,0,0,-1,1,0,0,1});
+        System.out.println(polygon.getArea());
+
+        System.out.println(polygon.contains(-0.5f,-1.3f));
+
 
 //        try {
 //            TexturePackGenerator.Options options = new TexturePackGenerator.Options("assets/atlases", "pack2",
@@ -36,10 +34,10 @@ public class Main {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-        //if (true) return;
-//        WindowAttributes config = new WindowAttributes();
-//        Application.createSingleWindowApplication(config);
-//        Application.launch(new ScreenLoading());
+        if (true) return;
+        WindowAttributes config = new WindowAttributes();
+        Application.createSingleWindowApplication(config);
+        Application.launch(new ScreenLoading());
     }
 
 }

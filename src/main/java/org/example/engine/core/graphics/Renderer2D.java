@@ -281,7 +281,9 @@ public class Renderer2D implements Resource {
             GL20.glEnableVertexAttribArray(0);
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
-            GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            //GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            // actually works.
+            GL11.glDrawElements(GL11.GL_LINE_LOOP, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
             GL20.glDisableVertexAttribArray(2);
             GL20.glDisableVertexAttribArray(1);
             GL20.glDisableVertexAttribArray(0);

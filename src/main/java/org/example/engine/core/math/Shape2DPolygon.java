@@ -9,7 +9,7 @@ public class Shape2DPolygon implements Shape2D {
     public final int vertexCount;
     public final float[] localPoints;
     private float[] worldPoints;
-    public final short[] indices; // indices created in the triangulation step.
+    //public final short[] indices; // indices created in the triangulation step.
 
     private float x, y;
     private float angle;
@@ -32,7 +32,7 @@ public class Shape2DPolygon implements Shape2D {
         this.worldPoints = new float[points.length];
         System.arraycopy(points, 0, worldPoints, 0, points.length);
         this.area = Algorithms.calculatePolygonSignedArea(this.worldPoints);
-        this.indices = Algorithms.triangulatePolygon(localPoints);
+        //this.indices = Algorithms.triangulatePolygon(localPoints);
         updated = false;
     }
 
@@ -53,7 +53,7 @@ public class Shape2DPolygon implements Shape2D {
         float maxX = worldPoints[0];
         float minY = worldPoints[1];
         float maxY = worldPoints[1];
-        for (int i = 1; i < worldPoints.length - 1; i += 2) {
+        for (int i = 2; i < worldPoints.length - 1; i += 2) {
             minX = Math.min(minX, worldPoints[i]);
             maxX = Math.max(maxX, worldPoints[i]);
             minY = Math.min(minY, worldPoints[i+1]);
@@ -62,12 +62,14 @@ public class Shape2DPolygon implements Shape2D {
         if (x < minX || x > maxX || y < minY || y > maxY) return false;
         // if broad test passed:
         boolean inside = false;
-        for (int i = 0, j = worldPoints.length - 2; i < worldPoints.length; j = i, i += 2) {
+        for (int i = 0, j = worldPoints.length - 2; i < worldPoints.length; i += 2) {
             float x1 = worldPoints[i];
             float y1 = worldPoints[i+1];
             float x2 = worldPoints[j];
             float y2 = worldPoints[j+1];
-            if ((y1 > y) != (y2 > y) && x < (x2 - x1) * (y - y1) / (y2 - y1) + x1) inside = !inside;
+            if ( ((y1 > y) != (y2 > y)) )
+                if (x < (x2 - x1) * (y - y1) / (y2 - y1) + x1) inside = !inside;
+            j = i;
         }
         return inside;
     }
