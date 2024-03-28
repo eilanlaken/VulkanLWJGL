@@ -17,7 +17,7 @@ public class Shape2DPolygon implements Shape2D {
 
     public Shape2DPolygon(float[] points) {
         if (points.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + points.length);
-        if (points.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0,x1,y1,...].");
+        if (points.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
         this.vertexCount = points.length / 2;
         this.x = 0;
         this.y = 0;

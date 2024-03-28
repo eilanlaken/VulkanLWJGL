@@ -1,27 +1,20 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
-import org.example.engine.core.assets.AssetUtils;
-import org.example.engine.core.collections.ArrayInt;
-import org.example.engine.core.graphics.TexturePackGenerator;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.engine.core.math.*;
 import org.example.game.ScreenLoading;
-import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GLCapabilities;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.nio.IntBuffer;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 public class Main {
 
     public static void main(String[] args) {
         Shape2DPolygon p = new Shape2DPolygon(new float[] {0,1, 1,1, 1,0, 0,0});
         System.out.println(Arrays.toString(p.indices));
+
 
 
 //        try {
@@ -38,6 +31,7 @@ public class Main {
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);
         Application.launch(new ScreenLoading());
+
     }
 
 }

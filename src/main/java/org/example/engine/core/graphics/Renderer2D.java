@@ -4,11 +4,9 @@ import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.*;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
@@ -17,34 +15,34 @@ import java.util.HashMap;
 // https://github.com/TheCherno/Hazel/blob/master/Hazelnut/assets/shaders/Renderer2D_Quad.glsl
 public class Renderer2D implements Resource {
 
-    public static final float DEFAULT_COLOR = new Color(1,1,1,1).toFloatBits();
-
     private static final int BATCH_SIZE = 2000;
     private static final int VERTEX_SIZE = 5;
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
     private static final int TRIANGLE_INDICES = 3;
 
-    // state management
-    private Camera camera;
     private final ShaderProgram defaultShader;
+    private final Texture singleWhitePixel;
+    private final float DEFAULT_TINT = new Color(1,1,1,1).toFloatBits();
+
+    private Camera camera;
     private ShaderProgram currentShader;
     private Texture lastTexture;
     private HashMap<String, Object> currentCustomAttributes;
-
     private boolean drawing = false;
     private int vertexIndex = 0;
     private int triangleIndex = 0;
+
     private final int vao;
-    private int vbo, ebo;
-    private FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * VERTEX_SIZE);
-    private IntBuffer indicesBuffer = BufferUtils.createIntBuffer(BATCH_TRIANGLES_CAPACITY * TRIANGLE_INDICES);
+    private final int vbo, ebo;
+    private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * VERTEX_SIZE);
+    private final IntBuffer indicesBuffer = BufferUtils.createIntBuffer(BATCH_TRIANGLES_CAPACITY * TRIANGLE_INDICES);
 
     // profiling
     private int drawCalls = 0;
 
     public Renderer2D() {
-        // TODO: for debugging only; later, inline the shader source code here.
         this.defaultShader = new ShaderProgram(AssetUtils.getFileContent("assets/shaders/default-2d-new-4.vert"), AssetUtils.getFileContent("assets/shaders/default-2d-new-4.frag"));
+        this.singleWhitePixel = createSingleWhitePixelTexture();
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
         {
@@ -108,7 +106,7 @@ public class Renderer2D implements Resource {
         x3 = x4 = x1 + scaleX * pw;
         //y1 = y2 =
 
-        float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
+        float t = tint == null ? DEFAULT_TINT : tint.toFloatBits();
         verticesBuffer
                 .put(-256f/2).put(256f/2).put(t).put(ui).put(vi)
                 .put(-256f/2).put(-256f/2).put(t).put(ui).put(vf)
@@ -218,7 +216,7 @@ public class Renderer2D implements Resource {
         x4 += x;
         y4 += y;
 
-        float t = tint == null ? DEFAULT_COLOR : tint.toFloatBits();
+        float t = tint == null ? DEFAULT_TINT : tint.toFloatBits();
         verticesBuffer
                 .put(x1).put(y1).put(t).put(ui).put(vi)
                 .put(x2).put(y2).put(t).put(ui).put(vf)
@@ -308,4 +306,28 @@ public class Renderer2D implements Resource {
         // free shader
         // free dynamic mesh
     }
+
+    private static ShaderProgram createDefaultShaderProgram() {
+        return null;
+    }
+
+    private static Texture createSingleWhitePixelTexture() {
+        ByteBuffer buffer = ByteBuffer.allocateDirect(4);
+        buffer.put((byte) ((0xFFFFFFFF >> 16) & 0xFF));   // Red component
+        buffer.put((byte) ((0xFFFFFFFF >> 8) & 0xFF));    // Green component
+        buffer.put((byte) (0xFF));           // Blue component
+        buffer.put((byte) ((0xFFFFFFFF >> 24) & 0xFF));   // Alpha component
+        buffer.flip();
+        int glHandle = GL11.glGenTextures();
+        Texture texture = new Texture(glHandle,
+                1, 1,
+                TextureParamFilter.NEAREST, TextureParamFilter.NEAREST,
+                TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE
+        );
+        TextureBinder.bind(texture);
+        GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, 1, 1, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        return texture;
+    }
+
 }
