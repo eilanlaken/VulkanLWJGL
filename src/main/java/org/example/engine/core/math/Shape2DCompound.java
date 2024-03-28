@@ -2,7 +2,7 @@ package org.example.engine.core.math;
 
 import org.example.engine.core.collections.Array;
 
-public class Shape2DCompound implements Shape2D {
+public class Shape2DCompound extends Shape2D {
 
     public Array<Shape2D> shapes;
 
@@ -32,17 +32,7 @@ public class Shape2DCompound implements Shape2D {
     }
 
     @Override
-    public void translate(float dx, float dy) {
-        for (Shape2D shape : shapes) shape.translate(dx, dy);
-    }
-
-    @Override
-    public void rotate(float degrees) {
-        for (Shape2D shape : shapes) shape.rotate(degrees);
-    }
-
-    @Override
-    public void scale(float scaleX, float scaleY) {
-        for (Shape2D shape: shapes) shape.scale(scaleX, scaleY);
+    public void update() {
+        for (Shape2D shape : shapes) shape.update();
     }
 }

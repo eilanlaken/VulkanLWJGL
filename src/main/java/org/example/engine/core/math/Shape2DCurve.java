@@ -2,19 +2,13 @@ package org.example.engine.core.math;
 
 import org.example.engine.core.collections.Array;
 
-public class Shape2DCurve implements Shape2D {
+public class Shape2DCurve extends Shape2D {
 
     private Array<Vector2> points;
     public Array<Vector2> worldPoints;
 
-    private float x, y;
-    private float angle;
-    private float scaleX, scaleY;
-
     private final Vector2 tmp1 = new Vector2();
     private final Vector2 tmp2 = new Vector2();
-
-    private boolean updated;
 
     public Shape2DCurve(Vector2 ...points) {
         if (points.length < 2) throw new IllegalArgumentException("At least 2 points are needed to construct a curve. Given: " + points.length);
@@ -24,14 +18,9 @@ public class Shape2DCurve implements Shape2D {
             this.points.add(new Vector2(point));
             this.worldPoints.add(new Vector2(point));
         }
-        this.x = 0;
-        this.y = 0;
-        this.angle = 0;
-        this.scaleX = 1;
-        this.scaleY = 1;
-        this.updated = true;
     }
 
+    @Override
     public void update() {
         for (int i = 0; i < worldPoints.size; i++) {
             // reset
@@ -69,26 +58,6 @@ public class Shape2DCurve implements Shape2D {
         float perimeter = 0;
         for (int i = 0; i < worldPoints.size - 1; i++) perimeter += Vector2.dst(worldPoints.items[i], worldPoints.items[i+1]);
         return perimeter;
-    }
-
-    @Override
-    public void translate(float dx, float dy) {
-        this.x += dx;
-        this.y += dy;
-        updated = false;
-    }
-
-    @Override
-    public void rotate(float degrees) {
-        this.angle += degrees;
-        updated = false;
-    }
-
-    @Override
-    public void scale(float scaleX, float scaleY) {
-        this.scaleX *= scaleX;
-        this.scaleY *= scaleY;
-        updated = false;
     }
 
 }

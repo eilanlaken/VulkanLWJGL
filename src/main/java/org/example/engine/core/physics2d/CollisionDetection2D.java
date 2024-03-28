@@ -13,14 +13,14 @@ public final class CollisionDetection2D {
     }
 
     private static boolean checkCollision(final Shape2DAABB a, final Shape2DAABB b) {
-        if (a.max.x < b.min.x || a.min.x > b.max.x) return false;
-        return !(a.max.y < b.min.y) && !(a.min.y > b.max.y);
+        if (a.worldMax.x < b.worldMin.x || a.worldMin.x > b.worldMax.x) return false;
+        return !(a.worldMax.y < b.worldMin.y) && !(a.worldMin.y > b.worldMax.y);
     }
 
     private static boolean checkCollision(final Shape2DCircle a, final Shape2DCircle b) {
-        float r = a.radius + b.radius;
+        float r = a.originalRadius + b.originalRadius;
         r *= r;
-        return r < (a.center.x + b.center.x) * (a.center.x + b.center.x) + (a.center.y + b.center.y) * (a.center.y + b.center.y);
+        return r < (a.localCenter.x + b.localCenter.x) * (a.localCenter.x + b.localCenter.x) + (a.localCenter.y + b.localCenter.y) * (a.localCenter.y + b.localCenter.y);
     }
 
 }

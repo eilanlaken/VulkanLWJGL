@@ -1,22 +1,20 @@
 package org.example.engine.core.math;
 
-public class Shape2DRectangle implements Shape2D {
+public class Shape2DRectangle extends Shape2D {
 
-    public Vector2 center;
-    public float width;
-    private float widthHalf;
-    public float height;
-    private float heightHalf;
-    public float angle;
-    private boolean updated;
+    public Vector2 localCenter;
+    public float originalWidth;
+    private float originalWidthHalf;
+    public float originalHeight;
+    private float originalHeightHalf;
 
-    // corners:
+    // world corners:
     /**
-     *  c1 --------- c4
-     *  |             |
-     *  |             |
-     *  |             |
-     *  c2 --------- c3
+     *  c1 ---------------c4
+     *  |                 |
+     *  |                 |
+     *  |                 |
+     *  c2 --------------c3
      */
     private Vector2 c1;
     private Vector2 c2;
@@ -26,38 +24,26 @@ public class Shape2DRectangle implements Shape2D {
     private final Vector2 tmp1 = new Vector2();
     private final Vector2 tmp2 = new Vector2();
 
-    public Shape2DRectangle(float centerX, float centerY, float width, float height, float angle) {
-        this.center = new Vector2(centerX, centerY);
-        this.width = width;
-        this.height = height;
-        this.widthHalf = width * 0.5f;
-        this.heightHalf = height * 0.5f;
-        this.angle = angle;
-        this.c1 = new Vector2();
-        this.c2 = new Vector2();
-        this.c3 = new Vector2();
-        this.c4 = new Vector2();
-        this.updated = false;
+    public Shape2DRectangle(float centerX, float centerY, float width, float height) {
+        this.localCenter = new Vector2(centerX, centerY);
+        this.originalWidth = width;
+        this.originalHeight = height;
+        this.originalWidthHalf = width * 0.5f;
+        this.originalHeightHalf = height * 0.5f;
+        this.c1 = new Vector2(centerX - originalWidthHalf, centerY + originalHeightHalf);
+        this.c2 = new Vector2(centerX - originalWidthHalf, centerY - originalHeightHalf);
+        this.c3 = new Vector2(centerX + originalWidthHalf, centerY - originalHeightHalf);
+        this.c4 = new Vector2(centerX + originalWidthHalf, centerY + originalHeightHalf);
     }
 
     public Shape2DRectangle(float width, float height) {
-        this.center = new Vector2();
-        this.width = width;
-        this.height = height;
-        this.widthHalf = width * 0.5f;
-        this.heightHalf = height * 0.5f;
-        this.angle = 0;
-        this.updated = false;
+        this(0,0, width, height);
     }
 
     @Override
     public boolean contains(float x, float y) {
-        if (angle == 0) {
-            if (x > center.x + widthHalf || x < center.x - widthHalf) return false;
-            if (y > center.y + heightHalf || y < center.y - heightHalf) return false;
-            return true;
-        }
-        if (!updated) updateCorners();
+        if (!updated) update();
+
         tmp1.set(c4).sub(c1);
         tmp2.set(x,y).sub(c1);
         float projection1 = tmp1.dot(tmp2);
@@ -73,76 +59,51 @@ public class Shape2DRectangle implements Shape2D {
 
     @Override
     public float getArea() {
-        return width * height;
+        return originalWidth * scaleX * originalHeight * scaleY;
     }
 
     @Override
     public float getPerimeter() {
-        return 2 * (width + height);
+        return 2 * (originalWidth * scaleX + originalHeight * scaleY);
     }
 
     @Override
-    public void translate(float dx, float dy) {
-        center.add(dx, dy);
-        this.updated = false;
-    }
-
-    @Override
-    public void rotate(float degrees) {
-        angle += degrees;
-        angle %= 360;
-        this.updated = false;
-    }
-
-    @Override
-    public void scale(float scaleX, float scaleY) {
-        this.width *= scaleX;
-        this.height *= scaleY;
-        this.widthHalf = width * 0.5f;
-        this.heightHalf = height * 0.5f;
-        this.updated = false;
-    }
-
-    public void updateCorners() {
-        float sin = MathUtils.sinDeg(angle);
-        float cos = MathUtils.cosDeg(angle);
-
-        float x1 = -widthHalf * cos - heightHalf * sin;
-        float y1 = -widthHalf * sin + heightHalf * cos;
-
-        float x2 = -widthHalf * cos + heightHalf * sin;
-        float y2 = -widthHalf * sin - heightHalf * cos;
-
-        float x3 = widthHalf * cos + heightHalf * sin;
-        float y3 = widthHalf * sin - heightHalf * cos;
-
-        float x4 = widthHalf * cos - heightHalf * sin;
-        float y4 = widthHalf * sin + heightHalf * cos;
-
-        this.c1.set(center.x, center.y).add(x1, y1);
-        this.c2.set(center.x, center.y).add(x2, y2);
-        this.c3.set(center.x, center.y).add(x3, y3);
-        this.c4.set(center.x, center.y).add(x4, y4);
+    public void update() {
+        // scale
+        c1.set(-originalWidthHalf, originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
+        c2.set(-originalWidthHalf, -originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
+        c3.set(originalWidthHalf, -originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
+        c4.set(originalWidthHalf, originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
+        // rotate
+        c1.rotateDeg(angle);
+        c2.rotateDeg(angle);
+        c3.rotateDeg(angle);
+        c4.rotateDeg(angle);
+        // translate
+        c1.add(x, y);
+        c2.add(x, y);
+        c3.add(x, y);
+        c4.add(x, y);
         this.updated = true;
     }
 
     public Vector2 getTopLeftCorner() {
-        if (!updated) updateCorners();
+        if (!updated) update();
         return c1;
     }
 
     public Vector2 getBottomLeftCorner() {
-        if (!updated) updateCorners();
+        if (!updated) update();
         return c2;
     }
 
     public Vector2 getBottomRightCorner() {
-        if (!updated) updateCorners();
+        if (!updated) update();
         return c3;
     }
 
     public Vector2 getTopRightCorner() {
-        if (!updated) updateCorners();
+        if (!updated) update();
         return c4;
     }
 

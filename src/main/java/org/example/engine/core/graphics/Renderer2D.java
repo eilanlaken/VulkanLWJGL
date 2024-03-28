@@ -1,7 +1,7 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.math.Shape2DPolygon;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
@@ -28,6 +28,7 @@ public class Renderer2D implements Resource {
     private ShaderProgram currentShader;
     private Texture lastTexture;
     private HashMap<String, Object> currentCustomAttributes;
+    private int drawMode = GL11.GL_TRIANGLES;
     private boolean drawing = false;
     private int vertexIndex = 0;
     private int triangleIndex = 0;
@@ -41,7 +42,7 @@ public class Renderer2D implements Resource {
     private int drawCalls = 0;
 
     public Renderer2D() {
-        this.defaultShader = new ShaderProgram(AssetUtils.getFileContent("assets/shaders/default-2d-new-4.vert"), AssetUtils.getFileContent("assets/shaders/default-2d-new-4.frag"));
+        this.defaultShader = createDefaultShaderProgram();
         this.singleWhitePixel = createSingleWhitePixelTexture();
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
@@ -76,47 +77,9 @@ public class Renderer2D implements Resource {
     }
 
     /** Push primitives: TextureRegion, Shape, Light **/
-    // TODO: libGDX PolygonSpriteBatch.java: 772
-    @Deprecated public void pushTexture(Texture texture, Color tint, float ui, float vi, float uf, float vf, float offsetX, float offsetY, float pw, float ph, float ow, float oh, float x, float y, float angle, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
-        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
-        useShader(shader);
-        useTexture(texture);
-        useCustomAttributes(customAttributes);
 
-        // put indices
-        int startVertex = this.vertexIndex / VERTEX_SIZE;
-        indicesBuffer
-                .put(startVertex)
-                .put(startVertex + 1)
-                .put(startVertex + 3)
-                .put(startVertex + 3)
-                .put(startVertex + 1)
-                .put(startVertex + 2)
-        ;
-        triangleIndex += 6;
-
-        // put vertices
-        float x1, y1;
-        float x2, y2;
-        float x3, y3;
-        float x4, y4;
-
-        x1 = x2 = scaleX * (offsetX - ow / 2);
-        x3 = x4 = x1 + scaleX * pw;
-        //y1 = y2 =
-
-        float t = tint == null ? DEFAULT_TINT : tint.toFloatBits();
-        verticesBuffer
-                .put(-256f/2).put(256f/2).put(t).put(ui).put(vi)
-                .put(-256f/2).put(-256f/2).put(t).put(ui).put(vf)
-                .put(256f/2).put(-256f/2).put(t).put(uf).put(vf)
-                .put(256f/2).put(256f/2).put(t).put(uf).put(vi)
-        ;
-        vertexIndex += 20;
-    }
-
-    public void pushTextureRegion(TextureRegion region, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+    // TODO: work directly with components to prevent copy operations.
+    public void pushTexture(TextureRegion region, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
 
@@ -156,10 +119,12 @@ public class Renderer2D implements Resource {
         float localX2, localY2;
         float localX3, localY3;
         float localX4, localY4;
+
         localX1 = localX2 = offsetX - originalWidthHalf;
         localX3 = localX4 = offsetX - originalWidthHalf + packedWidth;
         localY1 = localY4 = offsetY - originalHeightHalf + packedHeight;
         localY2 = localY3 = offsetY - originalHeightHalf;
+
         if (scaleX != 1.0f) {
             localX1 *= scaleX;
             localX2 *= scaleX;
@@ -172,10 +137,12 @@ public class Renderer2D implements Resource {
             localY3 *= scaleY;
             localY4 *= scaleY;
         }
+
         float x1, y1;
         float x2, y2;
         float x3, y3;
         float x4, y4;
+
         if (angleZ != 0.0f) {
             final float sin = MathUtils.sinDeg(angleZ);
             final float cos = MathUtils.cosDeg(angleZ);
@@ -226,8 +193,26 @@ public class Renderer2D implements Resource {
         vertexIndex += 20;
     }
 
-    public void pushShape() {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public void pushShape(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (indicesBuffer.position() + triangleIndex + polygon.indices.length > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + polygon.localPoints.length > verticesBuffer.capacity()) flush();
+
+        useShader(shader);
+        useTexture(singleWhitePixel);
+        useCustomAttributes(customAttributes);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 0; i < polygon.indices.length; i++) indicesBuffer.put(startVertex + polygon.indices[i]);
+        triangleIndex += polygon.indices.length;
+
+        if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
+        if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
+
+        polygon.setScale(scaleX, scaleY);
+        polygon.setRotation(angleZ);
+        polygon.setTranslation(x, y);
+
     }
 
     public void pushLight() {
@@ -274,9 +259,9 @@ public class Renderer2D implements Resource {
             GL20.glEnableVertexAttribArray(0);
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
-            //GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0); // TODO: try to only use triangles
             // actually works.
-            GL11.glDrawElements(GL11.GL_LINE_LOOP, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            //GL11.glDrawElements(GL11.GL_LINE_LOOP, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
             GL20.glDisableVertexAttribArray(2);
             GL20.glDisableVertexAttribArray(1);
             GL20.glDisableVertexAttribArray(0);
@@ -308,7 +293,44 @@ public class Renderer2D implements Resource {
     }
 
     private static ShaderProgram createDefaultShaderProgram() {
-        return null;
+        final String vertexShader = "#version 450\n" +
+                "\n" +
+                "// attributes\n" +
+                "layout(location = 0) in vec2 a_position;\n" +
+                "layout(location = 1) in vec4 a_color;\n" +
+                "layout(location = 2) in vec2 a_texCoord0;\n" +
+                "\n" +
+                "// uniforms\n" +
+                "uniform mat4 u_camera_combined;\n" +
+                "\n" +
+                "// outputs\n" +
+                "out vec4 color;\n" +
+                "out vec2 uv;\n" +
+                "\n" +
+                "void main() {\n" +
+                "    color = a_color;\n" +
+                "    uv = a_texCoord0;\n" +
+                "    gl_Position = u_camera_combined * vec4(a_position.x, a_position.y, 0.0, 1.0);\n" +
+                "}";
+
+        final String fragmentShader = "#version 450\n" +
+                "\n" +
+                "// inputs\n" +
+                "in vec4 color;\n" +
+                "in vec2 uv;\n" +
+                "\n" +
+                "uniform sampler2D u_texture;\n" +
+                "\n" +
+                "// outputs\n" +
+                "layout (location = 0) out vec4 out_color;\n" +
+                "\n" +
+                "void main() {\n" +
+                "\n" +
+                "    out_color = color * texture(u_texture, uv);\n" +
+                "\n" +
+                "}";
+
+        return new ShaderProgram(vertexShader, fragmentShader);
     }
 
     private static Texture createSingleWhitePixelTexture() {

@@ -28,12 +28,4 @@ public class Component {
 
     }
 
-    public static final class Factory {
-
-        // Transform
-        public static ComponentTransform createTransform() {
-            return new ComponentTransform(false,0,0,0,0,0,0,1,1,1);
-        }
-
-    }
 }

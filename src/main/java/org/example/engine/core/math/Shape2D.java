@@ -1,15 +1,46 @@
 package org.example.engine.core.math;
 
-public interface Shape2D {
+public abstract class Shape2D {
 
-    default boolean contains(final Vector2 point) {
+    protected float x, y;
+    protected float angle;
+    protected float scaleX, scaleY;
+    protected boolean updated;
+
+    public Shape2D() {
+        this.x = 0;
+        this.y = 0;
+        this.angle = 0;
+        this.scaleX = 1;
+        this.scaleY = 1;
+        updated = true;
+    }
+
+    public boolean contains(final Vector2 point) {
         return contains(point.x, point.y);
     }
-    boolean contains(float x, float y);
-    float getArea();
-    float getPerimeter();
-    void translate(float dx, float dy);
-    void rotate(float degrees);
-    void scale(float scaleX, float scaleY);
+
+    public final void setTranslation(float x, float y) {
+        this.x = x;
+        this.y = y;
+        updated = false;
+    }
+
+    public final void setRotation(float degrees) {
+        this.angle = degrees;
+        updated = false;
+    }
+
+    public final void setScale(float scaleX, float scaleY) {
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+        updated = false;
+    }
+
+    public abstract void update();
+    public abstract boolean contains(float x, float y);
+    public abstract float getArea();
+    public abstract float getPerimeter();
+
 
 }
