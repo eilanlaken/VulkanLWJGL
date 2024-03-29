@@ -12,9 +12,18 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String[] args) {
-        Shape2DPolygon p = new Shape2DPolygon(new float[] {0,1, 1,1, 1,0, 0,0});
-        System.out.println(Arrays.toString(p.indices));
+        //Shape2DPolygon p = new Shape2DPolygon(new float[] {0,1, 1,1, 1,0, 0,0});
 
+        Shape2DPolygon p = new Shape2DPolygon(new float[] {0,1, 0,0, 1,0, 1,1});
+        System.out.println(Arrays.toString(p.indices));
+        System.out.println(p.getArea());
+
+        System.out.println("world: " + Arrays.toString(p.worldPoints));
+
+        p.setScale(2,2);
+
+        p.update();
+        System.out.println("world: " + Arrays.toString(p.worldPoints));
 
 
 //        try {
@@ -27,7 +36,7 @@ public class Main {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-        //if (true) return;
+        if (true) return;
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);
         Application.launch(new ScreenLoading());

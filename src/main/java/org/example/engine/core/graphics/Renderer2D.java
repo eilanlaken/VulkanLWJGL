@@ -212,7 +212,13 @@ public class Renderer2D implements Resource {
         polygon.setScale(scaleX, scaleY);
         polygon.setRotation(angleZ);
         polygon.setTranslation(x, y);
+        polygon.update();
 
+        float t = tint == null ? DEFAULT_TINT : tint.toFloatBits();
+        for (int i = 0; i < polygon.worldPoints.length - 1; i += 2) {
+            verticesBuffer.put(polygon.worldPoints[i]).put(polygon.worldPoints[i+1]).put(t).put(0.5f).put(0.5f);
+        }
+        vertexIndex += polygon.vertexCount;
     }
 
     public void pushLight() {

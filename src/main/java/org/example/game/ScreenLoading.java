@@ -22,10 +22,7 @@ public class ScreenLoading extends WindowScreen {
 
     @Override
     protected void refresh() {
-        System.out.println(AssetStore.isLoaded("assets/models/cube-blue.fbx"));
-
         if (!AssetStore.isLoadingInProgress()) {
-            System.out.println(AssetStore.isLoaded("assets/models/cube-blue.fbx"));
             Application.switchScreen(screen);
         }
 
