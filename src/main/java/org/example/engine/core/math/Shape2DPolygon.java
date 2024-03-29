@@ -5,8 +5,7 @@ public class Shape2DPolygon extends Shape2D {
     public final int vertexCount;
     public final float[] localPoints;
     public final int[] indices;
-    public float[] worldPoints;
-
+    private float[] worldPoints;
     private float area;
 
     private final Vector2 tmp = new Vector2();
@@ -14,11 +13,12 @@ public class Shape2DPolygon extends Shape2D {
     public Shape2DPolygon(float[] points) {
         if (points.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + points.length);
         if (points.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
+
         this.vertexCount = points.length / 2;
-        this.localPoints = points;
+        this.localPoints = new float[points.length];
+        System.arraycopy(points, 0, localPoints, 0, points.length);
+        this.area = Algorithms.calculatePolygonSignedArea(points);
         this.worldPoints = new float[points.length];
-        System.arraycopy(points, 0, worldPoints, 0, points.length);
-        this.area = Algorithms.calculatePolygonSignedArea(this.worldPoints);
         this.indices = Algorithms.triangulatePolygon(localPoints);
         updated = false;
     }
@@ -33,11 +33,9 @@ public class Shape2DPolygon extends Shape2D {
         updated = true;
     }
 
-    public Vector2 getVertex(int index, Vector2 output) {
-        if (index >= vertexCount) output.set(worldPoints[(index * 2) % worldPoints.length], worldPoints[(index * 2) % worldPoints.length + 1]);
-        else if (index < 0) output.set(worldPoints[(index * 2) % worldPoints.length + worldPoints.length], worldPoints[(index * 2) % worldPoints.length + worldPoints.length + 1]);
-        else output.set(worldPoints[index * 2], worldPoints[index * 2 + 1]);
-        return output;
+    public float[] getWorldPoints() {
+        if (!updated) update();
+        return worldPoints;
     }
 
     @Override
@@ -81,13 +79,6 @@ public class Shape2DPolygon extends Shape2D {
         for (int i = 0; i < worldPoints.length - 2; i += 2) perimeter += Vector2.dst(worldPoints[i], worldPoints[i+1], worldPoints[i+2], worldPoints[i+3]);
         perimeter += Vector2.dst(worldPoints[worldPoints.length - 2], worldPoints[worldPoints.length - 1], worldPoints[0], worldPoints[1]);
         return perimeter;
-    }
-
-    public static void getVertex(float[] points, int index, Vector2 output) {
-        final int vertexCount = points.length / 2;
-        if (index >= vertexCount) output.set(points[(index * 2) % points.length], points[(index * 2) % points.length + 1]);
-        else if (index < 0) output.set(points[(index * 2) % points.length + points.length], points[(index * 2) % points.length + points.length + 1]);
-        else output.set(points[index * 2], points[index * 2 + 1]);
     }
 
 }

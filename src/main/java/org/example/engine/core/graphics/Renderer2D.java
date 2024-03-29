@@ -215,8 +215,9 @@ public class Renderer2D implements Resource {
         polygon.update();
 
         float t = tint == null ? DEFAULT_TINT : tint.toFloatBits();
-        for (int i = 0; i < polygon.worldPoints.length - 1; i += 2) {
-            verticesBuffer.put(polygon.worldPoints[i]).put(polygon.worldPoints[i+1]).put(t).put(0.5f).put(0.5f);
+        final float[] worldPoints = polygon.getWorldPoints();
+        for (int i = 0; i < worldPoints.length - 1; i += 2) {
+            verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(t).put(0.5f).put(0.5f);
         }
         vertexIndex += polygon.vertexCount;
     }
