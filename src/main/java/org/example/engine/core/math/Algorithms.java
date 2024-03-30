@@ -1,7 +1,6 @@
 package org.example.engine.core.math;
 
 import org.example.engine.core.collections.ArrayInt;
-import org.example.engine.core.collections.CyclicLinkedList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -358,11 +357,10 @@ public class Algorithms {
         sortLinked(p);
     }
 
-    private static Node sortLinked(Node list) {
+    private static void sortLinked(Node list) {
         int inSize = 1;
-
-
         int numMerges;
+
         do {
             Node p = list;
             list = null;
@@ -418,8 +416,6 @@ public class Algorithms {
             inSize *= 2;
 
         } while (numMerges > 1);
-
-        return list;
     }
 
     private static Node eliminateHoles(float[] data, int[] holeIndices, Node outerNode, int dim) {
