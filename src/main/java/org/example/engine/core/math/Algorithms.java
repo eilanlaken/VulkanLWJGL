@@ -86,12 +86,7 @@ public class Algorithms {
 
         triangulateLinked(outerNode, triangles, dim, minX, minY, invSize, Integer.MIN_VALUE);
 
-        System.out.println("triangles: " + Arrays.toString(triangles.items));
-        triangles.pack();
-        System.out.println("triangles: " + Arrays.toString(triangles.items));
-
-
-        return triangles.items;
+        return triangles.pack().items;
     }
 
     private static void triangulateLinked(Node ear, ArrayInt triangles, int dim, float minX, float minY, float invSize, int pass) {

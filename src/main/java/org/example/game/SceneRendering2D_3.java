@@ -52,12 +52,8 @@ public class SceneRendering2D_3 extends WindowScreen {
         //shape = FactoryComponent.createShapeLine(0, 0, 100, 0, 2, new Color(1,0,1,1), null, null);
         //shape = FactoryComponent.createShapeRectangleFilled(100, 30, new Color(1,0,1,1), null, null);
 
-        shape = FactoryComponent.createShapeCircleFilled(30, 500, new Color(0,0.5f,1,1), null, null);
+        shape = FactoryComponent.createShapeCircleFilled(30, 1500, new Color(0,0.5f,1,1), null, null);
         shape2 = FactoryComponent.createShapeCircleFilled(30, 501, new Color(0,0.5f,1,1), null, null);
-
-        System.out.println("vertex array length: " + shape.polygon.localPoints.length);
-        System.out.println("index array length: " + shape.polygon.indices.length);
-
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -74,12 +70,13 @@ public class SceneRendering2D_3 extends WindowScreen {
         GL11.glClearColor(0,0,0,0);
         renderer2D.begin(camera);
         //renderer2D.pushTexture(texture0, new Color(1,1,1,1f), 0,0,1,1,0,0,256,256,256,256,0,0,0, 1, 1,null,null);
-        for (int i = 0; i < 16; i++) {
-            renderer2D.pushTexture(region, new Color(1,1,1,1),i*200,0,0,0,0,0.2f,0.2f,null,null);
-
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 100; j++) {
+                renderer2D.pushTexture(region, new Color(1,1,1,1),-350 + i*10,350 - j*10,0,0,0,0.2f,0.2f,null,null);
+            }
         }
-        //renderer2D.pushShape(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
-        //renderer2D.pushShape(shape2.polygon, shape.tint,100,0,0,0,0,1,1,null,null);
+        renderer2D.pushShape(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
+        renderer2D.pushShape(shape2.polygon, shape.tint,100,0,0,0,0,1,1,null,null);
 
         renderer2D.end();
         time++;

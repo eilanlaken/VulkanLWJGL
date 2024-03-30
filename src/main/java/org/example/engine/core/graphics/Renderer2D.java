@@ -15,8 +15,7 @@ import java.util.HashMap;
 public class Renderer2D implements Resource {
 
     // observation: batch size must be at least the number of max vertices.
-    //private static final int BATCH_SIZE = 4000;
-    private static final int BATCH_SIZE = 4;
+    private static final int BATCH_SIZE = 4000;
     private static final int VERTEX_SIZE = 5;
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
 
@@ -41,7 +40,6 @@ public class Renderer2D implements Resource {
     private int drawCalls = 0;
 
     public Renderer2D() {
-        System.out.println("indices buffer limit: " + indicesBuffer.limit());
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
         {
@@ -76,16 +74,11 @@ public class Renderer2D implements Resource {
 
     /** Push primitives: TextureRegion, Shape, Light **/
 
-    // TODO: when the vertices count > batch size, this does not work.
     public void pushTexture(TextureRegion region, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        System.out.println("indices capcaity: " + indicesBuffer.capacity());
-        System.out.println("verts capcaity: " + verticesBuffer.capacity());
-        if (triangleIndex + 6 > indicesBuffer.capacity() || vertexIndex + 20 > BATCH_SIZE * 4) {
-            System.out.println("flash");
+        if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
             flush();
         }
-
 
         final Texture texture = region.texture;
         final float ui = region.u;
@@ -108,7 +101,6 @@ public class Renderer2D implements Resource {
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
-
         indicesBuffer
                 .put(startVertex)
                 .put(startVertex + 1)
@@ -198,10 +190,9 @@ public class Renderer2D implements Resource {
         vertexIndex += 20;
     }
 
-    // TODO: bug here. simply does not work if the vertex sum is > 1000 and batch size 4000
     public void pushShape(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (indicesBuffer.position() + triangleIndex + polygon.indices.length > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + polygon.localPoints.length > verticesBuffer.capacity()) {
+        if (triangleIndex + polygon.indices.length > indicesBuffer.limit() || vertexIndex + polygon.localPoints.length > BATCH_SIZE * 4) {
             flush();
         }
         useShader(shader);
@@ -210,12 +201,10 @@ public class Renderer2D implements Resource {
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
-        System.out.println(startVertex);
         for (int i = 0; i < polygon.indices.length; i++) {
             indicesBuffer.put(startVertex + polygon.indices[i]);
         }
         triangleIndex += polygon.indices.length;
-        System.out.println("tri " + triangleIndex);
 
         if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
         if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
@@ -285,6 +274,8 @@ public class Renderer2D implements Resource {
         }
         GL30.glBindVertexArray(0);
 
+        verticesBuffer.clear();
+        indicesBuffer.clear();
         vertexIndex = 0;
         triangleIndex = 0;
         drawCalls++;

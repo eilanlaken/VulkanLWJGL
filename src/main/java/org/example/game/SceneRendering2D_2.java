@@ -55,10 +55,6 @@ public class SceneRendering2D_2 extends WindowScreen {
         shape = FactoryComponent.createShapeCircleFilled(30, 500, new Color(0,0.5f,1,1), null, null);
         shape2 = FactoryComponent.createShapeCircleFilled(30, 501, new Color(0,0.5f,1,1), null, null);
 
-        System.out.println("vertex array length: " + shape.polygon.localPoints.length);
-        System.out.println("index array length: " + shape.polygon.indices.length);
-
-
         camera = new Camera(640*2,480*2, 1);
         camera.update();
     }
