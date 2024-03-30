@@ -1,5 +1,7 @@
 package org.example.game;
 
+import org.example.engine.components.ComponentGraphics2DShape;
+import org.example.engine.components.FactoryComponent;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.memory.Resource;
@@ -15,15 +17,17 @@ import java.util.Map;
 // Note: glBufferData invalidates and reallocates the whole buffer. Use glBufferSubData to only update the data inside.
 // https://stackoverflow.com/questions/72648980/opengl-sampler2d-array
 // libGDX PolygonSpriteBatch.java line 772 draw()
-public class SceneRendering2D_1 extends WindowScreen {
+public class SceneRendering2D_2 extends WindowScreen {
 
     private Renderer2D renderer2D;
     private Texture texture0;
     private Camera camera;
 
+    private ComponentGraphics2DShape shape;
+
     private TextureRegion region;
 
-    public SceneRendering2D_1() {
+    public SceneRendering2D_2() {
         renderer2D = new Renderer2D();
     }
 
@@ -41,6 +45,7 @@ public class SceneRendering2D_1 extends WindowScreen {
         texture0 = AssetStore.get("assets/atlases/pack2_0.png");
         region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
+        shape = FactoryComponent.createShapeCircleFilled(200, 300, new Color(1,0,1,1), null, null);
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -57,7 +62,9 @@ public class SceneRendering2D_1 extends WindowScreen {
         GL11.glClearColor(0,0,0,0);
         renderer2D.begin(camera);
         //renderer2D.pushTexture(texture0, new Color(1,1,1,1f), 0,0,1,1,0,0,256,256,256,256,0,0,0, 1, 1,null,null);
-        renderer2D.pushTexture(region, new Color(1,1,1,1),0,0,0,0,0,1.5f,1.5f,null,null);
+        renderer2D.pushTexture(region, new Color(1,1,1,1),time,0,0,0,0,1.5f,1.5f,null,null);
+        renderer2D.pushShape(shape.polygon, shape.tint,0,0,0,0,0,1,1,null,null);
+
         renderer2D.end();
         time++;
     }

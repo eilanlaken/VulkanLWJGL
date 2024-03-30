@@ -3,7 +3,10 @@ package org.example.engine.components;
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.TextureRegion;
+import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.math.Shape2DPolygon;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 public final class FactoryComponent {
@@ -39,8 +42,21 @@ public final class FactoryComponent {
     }
 
     public static ComponentGraphics2DShape createShapeRectangleFilled(float width, float height, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
+        Shape2DPolygon polygon = new Shape2DPolygon(new float[] {-width * 0.5f, height * 0.5f, -width * 0.5f, -height * 0.5f, width * 0.5f, -height * 0.5f, width * 0.5f, height * 0.5f});
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.RECTANGLE, tint, polygon, customShader, customAttributes);
+    }
 
-        return null;
+    // TODO: cache refinement data.
+    public static ComponentGraphics2DShape createShapeCircleFilled(float r, int refinement, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
+        if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
+        float[] vertices = new float[refinement * 2];
+        for (int i = 0; i < refinement * 2; i += 2) {
+            float angle = 360f * (i * 0.5f) / refinement;
+            vertices[i] = r * MathUtils.cosDeg(angle);
+            vertices[i+1] = r * MathUtils.sinDeg(angle);
+        }
+        Shape2DPolygon polygon = new Shape2DPolygon(vertices);
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, polygon, customShader, customAttributes);
     }
 
     public static ComponentGraphics2DShape createShapeRectangleHollow(float width, float height, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {

@@ -14,16 +14,6 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Shape2DPolygon p = new Shape2DPolygon(new float[] {0,1, 0,0, 1,0, 1,1});
-        System.out.println(Arrays.toString(p.indices));
-        System.out.println(p.getArea());
-
-        float[] f = new float[] { 0, 0, 100, 0, 100, 100, 0, 100, 20, 20, 80, 20, 80, 80, 20, 80 };
-
-        int[] indices = Algorithms.triangulatePolygon(new float[] { 0, 0, 100, 0, 100, 100, 0, 100, 20, 20, 80, 20, 80, 80, 20, 80 }, new int[] { 4 }, 2);
-        System.out.println(Arrays.toString(indices));
-        System.out.println("f length: " + f.length);
-        System.out.println("indices length: " + indices.length);
 
 
 //
@@ -45,7 +35,9 @@ public class Main {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-        if (true) return;
+
+        //if (true) return;
+
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);
         Application.launch(new ScreenLoading());

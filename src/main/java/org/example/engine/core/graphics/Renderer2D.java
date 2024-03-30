@@ -11,8 +11,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 
-// The Cherno:
-// https://github.com/TheCherno/Hazel/blob/master/Hazelnut/assets/shaders/Renderer2D_Quad.glsl
 public class Renderer2D implements Resource {
 
     private static final int BATCH_SIZE = 2000;
@@ -104,6 +102,7 @@ public class Renderer2D implements Resource {
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
+
         indicesBuffer
                 .put(startVertex)
                 .put(startVertex + 1)
@@ -266,16 +265,15 @@ public class Renderer2D implements Resource {
             GL20.glEnableVertexAttribArray(0);
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
-            GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0); // TODO: try to only use triangles
-            // actually works.
-            //GL11.glDrawElements(GL11.GL_LINE_LOOP, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
             GL20.glDisableVertexAttribArray(2);
             GL20.glDisableVertexAttribArray(1);
             GL20.glDisableVertexAttribArray(0);
         }
         GL30.glBindVertexArray(0);
-        indicesBuffer.position(0);
-        verticesBuffer.position(0);
+
+        verticesBuffer.limit(BATCH_SIZE * VERTEX_SIZE);
+        indicesBuffer.limit(BATCH_TRIANGLES_CAPACITY * TRIANGLE_INDICES);
         vertexIndex = 0;
         triangleIndex = 0;
         drawCalls++;
