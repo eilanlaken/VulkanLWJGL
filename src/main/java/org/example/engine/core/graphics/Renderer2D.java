@@ -14,7 +14,9 @@ import java.util.HashMap;
 
 public class Renderer2D implements Resource {
 
-    private static final int BATCH_SIZE = 4000;
+    // observation: batch size must be at least the number of max vertices.
+    //private static final int BATCH_SIZE = 4000;
+    private static final int BATCH_SIZE = 4;
     private static final int VERTEX_SIZE = 5;
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
 
@@ -32,7 +34,7 @@ public class Renderer2D implements Resource {
 
     private final int vao;
     private final int vbo, ebo;
-    private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * VERTEX_SIZE);
+    private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * 4 * VERTEX_SIZE);
     private final IntBuffer indicesBuffer = BufferUtils.createIntBuffer(BATCH_TRIANGLES_CAPACITY * 3);
 
     // profiling
@@ -74,10 +76,16 @@ public class Renderer2D implements Resource {
 
     /** Push primitives: TextureRegion, Shape, Light **/
 
-    // TODO: work directly with components to prevent copy operations.
+    // TODO: when the vertices count > batch size, this does not work.
     public void pushTexture(TextureRegion region, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (indicesBuffer.position() + triangleIndex + 6 > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + 24 > verticesBuffer.capacity()) flush();
+        System.out.println("indices capcaity: " + indicesBuffer.capacity());
+        System.out.println("verts capcaity: " + verticesBuffer.capacity());
+        if (triangleIndex + 6 > indicesBuffer.capacity() || vertexIndex + 20 > BATCH_SIZE * 4) {
+            System.out.println("flash");
+            flush();
+        }
+
 
         final Texture texture = region.texture;
         final float ui = region.u;
@@ -190,6 +198,7 @@ public class Renderer2D implements Resource {
         vertexIndex += 20;
     }
 
+    // TODO: bug here. simply does not work if the vertex sum is > 1000 and batch size 4000
     public void pushShape(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (indicesBuffer.position() + triangleIndex + polygon.indices.length > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + polygon.localPoints.length > verticesBuffer.capacity()) {
@@ -201,11 +210,12 @@ public class Renderer2D implements Resource {
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
-        System.out.println("start vertex: " + startVertex);
+        System.out.println(startVertex);
         for (int i = 0; i < polygon.indices.length; i++) {
             indicesBuffer.put(startVertex + polygon.indices[i]);
         }
         triangleIndex += polygon.indices.length;
+        System.out.println("tri " + triangleIndex);
 
         if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
         if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
@@ -221,12 +231,7 @@ public class Renderer2D implements Resource {
         for (int i = 0; i < worldPoints.length - 1; i += 2) {
             verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(t).put(0.5f).put(0.5f);
         }
-        System.out.println("vertices buffer pos: " + verticesBuffer.position());
-        //vertexIndex += polygon.vertexCount * 5;
-        vertexIndex += worldPoints.length * 5;
-        System.out.println("polygon vertex count: " + polygon.vertexCount);
-        System.out.println("vertex index: " + vertexIndex);
-
+        vertexIndex += polygon.vertexCount * 5;
     }
 
     public void pushLight() {
@@ -279,8 +284,6 @@ public class Renderer2D implements Resource {
             GL20.glDisableVertexAttribArray(0);
         }
         GL30.glBindVertexArray(0);
-        verticesBuffer.limit(BATCH_SIZE * VERTEX_SIZE);
-        indicesBuffer.limit(BATCH_TRIANGLES_CAPACITY * 3);
 
         vertexIndex = 0;
         triangleIndex = 0;
