@@ -3,6 +3,7 @@ package org.example.engine.core.math;
 import org.example.engine.core.collections.ArrayInt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 //https://github.com/earcut4j/earcut4j/blob/master/src/test/java/earcut4j/Test01.java
@@ -85,7 +86,11 @@ public class Algorithms {
 
         triangulateLinked(outerNode, triangles, dim, minX, minY, invSize, Integer.MIN_VALUE);
 
+        System.out.println("triangles: " + Arrays.toString(triangles.items));
         triangles.pack();
+        System.out.println("triangles: " + Arrays.toString(triangles.items));
+
+
         return triangles.items;
     }
 

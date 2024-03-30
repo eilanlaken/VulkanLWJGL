@@ -23,6 +23,7 @@ public class Shape2DPolygon extends Shape2D {
         System.arraycopy(vertices, 0, localPoints, 0, vertices.length);
         this.area = Algorithms.calculatePolygonSignedArea(vertices);
         this.worldPoints = new float[vertices.length];
+        System.out.println("holes: " + holes);
         this.indices = Algorithms.triangulatePolygon(localPoints, holes, 2);
         updated = false;
     }

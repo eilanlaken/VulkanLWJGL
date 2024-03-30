@@ -5,6 +5,7 @@ import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.TextureRegion;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Shape2DPolygon;
+import org.example.engine.core.math.Vector2;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,14 +38,22 @@ public final class FactoryComponent {
 
     /** Graphics - Shapes **/
     public static ComponentGraphics2DShape createShapeLine(float x1, float y1, float x2, float y2, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
-
-        return null;
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        Vector2 strokeVector = new Vector2(dx, dy);
+        strokeVector.rotate90(1);
+        strokeVector.nor().scl(stroke * 0.5f, stroke * 0.5f);
+        System.out.println(strokeVector);
+        Shape2DPolygon polygon = new Shape2DPolygon(new float[] {x1 + strokeVector.x, y1 + strokeVector.y, x1 - strokeVector.x, y1 - strokeVector.y, x2 - strokeVector.x, y2 - strokeVector.y, x2 + strokeVector.x, y2 + strokeVector.y});
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.LINE, tint, polygon, customShader, customAttributes);
     }
 
     public static ComponentGraphics2DShape createShapeRectangleFilled(float width, float height, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
         final float widthHalf = width * 0.5f;
         final float heightHalf = height * 0.5f;
         Shape2DPolygon polygon = new Shape2DPolygon(new float[] {-widthHalf, heightHalf, -widthHalf, -heightHalf, widthHalf, -heightHalf, widthHalf, heightHalf});
+        System.out.println("int rect: " + Arrays.toString(polygon.indices));
+
         return new ComponentGraphics2DShape(ComponentGraphics2DShape.RECTANGLE, tint, polygon, customShader, customAttributes);
     }
 

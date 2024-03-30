@@ -9,24 +9,23 @@ import org.lwjgl.opengl.*;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Renderer2D implements Resource {
 
-    private static final int BATCH_SIZE = 2000;
+    private static final int BATCH_SIZE = 4000;
     private static final int VERTEX_SIZE = 5;
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
-    private static final int TRIANGLE_INDICES = 3;
 
-    private final ShaderProgram defaultShader;
-    private final Texture singleWhitePixel;
+    private final ShaderProgram defaultShader = createDefaultShaderProgram();
+    private final Texture singleWhitePixelTexture = createSingleWhitePixelTexture();
     private final float DEFAULT_TINT = new Color(1,1,1,1).toFloatBits();
 
     private Camera camera;
     private ShaderProgram currentShader;
     private Texture lastTexture;
     private HashMap<String, Object> currentCustomAttributes;
-    private int drawMode = GL11.GL_TRIANGLES;
     private boolean drawing = false;
     private int vertexIndex = 0;
     private int triangleIndex = 0;
@@ -34,15 +33,13 @@ public class Renderer2D implements Resource {
     private final int vao;
     private final int vbo, ebo;
     private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * VERTEX_SIZE);
-    private final IntBuffer indicesBuffer = BufferUtils.createIntBuffer(BATCH_TRIANGLES_CAPACITY * TRIANGLE_INDICES);
+    private final IntBuffer indicesBuffer = BufferUtils.createIntBuffer(BATCH_TRIANGLES_CAPACITY * 3);
 
     // profiling
     private int drawCalls = 0;
 
     public Renderer2D() {
         System.out.println("indices buffer limit: " + indicesBuffer.limit());
-        this.defaultShader = createDefaultShaderProgram();
-        this.singleWhitePixel = createSingleWhitePixelTexture();
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
         {
@@ -185,38 +182,21 @@ public class Renderer2D implements Resource {
 
         float t = tint == null ? DEFAULT_TINT : tint.toFloatBits();
         verticesBuffer
-                .put(x1).put(y1).put(t).put(ui).put(vi)
-                .put(x2).put(y2).put(t).put(ui).put(vf)
-                .put(x3).put(y3).put(t).put(uf).put(vf)
-                .put(x4).put(y4).put(t).put(uf).put(vi)
+                .put(x1).put(y1).put(t).put(ui).put(vi) // V1
+                .put(x2).put(y2).put(t).put(ui).put(vf) // V2
+                .put(x3).put(y3).put(t).put(uf).put(vf) // V3
+                .put(x4).put(y4).put(t).put(uf).put(vi) // V4
         ;
         vertexIndex += 20;
     }
 
     public void pushShape(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        System.out.println("position: " + indicesBuffer.position());
-        System.out.println("t index: " + triangleIndex);
-        System.out.println("poly : " + polygon.indices.length);
-        System.out.println("capacity: : " + indicesBuffer.capacity());
-
-        System.out.println("===========");
-
-        System.out.println("position verts: " + verticesBuffer.position());
-        System.out.println("vertex index: " + vertexIndex);
-        System.out.println("poly local points : " + polygon.localPoints.length);
-        System.out.println("capacity verts : " + verticesBuffer.capacity());
-
         if (indicesBuffer.position() + triangleIndex + polygon.indices.length > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + polygon.localPoints.length > verticesBuffer.capacity()) {
-            System.out.println("flushing");
             flush();
-        } else {
-            System.out.println("not flushing");
-
         }
-
         useShader(shader);
-        useTexture(singleWhitePixel);
+        useTexture(singleWhitePixelTexture);
         useCustomAttributes(customAttributes);
 
         // put indices
@@ -237,10 +217,13 @@ public class Renderer2D implements Resource {
 
         float t = tint == null ? DEFAULT_TINT : tint.toFloatBits();
         final float[] worldPoints = polygon.getWorldPoints();
+
         for (int i = 0; i < worldPoints.length - 1; i += 2) {
             verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(t).put(0.5f).put(0.5f);
         }
-        vertexIndex += polygon.vertexCount;
+        System.out.println("vertices buffer pos: " + verticesBuffer.position());
+        //vertexIndex += polygon.vertexCount * 5;
+        vertexIndex += worldPoints.length * 5;
         System.out.println("polygon vertex count: " + polygon.vertexCount);
         System.out.println("vertex index: " + vertexIndex);
 
@@ -296,9 +279,9 @@ public class Renderer2D implements Resource {
             GL20.glDisableVertexAttribArray(0);
         }
         GL30.glBindVertexArray(0);
-
         verticesBuffer.limit(BATCH_SIZE * VERTEX_SIZE);
-        indicesBuffer.limit(BATCH_TRIANGLES_CAPACITY * TRIANGLE_INDICES);
+        indicesBuffer.limit(BATCH_TRIANGLES_CAPACITY * 3);
+
         vertexIndex = 0;
         triangleIndex = 0;
         drawCalls++;
