@@ -42,7 +42,21 @@ public final class FactoryComponent {
     }
 
     public static ComponentGraphics2DShape createShapeRectangleFilled(float width, float height, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
-        Shape2DPolygon polygon = new Shape2DPolygon(new float[] {-width * 0.5f, height * 0.5f, -width * 0.5f, -height * 0.5f, width * 0.5f, -height * 0.5f, width * 0.5f, height * 0.5f});
+        final float widthHalf = width * 0.5f;
+        final float heightHalf = height * 0.5f;
+        Shape2DPolygon polygon = new Shape2DPolygon(new float[] {-widthHalf, heightHalf, -widthHalf, -heightHalf, widthHalf, -heightHalf, widthHalf, heightHalf});
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.RECTANGLE, tint, polygon, customShader, customAttributes);
+    }
+
+    public static ComponentGraphics2DShape createShapeRectangleHollow(float width, float height, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
+        if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+        final float widthHalf = width * 0.5f;
+        final float heightHalf = height * 0.5f;
+        final float strokeHalf = stroke * 0.5f;
+        Shape2DPolygon polygon = new Shape2DPolygon(new float[]{
+                -widthHalf - strokeHalf, heightHalf + strokeHalf, -widthHalf - strokeHalf, -heightHalf - strokeHalf, widthHalf + strokeHalf, -heightHalf - strokeHalf, widthHalf + strokeHalf, heightHalf + strokeHalf,
+                -widthHalf + strokeHalf, heightHalf - strokeHalf, -widthHalf + strokeHalf, -heightHalf + strokeHalf, widthHalf - strokeHalf, -heightHalf + strokeHalf, widthHalf - strokeHalf, heightHalf - strokeHalf
+        }, new int[] { 4 });
         return new ComponentGraphics2DShape(ComponentGraphics2DShape.RECTANGLE, tint, polygon, customShader, customAttributes);
     }
 
@@ -59,9 +73,25 @@ public final class FactoryComponent {
         return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, polygon, customShader, customAttributes);
     }
 
-    public static ComponentGraphics2DShape createShapeRectangleHollow(float width, float height, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
-
-        return null;
+    public static ComponentGraphics2DShape createShapeCircleHollow(float r, int refinement, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
+        if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
+        if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+        float outerRadius = r + stroke * 0.5f;
+        float innerRadius = r - stroke * 0.5f;
+        float[] vertices = new float[refinement * 2 * 2];
+        for (int i = 0; i < refinement * 2; i += 2) { // outer rim
+            float angle = 360f * (i * 0.5f) / refinement;
+            vertices[i] = outerRadius * MathUtils.cosDeg(angle);
+            vertices[i+1] = outerRadius * MathUtils.sinDeg(angle);
+        }
+        for (int i = refinement * 2; i < refinement * 2 * 2; i += 2) { // outer rim
+            float angle = 360f * (i * 0.5f) / refinement;
+            vertices[i] = innerRadius * MathUtils.cosDeg(angle);
+            vertices[i+1] = innerRadius * MathUtils.sinDeg(angle);
+        }
+        Shape2DPolygon polygon = new Shape2DPolygon(vertices, new int[] { refinement });
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, polygon, customShader, customAttributes);
     }
+
 
 }

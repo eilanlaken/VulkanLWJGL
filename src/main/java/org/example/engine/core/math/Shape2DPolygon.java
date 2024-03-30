@@ -10,16 +10,20 @@ public class Shape2DPolygon extends Shape2D {
 
     private final Vector2 tmp = new Vector2();
 
-    public Shape2DPolygon(float[] points) {
-        if (points.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + points.length);
-        if (points.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
+    public Shape2DPolygon(float[] vertices) {
+        this(vertices, null);
+    }
 
-        this.vertexCount = points.length / 2;
-        this.localPoints = new float[points.length];
-        System.arraycopy(points, 0, localPoints, 0, points.length);
-        this.area = Algorithms.calculatePolygonSignedArea(points);
-        this.worldPoints = new float[points.length];
-        this.indices = Algorithms.triangulatePolygon(localPoints);
+    public Shape2DPolygon(float[] vertices, int[] holes) {
+        if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
+        if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
+
+        this.vertexCount = vertices.length / 2;
+        this.localPoints = new float[vertices.length];
+        System.arraycopy(vertices, 0, localPoints, 0, vertices.length);
+        this.area = Algorithms.calculatePolygonSignedArea(vertices);
+        this.worldPoints = new float[vertices.length];
+        this.indices = Algorithms.triangulatePolygon(localPoints, holes, 2);
         updated = false;
     }
 

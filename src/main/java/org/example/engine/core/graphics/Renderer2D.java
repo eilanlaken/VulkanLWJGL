@@ -40,6 +40,7 @@ public class Renderer2D implements Resource {
     private int drawCalls = 0;
 
     public Renderer2D() {
+        System.out.println("indices buffer limit: " + indicesBuffer.limit());
         this.defaultShader = createDefaultShaderProgram();
         this.singleWhitePixel = createSingleWhitePixelTexture();
         this.vao = GL30.glGenVertexArrays();
@@ -194,7 +195,25 @@ public class Renderer2D implements Resource {
 
     public void pushShape(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (indicesBuffer.position() + triangleIndex + polygon.indices.length > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + polygon.localPoints.length > verticesBuffer.capacity()) flush();
+        System.out.println("position: " + indicesBuffer.position());
+        System.out.println("t index: " + triangleIndex);
+        System.out.println("poly : " + polygon.indices.length);
+        System.out.println("capacity: : " + indicesBuffer.capacity());
+
+        System.out.println("===========");
+
+        System.out.println("position verts: " + verticesBuffer.position());
+        System.out.println("vertex index: " + vertexIndex);
+        System.out.println("poly local points : " + polygon.localPoints.length);
+        System.out.println("capacity verts : " + verticesBuffer.capacity());
+
+        if (indicesBuffer.position() + triangleIndex + polygon.indices.length > indicesBuffer.capacity() || verticesBuffer.position() + vertexIndex + polygon.localPoints.length > verticesBuffer.capacity()) {
+            System.out.println("flushing");
+            flush();
+        } else {
+            System.out.println("not flushing");
+
+        }
 
         useShader(shader);
         useTexture(singleWhitePixel);
@@ -202,7 +221,10 @@ public class Renderer2D implements Resource {
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
-        for (int i = 0; i < polygon.indices.length; i++) indicesBuffer.put(startVertex + polygon.indices[i]);
+        System.out.println("start vertex: " + startVertex);
+        for (int i = 0; i < polygon.indices.length; i++) {
+            indicesBuffer.put(startVertex + polygon.indices[i]);
+        }
         triangleIndex += polygon.indices.length;
 
         if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
@@ -219,6 +241,9 @@ public class Renderer2D implements Resource {
             verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(t).put(0.5f).put(0.5f);
         }
         vertexIndex += polygon.vertexCount;
+        System.out.println("polygon vertex count: " + polygon.vertexCount);
+        System.out.println("vertex index: " + vertexIndex);
+
     }
 
     public void pushLight() {

@@ -46,6 +46,13 @@ public class SceneRendering2D_2 extends WindowScreen {
         region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
         shape = FactoryComponent.createShapeCircleFilled(200, 300, new Color(1,0,1,1), null, null);
+        shape = FactoryComponent.createShapeRectangleHollow(200, 300, 10, new Color(1,0,1,1), null, null);
+
+        // TODO: bug here: something is not right with the renderer: buffer limits etc.
+        shape = FactoryComponent.createShapeCircleHollow(200, 300, 30, new Color(1,0,1,1), null, null);
+        System.out.println("vertex array length: " + shape.polygon.localPoints.length);
+        System.out.println("index array length: " + shape.polygon.indices.length);
+
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -62,7 +69,7 @@ public class SceneRendering2D_2 extends WindowScreen {
         GL11.glClearColor(0,0,0,0);
         renderer2D.begin(camera);
         //renderer2D.pushTexture(texture0, new Color(1,1,1,1f), 0,0,1,1,0,0,256,256,256,256,0,0,0, 1, 1,null,null);
-        renderer2D.pushTexture(region, new Color(1,1,1,1),time,0,0,0,0,1.5f,1.5f,null,null);
+        //renderer2D.pushTexture(region, new Color(1,1,1,1),time,0,0,0,0,1.5f,1.5f,null,null);
         renderer2D.pushShape(shape.polygon, shape.tint,0,0,0,0,0,1,1,null,null);
 
         renderer2D.end();
