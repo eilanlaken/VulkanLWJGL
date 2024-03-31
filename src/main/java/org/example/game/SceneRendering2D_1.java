@@ -1,5 +1,7 @@
 package org.example.game;
 
+import org.example.engine.components.ComponentGraphics2DShape;
+import org.example.engine.components.FactoryComponent;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.memory.Resource;
@@ -8,18 +10,14 @@ import org.lwjgl.opengl.GL11;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO: pretty good solution here:
-//  TODO: http://forum.lwjgl.org/index.php?topic=5789.0
-// TODO: orphaning - multi buffering:
-// TODO: https://www.cppstories.com/2015/01/persistent-mapped-buffers-in-opengl/#persistence
-// Note: glBufferData invalidates and reallocates the whole buffer. Use glBufferSubData to only update the data inside.
-// https://stackoverflow.com/questions/72648980/opengl-sampler2d-array
-// libGDX PolygonSpriteBatch.java line 772 draw()
 public class SceneRendering2D_1 extends WindowScreen {
 
     private Renderer2D renderer2D;
     private Texture texture0;
     private Camera camera;
+
+    private ComponentGraphics2DShape shape;
+    private ComponentGraphics2DShape shape2;
 
     private TextureRegion region;
 
@@ -41,6 +39,14 @@ public class SceneRendering2D_1 extends WindowScreen {
         texture0 = AssetStore.get("assets/atlases/pack2_0.png");
         region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
+        // TODO: bug here: something is not right with the renderer: buffer limits etc.
+        //shape = FactoryComponent.createShapeCircleHollow(200, 501, 30, new Color(1,0,1,1), null, null);
+        //shape = FactoryComponent.createShapeCircleHollow(200, 500, 30, new Color(1,0,1,1), null, null);
+        //shape = FactoryComponent.createShapeLine(0, 0, 100, 0, 2, new Color(1,0,1,1), null, null);
+        //shape = FactoryComponent.createShapeRectangleFilled(100, 30, new Color(1,0,1,1), null, null);
+
+        shape = FactoryComponent.createShapeCircleFilled(30, 1500, new Color(0,0.5f,1,1), null, null);
+        shape2 = FactoryComponent.createShapeCircleFilled(30, 501, new Color(0,0.5f,1,1), null, null);
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -57,7 +63,14 @@ public class SceneRendering2D_1 extends WindowScreen {
         GL11.glClearColor(0,0,0,0);
         renderer2D.begin(camera);
         //renderer2D.pushTexture(texture0, new Color(1,1,1,1f), 0,0,1,1,0,0,256,256,256,256,0,0,0, 1, 1,null,null);
-        renderer2D.pushTexture(region, new Color(1,1,1,1),0,0,0,0,0,1.5f,1.5f,null,null);
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 100; j++) {
+                renderer2D.pushTexture(region, new Color(1,1,1,1),-350 + i*10,350 - j*10,0,0,0,0.2f,0.2f,null,null);
+            }
+        }
+        renderer2D.pushShape(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
+        renderer2D.pushShape(shape2.polygon, shape.tint,100,0,0,0,0,1,1,null,null);
+
         renderer2D.end();
         time++;
     }

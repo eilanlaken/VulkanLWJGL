@@ -14,7 +14,6 @@ import java.util.HashMap;
 
 public class Renderer2D implements Resource {
 
-    // observation: batch size must be at least the number of max vertices.
     private static final int BATCH_SIZE = 4000;
     private static final int VERTEX_SIZE = 5;
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
