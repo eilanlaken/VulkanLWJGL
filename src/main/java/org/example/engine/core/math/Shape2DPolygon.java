@@ -6,7 +6,7 @@ public class Shape2DPolygon extends Shape2D {
     public final float[] localPoints;
     public final int[] indices;
     private float[] worldPoints;
-    private float area;
+    private final float area;
 
     private final Vector2 tmp = new Vector2();
 
