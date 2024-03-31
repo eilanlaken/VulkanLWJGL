@@ -54,19 +54,6 @@ public class Shape2DPolygon extends Shape2D {
     @Override
     public boolean contains(float x, float y) {
         if (!updated) update();
-        // preliminary test
-        float minX = worldPoints[0];
-        float maxX = worldPoints[0];
-        float minY = worldPoints[1];
-        float maxY = worldPoints[1];
-        for (int i = 2; i < worldPoints.length - 1; i += 2) {
-            minX = Math.min(minX, worldPoints[i]);
-            maxX = Math.max(maxX, worldPoints[i]);
-            minY = Math.min(minY, worldPoints[i+1]);
-            maxY = Math.max(maxY, worldPoints[i+1]);
-        }
-        if (x < minX || x > maxX || y < minY || y > maxY) return false;
-        // if broad test passed:
         boolean inside = false;
         for (int i = 0, j = worldPoints.length - 2; i < worldPoints.length; i += 2) {
             float x1 = worldPoints[i];
