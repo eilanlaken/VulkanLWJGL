@@ -2,7 +2,8 @@ package org.example.engine.core.math;
 
 public abstract class Shape2D {
 
-    protected float x, y;
+    protected float x;
+    protected float y;
     protected float angle;
     protected float scaleX, scaleY;
     protected boolean updated;

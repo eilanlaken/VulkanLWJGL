@@ -87,22 +87,22 @@ public class Shape2DRectangle extends Shape2D {
         this.updated = true;
     }
 
-    public Vector2 getTopLeftCorner() {
+    public Vector2 c1() {
         if (!updated) update();
         return c1;
     }
 
-    public Vector2 getBottomLeftCorner() {
+    public Vector2 c2() {
         if (!updated) update();
         return c2;
     }
 
-    public Vector2 getBottomRightCorner() {
+    public Vector2 c3() {
         if (!updated) update();
         return c3;
     }
 
-    public Vector2 getTopRightCorner() {
+    public Vector2 c4() {
         if (!updated) update();
         return c4;
     }
