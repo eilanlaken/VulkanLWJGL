@@ -65,11 +65,11 @@ public class SceneRendering2D_1 extends WindowScreen {
         //renderer2D.pushTexture(texture0, new Color(1,1,1,1f), 0,0,1,1,0,0,256,256,256,256,0,0,0, 1, 1,null,null);
         for (int i = 0; i < 100; i++) {
             for (int j = 0; j < 100; j++) {
-                renderer2D.pushTexture(region, new Color(1,1,1,1),-350 + i*10,350 - j*10,0,0,0,0.2f,0.2f,null,null);
+                renderer2D.pushTextureRegion(region, new Color(1,1,1,1),-350 + i*10,350 - j*10,0,0,0,0.2f,0.2f,null,null);
             }
         }
-        renderer2D.pushShape(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
-        renderer2D.pushShape(shape2.polygon, shape.tint,100,0,0,0,0,1,1,null,null);
+        renderer2D.pushPolygon(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
+        renderer2D.pushPolygon(shape2.polygon, shape.tint,100,0,0,0,0,1,1,null,null);
 
         renderer2D.end();
         time++;

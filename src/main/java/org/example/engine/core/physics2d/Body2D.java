@@ -7,14 +7,27 @@ public class Body2D {
 
     public Object owner;
     public boolean active;
+
     public Vector2 position;
     public float angle;
     public Vector2 velocity;
     public float angularVelocity;
+
     public Shape2D shape;
+    public float density;
+    public float friction;
+    public float restitution;
+    public boolean sensor;
+    public int bitmask;
 
     protected Body2D() {
 
+    }
+
+    public enum Type {
+        STATIC,
+        KINEMATIC,
+        DYNAMIC
     }
 
 }

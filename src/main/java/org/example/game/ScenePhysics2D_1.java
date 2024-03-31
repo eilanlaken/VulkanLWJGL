@@ -46,12 +46,12 @@ public class ScenePhysics2D_1 extends WindowScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,0);
         renderer2D.begin(camera);
-        renderer2D.pushShape(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
+        renderer2D.pushPolygon(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
 
-        renderer2D.pushShape(c1.polygon, shape.tint, rect.c1().x, rect.c1().y,0,0,0,1,1,null,null);
-        renderer2D.pushShape(c2.polygon, shape.tint, rect.c2().x, rect.c2().y,0,0,0,1,1,null,null);
-        renderer2D.pushShape(c3.polygon, shape.tint, rect.c3().x, rect.c3().y,0,0,0,1,1,null,null);
-        renderer2D.pushShape(c4.polygon, shape.tint, rect.c4().x, rect.c4().y,0,0,0,1,1,null,null);
+        renderer2D.pushPolygon(c1.polygon, shape.tint, rect.c1().x, rect.c1().y,0,0,0,1,1,null,null);
+        renderer2D.pushPolygon(c2.polygon, shape.tint, rect.c2().x, rect.c2().y,0,0,0,1,1,null,null);
+        renderer2D.pushPolygon(c3.polygon, shape.tint, rect.c3().x, rect.c3().y,0,0,0,1,1,null,null);
+        renderer2D.pushPolygon(c4.polygon, shape.tint, rect.c4().x, rect.c4().y,0,0,0,1,1,null,null);
 
 
         renderer2D.end();
