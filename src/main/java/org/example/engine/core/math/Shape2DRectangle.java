@@ -4,9 +4,9 @@ public class Shape2DRectangle extends Shape2D {
 
     public Vector2 localCenter;
     public float originalWidth;
-    private float originalWidthHalf;
+    private final float originalWidthHalf;
     public float originalHeight;
-    private float originalHeightHalf;
+    private final float originalHeightHalf;
 
     // world corners:
     /**
@@ -75,10 +75,12 @@ public class Shape2DRectangle extends Shape2D {
         c3.set(originalWidthHalf, -originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
         c4.set(originalWidthHalf, originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
         // rotate
-        c1.rotateDeg(angle);
-        c2.rotateDeg(angle);
-        c3.rotateDeg(angle);
-        c4.rotateDeg(angle);
+        if (angle != 0.0f) {
+            c1.rotateDeg(angle);
+            c2.rotateDeg(angle);
+            c3.rotateDeg(angle);
+            c4.rotateDeg(angle);
+        }
         // translate
         c1.add(x, y);
         c2.add(x, y);

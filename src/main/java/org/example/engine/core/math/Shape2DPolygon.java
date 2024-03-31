@@ -30,7 +30,9 @@ public class Shape2DPolygon extends Shape2D {
     @Override
     public void update() {
         for (int i = 0; i < localPoints.length - 1; i += 2) {
-            tmp.set(localPoints[i] * scaleX, localPoints[i + 1] * scaleY).rotateDeg(angle).add(x, y);
+            tmp.set(localPoints[i] * scaleX, localPoints[i + 1] * scaleY);
+            if (angle != 0.0f) tmp.rotateDeg(angle);
+            tmp.add(x, y);
             worldPoints[i] = tmp.x;
             worldPoints[i + 1] = tmp.y;
         }
