@@ -18,7 +18,10 @@ public class Renderer2D implements Resource {
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
 
     private final ShaderProgram defaultShader = createDefaultShaderProgram();
-    private final Texture singleWhitePixelTexture = createSingleWhitePixelTexture();
+    // TODO: implement.
+    private final Texture whiteHollowSquareTexture = createWhiteHollowSquareTexture();
+    private final Texture whiteHollowCircleTexture = createWhiteHollowCircleTexture();
+    private final Texture whiteSinglePixelTexture = createWhiteSinglePixelTexture();
     private final float DEFAULT_TINT = new Color(1,1,1,1).toFloatBits();
 
     private Camera camera;
@@ -194,7 +197,7 @@ public class Renderer2D implements Resource {
             flush();
         }
         useShader(shader);
-        useTexture(singleWhitePixelTexture);
+        useTexture(whiteSinglePixelTexture);
         useCustomAttributes(customAttributes);
 
         // put indices
@@ -338,7 +341,7 @@ public class Renderer2D implements Resource {
         return new ShaderProgram(vertexShader, fragmentShader);
     }
 
-    private static Texture createSingleWhitePixelTexture() {
+    private static Texture createWhiteSinglePixelTexture() {
         ByteBuffer buffer = ByteBuffer.allocateDirect(4);
         buffer.put((byte) ((0xFFFFFFFF >> 16) & 0xFF));   // Red component
         buffer.put((byte) ((0xFFFFFFFF >> 8) & 0xFF));    // Green component
@@ -355,6 +358,15 @@ public class Renderer2D implements Resource {
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, 1, 1, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         return texture;
+    }
+
+    private static Texture createWhiteHollowSquareTexture() {
+        return null;
+    }
+
+    private static Texture createWhiteHollowCircleTexture() {
+
+        return null;
     }
 
 }

@@ -81,8 +81,8 @@ public final class FactoryComponent {
     public static ComponentGraphics2DShape createShapeCircleHollow(float r, int refinement, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
         if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
-        float outerRadius = r + stroke * 0.5f;
-        float innerRadius = r - stroke * 0.5f;
+        final float outerRadius = r + stroke * 0.5f;
+        final float innerRadius = r - stroke * 0.5f;
         float[] vertices = new float[refinement * 2 * 2];
         for (int i = 0; i < refinement * 2; i += 2) { // outer rim
             float angle = 360f * (i * 0.5f) / refinement;
