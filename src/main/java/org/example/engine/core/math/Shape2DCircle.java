@@ -13,6 +13,7 @@ public class Shape2DCircle extends Shape2D {
         this.originalRadius = r;
         this.worldCenter = new Vector2(localCenter);
         this.radius = r;
+        super.originalBoundingRadius = r;
     }
 
     public void update() {

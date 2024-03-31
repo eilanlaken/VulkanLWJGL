@@ -24,6 +24,13 @@ public class Shape2DPolygon extends Shape2D {
         this.area = Algorithms.calculatePolygonSignedArea(vertices);
         this.worldPoints = new float[vertices.length];
         this.indices = Algorithms.triangulatePolygon(localPoints, holes, 2);
+
+        float max = 0;
+        for (int i = 0; i < vertices.length - 1; i += 2) {
+            float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
+            if (l2 > max) max = l2;
+        }
+        super.originalBoundingRadius = (float) Math.sqrt(max);
         updated = false;
     }
 

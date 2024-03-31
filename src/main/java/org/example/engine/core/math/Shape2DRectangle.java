@@ -3,9 +3,9 @@ package org.example.engine.core.math;
 public class Shape2DRectangle extends Shape2D {
 
     public Vector2 localCenter;
-    public float originalWidth;
+    public final float originalWidth;
     private final float originalWidthHalf;
-    public float originalHeight;
+    public final float originalHeight;
     private final float originalHeightHalf;
 
     // world corners:
@@ -34,6 +34,7 @@ public class Shape2DRectangle extends Shape2D {
         this.c2 = new Vector2(centerX - originalWidthHalf, centerY - originalHeightHalf);
         this.c3 = new Vector2(centerX + originalWidthHalf, centerY - originalHeightHalf);
         this.c4 = new Vector2(centerX + originalWidthHalf, centerY + originalHeightHalf);
+        this.originalBoundingRadius = (float) Math.sqrt(originalWidthHalf * originalWidthHalf + originalHeightHalf * originalHeightHalf);
     }
 
     public Shape2DRectangle(float width, float height) {

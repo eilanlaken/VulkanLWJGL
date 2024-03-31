@@ -13,6 +13,7 @@ public class Shape2DAABB extends Shape2D {
         this.localMax = new Vector2(x2, y2);
         this.worldMin = new Vector2(localMin);
         this.worldMax = new Vector2(localMax);
+        super.originalBoundingRadius = (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
     }
 
     public Shape2DAABB(float width, float height) {
@@ -20,6 +21,7 @@ public class Shape2DAABB extends Shape2D {
         this.localMax = new Vector2(width * 0.5f, height * 0.5f);
         this.worldMin = new Vector2(localMin);
         this.worldMax = new Vector2(localMax);
+        super.originalBoundingRadius = (float) Math.sqrt(width * width * 0.25f + height * height * 0.25f);
     }
 
     @Override
