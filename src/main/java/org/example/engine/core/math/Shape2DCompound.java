@@ -43,7 +43,7 @@ public class Shape2DCompound extends Shape2D {
     public float getPerimeter() {
         float perimeter = 0;
         for (Shape2D shape : islands) perimeter += shape.getPerimeter();
-        for (Shape2D shape : holes) perimeter -= shape.getPerimeter();
+        for (Shape2D shape : holes) perimeter += shape.getPerimeter();
         return perimeter;
     }
 
