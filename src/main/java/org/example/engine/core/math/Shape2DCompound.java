@@ -8,6 +8,12 @@ public class Shape2DCompound extends Shape2D {
     public final Array<Shape2D> holes;
 
     public Shape2DCompound(final Array<Shape2D> islands, final Array<Shape2D> holes) {
+        for (Shape2D island : islands) {
+            if (island instanceof Shape2DCompound) throw new IllegalArgumentException("Trying to construct a " + Shape2DCompound.class.getSimpleName() +" using 1 or more compound shapes.");
+        }
+        for (Shape2D hole: holes) {
+            if (hole instanceof Shape2DCompound) throw new IllegalArgumentException("Trying to construct a " + Shape2DCompound.class.getSimpleName() +" using 1 or more compound shapes.");
+        }
         this.islands = islands;
         this.holes = holes;
     }
