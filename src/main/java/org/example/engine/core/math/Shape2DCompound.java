@@ -4,35 +4,46 @@ import org.example.engine.core.collections.Array;
 
 public class Shape2DCompound extends Shape2D {
 
-    public Array<Shape2D> shapes;
+    public final Array<Shape2D> islands;
+    public final Array<Shape2D> holes;
 
-    public Shape2DCompound(Shape2D ...shapes) {
-        this.shapes = new Array<>();
-        for (Shape2D shape : shapes) this.shapes.add(shape);
+    public Shape2DCompound(final Array<Shape2D> islands, final Array<Shape2D> holes) {
+        this.islands = islands;
+        this.holes = holes;
     }
 
     @Override
     public boolean contains(float x, float y) {
-        for (Shape2D shape : shapes) if (shape.contains(x, y)) return true;
+        for (Shape2D shape : islands) {
+            if (shape.contains(x, y)) {
+                for (Shape2D intersectionShape : holes) {
+                    if (intersectionShape.contains(x, y)) break;
+                }
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
     public float getArea() {
         float area = 0;
-        for (Shape2D shape : shapes) area += shape.getArea();
+        for (Shape2D shape : islands) area += shape.getArea();
+        for (Shape2D shape2D : holes) area -= shape2D.getArea();
         return area;
     }
 
     @Override
     public float getPerimeter() {
         float perimeter = 0;
-        for (Shape2D shape : shapes) perimeter += shape.getPerimeter();
+        for (Shape2D shape : islands) perimeter += shape.getPerimeter();
+        for (Shape2D shape : holes) perimeter -= shape.getPerimeter();
         return perimeter;
     }
 
     @Override
     public void update() {
-        for (Shape2D shape : shapes) shape.update();
+        for (Shape2D island : islands) island.update(x, y, angle, scaleX, scaleY);
+        for (Shape2D hole : holes) hole.update(x, y, angle, scaleX, scaleY);
     }
 }

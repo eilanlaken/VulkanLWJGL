@@ -38,6 +38,20 @@ public abstract class Shape2D {
         updated = false;
     }
 
+    public final void setTransform(float x, float y, float angle, float scaleX, float scaleY) {
+        this.x = x;
+        this.y = y;
+        this.angle = angle;
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+        updated = false;
+    }
+
+    public final void update(float x, float y, float angle, float scaleX, float scaleY) {
+        setTransform(x, y, angle, scaleX, scaleY);
+        update();
+    }
+
     public abstract void update();
     public abstract boolean contains(float x, float y);
     public abstract float getArea();
