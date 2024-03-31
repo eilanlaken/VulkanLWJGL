@@ -3,7 +3,7 @@ package org.example.engine.core.physics2d;
 import org.example.engine.core.math.Shape2D;
 import org.example.engine.core.math.Vector2;
 
-public class Body2D {
+public class Physics2DBody {
 
     public Object owner;
     public boolean active;
@@ -20,7 +20,7 @@ public class Body2D {
     public boolean sensor;
     public int bitmask;
 
-    protected Body2D() {
+    protected Physics2DBody() {
 
     }
 

@@ -1,4 +1,4 @@
 package org.example.engine.core.physics2d;
 
-public class CollisionResolution2D {
+public class Physics2DJointDistanceFixed {
 }

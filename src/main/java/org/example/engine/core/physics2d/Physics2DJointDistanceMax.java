@@ -1,4 +1,4 @@
 package org.example.engine.core.physics2d;
 
-public class Joint2DDistance {
+public class Physics2DJointDistanceMax {
 }
