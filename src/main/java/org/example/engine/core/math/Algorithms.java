@@ -102,8 +102,6 @@ public class Algorithms {
         return new Shape2DPolygon(indices, vertices);
     }
 
-    ////////////////////
-
     public static float calculatePolygonSignedArea(final float[] vertices) {
         float area = 0;
         final int n = vertices.length;
@@ -204,37 +202,24 @@ public class Algorithms {
                 triangles.add(prev.i / dim);
                 triangles.add(ear.i / dim);
                 triangles.add(next.i / dim);
-
                 removeNode(ear);
-
-                // skipping the next vertice leads to less sliver triangles
                 ear = next.next;
                 stop = next.next;
-
                 continue;
             }
 
             ear = next;
 
-            // if we looped through the whole remaining polygon and can't find
-            // any more ears
             if (ear == stop) {
                 // try filtering points and slicing again
                 if (pass == Integer.MIN_VALUE) {
                     triangulateLinked(filterPoints(ear, null), triangles, dim, minX, minY, invSize, 1);
-
-                    // if this didn't work, try curing all small
-                    // self-intersections locally
                 } else if (pass == 1) {
                     ear = cureLocalIntersections(filterPoints(ear, null), triangles, dim);
                     triangulateLinked(ear, triangles, dim, minX, minY, invSize, 2);
-
-                    // as a last resort, try splitting the remaining polygon
-                    // into two
                 } else if (pass == 2) {
                     splitPolygon(ear, triangles, dim, minX, minY, invSize);
                 }
-
                 break;
             }
         }
@@ -249,12 +234,8 @@ public class Algorithms {
                 if (a.i != b.i && isValidDiagonal(a, b)) {
                     // split the polygon in two by the diagonal
                     Node c = splitPolygon(a, b);
-
-                    // filter colinear points around the cuts
                     a = filterPoints(a, a.next);
                     c = filterPoints(c, c.next);
-
-                    // run earcut on each half
                     triangulateLinked(a, triangles, dim, minX, minY, size, Integer.MIN_VALUE);
                     triangulateLinked(c, triangles, dim, minX, minY, size, Integer.MIN_VALUE);
                     return;
@@ -266,7 +247,7 @@ public class Algorithms {
     }
 
     private static boolean isValidDiagonal(Node a, Node b) {
-        return a.next.i != b.i && a.prev.i != b.i && !intersectsPolygon(a, b) && // dones't intersect other edges
+        return a.next.i != b.i && a.prev.i != b.i && !intersectsPolygon(a, b) && // doesn't intersect other edges
                 (locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && // locally visible
                         (area(a.prev, a, b.prev) != 0 || area(a, b.prev, b) != 0) || // does not create opposite-facing sectors
                         equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
@@ -300,10 +281,10 @@ public class Algorithms {
     private static boolean intersects(Node p1, Node q1, Node p2, Node q2) {
         if ((equals(p1, p2) && equals(q1, q2)) || (equals(p1, q2) && equals(p2, q1)))
             return true;
-        float o1 = sign(area(p1, q1, p2));
-        float o2 = sign(area(p1, q1, q2));
-        float o3 = sign(area(p2, q2, p1));
-        float o4 = sign(area(p2, q2, q1));
+        float o1 = Math.signum(area(p1, q1, p2));
+        float o2 = Math.signum(area(p1, q1, q2));
+        float o3 = Math.signum(area(p2, q2, p1));
+        float o4 = Math.signum(area(p2, q2, q1));
 
         if (o1 != o2 && o3 != o4)
             return true; // general case
@@ -316,17 +297,11 @@ public class Algorithms {
             return true; // p2, q2 and p1 are collinear and p1 lies on p2q2
         if (o4 == 0 && onSegment(p2, q1, q2))
             return true; // p2, q2 and q1 are collinear and q1 lies on p2q2
-
         return false;
     }
 
-    // for collinear points p, q, r, check if point q lies on segment pr
     private static boolean onSegment(Node p, Node q, Node r) {
         return q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y);
-    }
-
-    private static float sign(float num) {
-        return num > 0 ? 1 : num < 0 ? -1 : 0;
     }
 
     private static Node cureLocalIntersections(Node start, ArrayInt triangles, int dim) {
@@ -335,15 +310,11 @@ public class Algorithms {
             Node a = p.prev, b = p.next.next;
 
             if (!equals(a, b) && intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a)) {
-
                 triangles.add(a.i / dim);
                 triangles.add(p.i / dim);
                 triangles.add(b.i / dim);
-
-                // remove two nodes involved
                 removeNode(p);
                 removeNode(p.next);
-
                 p = start = b;
             }
             p = p.next;
@@ -360,7 +331,6 @@ public class Algorithms {
 
         // now make sure we don't have other points inside the potential ear
         Node p = ear.next.next;
-
         while (p != ear.prev) {
             if (pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) && area(p.prev, p, p.next) >= 0)
                 return false;
@@ -378,11 +348,10 @@ public class Algorithms {
         if (area(a, b, c) >= 0)
             return false; // reflex, can't be an ear
 
-        // triangle bbox; min & max are calculated like this for speed
-        float minTX = a.x < b.x ? (Math.min(a.x, c.x)) : (Math.min(b.x, c.x)), minTY = a.y < b.y ? (Math.min(a.y, c.y)) : (Math.min(b.y, c.y)),
-                maxTX = a.x > b.x ? (Math.max(a.x, c.x)) : (Math.max(b.x, c.x)), maxTY = a.y > b.y ? (Math.max(a.y, c.y)) : (Math.max(b.y, c.y));
-
-        // z-order range for the current triangle bbox;
+        float minTX = a.x < b.x ? (Math.min(a.x, c.x)) : (Math.min(b.x, c.x));
+        float minTY = a.y < b.y ? (Math.min(a.y, c.y)) : (Math.min(b.y, c.y));
+        float maxTX = a.x > b.x ? (Math.max(a.x, c.x)) : (Math.max(b.x, c.x));
+        float maxTY = a.y > b.y ? (Math.max(a.y, c.y)) : (Math.max(b.y, c.y));
         float minZ = zOrder(minTX, minTY, minX, minY, invSize);
         float maxZ = zOrder(maxTX, maxTY, minX, minY, invSize);
 
@@ -580,8 +549,6 @@ public class Algorithms {
         outerNode = findHoleBridge(hole, outerNode);
         if (outerNode != null) {
             Node b = splitPolygon(outerNode, hole);
-
-            // filter collinear points around the cuts
             filterPoints(outerNode, outerNode.next);
             filterPoints(b, b.next);
         }
@@ -616,9 +583,6 @@ public class Algorithms {
         float qx = -Float.MAX_VALUE;
         Node m = null;
 
-        // find a segment intersected by a ray from the hole's leftmost point to
-        // the left;
-        // segment's endpoint with lesser x will be potential connection point
         do {
             if (hy <= p.y && hy >= p.next.y) {
                 float x = p.x + (hy - p.y) * (p.next.x - p.x) / (p.next.y - p.y);
@@ -639,8 +603,7 @@ public class Algorithms {
         if (m == null)
             return null;
 
-        if (hx == qx)
-            return m; // hole touches outer segment; pick leftmost endpoint
+        if (hx == qx) return m; // hole touches outer segment; pick leftmost endpoint
 
         // look for points inside the triangle of hole point, segment
         // intersection and endpoint;
@@ -677,8 +640,6 @@ public class Algorithms {
         return area(a.prev, a, a.next) < 0 ? area(a, b, a.next) >= 0 && area(a, a.prev, b) >= 0 : area(a, b, a.prev) < 0 || area(a, a.next, b) < 0;
     }
 
-    // whether sector in vertex m contains sector in vertex p in the same
-    // coordinates
     private static boolean sectorContainsSector(Node m, Node p) {
         return area(m.prev, m, p.prev) < 0 && area(p.next, m, m.next) < 0;
     }
@@ -780,7 +741,7 @@ public class Algorithms {
             this.nextZ = null;
             this.steiner = false;
         }
-    }
 
+    }
 
 }
