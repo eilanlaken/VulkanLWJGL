@@ -16,17 +16,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ComponentGraphics2DShape s0 = FactoryComponent.createShapeLine(100, -4, 333,-4, 3, null,null, null);
-        System.out.println("indices 1: " + Arrays.toString(s0.polygon.indices));
-        ComponentGraphics2DShape s1 = FactoryComponent.createShapeCircleHollow(10, 10, 1,null, null, null);
-        System.out.println("indices 1: " + Arrays.toString(s1.polygon.indices));
-        ComponentGraphics2DShape s2 = FactoryComponent.createShapeCircleHollow(150, 10, 2,null, null, null);
-        System.out.println("indices 2: " + Arrays.toString(s2.polygon.indices));
-        ComponentGraphics2DShape s3 = FactoryComponent.createShapeRectangleFilled(150, 10,null, null, null);
-        System.out.println("indices 2fff: " + Arrays.toString(s3.polygon.indices));
 
-        ComponentGraphics2DShape s4 = FactoryComponent.createShapeRectangleHollow(150, 600, 10,null, null, null);
-        System.out.println("indices gggggg: " + Arrays.toString(s4.polygon.indices));
 
 
 //
@@ -49,7 +39,7 @@ public class Main {
 //            e.printStackTrace();
 //        }
 
-        if (true) return;
+        //if (true) return;
 
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);

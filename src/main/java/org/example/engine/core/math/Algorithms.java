@@ -34,7 +34,6 @@ public class Algorithms {
     }
 
     public static Shape2DPolygon createPolygonRectangleHollow(float width, float height, float stroke) {
-        if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
         final float widthHalf = width * 0.5f;
         final float heightHalf = height * 0.5f;
         final float strokeHalf = stroke * 0.5f;

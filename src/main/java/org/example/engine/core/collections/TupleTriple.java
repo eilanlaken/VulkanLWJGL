@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class TupleTriple<T, U, V> {
 
-    public T first;
-    public U second;
-    public V third;
+    public final T first;
+    public final U second;
+    public final V third;
 
     public TupleTriple(T first, U second, V third) {
         this.first = first;
