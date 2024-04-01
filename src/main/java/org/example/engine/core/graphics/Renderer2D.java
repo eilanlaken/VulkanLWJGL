@@ -1,8 +1,8 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.Shape2DPolygon;
+import org.example.engine.core.math.*;
 import org.example.engine.core.memory.Resource;
+import org.example.engine.core.physics2d.Physics2DBody;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -27,9 +27,12 @@ public class Renderer2D implements Resource {
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
 
     private final ShaderProgram defaultShader = createDefaultShaderProgram();
-    private final Texture debugShapesTexture = createPhysics2DDebugShapesTexture();
     private final Texture whiteSinglePixelTexture = createWhiteSinglePixelTexture();
-    private final float DEFAULT_TINT = new Color(1,1,1,1).toFloatBits();
+    private final Texture debugShapesTexture = createPhysics2DDebugShapesTexture();
+    private final float WHITE_TINT = new Color(1,1,1,1).toFloatBits();
+    private final float RED_TINT = new Color(1,0,0,1).toFloatBits();
+    private final float GREEN_TINT = new Color(0,1,0,1).toFloatBits();
+    private final float BLUE_TINT = new Color(0,0,1,1).toFloatBits();
 
     private Camera camera;
     private ShaderProgram currentShader;
@@ -81,7 +84,6 @@ public class Renderer2D implements Resource {
     }
 
     /** Push primitives: TextureRegion, Shape, Light **/
-
     public void pushTextureRegion(TextureRegion region, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
@@ -188,7 +190,7 @@ public class Renderer2D implements Resource {
         x4 += x;
         y4 += y;
 
-        float t = tint == null ? DEFAULT_TINT : tint.toFloatBits();
+        float t = tint == null ? WHITE_TINT : tint.toFloatBits();
         verticesBuffer
                 .put(x1).put(y1).put(t).put(ui).put(vi) // V1
                 .put(x2).put(y2).put(t).put(ui).put(vf) // V2
@@ -222,7 +224,7 @@ public class Renderer2D implements Resource {
         polygon.setTranslation(x, y);
         polygon.update();
 
-        float t = tint == null ? DEFAULT_TINT : tint.toFloatBits();
+        float t = tint == null ? WHITE_TINT : tint.toFloatBits();
         final float[] worldPoints = polygon.getWorldPoints();
 
         for (int i = 0; i < worldPoints.length - 1; i += 2) {
@@ -233,6 +235,98 @@ public class Renderer2D implements Resource {
 
     public void pushLight() {
         throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    public void pushDebugShape(final Shape2D shape, final Color tint) {
+        if (shape instanceof Shape2DCircle) pushDebugCircle((Shape2DCircle) shape, tint);
+    }
+
+    private void pushDebugCircle(final Shape2DCircle circle, final Color tint) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
+            flush();
+        }
+
+        useShader(defaultShader);
+        useTexture(debugShapesTexture);
+        useCustomAttributes(null);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+        ;
+        triangleIndex += 6;
+
+        // put vertices
+        float localX1, localY1;
+        float localX2, localY2;
+        float localX3, localY3;
+        float localX4, localY4;
+
+        localX1 = localX2 = -circle.radius * 0.5f;
+        localX3 = localX4 = circle.radius * 0.5f;
+        localY1 = localY4 = circle.radius * 0.5f;
+        localY2 = localY3 = -circle.radius * 0.5f;
+
+        float x1, y1;
+        float x2, y2;
+        float x3, y3;
+        float x4, y4;
+
+        final float sin = MathUtils.sinDeg(circle.getAngle());
+        final float cos = MathUtils.cosDeg(circle.getAngle());
+        x1 = localX1 * cos - localY1 * sin;
+        y1 = localX1 * sin + localY1 * cos;
+
+        x2 = localX2 * cos - localY2 * sin;
+        y2 = localX2 * sin + localY2 * cos;
+
+        x3 = localX3 * cos - localY3 * sin;
+        y3 = localX3 * sin + localY3 * cos;
+
+        x4 = localX4 * cos - localY4 * sin;
+        y4 = localX4 * sin + localY4 * cos;
+
+        final float x = circle.getX();
+        final float y = circle.getY();
+        x1 += x;
+        y1 += y;
+
+        x2 += x;
+        y2 += y;
+
+        x3 += x;
+        y3 += y;
+
+        x4 += x;
+        y4 += y;
+
+        float t = tint == null ? WHITE_TINT : tint.toFloatBits();
+        verticesBuffer
+                .put(x1).put(y1).put(t).put(0).put(0) // V1
+                .put(x2).put(y2).put(t).put(0).put(1) // V2
+                .put(x3).put(y3).put(t).put(0.5f).put(1) // V3
+                .put(x4).put(y4).put(t).put(0.5f).put(0) // V4
+        ;
+        vertexIndex += 20;
+    }
+
+    private void pushDebugRectangle(final Shape2DRectangle rectangle, final Color tint) {
+
+    }
+
+    private void pushDebugPolygon(final Shape2DPolygon polygon, final Color tint) {
+
+    }
+
+    private void pushDebugAABB(final Shape2DAABB aabb, final Color tint) {
+
     }
 
     /** Swap Operations **/
@@ -388,6 +482,11 @@ public class Renderer2D implements Resource {
     }
 
     private static Texture createPhysics2DDebugShapesTexture() {
+        try {
+            return TextureBuilder.buildFromClassPath("physics-2d-debug-shapes.png");
+        } catch (Exception e) {
+            // TODO: build manually.
+        }
         return null;
     }
 

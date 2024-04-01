@@ -60,6 +60,26 @@ public abstract class Shape2D {
         update();
     }
 
+    public final float getX() {
+        return x;
+    }
+
+    public final float getY() {
+        return y;
+    }
+
+    public final float getAngle() {
+        return angle;
+    }
+
+    public float getScaleX() {
+        return scaleX;
+    }
+
+    public float getScaleY() {
+        return scaleY;
+    }
+
     public abstract void update();
     public abstract boolean contains(float x, float y);
     public abstract float getArea();
