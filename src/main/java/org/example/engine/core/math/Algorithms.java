@@ -1,13 +1,109 @@
 package org.example.engine.core.math;
 
+import org.example.engine.components.ComponentGraphics2DShape;
 import org.example.engine.core.collections.ArrayInt;
+import org.example.engine.core.collections.TuplePair;
+import org.example.engine.core.collections.TupleTriple;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 //https://github.com/earcut4j/earcut4j/blob/master/src/test/java/earcut4j/Test01.java
 public class Algorithms {
+
+    private static final int[] rectanglePolygonIndices = new int[] {2, 3, 0, 0, 1, 2};
+    private static final Map<TupleTriple<Float, Float, Float>, int[]> cachedHollowRectangleIndices = new HashMap<>();
+    private static final Map<TuplePair<Float, Integer>, float[]> cachedFilledCirclesVertices = new HashMap<>();
+    private static final Map<TuplePair<Float, Integer>, int[]> cachedFilledCirclesIndices = new HashMap<>();
+    private static final Map<TupleTriple<Float, Integer, Float>, float[]> cachedHollowCirclesVertices = new HashMap<>();
+    private static final Map<TupleTriple<Float, Integer, Float>, int[]> cachedHollowCirclesIndices = new HashMap<>();
+
+    public static Shape2DPolygon createPolygonLine(float x1, float y1, float x2, float y2, float stroke) {
+        if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        Vector2 strokeVector = new Vector2(dx, dy).rotate90(1).nor().scl(stroke * 0.5f, stroke * 0.5f);
+        float[] vertices = new float[] {x1 + strokeVector.x, y1 + strokeVector.y, x1 - strokeVector.x, y1 - strokeVector.y, x2 - strokeVector.x, y2 - strokeVector.y, x2 + strokeVector.x, y2 + strokeVector.y};
+        return new Shape2DPolygon(rectanglePolygonIndices, vertices);
+    }
+
+    public static Shape2DPolygon createPolygonRectangleFilled(float width, float height) {
+        final float widthHalf = width * 0.5f;
+        final float heightHalf = height * 0.5f;
+        float[] vertices = new float[] {-widthHalf, heightHalf, -widthHalf, -heightHalf, widthHalf, -heightHalf, widthHalf, heightHalf};
+        return new Shape2DPolygon(rectanglePolygonIndices, vertices);
+    }
+
+    public static Shape2DPolygon createPolygonRectangleHollow(float width, float height, float stroke) {
+        if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+        final float widthHalf = width * 0.5f;
+        final float heightHalf = height * 0.5f;
+        final float strokeHalf = stroke * 0.5f;
+        float[] vertices = new float[] {
+                -widthHalf - strokeHalf, heightHalf + strokeHalf, -widthHalf - strokeHalf, -heightHalf - strokeHalf, widthHalf + strokeHalf, -heightHalf - strokeHalf, widthHalf + strokeHalf, heightHalf + strokeHalf,
+                -widthHalf + strokeHalf, heightHalf - strokeHalf, -widthHalf + strokeHalf, -heightHalf + strokeHalf, widthHalf - strokeHalf, -heightHalf + strokeHalf, widthHalf - strokeHalf, heightHalf - strokeHalf
+        };
+        final TupleTriple<Float, Float, Float> widthHeightStroke = new TupleTriple<>(width, height, stroke);
+        int[] indices = cachedHollowRectangleIndices.get(widthHeightStroke);
+        if (indices == null) {
+            indices = Algorithms.triangulatePolygon(vertices, new int[] { 4 }, 2);
+            cachedHollowRectangleIndices.put(widthHeightStroke, indices);
+        }
+        return new Shape2DPolygon(indices, vertices);
+    }
+
+    public static Shape2DPolygon createPolygonCircleFilled(float r, int refinement) {
+        if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
+        final TuplePair<Float, Integer> radiusRefinement = new TuplePair<>(r, refinement);
+        float[] vertices = cachedFilledCirclesVertices.get(new TuplePair<>(r, refinement));
+        if (vertices == null) {
+            vertices = new float[refinement * 2];
+            for (int i = 0; i < refinement * 2; i += 2) {
+                float angle = 360f * (i * 0.5f) / refinement;
+                vertices[i] = r * MathUtils.cosDeg(angle);
+                vertices[i+1] = r * MathUtils.sinDeg(angle);
+            }
+            cachedFilledCirclesVertices.put(radiusRefinement, vertices);
+        }
+        int[] indices = cachedFilledCirclesIndices.get(radiusRefinement);
+        if (indices == null) {
+            indices = triangulatePolygon(vertices);
+            cachedFilledCirclesIndices.put(radiusRefinement, indices);
+        }
+        return new Shape2DPolygon(indices, vertices);
+    }
+
+    public static Shape2DPolygon createPolygonCircleHollow(float r, int refinement, float stroke) {
+        if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
+        if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+
+        final TupleTriple<Float, Integer, Float> radiusRefinementStroke = new TupleTriple<>(r, refinement, stroke);
+        float[] vertices = cachedHollowCirclesVertices.get(radiusRefinementStroke);
+        if (vertices == null) {
+            final float outerRadius = r + stroke * 0.5f;
+            final float innerRadius = r - stroke * 0.5f;
+            vertices = new float[refinement * 2 * 2];
+            for (int i = 0; i < refinement * 2; i += 2) { // outer rim
+                float angle = 360f * (i * 0.5f) / refinement;
+                vertices[i] = outerRadius * MathUtils.cosDeg(angle);
+                vertices[i+1] = outerRadius * MathUtils.sinDeg(angle);
+            }
+            for (int i = refinement * 2; i < refinement * 2 * 2; i += 2) { // outer rim
+                float angle = 360f * (i * 0.5f) / refinement;
+                vertices[i] = innerRadius * MathUtils.cosDeg(angle);
+                vertices[i+1] = innerRadius * MathUtils.sinDeg(angle);
+            }
+            cachedHollowCirclesVertices.put(radiusRefinementStroke, vertices);
+        }
+
+        int[] indices = cachedHollowCirclesIndices.get(radiusRefinementStroke);
+        if (indices == null) {
+            indices = triangulatePolygon(vertices, new int[] { refinement }, 2);
+            cachedHollowCirclesIndices.put(radiusRefinementStroke, indices);
+        }
+        return new Shape2DPolygon(indices, vertices);
+    }
+
+    ////////////////////
 
     public static float calculatePolygonSignedArea(final float[] vertices) {
         float area = 0;

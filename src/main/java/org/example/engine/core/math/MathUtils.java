@@ -1,5 +1,11 @@
 package org.example.engine.core.math;
 
+import org.example.engine.core.collections.ArrayInt;
+import org.example.engine.core.collections.TuplePair;
+import org.example.engine.core.collections.TupleTriple;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public final class MathUtils {

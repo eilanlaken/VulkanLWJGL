@@ -6,9 +6,26 @@ public class Shape2DPolygon extends Shape2D {
     public final float[] localPoints;
     public final int[] indices;
     private float[] worldPoints;
-    private final float area;
+    private float area = Float.NaN;
 
     private final Vector2 tmp = new Vector2();
+
+    public Shape2DPolygon(int[] indices, float[] vertices) {
+        if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
+        if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
+
+        this.vertexCount = vertices.length / 2;
+        this.localPoints = vertices;
+        this.worldPoints = new float[vertices.length];
+        this.indices = indices;
+        float max = 0;
+        for (int i = 0; i < vertices.length - 1; i += 2) {
+            float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
+            if (l2 > max) max = l2;
+        }
+        super.originalBoundingRadius = (float) Math.sqrt(max);
+        updated = false;
+    }
 
     public Shape2DPolygon(float[] vertices) {
         this(vertices, null);
@@ -19,12 +36,9 @@ public class Shape2DPolygon extends Shape2D {
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
 
         this.vertexCount = vertices.length / 2;
-        this.localPoints = new float[vertices.length];
-        System.arraycopy(vertices, 0, localPoints, 0, vertices.length);
-        this.area = Algorithms.calculatePolygonSignedArea(vertices);
+        this.localPoints = vertices;
         this.worldPoints = new float[vertices.length];
         this.indices = Algorithms.triangulatePolygon(localPoints, holes, 2);
-
         float max = 0;
         for (int i = 0; i < vertices.length - 1; i += 2) {
             float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
@@ -69,6 +83,7 @@ public class Shape2DPolygon extends Shape2D {
 
     @Override
     public float getArea() {
+        if (Float.isNaN(area)) this.area = Algorithms.calculatePolygonSignedArea(localPoints);
         return Math.abs(area * scaleX * scaleY);
     }
 
