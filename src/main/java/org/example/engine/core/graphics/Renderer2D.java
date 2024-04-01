@@ -14,6 +14,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 
+// TODO: move to main/resources based architecture.
 public class Renderer2D implements Resource {
 
     private static final int BATCH_SIZE = 4000;
@@ -21,9 +22,7 @@ public class Renderer2D implements Resource {
     private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
 
     private final ShaderProgram defaultShader = createDefaultShaderProgram();
-    // TODO: implement.
-    private final Texture whiteHollowSquareTexture = createWhiteHollowSquareTexture();
-    private final Texture whiteHollowCircleTexture = createWhiteHollowCircleTexture();
+    private final Texture debugShapesTexture = createPhysics2DDebugShapesTexture();
     private final Texture whiteSinglePixelTexture = createWhiteSinglePixelTexture();
     private final float DEFAULT_TINT = new Color(1,1,1,1).toFloatBits();
 
@@ -301,9 +300,10 @@ public class Renderer2D implements Resource {
     public void free() {
         // free shader
         // free dynamic mesh
+        // free used textures
     }
 
-    private static ShaderProgram createDefaultShaderProgram() {
+    @Deprecated private static ShaderProgram createDefaultShaderProgram() {
         final String vertexShader = "#version 450\n" +
                 "\n" +
                 "// attributes\n" +
@@ -344,7 +344,7 @@ public class Renderer2D implements Resource {
         return new ShaderProgram(vertexShader, fragmentShader);
     }
 
-    private static Texture createWhiteSinglePixelTexture() {
+    @Deprecated private static Texture createWhiteSinglePixelTexture() {
         ByteBuffer buffer = ByteBuffer.allocateDirect(4);
         buffer.put((byte) ((0xFFFFFFFF >> 16) & 0xFF));   // Red component
         buffer.put((byte) ((0xFFFFFFFF >> 8) & 0xFF));    // Green component
@@ -354,8 +354,8 @@ public class Renderer2D implements Resource {
         int glHandle = GL11.glGenTextures();
         Texture texture = new Texture(glHandle,
                 1, 1,
-                TextureParamFilter.NEAREST, TextureParamFilter.NEAREST,
-                TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE
+                Texture.Filter.NEAREST, Texture.Filter.NEAREST,
+                Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE
         );
         TextureBinder.bind(texture);
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
@@ -363,12 +363,7 @@ public class Renderer2D implements Resource {
         return texture;
     }
 
-    private static Texture createWhiteHollowSquareTexture() {
-        return null;
-    }
-
-    private static Texture createWhiteHollowCircleTexture() {
-
+    private static Texture createPhysics2DDebugShapesTexture() {
         return null;
     }
 

@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
+import org.example.engine.core.graphics.TexturePacker;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.game.ScreenLoading;
 
@@ -21,11 +22,11 @@ public class Main {
 
 
 //        try {
-//            TexturePackGenerator.Options options = new TexturePackGenerator.Options("assets/atlases", "pack2",
+//            TexturePacker.Options options = new TexturePacker.Options("assets/atlases", "physicsDebugShapes",
 //                    null, null, null, null,
-//                    20,5, TexturePackGenerator.Options.Size.XX_LARGE_8192);
+//                    0,0, TexturePacker.Options.Size.XX_LARGE_8192);
 //            //TexturePacker.packTextures(options, "assets/textures/pinkSpot.png", "assets/textures/yellowSquare.png", "assets/textures/yellowSquare2.png");
-//            TexturePackGenerator.packTextures(options, "assets/textures/sphere-colored.png", "assets/textures/yellowSquare2.png", "assets/textures/pinkSpot.png");
+//            TexturePacker.packTextures(options, "assets/textures/physicsCircle.png", "assets/textures/physicsSquare.png");
 //
 //        } catch (Exception e) {
 //            e.printStackTrace();

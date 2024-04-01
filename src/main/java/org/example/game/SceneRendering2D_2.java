@@ -22,7 +22,7 @@ public class SceneRendering2D_2 extends WindowScreen {
     public void show() {
         shape = FactoryComponent.createShapeCircleHollow(30, 30,3, new Color(0,0.5f,1,1), null, null);
         shape = FactoryComponent.createShapePolygonFilled(new float[] {0,100, 0,0, 100,0, 200,200}, new Color(0,0.5f,1,1), null, null);
-        shape = FactoryComponent.createShapePolygonHollow(new float[] {-50,50, -50,-50, 0,0}, 3, new Color(0,0.5f,1,1), null, null);
+        shape = FactoryComponent.createShapePolygonHollow(new float[] {-50,50, -50,-50, 0,0}, 6, new Color(0,0.5f,1,1), null, null);
         //shape = FactoryComponent.createShapePolygonFilled(new float[] {-50,50, -50,-50, 50,-50, 50,50}, new Color(0,0.5f,1,1), null, null);
         //shape = FactoryComponent.createShapeRectangleHollow(30, 30,3, new Color(0,0.5f,1,1), null, null);
 

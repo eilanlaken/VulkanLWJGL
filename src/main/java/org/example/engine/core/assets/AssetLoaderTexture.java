@@ -10,6 +10,7 @@ import org.lwjgl.system.MemoryStack;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+// TODO: use TextureBuilder instead
 public class AssetLoaderTexture implements AssetLoader<Texture> {
 
     public static final int maxTextureSize = GraphicsUtils.getMaxTextureSize();
@@ -40,8 +41,8 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
         int glHandle = GL11.glGenTextures();
         Texture texture = new Texture(glHandle,
                 width, height,
-                TextureParamFilter.MIP_MAP_NEAREST_NEAREST, TextureParamFilter.MIP_MAP_NEAREST_NEAREST,
-                TextureParamWrap.CLAMP_TO_EDGE, TextureParamWrap.CLAMP_TO_EDGE
+                Texture.Filter.MIP_MAP_NEAREST_NEAREST, Texture.Filter.MIP_MAP_NEAREST_NEAREST,
+                Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE
         );
         TextureBinder.bind(texture);
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
