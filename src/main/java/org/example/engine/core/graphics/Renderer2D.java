@@ -9,10 +9,15 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 // TODO: move to main/resources based architecture.
 public class Renderer2D implements Resource {
@@ -303,64 +308,83 @@ public class Renderer2D implements Resource {
         // free used textures
     }
 
-    @Deprecated private static ShaderProgram createDefaultShaderProgram() {
-        final String vertexShader = "#version 450\n" +
-                "\n" +
-                "// attributes\n" +
-                "layout(location = 0) in vec2 a_position;\n" +
-                "layout(location = 1) in vec4 a_color;\n" +
-                "layout(location = 2) in vec2 a_texCoord0;\n" +
-                "\n" +
-                "// uniforms\n" +
-                "uniform mat4 u_camera_combined;\n" +
-                "\n" +
-                "// outputs\n" +
-                "out vec4 color;\n" +
-                "out vec2 uv;\n" +
-                "\n" +
-                "void main() {\n" +
-                "    color = a_color;\n" +
-                "    uv = a_texCoord0;\n" +
-                "    gl_Position = u_camera_combined * vec4(a_position.x, a_position.y, 0.0, 1.0);\n" +
-                "}";
+    private static ShaderProgram createDefaultShaderProgram() {
+        try (InputStream vertexShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
+             BufferedReader vertexShaderBufferedReader = new BufferedReader(new InputStreamReader(vertexShaderInputStream, StandardCharsets.UTF_8));
+             InputStream fragmentShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
+             BufferedReader fragmentShaderBufferedReader = new BufferedReader(new InputStreamReader(fragmentShaderInputStream, StandardCharsets.UTF_8))) {
 
-        final String fragmentShader = "#version 450\n" +
-                "\n" +
-                "// inputs\n" +
-                "in vec4 color;\n" +
-                "in vec2 uv;\n" +
-                "\n" +
-                "uniform sampler2D u_texture;\n" +
-                "\n" +
-                "// outputs\n" +
-                "layout (location = 0) out vec4 out_color;\n" +
-                "\n" +
-                "void main() {\n" +
-                "\n" +
-                "    out_color = color * texture(u_texture, uv);\n" +
-                "\n" +
-                "}";
+            String vertexShader = vertexShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+            String fragmentShader = fragmentShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
 
-        return new ShaderProgram(vertexShader, fragmentShader);
+            return new ShaderProgram(vertexShader, fragmentShader);
+        } catch (Exception e) {
+            System.err.println("Could not create shader program from resources: ");
+            e.printStackTrace();
+            String vertexShader = "#version 450\n" +
+                    "\n" +
+                    "// attributes\n" +
+                    "layout(location = 0) in vec2 a_position;\n" +
+                    "layout(location = 1) in vec4 a_color;\n" +
+                    "layout(location = 2) in vec2 a_texCoord0;\n" +
+                    "\n" +
+                    "// uniforms\n" +
+                    "uniform mat4 u_camera_combined;\n" +
+                    "\n" +
+                    "// outputs\n" +
+                    "out vec4 color;\n" +
+                    "out vec2 uv;\n" +
+                    "\n" +
+                    "void main() {\n" +
+                    "    color = a_color;\n" +
+                    "    uv = a_texCoord0;\n" +
+                    "    gl_Position = u_camera_combined * vec4(a_position.x, a_position.y, 0.0, 1.0);\n" +
+                    "};";
+
+            String fragmentShader = "#version 450\n" +
+                    "\n" +
+                    "// inputs\n" +
+                    "in vec4 color;\n" +
+                    "in vec2 uv;\n" +
+                    "\n" +
+                    "// uniforms\n" +
+                    "uniform sampler2D u_texture;\n" +
+                    "\n" +
+                    "// outputs\n" +
+                    "layout (location = 0) out vec4 out_color;\n" +
+                    "\n" +
+                    "void main() {\n" +
+                    "    out_color = color * texture(u_texture, uv);\n" +
+                    "}";
+
+            return new ShaderProgram(vertexShader, fragmentShader);
+        }
     }
 
-    @Deprecated private static Texture createWhiteSinglePixelTexture() {
-        ByteBuffer buffer = ByteBuffer.allocateDirect(4);
-        buffer.put((byte) ((0xFFFFFFFF >> 16) & 0xFF));   // Red component
-        buffer.put((byte) ((0xFFFFFFFF >> 8) & 0xFF));    // Green component
-        buffer.put((byte) (0xFF));           // Blue component
-        buffer.put((byte) ((0xFFFFFFFF >> 24) & 0xFF));   // Alpha component
-        buffer.flip();
-        int glHandle = GL11.glGenTextures();
-        Texture texture = new Texture(glHandle,
-                1, 1,
-                Texture.Filter.NEAREST, Texture.Filter.NEAREST,
-                Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE
-        );
-        TextureBinder.bind(texture);
-        GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, 1, 1, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-        return texture;
+    private static Texture createWhiteSinglePixelTexture() {
+        try {
+            return TextureBuilder.buildFromClassPath("graphics-2d-single-white-pixel.png");
+        } catch (Exception e) {
+            System.err.println("Could not create single white pixel texture from resource. Creating manually.");
+            e.printStackTrace();
+
+            ByteBuffer buffer = ByteBuffer.allocateDirect(4);
+            buffer.put((byte) ((0xFFFFFFFF >> 16) & 0xFF));   // Red component
+            buffer.put((byte) ((0xFFFFFFFF >> 8) & 0xFF));    // Green component
+            buffer.put((byte) (0xFF));           // Blue component
+            buffer.put((byte) ((0xFFFFFFFF >> 24) & 0xFF));   // Alpha component
+            buffer.flip();
+            int glHandle = GL11.glGenTextures();
+            Texture texture = new Texture(glHandle,
+                    1, 1,
+                    Texture.Filter.NEAREST, Texture.Filter.NEAREST,
+                    Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE
+            );
+            TextureBinder.bind(texture);
+            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, 1, 1, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+            return texture;
+        }
     }
 
     private static Texture createPhysics2DDebugShapesTexture() {

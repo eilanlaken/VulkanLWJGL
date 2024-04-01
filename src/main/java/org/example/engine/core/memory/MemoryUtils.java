@@ -1,5 +1,6 @@
 package org.example.engine.core.memory;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.*;
@@ -38,6 +39,13 @@ public final class MemoryUtils {
     public static FloatBuffer store(final float[] data, int offset, int count, FloatBuffer target) {
         target.put(data, offset, count);
         return target.flip();
+    }
+
+    public static ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
+        ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCapacity);
+        buffer.flip();
+        newBuffer.put(buffer);
+        return newBuffer;
     }
 
 }
