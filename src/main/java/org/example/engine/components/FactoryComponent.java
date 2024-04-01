@@ -4,6 +4,7 @@ import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.TextureRegion;
 import org.example.engine.core.math.Algorithms;
+import org.example.engine.core.math.Shape2DPolygon;
 
 import java.util.HashMap;
 
@@ -54,5 +55,14 @@ public final class FactoryComponent {
         return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, Algorithms.createPolygonCircleHollow(r, refinement, stroke), customShader, customAttributes);
     }
 
+    // TODO: test
+    public static ComponentGraphics2DShape createShapePolygonFilled(float[] vertices, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, Algorithms.createPolygonFilled(vertices), customShader, customAttributes);
+    }
+
+    // TODO: test
+    public static ComponentGraphics2DShape createShapePolygonHollow(float[] vertices, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, Algorithms.createPolygonHollow(vertices, stroke), customShader, customAttributes);
+    }
 
 }

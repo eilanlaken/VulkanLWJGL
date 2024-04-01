@@ -4,10 +4,7 @@ import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.TuplePair;
 import org.example.engine.core.collections.TupleTriple;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 //https://github.com/earcut4j/earcut4j/blob/master/src/test/java/earcut4j/Test01.java
 public class Algorithms {
@@ -18,6 +15,9 @@ public class Algorithms {
     private static final Map<TuplePair<Float, Integer>, int[]> cachedFilledCirclesIndices = new HashMap<>();
     private static final Map<TupleTriple<Float, Integer, Float>, float[]> cachedHollowCirclesVertices = new HashMap<>();
     private static final Map<TupleTriple<Float, Integer, Float>, int[]> cachedHollowCirclesIndices = new HashMap<>();
+    private static final Map<float[], int[]> cachedFilledPolygonIndices = new HashMap<>();
+    private static final Map<float[], float[]> cachedHollowPolygonVertices = new HashMap<>();
+    private static final Map<float[], int[]> cachedHollowPolygonIndices = new HashMap<>();
 
     public static Shape2DPolygon createPolygonLine(float x1, float y1, float x2, float y2, float stroke) {
         if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
@@ -75,7 +75,7 @@ public class Algorithms {
 
     public static Shape2DPolygon createPolygonCircleHollow(float r, int refinement, float stroke) {
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
-        if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+        if (stroke < 0) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
 
         final TupleTriple<Float, Integer, Float> radiusRefinementStroke = new TupleTriple<>(r, refinement, stroke);
         float[] vertices = cachedHollowCirclesVertices.get(radiusRefinementStroke);
@@ -102,6 +102,50 @@ public class Algorithms {
             cachedHollowCirclesIndices.put(radiusRefinementStroke, indices);
         }
         return new Shape2DPolygon(indices, vertices);
+    }
+
+    public static Shape2DPolygon createPolygonFilled(float[] vertices) {
+        int[] indices = cachedFilledPolygonIndices.get(vertices);
+        if (indices == null) {
+            indices = triangulatePolygon(vertices, null, 2);
+            cachedFilledPolygonIndices.put(vertices, indices);
+        }
+        return new Shape2DPolygon(indices, vertices);
+    }
+
+    public static Shape2DPolygon createPolygonHollow(float[] vertices, float stroke) {
+        if (stroke < 0) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+        float[] expandedVertices = cachedHollowPolygonVertices.get(vertices);
+        if (expandedVertices == null) {
+            Vector2 centerOfGeometry = calculateCenterOfGeometry(vertices);
+            Vector2 tmp = new Vector2();
+            expandedVertices = new float[vertices.length * 2];
+            final float extrude = stroke * 0.5f;
+            for (int i = 0; i < vertices.length; i += 2) {
+                tmp.set(vertices[i], vertices[i+1]).sub(centerOfGeometry).nor().scl(extrude);
+                // outer rim
+                expandedVertices[i] = vertices[i] + tmp.x;
+                expandedVertices[i + 1] = vertices[i + 1] + tmp.y;
+                // inner rim
+                expandedVertices[i + vertices.length] = vertices[i] - tmp.x;
+                expandedVertices[i + vertices.length + 1] = vertices[i + 1] - tmp.y;
+            }
+            cachedHollowPolygonVertices.put(vertices, expandedVertices);
+        }
+        int[] indices = cachedHollowPolygonIndices.get(vertices);
+        if (indices == null) {
+            indices = triangulatePolygon(expandedVertices, new int[] { vertices.length / 2 }, 2);
+            cachedHollowPolygonIndices.put(vertices, indices);
+        }
+        return new Shape2DPolygon(indices, expandedVertices);
+    }
+
+    public static Vector2 calculateCenterOfGeometry(float[] vertices) {
+        Vector2 center = new Vector2();
+        for (int i = 0; i < vertices.length - 1; i += 2) {
+            center.add(vertices[i], vertices[i+1]);
+        }
+        return center.scl(1f / (vertices.length * 0.5f));
     }
 
     public static float calculatePolygonSignedArea(final float[] vertices) {
