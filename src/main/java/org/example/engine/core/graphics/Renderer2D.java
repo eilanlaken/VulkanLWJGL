@@ -4,7 +4,10 @@ import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Shape2DPolygon;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;

@@ -1,16 +1,8 @@
 package org.example;
 
-import org.example.engine.components.ComponentGraphics2DShape;
-import org.example.engine.components.FactoryComponent;
 import org.example.engine.core.application.Application;
-import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.graphics.WindowAttributes;
-import org.example.engine.core.math.*;
 import org.example.game.ScreenLoading;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GLCapabilities;
-
-import java.util.Arrays;
 
 public class Main {
 

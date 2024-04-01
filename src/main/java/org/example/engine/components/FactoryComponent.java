@@ -4,11 +4,7 @@ import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.TextureRegion;
 import org.example.engine.core.math.Algorithms;
-import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.Shape2DPolygon;
-import org.example.engine.core.math.Vector2;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 public final class FactoryComponent {

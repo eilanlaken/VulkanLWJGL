@@ -1,7 +1,5 @@
 package org.example.engine.components;
 
-import org.example.engine.core.graphics.GraphicsUtils;
-
 public class Component {
 
     public final Category category;

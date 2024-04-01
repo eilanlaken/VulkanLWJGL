@@ -2,7 +2,10 @@ package org.example.game;
 
 import org.example.engine.components.ComponentGraphics2DShape;
 import org.example.engine.components.FactoryComponent;
-import org.example.engine.core.graphics.*;
+import org.example.engine.core.graphics.Camera;
+import org.example.engine.core.graphics.Color;
+import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.WindowScreen;
 import org.example.engine.core.math.Shape2DRectangle;
 import org.lwjgl.opengl.GL11;
 

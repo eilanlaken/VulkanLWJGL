@@ -1,11 +1,13 @@
 package org.example.engine.core.math;
 
-import org.example.engine.components.ComponentGraphics2DShape;
 import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.TuplePair;
 import org.example.engine.core.collections.TupleTriple;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 //https://github.com/earcut4j/earcut4j/blob/master/src/test/java/earcut4j/Test01.java
 public class Algorithms {

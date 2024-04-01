@@ -1,6 +1,5 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Quaternion;
@@ -8,7 +7,6 @@ import org.example.engine.core.math.Vector3;
 import org.example.engine.core.math.Vector4;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 import java.nio.IntBuffer;
