@@ -30,6 +30,8 @@ public class SceneRendering2D_2 extends WindowScreen {
         //shape = FactoryComponent.createShapeRectangleHollow(30, 30,3, new Color(0,0.5f,1,1), null, null);
 
         circle = new Shape2DCircle(0,0,150);
+        circle.setRotation(30);
+        circle.update();
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
