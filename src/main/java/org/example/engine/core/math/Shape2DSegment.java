@@ -7,8 +7,6 @@ public class Shape2DSegment extends Shape2D {
     public Vector2 world_a;
     public Vector2 world_b;
 
-    Vector2 tmp = new Vector2();
-
     public Shape2DSegment(float x1, float y1, float x2, float y2) {
         this.a = new Vector2(x1, y1);
         this.b = new Vector2(x2, y2);
@@ -17,11 +15,9 @@ public class Shape2DSegment extends Shape2D {
         super.originalBoundingRadius = (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
     }
 
-    // TODO: make sure to fix all floating points comparisons
     @Override
     public boolean contains(float x, float y) {
-        tmp.set(x, y);
-        return Vector2.dst(world_a, tmp) + Vector2.dst(tmp, world_b) == Vector2.dst(world_a, world_b);
+        return MathUtils.isEqual(Vector2.dst(world_a.x, world_a.y, x, y) + Vector2.dst(x, y, world_b.x, world_b.y), Vector2.dst(world_a, world_b));
     }
 
     @Override
