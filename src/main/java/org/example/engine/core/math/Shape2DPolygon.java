@@ -5,9 +5,9 @@ public class Shape2DPolygon extends Shape2D {
     public final int vertexCount;
     public final float[] localPoints;
     public final int[] indices;
-    private float[] worldPoints;
-    private float area = Float.NaN;
+    private final float[] worldPoints;
     public final boolean isConvex;
+    private float area = Float.NaN;
 
     private final Vector2 tmp = new Vector2();
 
