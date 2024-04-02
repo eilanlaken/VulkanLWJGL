@@ -4,6 +4,8 @@ import org.example.engine.core.math.MathUtils;
 
 public final class CollectionsUtils {
 
+    private CollectionsUtils() {}
+
     public static Object createArray(Class clazz, int size) {
         return java.lang.reflect.Array.newInstance(clazz, size);
     }

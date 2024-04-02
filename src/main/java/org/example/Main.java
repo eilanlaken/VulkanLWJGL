@@ -3,11 +3,16 @@ package org.example;
 import org.example.engine.core.application.Application;
 import org.example.engine.core.graphics.TexturePacker;
 import org.example.engine.core.graphics.WindowAttributes;
+import org.example.engine.core.math.Algorithms;
+import org.example.engine.core.math.Shape2DPolygon;
 import org.example.game.ScreenLoading;
 
 public class Main {
 
     public static void main(String[] args) {
+
+        float[] v = new float[] {0,10, 0,0, 10,0, 2,2};
+        System.out.println(Algorithms.isPolygonConvex(v));
 
 
 
@@ -32,7 +37,7 @@ public class Main {
 //            e.printStackTrace();
 //        }
 
-        //if (true) return;
+        if (true) return;
 
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);

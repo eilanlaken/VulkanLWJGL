@@ -7,10 +7,11 @@ public class Shape2DPolygon extends Shape2D {
     public final int[] indices;
     private float[] worldPoints;
     private float area = Float.NaN;
+    private final boolean isConvex;
 
     private final Vector2 tmp = new Vector2();
 
-    public Shape2DPolygon(int[] indices, float[] vertices) {
+    protected Shape2DPolygon(int[] indices, float[] vertices) {
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
 
@@ -18,6 +19,7 @@ public class Shape2DPolygon extends Shape2D {
         this.localPoints = vertices;
         this.worldPoints = new float[vertices.length];
         this.indices = indices;
+        this.isConvex = Algorithms.isPolygonConvex(vertices);
         float max = 0;
         for (int i = 0; i < vertices.length - 1; i += 2) {
             float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
@@ -39,6 +41,7 @@ public class Shape2DPolygon extends Shape2D {
         this.localPoints = vertices;
         this.worldPoints = new float[vertices.length];
         this.indices = Algorithms.triangulatePolygon(localPoints, holes, 2);
+        this.isConvex = (holes == null || holes.length == 0) && Algorithms.isPolygonConvex(vertices);
         float max = 0;
         for (int i = 0; i < vertices.length - 1; i += 2) {
             float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
@@ -94,6 +97,20 @@ public class Shape2DPolygon extends Shape2D {
         for (int i = 0; i < worldPoints.length - 2; i += 2) perimeter += Vector2.dst(worldPoints[i], worldPoints[i+1], worldPoints[i+2], worldPoints[i+3]);
         perimeter += Vector2.dst(worldPoints[worldPoints.length - 2], worldPoints[worldPoints.length - 1], worldPoints[0], worldPoints[1]);
         return perimeter;
+    }
+
+    public static float getVertexX(int index, float[] vertices) {
+        int n2 = vertices.length / 2;
+        if (index >= n2) return vertices[(index % n2) * 2];
+        else if (index < 0) return vertices[(index % n2 + n2) * 2];
+        return vertices[index * 2];
+    }
+
+    public static float getVertexY(int index, float[] vertices) {
+        int n2 = vertices.length / 2;
+        if (index >= n2) return vertices[(index % n2) * 2 + 1];
+        else if (index < 0) return vertices[(index % n2 + n2) * 2 + 1];
+        return vertices[index * 2 + 1];
     }
 
 }

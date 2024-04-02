@@ -140,7 +140,30 @@ public class Algorithms {
         return new Shape2DPolygon(indices, expandedVertices);
     }
 
-    public static Vector2 calculateCenterOfGeometry(float[] vertices) {
+    public static boolean isPolygonConvex(final float[] vertices) {
+        if (vertices.length <= 6) return true;
+        Vector2 tmp1 = new Vector2();
+        Vector2 tmp2 = new Vector2();
+
+        tmp1.set(Shape2DPolygon.getVertexX(0, vertices), Shape2DPolygon.getVertexY(0, vertices))
+                .sub(Shape2DPolygon.getVertexX(-1, vertices), Shape2DPolygon.getVertexY(-1, vertices));
+        tmp2.set(Shape2DPolygon.getVertexX(+1, vertices), Shape2DPolygon.getVertexY(+1, vertices))
+                .sub(Shape2DPolygon.getVertexX(0, vertices), Shape2DPolygon.getVertexY(0, vertices));
+
+        float crossSign = Math.signum(tmp1.crs(tmp2));
+
+        for (int i = 1; i < vertices.length; i++) {
+            tmp1.set(Shape2DPolygon.getVertexX(i, vertices), Shape2DPolygon.getVertexY(i, vertices))
+                    .sub(Shape2DPolygon.getVertexX(i-1, vertices), Shape2DPolygon.getVertexY(i-1, vertices));
+            tmp2.set(Shape2DPolygon.getVertexX(i+1, vertices), Shape2DPolygon.getVertexY(i+1, vertices))
+                    .sub(Shape2DPolygon.getVertexX(i, vertices), Shape2DPolygon.getVertexY(i, vertices));
+            float crossSignCurrent = Math.signum(tmp1.crs(tmp2));
+            if (crossSignCurrent != crossSign) return false;
+        }
+        return true;
+    }
+
+    public static Vector2 calculateCenterOfGeometry(final float[] vertices) {
         Vector2 center = new Vector2();
         for (int i = 0; i < vertices.length - 1; i += 2) {
             center.add(vertices[i], vertices[i+1]);
