@@ -14,12 +14,12 @@ public class SceneRendering2D_1 extends WindowScreen {
 
     private Renderer2D renderer2D;
     private Texture texture0;
+    private TextureRegion region;
     private Camera camera;
 
     private ComponentGraphics2DShape shape;
     private ComponentGraphics2DShape shape2;
 
-    private TextureRegion region;
 
     public SceneRendering2D_1() {
         renderer2D = new Renderer2D();

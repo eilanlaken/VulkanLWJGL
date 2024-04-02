@@ -3,10 +3,7 @@ package org.example.engine.core.graphics;
 import org.example.engine.core.math.*;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.*;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -40,6 +37,7 @@ public class Renderer2D implements Resource {
     private boolean drawing = false;
     private int vertexIndex = 0;
     private int triangleIndex = 0;
+    private int drawMode = GL11.GL_TRIANGLES;
 
     private final int vao;
     private final int vbo, ebo;
@@ -107,6 +105,7 @@ public class Renderer2D implements Resource {
         useShader(shader);
         useTexture(texture);
         useCustomAttributes(customAttributes);
+        useMode(GL11.GL_TRIANGLES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -207,6 +206,7 @@ public class Renderer2D implements Resource {
         useShader(shader);
         useTexture(whiteSinglePixelTexture);
         useCustomAttributes(customAttributes);
+        useMode(GL11.GL_TRIANGLES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -255,54 +255,30 @@ public class Renderer2D implements Resource {
         }
 
         useShader(defaultShader);
-        useTexture(debugShapesTexture);
+        useTexture(whiteSinglePixelTexture);
         useCustomAttributes(null);
+        useMode(GL11.GL_LINE_LOOP);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
-        indicesBuffer
-                .put(startVertex)
-                .put(startVertex + 1)
-                .put(startVertex + 3)
-                .put(startVertex + 3)
-                .put(startVertex + 1)
-                .put(startVertex + 2)
-        ;
-        triangleIndex += 6;
+        for (int i = 0; i < 15; i++) indicesBuffer.put(startVertex + i);
+        triangleIndex += 15;
 
         circle.update();
-        // put vertices
-        final float halfRadius = circle.radius;
-        float localX1 = -halfRadius;
-        float localY1 = halfRadius;
-        float localX2 = -halfRadius;
-        float localY2 = -halfRadius;
-        float localX3 = halfRadius;
-        float localY3 = -halfRadius;
-        float localX4 = halfRadius;
-        float localY4 = halfRadius;
-
-        final float x = circle.worldCenter.x;
-        final float y = circle.worldCenter.y;
-        final float sin = MathUtils.sinDeg(circle.getAngle());
-        final float cos = MathUtils.cosDeg(circle.getAngle());
-
-        final float x1 = x + (localX1 * cos - localY1 * sin);
-        final float y1 = y + (localX1 * sin + localY1 * cos);
-        final float x2 = x + (localX2 * cos - localY2 * sin);
-        final float y2 = y + (localX2 * sin + localY2 * cos);
-        final float x3 = x + (localX3 * cos - localY3 * sin);
-        final float y3 = y + (localX3 * sin + localY3 * cos);
-        final float x4 = x + (localX4 * cos - localY4 * sin);
-        final float y4 = y + (localX4 * sin + localY4 * cos);
-
-        verticesBuffer
-                .put(x1).put(y1).put(tintFloatBits).put(0).put(0) // V1
-                .put(x2).put(y2).put(tintFloatBits).put(0).put(1) // V2
-                .put(x3).put(y3).put(tintFloatBits).put(0.5f).put(1) // V3
-                .put(x4).put(y4).put(tintFloatBits).put(0.5f).put(0) // V4
-        ;
-        vertexIndex += 20;
+        float x = circle.worldCenter.x;
+        float y = circle.worldCenter.y;
+        float r = circle.radius;
+        float dAngle = 360f / 15;
+        for (int i = 0; i < 15; i++) {
+            verticesBuffer
+                    .put(x + r * MathUtils.cosDeg(dAngle * i))
+                    .put(y + r * MathUtils.sinDeg(dAngle * i))
+                    .put(tintFloatBits)
+                    .put(1)
+                    .put(1)
+            ;
+        }
+        vertexIndex += 15 * 5;
     }
 
     private void pushDebugRectangle(final Shape2DRectangle rectangle, final float tintFloatBits) {
@@ -388,6 +364,7 @@ public class Renderer2D implements Resource {
         useShader(defaultShader);
         useTexture(debugShapesTexture);
         useCustomAttributes(null);
+        useMode(GL11.GL_LINE);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -447,6 +424,13 @@ public class Renderer2D implements Resource {
 
     }
 
+    private void useMode(final int mode) {
+        if (mode != this.drawMode) {
+            flush();
+        }
+        this.drawMode = mode;
+    }
+
     // contains the logic that sends everything to the GPU for rendering
     private void flush() {
         if (verticesBuffer.position() == 0) return;
@@ -463,7 +447,7 @@ public class Renderer2D implements Resource {
             GL20.glEnableVertexAttribArray(0);
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
-            GL11.glDrawElements(GL11.GL_TRIANGLES, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            GL11.glDrawElements(drawMode, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
             GL20.glDisableVertexAttribArray(2);
             GL20.glDisableVertexAttribArray(1);
             GL20.glDisableVertexAttribArray(0);
