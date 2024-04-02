@@ -37,7 +37,7 @@ public class Renderer2D implements Resource {
     private boolean drawing = false;
     private int vertexIndex = 0;
     private int triangleIndex = 0;
-    private int drawMode = GL11.GL_TRIANGLES;
+    private int mode = GL11.GL_TRIANGLES;
 
     private final int vao;
     private final int vbo, ebo;
@@ -250,72 +250,92 @@ public class Renderer2D implements Resource {
 
     private void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
+        if (triangleIndex + 34 > indicesBuffer.limit() || vertexIndex + 17 * 5 > BATCH_SIZE * 4) {
             flush();
         }
 
         useShader(defaultShader);
         useTexture(whiteSinglePixelTexture);
         useCustomAttributes(null);
-        useMode(GL11.GL_LINE_LOOP);
+        useMode(GL11.GL_LINES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
-        for (int i = 0; i < 15; i++) indicesBuffer.put(startVertex + i);
-        triangleIndex += 15;
+        for (int i = 1; i < 15; i++) {
+            indicesBuffer.put(startVertex + i - 1);
+            indicesBuffer.put(startVertex + i);
+        }
+        indicesBuffer.put(startVertex + 14);
+        indicesBuffer.put(startVertex);
+        indicesBuffer.put(startVertex + 15);
+        indicesBuffer.put(startVertex + 16);
+        triangleIndex += 34;
 
         circle.update();
         float x = circle.worldCenter.x;
         float y = circle.worldCenter.y;
         float r = circle.radius;
-        float dAngle = 360f / 15;
+        float da = 360f / 15;
         for (int i = 0; i < 15; i++) {
             verticesBuffer
-                    .put(x + r * MathUtils.cosDeg(dAngle * i))
-                    .put(y + r * MathUtils.sinDeg(dAngle * i))
+                    .put(x + r * MathUtils.cosDeg(da * i))
+                    .put(y + r * MathUtils.sinDeg(da * i))
                     .put(tintFloatBits)
-                    .put(1)
-                    .put(1)
+                    .put(0.5f)
+                    .put(0.5f)
             ;
         }
-        vertexIndex += 15 * 5;
+        verticesBuffer.put(x).put(y).put(tintFloatBits).put(0.5f).put(0.5f);
+        verticesBuffer.put(x + r * MathUtils.cosDeg(circle.getAngle())).put(y + r * MathUtils.sinDeg(circle.getAngle())).put(tintFloatBits).put(0.5f).put(0.5f);
+        vertexIndex += 17 * 5;
     }
 
     private void pushDebugRectangle(final Shape2DRectangle rectangle, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
+        if (triangleIndex + 10 > indicesBuffer.limit() || vertexIndex + 6 * 5 > BATCH_SIZE * 4) {
             flush();
         }
 
         useShader(defaultShader);
         useTexture(debugShapesTexture);
         useCustomAttributes(null);
+        useMode(GL11.GL_LINES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
         indicesBuffer
                 .put(startVertex)
                 .put(startVertex + 1)
-                .put(startVertex + 3)
-                .put(startVertex + 3)
                 .put(startVertex + 1)
                 .put(startVertex + 2)
+                .put(startVertex + 2)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex)
         ;
-        triangleIndex += 6;
+        indicesBuffer.put(startVertex + 4);
+        indicesBuffer.put(startVertex + 5);
+        triangleIndex += 10;
 
         rectangle.update();
         float x1 = rectangle.c1().x, y1 = rectangle.c1().y;
         float x2 = rectangle.c2().x, y2 = rectangle.c2().y;
         float x3 = rectangle.c3().x, y3 = rectangle.c3().y;
         float x4 = rectangle.c4().x, y4 = rectangle.c4().y;
-
         verticesBuffer
-                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0f) // V1
-                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(1f) // V2
-                .put(x3).put(y3).put(tintFloatBits).put(1f).put(1f) // V3
-                .put(x4).put(y4).put(tintFloatBits).put(1f).put(0f) // V4
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // V1
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // V2
+                .put(x3).put(y3).put(tintFloatBits).put(0.5f).put(0.5f) // V3
+                .put(x4).put(y4).put(tintFloatBits).put(0.5f).put(0.5f) // V4
         ;
-        vertexIndex += 20;
+
+        float centerX = (x1 + x2 + x3 + x4) * 0.25f;
+        float centerY = (y1 + y2 + y3 + y4) * 0.25f;
+        float lineEndX = (x3 + x4) * 0.5f;
+        float lineEndY = (y3 + y4) * 0.5f;
+        verticesBuffer.put(centerX).put(centerY).put(tintFloatBits).put(0.5f).put(0.5f);
+        verticesBuffer.put(lineEndX).put(lineEndY).put(tintFloatBits).put(0.5f).put(0.5f);
+        vertexIndex += 6 * 5;
     }
 
     private void pushDebugAABB(final Shape2DAABB aabb, final float tintFloatBits) {
@@ -425,10 +445,10 @@ public class Renderer2D implements Resource {
     }
 
     private void useMode(final int mode) {
-        if (mode != this.drawMode) {
+        if (mode != this.mode) {
             flush();
         }
-        this.drawMode = mode;
+        this.mode = mode;
     }
 
     // contains the logic that sends everything to the GPU for rendering
@@ -447,7 +467,7 @@ public class Renderer2D implements Resource {
             GL20.glEnableVertexAttribArray(0);
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
-            GL11.glDrawElements(drawMode, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            GL11.glDrawElements(mode, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
             GL20.glDisableVertexAttribArray(2);
             GL20.glDisableVertexAttribArray(1);
             GL20.glDisableVertexAttribArray(0);
@@ -559,7 +579,7 @@ public class Renderer2D implements Resource {
         }
     }
 
-    private static Texture createPhysics2DDebugShapesTexture() {
+    @Deprecated private static Texture createPhysics2DDebugShapesTexture() {
         try {
             return TextureBuilder.buildFromClassPath("physics-2d-debug-shapes.png");
         } catch (Exception e) {
