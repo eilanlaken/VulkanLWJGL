@@ -402,7 +402,7 @@ public class Renderer2D implements Resource {
         triangleIndex += 6;
 
         segment.update();
-//
+
 //        float x1 = rectangle.c1().x, y1 = rectangle.c1().y;
 //        float x2 = rectangle.c2().x, y2 = rectangle.c2().y;
 //        float x3 = rectangle.c3().x, y3 = rectangle.c3().y;
