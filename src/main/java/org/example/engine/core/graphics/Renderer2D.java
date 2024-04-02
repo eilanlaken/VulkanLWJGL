@@ -236,14 +236,19 @@ public class Renderer2D implements Resource {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    public void pushDebugShape(final Shape2D shape, final Color tint) {
-        if (shape instanceof Shape2DCircle) pushDebugCircle((Shape2DCircle) shape, tint);
-        if (shape instanceof Shape2DRectangle) pushDebugRectangle((Shape2DRectangle) shape, tint);
-        if (shape instanceof Shape2DAABB) pushDebugAABB((Shape2DAABB) shape, tint);
-        if (shape instanceof Shape2DPolygon) pushDebugPolygon((Shape2DPolygon) shape, tint);
+    public void pushDebugShape(Shape2D shape, final Color tint) {
+        final float tintFloatBits = tint == null ? WHITE_TINT : tint.toFloatBits();
+        pushDebugShape(shape, tintFloatBits);
     }
 
-    private void pushDebugCircle(final Shape2DCircle circle, final Color tint) {
+    public void pushDebugShape(Shape2D shape, final float tintFloatBits) {
+        if (shape instanceof Shape2DCircle) pushDebugCircle((Shape2DCircle) shape, tintFloatBits);
+        if (shape instanceof Shape2DRectangle) pushDebugRectangle((Shape2DRectangle) shape, tintFloatBits);
+        if (shape instanceof Shape2DAABB) pushDebugAABB((Shape2DAABB) shape, tintFloatBits);
+        if (shape instanceof Shape2DPolygon) pushDebugPolygon((Shape2DPolygon) shape, tintFloatBits);
+    }
+
+    private void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
             flush();
@@ -265,61 +270,42 @@ public class Renderer2D implements Resource {
         ;
         triangleIndex += 6;
 
+        circle.update();
         // put vertices
-        float localX1, localY1;
-        float localX2, localY2;
-        float localX3, localY3;
-        float localX4, localY4;
+        final float halfRadius = circle.radius;
+        float localX1 = -halfRadius;
+        float localY1 = halfRadius;
+        float localX2 = -halfRadius;
+        float localY2 = -halfRadius;
+        float localX3 = halfRadius;
+        float localY3 = -halfRadius;
+        float localX4 = halfRadius;
+        float localY4 = halfRadius;
 
-        localX1 = localX2 = -circle.radius * 0.5f;
-        localX3 = localX4 = circle.radius * 0.5f;
-        localY1 = localY4 = circle.radius * 0.5f;
-        localY2 = localY3 = -circle.radius * 0.5f;
-
-        float x1, y1;
-        float x2, y2;
-        float x3, y3;
-        float x4, y4;
-
+        final float x = circle.worldCenter.x;
+        final float y = circle.worldCenter.y;
         final float sin = MathUtils.sinDeg(circle.getAngle());
         final float cos = MathUtils.cosDeg(circle.getAngle());
-        x1 = localX1 * cos - localY1 * sin;
-        y1 = localX1 * sin + localY1 * cos;
 
-        x2 = localX2 * cos - localY2 * sin;
-        y2 = localX2 * sin + localY2 * cos;
+        final float x1 = x + (localX1 * cos - localY1 * sin);
+        final float y1 = y + (localX1 * sin + localY1 * cos);
+        final float x2 = x + (localX2 * cos - localY2 * sin);
+        final float y2 = y + (localX2 * sin + localY2 * cos);
+        final float x3 = x + (localX3 * cos - localY3 * sin);
+        final float y3 = y + (localX3 * sin + localY3 * cos);
+        final float x4 = x + (localX4 * cos - localY4 * sin);
+        final float y4 = y + (localX4 * sin + localY4 * cos);
 
-        x3 = localX3 * cos - localY3 * sin;
-        y3 = localX3 * sin + localY3 * cos;
-
-        x4 = localX4 * cos - localY4 * sin;
-        y4 = localX4 * sin + localY4 * cos;
-
-        final float x = circle.getX();
-        final float y = circle.getY();
-        x1 += x;
-        y1 += y;
-
-        x2 += x;
-        y2 += y;
-
-        x3 += x;
-        y3 += y;
-
-        x4 += x;
-        y4 += y;
-
-        float t = tint == null ? WHITE_TINT : tint.toFloatBits();
         verticesBuffer
-                .put(x1).put(y1).put(t).put(0).put(0) // V1
-                .put(x2).put(y2).put(t).put(0).put(1) // V2
-                .put(x3).put(y3).put(t).put(0.5f).put(1) // V3
-                .put(x4).put(y4).put(t).put(0.5f).put(0) // V4
+                .put(x1).put(y1).put(tintFloatBits).put(0).put(0) // V1
+                .put(x2).put(y2).put(tintFloatBits).put(0).put(1) // V2
+                .put(x3).put(y3).put(tintFloatBits).put(0.5f).put(1) // V3
+                .put(x4).put(y4).put(tintFloatBits).put(0.5f).put(0) // V4
         ;
         vertexIndex += 20;
     }
 
-    private void pushDebugRectangle(final Shape2DRectangle rectangle, final Color tint) {
+    private void pushDebugRectangle(final Shape2DRectangle rectangle, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
             flush();
@@ -341,22 +327,22 @@ public class Renderer2D implements Resource {
         ;
         triangleIndex += 6;
 
+        rectangle.update();
         float x1 = rectangle.c1().x, y1 = rectangle.c1().y;
         float x2 = rectangle.c2().x, y2 = rectangle.c2().y;
         float x3 = rectangle.c3().x, y3 = rectangle.c3().y;
         float x4 = rectangle.c4().x, y4 = rectangle.c4().y;
 
-        float t = tint == null ? WHITE_TINT : tint.toFloatBits();
         verticesBuffer
-                .put(x1).put(y1).put(t).put(0.5f).put(0f) // V1
-                .put(x2).put(y2).put(t).put(0.5f).put(1f) // V2
-                .put(x3).put(y3).put(t).put(1f).put(1f) // V3
-                .put(x4).put(y4).put(t).put(1f).put(0f) // V4
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0f) // V1
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(1f) // V2
+                .put(x3).put(y3).put(tintFloatBits).put(1f).put(1f) // V3
+                .put(x4).put(y4).put(tintFloatBits).put(1f).put(0f) // V4
         ;
         vertexIndex += 20;
     }
 
-    private void pushDebugAABB(final Shape2DAABB aabb, final Color tint) {
+    private void pushDebugAABB(final Shape2DAABB aabb, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
             flush();
@@ -384,22 +370,56 @@ public class Renderer2D implements Resource {
         float x3 = aabb.worldMax.x, y3 = aabb.worldMin.y;
         float x4 = aabb.worldMax.x, y4 = aabb.worldMax.y;
 
-        float t = tint == null ? WHITE_TINT : tint.toFloatBits();
         verticesBuffer
-                .put(x1).put(y1).put(t).put(0.5f).put(0f) // V1
-                .put(x2).put(y2).put(t).put(0.5f).put(1f) // V2
-                .put(x3).put(y3).put(t).put(1f).put(1f) // V3
-                .put(x4).put(y4).put(t).put(1f).put(0f) // V4
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0f) // V1
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(1f) // V2
+                .put(x3).put(y3).put(tintFloatBits).put(1f).put(1f) // V3
+                .put(x4).put(y4).put(tintFloatBits).put(1f).put(0f) // V4
         ;
         vertexIndex += 20;
     }
 
-    // TODO: implement
-    private void pushDebugPolygon(final Shape2DPolygon polygon, final Color tint) {
+    private void pushDebugSegment(final Shape2DSegment segment, final float tintFloatBits) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
+            flush();
+        }
 
+        useShader(defaultShader);
+        useTexture(debugShapesTexture);
+        useCustomAttributes(null);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+        ;
+        triangleIndex += 6;
+
+        segment.update();
+//
+//        float x1 = rectangle.c1().x, y1 = rectangle.c1().y;
+//        float x2 = rectangle.c2().x, y2 = rectangle.c2().y;
+//        float x3 = rectangle.c3().x, y3 = rectangle.c3().y;
+//        float x4 = rectangle.c4().x, y4 = rectangle.c4().y;
+//
+//
+//        verticesBuffer
+//                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0f) // V1
+//                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(1f) // V2
+//                .put(x3).put(y3).put(tintFloatBits).put(1f).put(1f) // V3
+//                .put(x4).put(y4).put(tintFloatBits).put(1f).put(0f) // V4
+//        ;
+//        vertexIndex += 20;
     }
 
-    private void pushDebugSegment(final Shape2DSegment segment, final Color tint) {
+    // TODO: implement
+    private void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {
 
     }
 
