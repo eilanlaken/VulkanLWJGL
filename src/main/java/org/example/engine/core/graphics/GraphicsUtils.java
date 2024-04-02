@@ -25,6 +25,8 @@ public class GraphicsUtils {
     private static int idleFps = 10;
     private static int maxTextureSize;
 
+    private GraphicsUtils() {}
+
     public static void init(final Window window) {
         if (initialized) throw new IllegalStateException(GraphicsUtils.class.getSimpleName() + " instance already initialized.");
         GraphicsUtils.window = window;

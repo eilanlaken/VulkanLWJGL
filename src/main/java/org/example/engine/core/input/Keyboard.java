@@ -15,6 +15,8 @@ public class Keyboard {
     private static ArrayInt keysHeld = new ArrayInt(12);
     private static ArrayInt keysJustPressed = new ArrayInt(12);
 
+    private Keyboard() {}
+
     public static void init(Window window) {
         if (initialized)
             throw new IllegalStateException("Device input " + Keyboard.class.getSimpleName() + " already initialized.");

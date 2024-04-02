@@ -7,6 +7,8 @@ import java.nio.*;
 
 public final class MemoryUtils {
 
+    private MemoryUtils() {}
+
     public static FloatBuffer store(float[] data) {
         FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length);
         buffer.put(data).flip();

@@ -21,6 +21,8 @@ public class Mouse {
     private static int[] mouseButtonsPrevStates = new int[5];
     private static int[] mouseButtonsCurrentStates = new int[5];
 
+    private Mouse() {}
+
     public static void init(Window window) {
         if (initialized) throw new IllegalStateException("Device input " + Mouse.class.getSimpleName() + " already initialized.");
         Mouse.window = window;

@@ -19,6 +19,8 @@ public class Algorithms {
     private static final Map<float[], float[]> cachedHollowPolygonVertices = new HashMap<>();
     private static final Map<float[], int[]> cachedHollowPolygonIndices = new HashMap<>();
 
+    private Algorithms() {}
+
     public static Shape2DPolygon createPolygonLine(float x1, float y1, float x2, float y2, float stroke) {
         if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
         float dx = x2 - x1;

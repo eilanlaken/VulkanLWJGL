@@ -39,6 +39,8 @@ public final class AssetUtils {
         gson = new Gson();
     }
 
+    private AssetUtils() {}
+
     public static void init(final Window window) {
         if (initialized) throw new IllegalStateException(AssetUtils.class.getSimpleName() + " instance already initialized.");
         AssetUtils.window = window;

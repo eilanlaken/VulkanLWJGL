@@ -19,12 +19,12 @@ import java.util.Set;
 public final class AssetStore {
 
     private final static HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> loaders = getLoadersMap();
-    private static volatile Queue<AssetDescriptor> loadQueue = new Queue<>();
-    private static volatile HashMap<String, Asset> store = new HashMap<>();
-    private static volatile Set<AssetStoreLoadingTask> completedAsyncTasks = new HashSet<>();
-    private static volatile Set<AssetStoreLoadingTask> asyncTasks = new HashSet<>();
-    private static volatile Set<AssetStoreLoadingTask> completedCreateTasks = new HashSet<>();
-    private static volatile Set<AssetStoreLoadingTask> createTasks = new HashSet<>();
+    private static final Queue<AssetDescriptor> loadQueue = new Queue<>();
+    private static final HashMap<String, Asset> store = new HashMap<>();
+    private static final Set<AssetStoreLoadingTask> completedAsyncTasks = new HashSet<>();
+    private static final Set<AssetStoreLoadingTask> asyncTasks = new HashSet<>();
+    private static final Set<AssetStoreLoadingTask> completedCreateTasks = new HashSet<>();
+    private static final Set<AssetStoreLoadingTask> createTasks = new HashSet<>();
 
     // loading state
 
