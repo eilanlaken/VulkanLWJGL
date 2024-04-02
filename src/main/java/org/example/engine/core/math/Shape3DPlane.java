@@ -1,5 +1,6 @@
 package org.example.engine.core.math;
 
+// TODO: redo entire Shape2D
 public class Shape3DPlane implements Shape3D {
 
     public Vector3 normal;

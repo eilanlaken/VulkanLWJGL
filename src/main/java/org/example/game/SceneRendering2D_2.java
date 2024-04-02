@@ -6,7 +6,9 @@ import org.example.engine.core.graphics.Camera;
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.graphics.WindowScreen;
+import org.example.engine.core.math.Shape2DAABB;
 import org.example.engine.core.math.Shape2DCircle;
+import org.example.engine.core.math.Shape2DRectangle;
 import org.lwjgl.opengl.GL11;
 
 public class SceneRendering2D_2 extends WindowScreen {
@@ -16,6 +18,8 @@ public class SceneRendering2D_2 extends WindowScreen {
     private ComponentGraphics2DShape shape;
 
     private Shape2DCircle circle;
+    private Shape2DRectangle rectangle;
+    private Shape2DAABB aabb;
 
     public SceneRendering2D_2() {
         renderer2D = new Renderer2D();
@@ -33,6 +37,13 @@ public class SceneRendering2D_2 extends WindowScreen {
         circle.setRotation(30);
         circle.update();
 
+        rectangle = new Shape2DRectangle(200, 400);
+        rectangle.setRotation(30);
+        rectangle.update();
+
+        aabb = new Shape2DAABB(40,40, 240, 240);
+        aabb.update();
+
         camera = new Camera(640*2,480*2, 1);
         camera.update();
     }
@@ -46,6 +57,9 @@ public class SceneRendering2D_2 extends WindowScreen {
         renderer2D.begin(camera);
         renderer2D.pushPolygon(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
         renderer2D.pushDebugShape(circle, null);
+        renderer2D.pushDebugShape(rectangle, null);
+        renderer2D.pushDebugShape(aabb, null);
+
         renderer2D.end();
         time++;
     }

@@ -8,6 +8,7 @@ package org.example.engine.core.math;
  *  (this, but in 3D)
  *
  */
+// TODO: redo entire Shape2D
 public class Shape3DFrustum implements Shape3D {
 
     // for the purpose of intermediate computations

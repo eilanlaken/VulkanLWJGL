@@ -1,6 +1,6 @@
 package org.example.engine.core.math;
 
-// TODO: implement
+// TODO: redo entire Shape2D
 public class Shape3DAABB implements Shape3D {
 
     public Vector3 offset = new Vector3();

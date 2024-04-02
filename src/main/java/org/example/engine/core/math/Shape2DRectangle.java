@@ -70,6 +70,7 @@ public class Shape2DRectangle extends Shape2D {
 
     @Override
     public void update() {
+        if (updated) return;
         // scale
         c1.set(-originalWidthHalf, originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
         c2.set(-originalWidthHalf, -originalHeightHalf).scl(scaleX, scaleY).add(localCenter);

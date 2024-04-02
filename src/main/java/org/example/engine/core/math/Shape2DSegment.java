@@ -1,6 +1,6 @@
 package org.example.engine.core.math;
 
-public class Shape2DLineSegment extends Shape2D {
+public class Shape2DSegment extends Shape2D {
 
     private final Vector2 a;
     private final Vector2 b;
@@ -9,7 +9,7 @@ public class Shape2DLineSegment extends Shape2D {
 
     Vector2 tmp = new Vector2();
 
-    public Shape2DLineSegment(float x1, float y1, float x2, float y2) {
+    public Shape2DSegment(float x1, float y1, float x2, float y2) {
         this.a = new Vector2(x1, y1);
         this.b = new Vector2(x2, y2);
         this.world_a = new Vector2(a);
@@ -36,6 +36,7 @@ public class Shape2DLineSegment extends Shape2D {
 
     @Override
     public void update() {
+        if (updated) return;
         this.world_a.set(a);
         this.world_b.set(b);
         // scale

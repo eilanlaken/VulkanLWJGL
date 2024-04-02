@@ -1,6 +1,7 @@
 package org.example.engine.core.math;
 
 // AABB = axis aligned bonding box
+// TODO: deprecate?
 public class Shape2DAABB extends Shape2D {
 
     private final Vector2 localMin;
@@ -41,6 +42,7 @@ public class Shape2DAABB extends Shape2D {
 
     @Override
     public void update() {
+        if (updated) return;
         if (angle != 0) throw new IllegalStateException("Cannot rotate an AABB: must remain aligned to axis. angle must remain 0. Current value: angle = " + angle);
         this.worldMin.set(localMin);
         this.worldMax.set(localMax);

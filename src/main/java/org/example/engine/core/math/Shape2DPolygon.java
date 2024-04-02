@@ -53,6 +53,7 @@ public class Shape2DPolygon extends Shape2D {
 
     @Override
     public void update() {
+        if (updated) return;
         for (int i = 0; i < localPoints.length - 1; i += 2) {
             tmp.set(localPoints[i] * scaleX, localPoints[i + 1] * scaleY);
             if (angle != 0.0f) tmp.rotateDeg(angle);

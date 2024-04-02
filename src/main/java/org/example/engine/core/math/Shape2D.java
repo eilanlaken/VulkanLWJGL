@@ -18,7 +18,7 @@ public abstract class Shape2D {
         this.angle = 0;
         this.scaleX = 1;
         this.scaleY = 1;
-        updated = true;
+        updated = false;
     }
 
     public boolean contains(final Vector2 point) {

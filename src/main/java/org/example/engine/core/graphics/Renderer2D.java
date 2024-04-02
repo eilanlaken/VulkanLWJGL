@@ -2,7 +2,6 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.math.*;
 import org.example.engine.core.memory.Resource;
-import org.example.engine.core.physics2d.Physics2DBody;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -239,6 +238,9 @@ public class Renderer2D implements Resource {
 
     public void pushDebugShape(final Shape2D shape, final Color tint) {
         if (shape instanceof Shape2DCircle) pushDebugCircle((Shape2DCircle) shape, tint);
+        if (shape instanceof Shape2DRectangle) pushDebugRectangle((Shape2DRectangle) shape, tint);
+        if (shape instanceof Shape2DAABB) pushDebugAABB((Shape2DAABB) shape, tint);
+        if (shape instanceof Shape2DPolygon) pushDebugPolygon((Shape2DPolygon) shape, tint);
     }
 
     private void pushDebugCircle(final Shape2DCircle circle, final Color tint) {
@@ -318,14 +320,86 @@ public class Renderer2D implements Resource {
     }
 
     private void pushDebugRectangle(final Shape2DRectangle rectangle, final Color tint) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
+            flush();
+        }
 
+        useShader(defaultShader);
+        useTexture(debugShapesTexture);
+        useCustomAttributes(null);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+        ;
+        triangleIndex += 6;
+
+        float x1 = rectangle.c1().x, y1 = rectangle.c1().y;
+        float x2 = rectangle.c2().x, y2 = rectangle.c2().y;
+        float x3 = rectangle.c3().x, y3 = rectangle.c3().y;
+        float x4 = rectangle.c4().x, y4 = rectangle.c4().y;
+
+        float t = tint == null ? WHITE_TINT : tint.toFloatBits();
+        verticesBuffer
+                .put(x1).put(y1).put(t).put(0.5f).put(0f) // V1
+                .put(x2).put(y2).put(t).put(0.5f).put(1f) // V2
+                .put(x3).put(y3).put(t).put(1f).put(1f) // V3
+                .put(x4).put(y4).put(t).put(1f).put(0f) // V4
+        ;
+        vertexIndex += 20;
     }
 
+    private void pushDebugAABB(final Shape2DAABB aabb, final Color tint) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
+            flush();
+        }
+
+        useShader(defaultShader);
+        useTexture(debugShapesTexture);
+        useCustomAttributes(null);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+        ;
+        triangleIndex += 6;
+
+        aabb.update();
+        float x1 = aabb.worldMin.x, y1 = aabb.worldMax.y;
+        float x2 = aabb.worldMin.x, y2 = aabb.worldMin.y;
+        float x3 = aabb.worldMax.x, y3 = aabb.worldMin.y;
+        float x4 = aabb.worldMax.x, y4 = aabb.worldMax.y;
+
+        float t = tint == null ? WHITE_TINT : tint.toFloatBits();
+        verticesBuffer
+                .put(x1).put(y1).put(t).put(0.5f).put(0f) // V1
+                .put(x2).put(y2).put(t).put(0.5f).put(1f) // V2
+                .put(x3).put(y3).put(t).put(1f).put(1f) // V3
+                .put(x4).put(y4).put(t).put(1f).put(0f) // V4
+        ;
+        vertexIndex += 20;
+    }
+
+    // TODO: implement
     private void pushDebugPolygon(final Shape2DPolygon polygon, final Color tint) {
 
     }
 
-    private void pushDebugAABB(final Shape2DAABB aabb, final Color tint) {
+    private void pushDebugSegment(final Shape2DSegment segment, final Color tint) {
 
     }
 

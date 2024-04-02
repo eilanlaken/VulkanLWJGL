@@ -1,5 +1,6 @@
 package org.example.engine.core.math;
 
+// TODO: redo entire Shape2D
 public class Shape3DSphere implements Shape3D {
 
     public final Vector3 center;

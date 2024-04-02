@@ -17,6 +17,7 @@ public class Shape2DCircle extends Shape2D {
     }
 
     public void update() {
+        if (updated) return;
         if (scaleX != scaleY) throw new IllegalStateException(this.getClass().getSimpleName() + " must have scaleX == scaleY to maintain circle proportions. scaleX: " + scaleX + " and scaleY: " + scaleX + ".");
         worldCenter.set(localCenter);
         if (scaleX != 1.0f) worldCenter.scl(scaleX, scaleY);

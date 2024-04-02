@@ -11,12 +11,6 @@ public class Main {
 
     public static void main(String[] args) {
 
-        float[] v = new float[] {0,10, 0,0, 10,0, 2,2};
-        System.out.println(Algorithms.isPolygonConvex(v));
-
-
-
-
 //
 //        System.out.println("world: " + Arrays.toString(p.getWorldPoints()));
 //
@@ -37,7 +31,7 @@ public class Main {
 //            e.printStackTrace();
 //        }
 
-        if (true) return;
+        //if (true) return;
 
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);

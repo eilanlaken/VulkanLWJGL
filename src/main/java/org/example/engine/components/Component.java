@@ -15,7 +15,7 @@ public class Component {
         GRAPHICS,
         AUDIO,
         LOGIC,
-        SIGNALS,
+        CHEMISTRY,
         ;
 
         public final int bitMask;

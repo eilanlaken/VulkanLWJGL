@@ -1,5 +1,6 @@
 package org.example.engine.core.math;
 
+// TODO: redo entire Shape2D
 public class Shape3DCube implements Shape3D {
 
     // for the purpose of intermediate computations
