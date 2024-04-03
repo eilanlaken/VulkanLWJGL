@@ -236,7 +236,7 @@ public class Renderer2D implements Resource {
     }
 
     public void pushDebugShape(Shape2D shape, final Color tint) {
-        final float tintFloatBits = tint == null ? WHITE_TINT : tint.toFloatBits();
+        final float tintFloatBits = tint == null ? BLUE_TINT : tint.toFloatBits();
         pushDebugShape(shape, tintFloatBits);
     }
 
@@ -246,6 +246,7 @@ public class Renderer2D implements Resource {
         if (shape instanceof Shape2DAABB) pushDebugAABB((Shape2DAABB) shape, tintFloatBits);
         if (shape instanceof Shape2DSegment) pushDebugSegment((Shape2DSegment) shape, tintFloatBits);
         if (shape instanceof Shape2DPolygon) pushDebugPolygon((Shape2DPolygon) shape, tintFloatBits);
+        if (shape instanceof Shape2DCompound) pushDebugCompoundShape((Shape2DCompound) shape, tintFloatBits);
     }
 
     private void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
@@ -446,6 +447,15 @@ public class Renderer2D implements Resource {
             verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(tintFloatBits).put(0.5f).put(0.5f);
         }
         vertexIndex += polygon.vertexCount * 5;
+    }
+
+    private void pushDebugCompoundShape(final Shape2DCompound compound, final float tintFloatBits) {
+        for (Shape2D island : compound.islands) {
+            pushDebugShape(island, tintFloatBits);
+        }
+        for (Shape2D hole : compound.holes) {
+            pushDebugShape(hole, RED_TINT);
+        }
     }
 
     /** Swap Operations **/
