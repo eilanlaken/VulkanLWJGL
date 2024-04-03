@@ -2,6 +2,7 @@ package org.example.engine.core.math;
 
 import org.example.engine.core.collections.Array;
 
+// TODO: finish implementing
 public class Shape2DCompound extends Shape2D {
 
     public final Array<Shape2D> islands;
