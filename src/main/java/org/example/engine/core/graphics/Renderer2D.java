@@ -24,7 +24,6 @@ public class Renderer2D implements Resource {
 
     private final ShaderProgram defaultShader = createDefaultShaderProgram();
     private final Texture whiteSinglePixelTexture = createWhiteSinglePixelTexture();
-    private final Texture debugShapesTexture = createPhysics2DDebugShapesTexture();
     private final float WHITE_TINT = new Color(1,1,1,1).toFloatBits();
     private final float RED_TINT = new Color(1,0,0,1).toFloatBits();
     private final float GREEN_TINT = new Color(0,1,0,1).toFloatBits();
@@ -245,6 +244,7 @@ public class Renderer2D implements Resource {
         if (shape instanceof Shape2DCircle) pushDebugCircle((Shape2DCircle) shape, tintFloatBits);
         if (shape instanceof Shape2DRectangle) pushDebugRectangle((Shape2DRectangle) shape, tintFloatBits);
         if (shape instanceof Shape2DAABB) pushDebugAABB((Shape2DAABB) shape, tintFloatBits);
+        if (shape instanceof Shape2DSegment) pushDebugSegment((Shape2DSegment) shape, tintFloatBits);
         if (shape instanceof Shape2DPolygon) pushDebugPolygon((Shape2DPolygon) shape, tintFloatBits);
     }
 
@@ -297,7 +297,7 @@ public class Renderer2D implements Resource {
         }
 
         useShader(defaultShader);
-        useTexture(debugShapesTexture);
+        useTexture(whiteSinglePixelTexture);
         useCustomAttributes(null);
         useMode(GL11.GL_LINES);
 
@@ -340,82 +340,81 @@ public class Renderer2D implements Resource {
 
     private void pushDebugAABB(final Shape2DAABB aabb, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
+        if (triangleIndex + 10 > indicesBuffer.limit() || vertexIndex + 6 * 5 > BATCH_SIZE * 4) {
             flush();
         }
 
         useShader(defaultShader);
-        useTexture(debugShapesTexture);
+        useTexture(whiteSinglePixelTexture);
         useCustomAttributes(null);
+        useMode(GL11.GL_LINES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
         indicesBuffer
                 .put(startVertex)
                 .put(startVertex + 1)
-                .put(startVertex + 3)
-                .put(startVertex + 3)
                 .put(startVertex + 1)
                 .put(startVertex + 2)
+                .put(startVertex + 2)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex)
         ;
-        triangleIndex += 6;
+        indicesBuffer.put(startVertex + 4);
+        indicesBuffer.put(startVertex + 5);
+        triangleIndex += 10;
 
         aabb.update();
         float x1 = aabb.worldMin.x, y1 = aabb.worldMax.y;
         float x2 = aabb.worldMin.x, y2 = aabb.worldMin.y;
         float x3 = aabb.worldMax.x, y3 = aabb.worldMin.y;
         float x4 = aabb.worldMax.x, y4 = aabb.worldMax.y;
-
         verticesBuffer
-                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0f) // V1
-                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(1f) // V2
-                .put(x3).put(y3).put(tintFloatBits).put(1f).put(1f) // V3
-                .put(x4).put(y4).put(tintFloatBits).put(1f).put(0f) // V4
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // V1
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // V2
+                .put(x3).put(y3).put(tintFloatBits).put(0.5f).put(0.5f) // V3
+                .put(x4).put(y4).put(tintFloatBits).put(0.5f).put(0.5f) // V4
         ;
-        vertexIndex += 20;
+
+        float centerX = (x1 + x2 + x3 + x4) * 0.25f;
+        float centerY = (y1 + y2 + y3 + y4) * 0.25f;
+        float lineEndX = (x3 + x4) * 0.5f;
+        float lineEndY = (y3 + y4) * 0.5f;
+        verticesBuffer.put(centerX).put(centerY).put(tintFloatBits).put(0.5f).put(0.5f);
+        verticesBuffer.put(lineEndX).put(lineEndY).put(tintFloatBits).put(0.5f).put(0.5f);
+        vertexIndex += 6 * 5;
     }
 
     private void pushDebugSegment(final Shape2DSegment segment, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
+        if (triangleIndex + 2 > indicesBuffer.limit() || vertexIndex + 2 * 5 > BATCH_SIZE * 4) {
             flush();
         }
 
         useShader(defaultShader);
-        useTexture(debugShapesTexture);
+        useTexture(whiteSinglePixelTexture);
         useCustomAttributes(null);
-        useMode(GL11.GL_LINE);
+        useMode(GL11.GL_LINES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
         indicesBuffer
                 .put(startVertex)
                 .put(startVertex + 1)
-                .put(startVertex + 3)
-                .put(startVertex + 3)
-                .put(startVertex + 1)
-                .put(startVertex + 2)
         ;
-        triangleIndex += 6;
+        triangleIndex += 2;
 
         segment.update();
-
-//        float x1 = rectangle.c1().x, y1 = rectangle.c1().y;
-//        float x2 = rectangle.c2().x, y2 = rectangle.c2().y;
-//        float x3 = rectangle.c3().x, y3 = rectangle.c3().y;
-//        float x4 = rectangle.c4().x, y4 = rectangle.c4().y;
-//
-//
-//        verticesBuffer
-//                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0f) // V1
-//                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(1f) // V2
-//                .put(x3).put(y3).put(tintFloatBits).put(1f).put(1f) // V3
-//                .put(x4).put(y4).put(tintFloatBits).put(1f).put(0f) // V4
-//        ;
-//        vertexIndex += 20;
+        float x1 = segment.world_a.x, y1 = segment.world_a.y;
+        float x2 = segment.world_b.x, y2 = segment.world_b.y;
+        verticesBuffer
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // a
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // b
+        ;
+        vertexIndex += 2 * 5;
     }
 
-    // TODO: implement
     private void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {
 
     }
@@ -577,15 +576,6 @@ public class Renderer2D implements Resource {
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, 1, 1, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
             return texture;
         }
-    }
-
-    @Deprecated private static Texture createPhysics2DDebugShapesTexture() {
-        try {
-            return TextureBuilder.buildFromClassPath("physics-2d-debug-shapes.png");
-        } catch (Exception e) {
-            // TODO: build manually.
-        }
-        return null;
     }
 
 }

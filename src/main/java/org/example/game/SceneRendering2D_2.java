@@ -7,6 +7,7 @@ import org.example.engine.core.graphics.*;
 import org.example.engine.core.math.Shape2DAABB;
 import org.example.engine.core.math.Shape2DCircle;
 import org.example.engine.core.math.Shape2DRectangle;
+import org.example.engine.core.math.Shape2DSegment;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL11;
 
@@ -22,6 +23,7 @@ public class SceneRendering2D_2 extends WindowScreen {
     private Shape2DCircle circle;
     private Shape2DRectangle rectangle;
     private Shape2DAABB aabb;
+    private Shape2DSegment segment;
 
     private Texture texture0;
     private TextureRegion region;
@@ -62,6 +64,10 @@ public class SceneRendering2D_2 extends WindowScreen {
         aabb = new Shape2DAABB(40,40, 240, 240);
         aabb.update();
 
+        segment = new Shape2DSegment(-100,-200,300,300);
+        segment.update();
+        System.out.println(segment);
+
         camera = new Camera(640*2,480*2, 1);
         camera.update();
     }
@@ -81,7 +87,9 @@ public class SceneRendering2D_2 extends WindowScreen {
         renderer2D.pushDebugShape(rectangle, null);
 
         //renderer2D.pushDebugShape(rectangle, null);
-        //renderer2D.pushDebugShape(aabb, null);
+        renderer2D.pushDebugShape(aabb, null);
+        renderer2D.pushDebugShape(segment, null);
+
 
         renderer2D.end();
         time++;
