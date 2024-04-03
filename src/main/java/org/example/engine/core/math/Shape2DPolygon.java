@@ -20,14 +20,7 @@ public class Shape2DPolygon extends Shape2D {
         this.worldPoints = new float[vertices.length];
         this.indices = indices;
         this.isConvex = Algorithms.isPolygonConvex(vertices);
-        float max = 0;
-        for (int i = 0; i < vertices.length - 1; i += 2) {
-            float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
-            if (l2 > max) max = l2;
-        }
-        super.originalBoundingRadius = (float) Math.sqrt(max);
         updated = false;
-        System.out.println(originalBoundingRadius);
     }
 
     public Shape2DPolygon(float[] vertices) {
@@ -48,10 +41,17 @@ public class Shape2DPolygon extends Shape2D {
             float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
             if (l2 > max) max = l2;
         }
-        super.originalBoundingRadius = (float) Math.sqrt(max);
-        super.boundingRadiusSquared = super.originalBoundingRadius * super.originalBoundingRadius;
-        System.out.println("poly rad: " + boundingRadiusSquared);
         updated = false;
+    }
+
+    @Override
+    protected void calculateOriginalBoundingRadius() {
+        float max = 0;
+        for (int i = 0; i < localPoints.length - 1; i += 2) {
+            float l2 = localPoints[i] * localPoints[i] + localPoints[i+1] * localPoints[i+1];
+            if (l2 > max) max = l2;
+        }
+        super.initialBoundingRadius = (float) Math.sqrt(max);
     }
 
     @Override

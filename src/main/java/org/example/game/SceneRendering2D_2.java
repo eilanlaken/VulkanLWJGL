@@ -1,14 +1,12 @@
 package org.example.game;
 
 import org.example.engine.components.ComponentGraphics2DShape;
-import org.example.engine.components.FactoryComponent;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.math.*;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,7 +69,7 @@ public class SceneRendering2D_2 extends WindowScreen {
         polygon.setRotation(30);
         polygon.setScale(-1.2f,1.3f);
 
-        bounds = new Shape2DCircle(polygon.getX(), polygon.getY(), (float) Math.sqrt(polygon.boundingRadiusSquared));
+        bounds = new Shape2DCircle(polygon.getX(), polygon.getY(), polygon.getBoundingRadius());
         System.out.println(bounds);
 
         camera = new Camera(640*2,480*2, 1);

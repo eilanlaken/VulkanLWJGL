@@ -32,6 +32,11 @@ public class Shape2DCompound extends Shape2D {
     }
 
     @Override
+    protected void calculateOriginalBoundingRadius() {
+        // TODO: implement?
+    }
+
+    @Override
     public float getArea() {
         float area = 0;
         for (Shape2D shape : islands) area += shape.getArea();

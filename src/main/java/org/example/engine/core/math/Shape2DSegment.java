@@ -12,7 +12,15 @@ public class Shape2DSegment extends Shape2D {
         this.b = new Vector2(x2, y2);
         this.world_a = new Vector2(a);
         this.world_b = new Vector2(b);
-        super.originalBoundingRadius = (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
+    }
+
+    @Override
+    protected void calculateOriginalBoundingRadius() {
+        float x1 = a.x;
+        float y1 = a.y;
+        float x2 = b.x;
+        float y2 = b.y;
+        initialBoundingRadius = (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
     }
 
     @Override

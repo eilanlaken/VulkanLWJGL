@@ -7,10 +7,7 @@ public abstract class Shape2D {
     protected float angle;
     protected float scaleX, scaleY;
     protected boolean updated;
-
-    // bounding sphere data
-    protected float originalBoundingRadius;
-    public float boundingRadiusSquared;
+    protected float initialBoundingRadius = -1;
 
     public Shape2D() {
         this.x = 0;
@@ -39,8 +36,6 @@ public abstract class Shape2D {
     public final void setScale(float scaleX, float scaleY) {
         this.scaleX = scaleX;
         this.scaleY = scaleY;
-        float boundingRadius = originalBoundingRadius * Math.max(Math.abs(scaleX), Math.abs(scaleY));
-        boundingRadiusSquared = boundingRadius * boundingRadius;
         updated = false;
     }
 
@@ -50,9 +45,14 @@ public abstract class Shape2D {
         this.angle = angle;
         this.scaleX = scaleX;
         this.scaleY = scaleY;
-        float boundingRadius = originalBoundingRadius * Math.max(Math.abs(scaleX), Math.abs(scaleY));
-        boundingRadiusSquared = boundingRadius * boundingRadius;
         updated = false;
+    }
+
+    protected abstract void calculateOriginalBoundingRadius();
+
+    public final float getBoundingRadius() {
+        if (MathUtils.isEqual(initialBoundingRadius, -1.0f)) calculateOriginalBoundingRadius();
+        return initialBoundingRadius * Math.max(Math.abs(scaleX), Math.abs(scaleY));
     }
 
     public final void update(float x, float y, float angle, float scaleX, float scaleY) {

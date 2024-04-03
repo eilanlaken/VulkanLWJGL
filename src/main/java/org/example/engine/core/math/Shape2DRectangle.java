@@ -34,11 +34,15 @@ public class Shape2DRectangle extends Shape2D {
         this.c2 = new Vector2(centerX - originalWidthHalf, centerY - originalHeightHalf);
         this.c3 = new Vector2(centerX + originalWidthHalf, centerY - originalHeightHalf);
         this.c4 = new Vector2(centerX + originalWidthHalf, centerY + originalHeightHalf);
-        this.originalBoundingRadius = (float) Math.sqrt(originalWidthHalf * originalWidthHalf + originalHeightHalf * originalHeightHalf);
     }
 
     public Shape2DRectangle(float width, float height) {
         this(0,0, width, height);
+    }
+
+    @Override
+    protected void calculateOriginalBoundingRadius() {
+        this.initialBoundingRadius = (float) Math.sqrt(originalWidthHalf * originalWidthHalf + originalHeightHalf * originalHeightHalf);
     }
 
     @Override
