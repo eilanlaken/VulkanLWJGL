@@ -43,4 +43,11 @@ public class Shape2DCircle extends Shape2D {
         return (float) (2.0 * Math.PI * radius);
     }
 
+    @Override
+    public String toString() {
+        return "<" + this.getClass().getSimpleName() +
+                "| worldCenter = " + worldCenter +
+                ", radius = " + radius +
+                '}';
+    }
 }

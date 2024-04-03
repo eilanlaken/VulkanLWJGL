@@ -27,6 +27,7 @@ public class Shape2DPolygon extends Shape2D {
         }
         super.originalBoundingRadius = (float) Math.sqrt(max);
         updated = false;
+        System.out.println(originalBoundingRadius);
     }
 
     public Shape2DPolygon(float[] vertices) {
@@ -48,6 +49,8 @@ public class Shape2DPolygon extends Shape2D {
             if (l2 > max) max = l2;
         }
         super.originalBoundingRadius = (float) Math.sqrt(max);
+        super.boundingRadiusSquared = super.originalBoundingRadius * super.originalBoundingRadius;
+        System.out.println("poly rad: " + boundingRadiusSquared);
         updated = false;
     }
 

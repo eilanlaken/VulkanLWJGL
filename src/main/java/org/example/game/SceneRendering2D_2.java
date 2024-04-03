@@ -27,6 +27,7 @@ public class SceneRendering2D_2 extends WindowScreen {
     private Texture texture0;
     private TextureRegion region;
 
+    private Shape2DCircle bounds;
 
     public SceneRendering2D_2() {
         renderer2D = new Renderer2D();
@@ -46,9 +47,9 @@ public class SceneRendering2D_2 extends WindowScreen {
         texture0 = AssetStore.get("assets/atlases/pack2_0.png");
         region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
-        shape = FactoryComponent.createShapeCircleHollow(30, 30,3, new Color(0,0.5f,1,1), null, null);
-        shape = FactoryComponent.createShapePolygonFilled(new float[] {0,100, 0,0, 100,0, 200,200}, new Color(0,0.5f,1,1), null, null);
-        shape = FactoryComponent.createShapePolygonHollow(new float[] {-50,50, -50,-50, 0,0}, 6, new Color(0,0.5f,1,1), null, null);
+        //shape = FactoryComponent.createShapeCircleHollow(30, 30,3, new Color(0,0.5f,1,1), null, null);
+        //shape = FactoryComponent.createShapePolygonFilled(new float[] {0,100, 0,0, 100,0, 200,200}, new Color(0,0.5f,1,1), null, null);
+        //shape = FactoryComponent.createShapePolygonHollow(new float[] {-50,50, -50,-50, 0,0}, 6, new Color(0,0.5f,1,1), null, null);
         //shape = FactoryComponent.createShapePolygonFilled(new float[] {-50,50, -50,-50, 50,-50, 50,50}, new Color(0,0.5f,1,1), null, null);
         //shape = FactoryComponent.createShapeRectangleHollow(30, 30,3, new Color(0,0.5f,1,1), null, null);
 
@@ -66,10 +67,12 @@ public class SceneRendering2D_2 extends WindowScreen {
         segment = new Shape2DSegment(-100,-200,300,300);
         segment.update();
 
-        polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300, 200, -400,100});
-        System.out.println(Arrays.toString(polygon.indices));
-        System.out.println(Arrays.toString(polygon.getWorldPoints()));
+        polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
+        polygon.setRotation(30);
+        polygon.setScale(-1.2f,1.3f);
 
+        bounds = new Shape2DCircle(polygon.getX(), polygon.getY(), (float) Math.sqrt(polygon.boundingRadiusSquared));
+        System.out.println(bounds);
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -85,14 +88,13 @@ public class SceneRendering2D_2 extends WindowScreen {
         renderer2D.pushTextureRegion(region, new Color(1,1,1,1),-350 + 10,10,0,0,0,0.2f,0.2f,null,null);
 
         circle.setRotation(time);
-        //renderer2D.pushPolygon(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
         //renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(rectangle, null);
-
-        //renderer2D.pushDebugShape(rectangle, null);
         //renderer2D.pushDebugShape(aabb, null);
-        //renderer2D.pushDebugShape(segment, null);
+        ////renderer2D.pushDebugShape(segment, null);
         renderer2D.pushDebugShape(polygon, null);
+
+        renderer2D.pushDebugShape(bounds, null);
 
 
         renderer2D.end();
