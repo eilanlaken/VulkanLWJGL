@@ -4,13 +4,11 @@ import org.example.engine.components.ComponentGraphics2DShape;
 import org.example.engine.components.FactoryComponent;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.math.Shape2DAABB;
-import org.example.engine.core.math.Shape2DCircle;
-import org.example.engine.core.math.Shape2DRectangle;
-import org.example.engine.core.math.Shape2DSegment;
+import org.example.engine.core.math.*;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL11;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +22,7 @@ public class SceneRendering2D_2 extends WindowScreen {
     private Shape2DRectangle rectangle;
     private Shape2DAABB aabb;
     private Shape2DSegment segment;
+    private Shape2DPolygon polygon;
 
     private Texture texture0;
     private TextureRegion region;
@@ -66,7 +65,11 @@ public class SceneRendering2D_2 extends WindowScreen {
 
         segment = new Shape2DSegment(-100,-200,300,300);
         segment.update();
-        System.out.println(segment);
+
+        polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300, 200, -400,100});
+        System.out.println(Arrays.toString(polygon.indices));
+        System.out.println(Arrays.toString(polygon.getWorldPoints()));
+
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -82,13 +85,14 @@ public class SceneRendering2D_2 extends WindowScreen {
         renderer2D.pushTextureRegion(region, new Color(1,1,1,1),-350 + 10,10,0,0,0,0.2f,0.2f,null,null);
 
         circle.setRotation(time);
-        renderer2D.pushPolygon(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
-        renderer2D.pushDebugShape(circle, null);
-        renderer2D.pushDebugShape(rectangle, null);
+        //renderer2D.pushPolygon(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
+        //renderer2D.pushDebugShape(circle, null);
+        //renderer2D.pushDebugShape(rectangle, null);
 
         //renderer2D.pushDebugShape(rectangle, null);
-        renderer2D.pushDebugShape(aabb, null);
-        renderer2D.pushDebugShape(segment, null);
+        //renderer2D.pushDebugShape(aabb, null);
+        //renderer2D.pushDebugShape(segment, null);
+        renderer2D.pushDebugShape(polygon, null);
 
 
         renderer2D.end();

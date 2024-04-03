@@ -416,7 +416,36 @@ public class Renderer2D implements Resource {
     }
 
     private void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + polygon.indices.length * 2 + 2 > indicesBuffer.limit() || vertexIndex + polygon.vertexCount * 5 > BATCH_SIZE * 4) {
+            flush();
+        }
 
+        useShader(defaultShader);
+        useTexture(whiteSinglePixelTexture);
+        useCustomAttributes(null);
+        useMode(GL11.GL_LINES);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 0; i < polygon.indices.length - 2; i += 3) {
+            indicesBuffer.put(startVertex + polygon.indices[i]);
+            indicesBuffer.put(startVertex + polygon.indices[i + 1]);
+
+            indicesBuffer.put(startVertex + polygon.indices[i + 1]);
+            indicesBuffer.put(startVertex + polygon.indices[i + 2]);
+
+            indicesBuffer.put(startVertex + polygon.indices[i + 2]);
+            indicesBuffer.put(startVertex + polygon.indices[i]);
+        }
+        triangleIndex += polygon.indices.length * 2;
+
+        polygon.update();
+        final float[] worldPoints = polygon.getWorldPoints();
+        for (int i = 0; i < worldPoints.length - 1; i += 2) {
+            verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(tintFloatBits).put(0.5f).put(0.5f);
+        }
+        vertexIndex += polygon.vertexCount * 5;
     }
 
     /** Swap Operations **/
