@@ -92,18 +92,13 @@ public class Shape2DPolygon extends Shape2D {
     }
 
     @Override
-    public float getArea() {
-        if (Float.isNaN(area)) this.area = Algorithms.calculatePolygonSignedArea(localPoints);
-        return Math.abs(area * scaleX * scaleY);
+    protected float calculateOriginalArea() {
+        return Math.abs(Algorithms.calculatePolygonSignedArea(localPoints));
     }
 
     @Override
-    public float getPerimeter() {
-        if (!updated) update();
-        float perimeter = 0;
-        for (int i = 0; i < worldPoints.length - 2; i += 2) perimeter += Vector2.dst(worldPoints[i], worldPoints[i+1], worldPoints[i+2], worldPoints[i+3]);
-        perimeter += Vector2.dst(worldPoints[worldPoints.length - 2], worldPoints[worldPoints.length - 1], worldPoints[0], worldPoints[1]);
-        return perimeter;
+    protected void bakeCurrentTransformToLocalCoordinates() {
+        System.arraycopy(worldPoints, 0, localPoints, 0, worldPoints.length);
     }
 
     public static float getVertexX(int index, float[] vertices) {

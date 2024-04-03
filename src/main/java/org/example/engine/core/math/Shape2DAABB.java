@@ -40,13 +40,8 @@ public class Shape2DAABB extends Shape2D {
     }
 
     @Override
-    public float getArea() {
-        return Math.abs((worldMax.x - worldMin.x) * (worldMax.y - worldMin.y));
-    }
-
-    @Override
-    public float getPerimeter() {
-        return 2 * (Math.abs(worldMax.y - worldMin.y) + Math.abs(worldMax.x - worldMin.x));
+    protected float calculateOriginalArea() {
+        return Math.abs((localMax.x - localMin.x) * (localMax.y - localMin.y));
     }
 
     @Override
@@ -54,6 +49,12 @@ public class Shape2DAABB extends Shape2D {
         if (angle != 0.0f) throw new IllegalStateException("Cannot rotate an AABB: must remain aligned to axis. angle must remain 0. Current value: angle = " + angle);
         this.worldMin.set(localMin).scl(scaleX, scaleY).add(x, y);
         this.worldMax.set(localMax).scl(scaleX, scaleY).add(x, y);
+    }
+
+    @Override
+    protected void bakeCurrentTransformToLocalCoordinates() {
+        localMin.set(worldMin);
+        localMax.set(worldMax);
     }
 
     @Override

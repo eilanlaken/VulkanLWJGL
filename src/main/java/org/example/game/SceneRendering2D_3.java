@@ -58,7 +58,7 @@ public class SceneRendering2D_3 extends WindowScreen {
         circle2.setRotation(30);
         circle2.update();
 
-        rectangle = new Shape2DRectangle(200, 400);
+        rectangle = new Shape2DRectangle(200,300);
         rectangle.setRotation(30);
         rectangle.update();
 
@@ -72,15 +72,16 @@ public class SceneRendering2D_3 extends WindowScreen {
         polygon.setRotation(30);
         polygon.setScale(-1.2f,1.3f);
 
-        bounds = new Shape2DCircle(polygon.getX(), polygon.getY(), polygon.getBoundingRadius());
-
         Array<Shape2D> islands = new Array<>();
         islands.add(circle1);
+        islands.add(polygon);
 
         Array<Shape2D> holes = new Array<>();
         holes.add(circle2);
 
         compound = new Shape2DCompound(islands, holes);
+        //compound.update();
+        bounds = new Shape2DCircle(compound.getX(), compound.getY(), compound.getBoundingRadius());
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -101,7 +102,7 @@ public class SceneRendering2D_3 extends WindowScreen {
         //renderer2D.pushDebugShape(aabb, null);
         ////renderer2D.pushDebugShape(segment, null);
         //renderer2D.pushDebugShape(polygon, null);
-        //renderer2D.pushDebugShape(bounds, null);
+        renderer2D.pushDebugShape(bounds, null);
         renderer2D.pushDebugShape(compound, null);
 
         renderer2D.end();

@@ -275,7 +275,7 @@ public class Renderer2D implements Resource {
         circle.update();
         float x = circle.worldCenter.x;
         float y = circle.worldCenter.y;
-        float r = circle.radius;
+        float r = circle.worldRadius;
         float da = 360f / 15;
         for (int i = 0; i < 15; i++) {
             verticesBuffer

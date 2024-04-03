@@ -26,18 +26,19 @@ public class Shape2DSegment extends Shape2D {
     }
 
     @Override
-    public boolean contains(float x, float y) {
-        return MathUtils.isEqual(Vector2.dst(world_a.x, world_a.y, x, y) + Vector2.dst(x, y, world_b.x, world_b.y), Vector2.dst(world_a, world_b));
+    protected void bakeCurrentTransformToLocalCoordinates() {
+        a.set(world_a);
+        b.set(world_b);
     }
 
     @Override
-    public float getArea() {
+    protected float calculateOriginalArea() {
         return 0;
     }
 
     @Override
-    public float getPerimeter() {
-        return Vector2.dst(world_a, world_b);
+    public boolean contains(float x, float y) {
+        return MathUtils.isEqual(Vector2.dst(world_a.x, world_a.y, x, y) + Vector2.dst(x, y, world_b.x, world_b.y), Vector2.dst(world_a, world_b));
     }
 
     @Override

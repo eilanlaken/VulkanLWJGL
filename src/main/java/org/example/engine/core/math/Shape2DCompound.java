@@ -10,9 +10,11 @@ public class Shape2DCompound extends Shape2D {
     public Shape2DCompound(final Array<Shape2D> islands, final Array<Shape2D> holes) {
         for (Shape2D island : islands) {
             if (island instanceof Shape2DCompound) throw new IllegalArgumentException("Trying to construct a " + Shape2DCompound.class.getSimpleName() + " using 1 or more compound shapes is not allowed.");
+            island.update();
         }
         for (Shape2D hole: holes) {
             if (hole instanceof Shape2DCompound) throw new IllegalArgumentException("Trying to construct a " + Shape2DCompound.class.getSimpleName() + " using 1 or more compound shapes is not allowed.");
+            hole.update();
         }
         this.islands = islands;
         this.holes = holes;
@@ -42,19 +44,16 @@ public class Shape2DCompound extends Shape2D {
     }
 
     @Override
-    public float getArea() {
-        float area = 0;
-        for (Shape2D shape : islands) area += shape.getArea();
-        for (Shape2D shape2D : holes) area -= shape2D.getArea();
-        return area;
+    protected void bakeCurrentTransformToLocalCoordinates() {
+        // TODO: implement
     }
 
     @Override
-    public float getPerimeter() {
-        float perimeter = 0;
-        for (Shape2D shape : islands) perimeter += shape.getPerimeter();
-        for (Shape2D shape : holes) perimeter += shape.getPerimeter();
-        return perimeter;
+    protected float calculateOriginalArea() {
+        float area = 0;
+        for (Shape2D shape : islands) area += shape.calculateOriginalArea();
+        for (Shape2D shape2D : holes) area -= shape2D.calculateOriginalArea();
+        return area;
     }
 
     @Override

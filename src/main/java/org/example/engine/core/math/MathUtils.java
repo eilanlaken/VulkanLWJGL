@@ -1,5 +1,7 @@
 package org.example.engine.core.math;
 
+import org.lwjgl.system.MathUtil;
+
 import java.util.Random;
 
 public final class MathUtils {
@@ -105,6 +107,10 @@ public final class MathUtils {
 
     public static float max(float a, float b, float c) {
         return Math.max(a, Math.max(b, c));
+    }
+
+    public static float max(float a, float b, float c, float d) {
+        return Math.max(a, MathUtils.max(b, c, d));
     }
 
     public static float sin(float radians) {

@@ -7,6 +7,9 @@ public abstract class Shape2D {
     protected float angle;
     protected float scaleX, scaleY;
     protected boolean updated;
+
+    protected float originalArea = -1.0f;
+    protected float area;
     protected float originalBoundingRadius = -1.0f;
     private float boundingRadius;
 
@@ -40,6 +43,15 @@ public abstract class Shape2D {
         updated = false;
     }
 
+    public final void resetTransform() {
+        this.x = 0;
+        this.y = 0;
+        this.scaleX = 1;
+        this.scaleY = 1;
+        this.angle = 0;
+        updated = false;
+    }
+
     public final void setTransform(float x, float y, float angle, float scaleX, float scaleY) {
         this.x = x;
         this.y = y;
@@ -49,7 +61,13 @@ public abstract class Shape2D {
         updated = false;
     }
 
-    protected abstract float calculateOriginalBoundingRadius();
+    public final float getArea() {
+        if (originalArea < 0.0f) {
+            originalArea = calculateOriginalArea();
+            area = originalArea * Math.abs(scaleX) * Math.abs(scaleY);
+        }
+        return area;
+    }
 
     public final float getBoundingRadius() {
         if (originalBoundingRadius < 0.0f) {
@@ -70,6 +88,14 @@ public abstract class Shape2D {
         updated = true;
     }
 
+    public void applyCurrentTransformToLocalCoordinates() {
+        updateWorldCoordinates();
+        bakeCurrentTransformToLocalCoordinates();
+        originalBoundingRadius = calculateOriginalBoundingRadius();
+        originalArea = calculateOriginalArea();
+        resetTransform();
+    }
+
     public final float getX() {
         return x;
     }
@@ -85,9 +111,11 @@ public abstract class Shape2D {
     public float getScaleY() {
         return scaleY;
     }
+
     public abstract boolean contains(float x, float y);
-    public abstract float getArea();
-    public abstract float getPerimeter();
+    protected abstract void bakeCurrentTransformToLocalCoordinates();
     protected abstract void updateWorldCoordinates();
+    protected abstract float calculateOriginalArea();
+    protected abstract float calculateOriginalBoundingRadius();
 
 }
