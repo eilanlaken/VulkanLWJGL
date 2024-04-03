@@ -8,6 +8,7 @@ public abstract class Shape2D {
     protected float scaleX, scaleY;
     protected boolean updated;
     protected float initialBoundingRadius = -1;
+    private float boundingRadius;
 
     public Shape2D() {
         this.x = 0;
@@ -51,8 +52,11 @@ public abstract class Shape2D {
     protected abstract void calculateOriginalBoundingRadius();
 
     public final float getBoundingRadius() {
-        if (MathUtils.isEqual(initialBoundingRadius, -1.0f)) calculateOriginalBoundingRadius();
-        return initialBoundingRadius * Math.max(Math.abs(scaleX), Math.abs(scaleY));
+        if (MathUtils.isEqual(initialBoundingRadius, -1.0f)) {
+            calculateOriginalBoundingRadius();
+            boundingRadius = initialBoundingRadius * Math.max(Math.abs(scaleX), Math.abs(scaleY));
+        }
+        return boundingRadius;
     }
 
     public final void update(float x, float y, float angle, float scaleX, float scaleY) {
