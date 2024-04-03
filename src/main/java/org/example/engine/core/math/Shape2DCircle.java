@@ -15,20 +15,19 @@ public class Shape2DCircle extends Shape2D {
         this.radius = r;
     }
 
-    public void update() {
-        if (updated) return;
+    @Override
+    protected void updateWorldCoordinates() {
         if (scaleX != scaleY) throw new IllegalStateException(this.getClass().getSimpleName() + " must have scaleX == scaleY to maintain circle proportions. scaleX: " + scaleX + " and scaleY: " + scaleX + ".");
         worldCenter.set(localCenter);
-        if (scaleX != 1.0f) worldCenter.scl(scaleX, scaleY);
-        if (angle != 0.0f) worldCenter.rotateDeg(angle);
+        if (!MathUtils.isEqual(scaleX, 1.0f)) worldCenter.scl(scaleX, scaleY);
+        if (!MathUtils.isZero(angle)) worldCenter.rotateDeg(angle);
         worldCenter.add(x, y);
         radius = scaleX * originalRadius;
-        updated = true;
     }
 
     @Override
-    protected void calculateOriginalBoundingRadius() {
-        super.initialBoundingRadius = originalRadius;
+    protected float calculateOriginalBoundingRadius() {
+        return localCenter.len() + originalRadius;
     }
 
     @Override

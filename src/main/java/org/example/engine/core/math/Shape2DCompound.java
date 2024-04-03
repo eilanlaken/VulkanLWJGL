@@ -32,8 +32,13 @@ public class Shape2DCompound extends Shape2D {
     }
 
     @Override
-    protected void calculateOriginalBoundingRadius() {
-        // TODO: implement?
+    protected float calculateOriginalBoundingRadius() {
+        float max = -1.0f;
+        for (Shape2D island : islands) {
+            float r = island.calculateOriginalBoundingRadius();
+            max = Math.max(max, r);
+        }
+        return max;
     }
 
     @Override
@@ -53,10 +58,9 @@ public class Shape2DCompound extends Shape2D {
     }
 
     @Override
-    public void update() {
-        if (updated) return;
+    protected void updateWorldCoordinates() {
         for (Shape2D island : islands) island.update(x, y, angle, scaleX, scaleY);
         for (Shape2D hole : holes) hole.update(x, y, angle, scaleX, scaleY);
-        updated = true;
     }
+
 }

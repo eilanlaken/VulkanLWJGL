@@ -85,7 +85,7 @@ public class SceneRendering2D_2 extends WindowScreen {
         renderer2D.begin(camera);
         renderer2D.pushTextureRegion(region, new Color(1,1,1,1),-350 + 10,10,0,0,0,0.2f,0.2f,null,null);
 
-        circle.setRotation(time);
+        polygon.setRotation(time);
         //renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(rectangle, null);
         //renderer2D.pushDebugShape(aabb, null);

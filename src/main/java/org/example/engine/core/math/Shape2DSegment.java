@@ -15,12 +15,14 @@ public class Shape2DSegment extends Shape2D {
     }
 
     @Override
-    protected void calculateOriginalBoundingRadius() {
+    protected float calculateOriginalBoundingRadius() {
         float x1 = a.x;
         float y1 = a.y;
         float x2 = b.x;
         float y2 = b.y;
-        initialBoundingRadius = (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
+        float localCenterX = (x1 + x2) * 0.5f;
+        float localCenterY = (y1 + y1) * 0.5f;
+        return Vector2.len(localCenterX, localCenterY) + (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
     }
 
     @Override
@@ -39,30 +41,17 @@ public class Shape2DSegment extends Shape2D {
     }
 
     @Override
-    public void update() {
-        if (updated) return;
-        this.world_a.set(a);
-        this.world_b.set(b);
-        // scale
-        if (scaleX != 1.0f || scaleY != 1.0f) {
-            float centerX = (a.x + b.x) * 0.5f;
-            float centerY = (a.y + b.y) * 0.5f;
-            this.world_a.sub(centerX, centerY);
-            this.world_b.sub(centerX, centerY);
-            this.world_a.scl(scaleX, scaleY);
-            this.world_b.scl(scaleX, scaleY);
-            this.world_a.add(centerX, centerY);
-            this.world_b.add(centerX, centerY);
-        }
+    protected void updateWorldCoordinates() {
+        this.world_a.set(a).scl(scaleX, scaleY);
+        this.world_b.set(b).scl(scaleX, scaleY);
         // rotate
-        if (angle != 0.0f) {
+        if (!MathUtils.isZero(angle)) {
             this.world_a.rotateDeg(angle);
             this.world_b.rotateDeg(angle);
         }
         // translate
         world_a.add(x, y);
         world_b.add(x,y);
-        updated = true;
     }
 
     @Override

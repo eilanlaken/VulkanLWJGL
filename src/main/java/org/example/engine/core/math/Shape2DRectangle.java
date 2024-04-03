@@ -8,6 +8,12 @@ public class Shape2DRectangle extends Shape2D {
     public final float originalHeight;
     private final float originalHeightHalf;
 
+    // original corners
+    private final Vector2 c1Origin;
+    private final Vector2 c2Origin;
+    private final Vector2 c3Origin;
+    private final Vector2 c4Origin;
+
     // world corners:
     /**
      *  c1 ---------------c4
@@ -16,10 +22,10 @@ public class Shape2DRectangle extends Shape2D {
      *  |                 |
      *  c2 --------------c3
      */
-    private Vector2 c1;
-    private Vector2 c2;
-    private Vector2 c3;
-    private Vector2 c4;
+    private Vector2 c1 = new Vector2();
+    private Vector2 c2 = new Vector2();
+    private Vector2 c3 = new Vector2();
+    private Vector2 c4 = new Vector2();
 
     private final Vector2 tmp1 = new Vector2();
     private final Vector2 tmp2 = new Vector2();
@@ -30,10 +36,10 @@ public class Shape2DRectangle extends Shape2D {
         this.originalHeight = height;
         this.originalWidthHalf = width * 0.5f;
         this.originalHeightHalf = height * 0.5f;
-        this.c1 = new Vector2(centerX - originalWidthHalf, centerY + originalHeightHalf);
-        this.c2 = new Vector2(centerX - originalWidthHalf, centerY - originalHeightHalf);
-        this.c3 = new Vector2(centerX + originalWidthHalf, centerY - originalHeightHalf);
-        this.c4 = new Vector2(centerX + originalWidthHalf, centerY + originalHeightHalf);
+        this.c1Origin = new Vector2(centerX - originalWidthHalf, centerY + originalHeightHalf);
+        this.c2Origin = new Vector2(centerX - originalWidthHalf, centerY - originalHeightHalf);
+        this.c3Origin = new Vector2(centerX + originalWidthHalf, centerY - originalHeightHalf);
+        this.c4Origin = new Vector2(centerX + originalWidthHalf, centerY + originalHeightHalf);
     }
 
     public Shape2DRectangle(float width, float height) {
@@ -41,8 +47,8 @@ public class Shape2DRectangle extends Shape2D {
     }
 
     @Override
-    protected void calculateOriginalBoundingRadius() {
-        this.initialBoundingRadius = (float) Math.sqrt(originalWidthHalf * originalWidthHalf + originalHeightHalf * originalHeightHalf);
+    protected float calculateOriginalBoundingRadius() {
+        return localCenter.len() + (float) Math.sqrt(originalWidthHalf * originalWidthHalf + originalHeightHalf * originalHeightHalf);
     }
 
     @Override
@@ -73,15 +79,20 @@ public class Shape2DRectangle extends Shape2D {
     }
 
     @Override
-    public void update() {
-        if (updated) return;
+    protected void updateWorldCoordinates() {
+        c1.set(c1Origin);
+        c2.set(c2Origin);
+        c3.set(c3Origin);
+        c4.set(c4Origin);
         // scale
-        c1.set(-originalWidthHalf, originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
-        c2.set(-originalWidthHalf, -originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
-        c3.set(originalWidthHalf, -originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
-        c4.set(originalWidthHalf, originalHeightHalf).scl(scaleX, scaleY).add(localCenter);
+        if (!MathUtils.isEqual(scaleX,1.0f) || !MathUtils.isEqual(scaleY,1.0f)) {
+            c1.scl(scaleX, scaleY);
+            c2.scl(scaleX, scaleY);
+            c3.scl(scaleX, scaleY);
+            c4.scl(scaleX, scaleY);
+        }
         // rotate
-        if (angle != 0.0f) {
+        if (!MathUtils.isZero(angle)) {
             c1.rotateDeg(angle);
             c2.rotateDeg(angle);
             c3.rotateDeg(angle);
@@ -92,7 +103,6 @@ public class Shape2DRectangle extends Shape2D {
         c2.add(x, y);
         c3.add(x, y);
         c4.add(x, y);
-        this.updated = true;
     }
 
     public Vector2 c1() {

@@ -24,12 +24,14 @@ public class Shape2DAABB extends Shape2D {
     }
 
     @Override
-    protected void calculateOriginalBoundingRadius() {
+    protected float calculateOriginalBoundingRadius() {
         float x1 = localMin.x;
         float y1 = localMin.y;
         float x2 = localMax.x;
         float y2 = localMax.y;
-        initialBoundingRadius = (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
+        float localCenterX = (x1 + x2) * 0.5f;
+        float localCenterY = (y1 + y1) * 0.5f;
+        return Vector2.len(localCenterX, localCenterY) + (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
     }
 
     @Override
@@ -48,27 +50,10 @@ public class Shape2DAABB extends Shape2D {
     }
 
     @Override
-    public void update() {
-        if (updated) return;
-        if (angle != 0) throw new IllegalStateException("Cannot rotate an AABB: must remain aligned to axis. angle must remain 0. Current value: angle = " + angle);
-        this.worldMin.set(localMin);
-        this.worldMax.set(localMax);
-        // scale
-        if (scaleX != 1.0f || scaleY != 1.0f) {
-            float centerX = (localMin.x + localMax.x) * 0.5f;
-            float centerY = (localMin.y + localMax.y) * 0.5f;
-            this.worldMin.sub(centerX, centerY);
-            this.worldMax.sub(centerX, centerY);
-            this.worldMin.scl(scaleX, scaleY);
-            this.worldMax.scl(scaleX, scaleY);
-            this.worldMin.add(centerX, centerY);
-            this.worldMax.add(centerX, centerY);
-        }
-        // "rotate" - AABB so do nothing
-        // translate
-        worldMin.add(x, y);
-        worldMax.add(x,y);
-        updated = true;
+    public void updateWorldCoordinates() {
+        if (angle != 0.0f) throw new IllegalStateException("Cannot rotate an AABB: must remain aligned to axis. angle must remain 0. Current value: angle = " + angle);
+        this.worldMin.set(localMin).scl(scaleX, scaleY).add(x, y);
+        this.worldMax.set(localMax).scl(scaleX, scaleY).add(x, y);
     }
 
     @Override

@@ -7,7 +7,7 @@ public abstract class Shape2D {
     protected float angle;
     protected float scaleX, scaleY;
     protected boolean updated;
-    protected float initialBoundingRadius = -1;
+    protected float originalBoundingRadius = -1.0f;
     private float boundingRadius;
 
     public Shape2D() {
@@ -49,12 +49,12 @@ public abstract class Shape2D {
         updated = false;
     }
 
-    protected abstract void calculateOriginalBoundingRadius();
+    protected abstract float calculateOriginalBoundingRadius();
 
     public final float getBoundingRadius() {
-        if (MathUtils.isEqual(initialBoundingRadius, -1.0f)) {
-            calculateOriginalBoundingRadius();
-            boundingRadius = initialBoundingRadius * Math.max(Math.abs(scaleX), Math.abs(scaleY));
+        if (originalBoundingRadius < 0.0f) {
+            originalBoundingRadius = calculateOriginalBoundingRadius();
+            boundingRadius = originalBoundingRadius * Math.max(Math.abs(scaleX), Math.abs(scaleY));
         }
         return boundingRadius;
     }
@@ -64,29 +64,30 @@ public abstract class Shape2D {
         update();
     }
 
+    public final void update() {
+        if (updated) return;
+        updateWorldCoordinates();
+        updated = true;
+    }
+
     public final float getX() {
         return x;
     }
-
     public final float getY() {
         return y;
     }
-
     public final float getAngle() {
         return angle;
     }
-
     public float getScaleX() {
         return scaleX;
     }
-
     public float getScaleY() {
         return scaleY;
     }
-
-    public abstract void update();
     public abstract boolean contains(float x, float y);
     public abstract float getArea();
     public abstract float getPerimeter();
+    protected abstract void updateWorldCoordinates();
 
 }

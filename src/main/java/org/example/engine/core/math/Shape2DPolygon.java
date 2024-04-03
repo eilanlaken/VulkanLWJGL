@@ -45,26 +45,29 @@ public class Shape2DPolygon extends Shape2D {
     }
 
     @Override
-    protected void calculateOriginalBoundingRadius() {
+    protected float calculateOriginalBoundingRadius() {
         float max = 0;
         for (int i = 0; i < localPoints.length - 1; i += 2) {
             float l2 = localPoints[i] * localPoints[i] + localPoints[i+1] * localPoints[i+1];
             if (l2 > max) max = l2;
         }
-        super.initialBoundingRadius = (float) Math.sqrt(max);
+        return (float) Math.sqrt(max);
     }
 
     @Override
-    public void update() {
-        if (updated) return;
-        for (int i = 0; i < localPoints.length - 1; i += 2) {
-            tmp.set(localPoints[i] * scaleX, localPoints[i + 1] * scaleY);
-            if (angle != 0.0f) tmp.rotateDeg(angle);
-            tmp.add(x, y);
-            worldPoints[i] = tmp.x;
-            worldPoints[i + 1] = tmp.y;
+    protected void updateWorldCoordinates() {
+        if (MathUtils.isZero(angle)) {
+            for (int i = 0; i < localPoints.length - 1; i += 2) {
+                worldPoints[i] = localPoints[i] * scaleX + x;
+                worldPoints[i + 1] = localPoints[i + 1] * scaleY + y;
+            }
+        } else {
+            for (int i = 0; i < localPoints.length - 1; i += 2) {
+                tmp.set(localPoints[i] * scaleX, localPoints[i + 1] * scaleY).rotateDeg(angle).add(x, y);
+                worldPoints[i] = tmp.x;
+                worldPoints[i + 1] = tmp.y;
+            }
         }
-        updated = true;
     }
 
     public float[] getWorldPoints() {
