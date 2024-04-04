@@ -70,7 +70,9 @@ public abstract class Shape2D {
     }
 
     public final float getBoundingRadius() {
+        System.out.println("ok");
         if (originalBoundingRadius < 0.0f) {
+            System.out.println("nn");
             originalBoundingRadius = calculateOriginalBoundingRadius();
             boundingRadius = originalBoundingRadius * Math.max(Math.abs(scaleX), Math.abs(scaleY));
         }
@@ -88,10 +90,10 @@ public abstract class Shape2D {
         updated = true;
     }
 
-    public void applyCurrentTransformToLocalCoordinates() {
+    public void applyTransform() {
         updateWorldCoordinates();
         bakeCurrentTransformToLocalCoordinates();
-        originalBoundingRadius = calculateOriginalBoundingRadius();
+        originalBoundingRadius = -1;//calculateOriginalBoundingRadius();
         originalArea = calculateOriginalArea();
         resetTransform();
     }

@@ -15,14 +15,11 @@ public class SceneRendering2D_4 extends WindowScreen {
     private Renderer2D renderer2D;
     private Camera camera;
 
-    private Shape2DCircle circle1;
-    private Shape2DCircle circle2;
-
+    private Shape2DCircle circle;
     private Shape2DRectangle rectangle;
     private Shape2DAABB aabb;
     private Shape2DSegment segment;
     private Shape2DPolygon polygon;
-
     private Shape2DCompound compound;
 
     private Texture texture0;
@@ -48,13 +45,12 @@ public class SceneRendering2D_4 extends WindowScreen {
         texture0 = AssetStore.get("assets/atlases/pack2_0.png");
         region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
-        circle1 = new Shape2DCircle(0,0,150);
-        circle1.setRotation(30);
-        circle1.update();
-
-        circle2 = new Shape2DCircle(0,0,90);
-        circle2.setRotation(30);
-        circle2.update();
+        circle = new Shape2DCircle(150, 0,0);
+        circle.setRotation(30);
+        circle.setTranslation(250,100);
+        circle.applyTransform();
+        circle.setScale(0.3f,0.3f);
+        //circle.update();
 
         rectangle = new Shape2DRectangle(200,300);
         rectangle.setRotation(30);
@@ -71,15 +67,15 @@ public class SceneRendering2D_4 extends WindowScreen {
         polygon.setScale(-1.2f,1.3f);
 
         Array<Shape2D> islands = new Array<>();
-        islands.add(circle1);
+        islands.add(circle);
         islands.add(polygon);
 
         Array<Shape2D> holes = new Array<>();
-        holes.add(circle2);
+        holes.add(new Shape2DCircle(90, 0,0));
 
         compound = new Shape2DCompound(islands, holes);
         //compound.update();
-        bounds = new Shape2DCircle(compound.getX(), compound.getY(), compound.getBoundingRadius());
+        bounds = new Shape2DCircle(compound.getBoundingRadius(), compound.getX(), compound.getY());
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -95,14 +91,24 @@ public class SceneRendering2D_4 extends WindowScreen {
         renderer2D.pushTextureRegion(region, new Color(1,1,1,1),-350 + 10,10,0,0,0,0.2f,0.2f,null,null);
 
         //polygon.setRotation(time);
-        //renderer2D.pushDebugShape(circle, null);
+        renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(rectangle, null);
         //renderer2D.pushDebugShape(aabb, null);
         ////renderer2D.pushDebugShape(segment, null);
         //renderer2D.pushDebugShape(polygon, null);
 
+        renderBounds(circle);
+
+
         renderer2D.end();
         time++;
+    }
+
+    private void renderBounds(Shape2D shape2D) {
+        float r = shape2D.getBoundingRadius();
+        System.out.println(r);
+        Shape2DCircle bounds = new Shape2DCircle(r, shape2D.getX(), shape2D.getY());
+        renderer2D.pushDebugShape(bounds,new Color(1,1,0,1));
     }
 
     @Override

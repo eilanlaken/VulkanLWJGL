@@ -51,7 +51,7 @@ public class SceneRendering2D_2 extends WindowScreen {
         //shape = FactoryComponent.createShapePolygonFilled(new float[] {-50,50, -50,-50, 50,-50, 50,50}, new Color(0,0.5f,1,1), null, null);
         //shape = FactoryComponent.createShapeRectangleHollow(30, 30,3, new Color(0,0.5f,1,1), null, null);
 
-        circle = new Shape2DCircle(0,0,150);
+        circle = new Shape2DCircle(150, 0,0);
         circle.setRotation(30);
         circle.update();
 
@@ -69,7 +69,7 @@ public class SceneRendering2D_2 extends WindowScreen {
         polygon.setRotation(30);
         polygon.setScale(-1.2f,1.3f);
 
-        bounds = new Shape2DCircle(polygon.getX(), polygon.getY(), polygon.getBoundingRadius());
+        bounds = new Shape2DCircle(polygon.getBoundingRadius(), polygon.getX(), polygon.getY());
         System.out.println(bounds);
 
         camera = new Camera(640*2,480*2, 1);

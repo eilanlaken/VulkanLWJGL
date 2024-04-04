@@ -50,11 +50,11 @@ public class SceneRendering2D_3 extends WindowScreen {
         texture0 = AssetStore.get("assets/atlases/pack2_0.png");
         region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
-        circle1 = new Shape2DCircle(0,0,150);
+        circle1 = new Shape2DCircle(150, 0,0);
         circle1.setRotation(30);
         circle1.update();
 
-        circle2 = new Shape2DCircle(0,0,90);
+        circle2 = new Shape2DCircle(90, 0,0);
         circle2.setRotation(30);
         circle2.update();
 
@@ -81,7 +81,7 @@ public class SceneRendering2D_3 extends WindowScreen {
 
         compound = new Shape2DCompound(islands, holes);
         //compound.update();
-        bounds = new Shape2DCircle(compound.getX(), compound.getY(), compound.getBoundingRadius());
+        bounds = new Shape2DCircle(compound.getBoundingRadius(), compound.getX(), compound.getY());
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();

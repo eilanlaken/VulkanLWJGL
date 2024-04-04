@@ -7,12 +7,16 @@ public class Shape2DCircle extends Shape2D {
     public Vector2 worldCenter;
     public float worldRadius;
 
-    public Shape2DCircle(float x, float y, float r) {
+    public Shape2DCircle(float r, float x, float y) {
         if (r < 0) throw new IllegalArgumentException("Radius must be positive. Got: " + r);
         this.localCenter = new Vector2(x, y);
         this.localRadius = r;
         this.worldCenter = new Vector2(localCenter);
         this.worldRadius = r;
+    }
+
+    public Shape2DCircle(float r) {
+        this(r, 0, 0);
     }
 
     @Override
