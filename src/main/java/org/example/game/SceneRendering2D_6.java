@@ -1,7 +1,5 @@
 package org.example.game;
 
-import org.example.engine.core.assets.AssetStore;
-import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
@@ -17,12 +15,8 @@ public class SceneRendering2D_6 extends WindowScreen {
     private Renderer2D renderer2D;
     private Camera camera;
 
-    private Shape2DCircle circle;
-    private Shape2DRectangle rectangle;
-    private Shape2DAABB aabb;
-    private Shape2DSegment segment;
-    private Shape2DPolygon polygon;
-    private Shape2DMorphed compound;
+    private Shape2DCircle circle1;
+    private Shape2DCircle circle2;
 
     public SceneRendering2D_6() {
         renderer2D = new Renderer2D();
@@ -39,32 +33,35 @@ public class SceneRendering2D_6 extends WindowScreen {
 
     @Override
     public void show() {
-        circle = new Shape2DCircle(150, 100,100);
+        circle1 = new Shape2DCircle(150, 0,0);
+        circle2 = new Shape2DCircle(300, 0,0);
+
+        circle1.xy(-200, 200);
+        circle1.update();
         //circle.update();
 
-        rectangle = new Shape2DRectangle(200,300);
-        rectangle = new Shape2DRectangle(200,-100,200,300,-45);
+        //rectangle = new Shape2DRectangle(200,300);
+        //rectangle = new Shape2DRectangle(200,-100,200,300,-45);
         //rectangle.angle(30);
         //rectangle.update();
 
-        aabb = new Shape2DAABB(400,400, 500, 500);
+        //aabb = new Shape2DAABB(400,400, 500, 500);
         //aabb.update();
 
-        segment = new Shape2DSegment(0,0,150,200);
-        segment.update();
+        //segment = new Shape2DSegment(0,0,150,200);
+        //segment.update();
 
-        polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
+        //polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
 
 
-        Array<Shape2D> islands = new Array<>();
-        islands.add(circle);
-        islands.add(polygon);
+//        Array<Shape2D> islands = new Array<>();
+//        islands.add(circle1);
+//        islands.add(polygon);
+//
+//        Array<Shape2D> holes = new Array<>();
+//        holes.add(new Shape2DCircle(90, 0,0));
 
-        Array<Shape2D> holes = new Array<>();
-        holes.add(new Shape2DCircle(90, 0,0));
-
-        compound = new Shape2DMorphed(islands, holes);
-        //compound.update();
+        //compound = new Shape2DMorphed(islands, holes);
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -82,16 +79,30 @@ public class SceneRendering2D_6 extends WindowScreen {
         //renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(rectangle, null);
         //renderer2D.pushDebugShape(aabb, null);
-        renderer2D.pushDebugShape(compound, null);
+        //renderer2D.pushDebugShape(compound, null);
         //renderer2D.pushDebugShape(polygon, null);
+        //renderBounds(compound);
 
-        renderBounds(compound);
+        renderer2D.pushDebugShape(circle1, null);
+        renderer2D.pushDebugShape(circle2, null);
+
 
         renderer2D.end();
 
 
-        if (Keyboard.isKeyJustPressed(Keyboard.Key.Q)) {
-            compound.addIsland(aabb);
+        float dx = 0;
+        float dy = 0;
+        if (Keyboard.isKeyPressed(Keyboard.Key.A)) dx -= 10;
+        if (Keyboard.isKeyPressed(Keyboard.Key.D)) dx += 10;
+        if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 10;
+        if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 10;
+
+        circle2.dx(dx);
+        circle2.dy(dy);
+        circle2.update();
+
+        if (AlgorithmsCollisions.doBoundingSpheresCollide(circle1, circle2)) {
+            System.out.println("collision");
         }
     }
 

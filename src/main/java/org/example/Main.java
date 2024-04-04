@@ -1,10 +1,7 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
-import org.example.engine.core.graphics.TexturePacker;
 import org.example.engine.core.graphics.WindowAttributes;
-import org.example.engine.core.math.Algorithms;
-import org.example.engine.core.math.Shape2DPolygon;
 import org.example.game.ScreenLoading;
 
 public class Main {

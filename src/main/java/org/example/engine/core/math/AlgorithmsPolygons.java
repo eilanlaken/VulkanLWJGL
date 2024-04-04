@@ -7,7 +7,7 @@ import org.example.engine.core.collections.TupleTriple;
 import java.util.*;
 
 //https://github.com/earcut4j/earcut4j/blob/master/src/test/java/earcut4j/Test01.java
-public class Algorithms {
+public class AlgorithmsPolygons {
 
     private static final int[] rectanglePolygonIndices = new int[] {2, 3, 0, 0, 1, 2};
     private static final Map<TupleTriple<Float, Float, Float>, int[]> cachedHollowRectangleIndices = new HashMap<>();
@@ -19,7 +19,7 @@ public class Algorithms {
     private static final Map<float[], float[]> cachedHollowPolygonVertices = new HashMap<>();
     private static final Map<float[], int[]> cachedHollowPolygonIndices = new HashMap<>();
 
-    private Algorithms() {}
+    private AlgorithmsPolygons() {}
 
     public static Shape2DPolygon createPolygonLine(float x1, float y1, float x2, float y2, float stroke) {
         if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
@@ -48,7 +48,7 @@ public class Algorithms {
         final TupleTriple<Float, Float, Float> widthHeightStroke = new TupleTriple<>(width, height, stroke);
         int[] indices = cachedHollowRectangleIndices.get(widthHeightStroke);
         if (indices == null) {
-            indices = Algorithms.triangulatePolygon(vertices, new int[] { 4 }, 2);
+            indices = AlgorithmsPolygons.triangulatePolygon(vertices, new int[] { 4 }, 2);
             cachedHollowRectangleIndices.put(widthHeightStroke, indices);
         }
         return new Shape2DPolygon(indices, vertices);
