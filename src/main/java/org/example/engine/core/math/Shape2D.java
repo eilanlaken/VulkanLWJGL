@@ -62,6 +62,20 @@ public abstract class Shape2D {
         updated = true;
     }
 
+    public final void dx(float dx) {
+        this.x += dx;
+        updated = false;
+    }
+    public final void dy(float dy) {
+        this.y += dy;
+        updated = false;
+    }
+    public final void rot(float da) {
+        angle += da;
+        angle %= 360.0f;
+        if (angle < 0) angle += 360.0f;
+        updated = false;
+    }
     public final void x(float x) {
         this.x = x;
         updated = false;
