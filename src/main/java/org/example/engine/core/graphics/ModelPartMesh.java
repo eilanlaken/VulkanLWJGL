@@ -28,7 +28,7 @@ public class ModelPartMesh implements Resource {
 
     @Override
     // TODO: confirm it works
-    public void free() {
+    public void delete() {
         GL30.glDeleteVertexArrays(vaoId);
         for (int vbo : vbos) {
             GL30.glDeleteBuffers(vbo);

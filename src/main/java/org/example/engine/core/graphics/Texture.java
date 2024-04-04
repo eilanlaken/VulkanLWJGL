@@ -38,7 +38,7 @@ public class Texture implements Resource {
     }
 
     @Override
-    public void free() {
+    public void delete() {
         TextureBinder.unbind(this);
         GL11.glDeleteTextures(handle);
         handle = 0;

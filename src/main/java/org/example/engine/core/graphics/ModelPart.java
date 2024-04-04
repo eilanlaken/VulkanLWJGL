@@ -16,7 +16,7 @@ public class ModelPart implements Resource {
     }
 
     @Override
-    public void free() {
-        mesh.free();
+    public void delete() {
+        mesh.delete();
     }
 }

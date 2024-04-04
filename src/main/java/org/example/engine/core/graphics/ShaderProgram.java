@@ -325,7 +325,7 @@ public class ShaderProgram implements Resource {
     }
 
     @Override
-    public void free() {
+    public void delete() {
         GL20.glUseProgram(0);
         GL20.glDeleteProgram(vertexShaderId);
         GL20.glDeleteProgram(fragmentShaderId);

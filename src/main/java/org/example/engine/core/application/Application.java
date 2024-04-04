@@ -87,7 +87,7 @@ public class Application {
     }
 
     private static void clean() {
-        window.free();
+        window.delete();
         GLFW.glfwTerminate();
         errorCallback.free();
     }

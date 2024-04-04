@@ -13,7 +13,7 @@ public class Model implements Resource {
     }
 
     @Override
-    public void free() {
+    public void delete() {
 
     }
 }

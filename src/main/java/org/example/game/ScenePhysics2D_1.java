@@ -66,11 +66,11 @@ public class ScenePhysics2D_1 extends WindowScreen {
 
     @Override
     public void hide() {
-        renderer2D.free();
+        renderer2D.deleteAll();
     }
 
     @Override
-    public void free() {
+    public void deleteAll() {
 
     }
 

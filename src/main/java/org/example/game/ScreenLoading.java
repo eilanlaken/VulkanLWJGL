@@ -44,7 +44,7 @@ public class ScreenLoading extends WindowScreen {
     }
 
     @Override
-    public void free() {
+    public void deleteAll() {
 
     }
 

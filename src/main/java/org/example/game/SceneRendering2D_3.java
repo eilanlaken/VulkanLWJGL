@@ -114,13 +114,13 @@ public class SceneRendering2D_3 extends WindowScreen {
 
     @Override
     public void hide() {
-        renderer2D.free();
+        renderer2D.deleteAll();
     }
 
     @Override
-    public void free() {
+    public void deleteAll() {
         System.out.println("free");
-        renderer2D.free();
+        renderer2D.deleteAll();
     }
 
 

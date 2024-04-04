@@ -131,11 +131,11 @@ public class SceneRendering3D_1 extends WindowScreen {
 
     @Override
     public void hide() {
-        shader.free();
+        shader.delete();
     }
 
     @Override
-    public void free() {
+    public void deleteAll() {
 
     }
 

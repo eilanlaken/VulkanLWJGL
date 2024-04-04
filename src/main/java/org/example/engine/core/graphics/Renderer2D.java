@@ -2,6 +2,7 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.math.*;
 import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.ResourceHolder;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 
@@ -15,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-public class Renderer2D implements Resource {
+public class Renderer2D implements ResourceHolder {
 
     private static final int BATCH_SIZE = 4000;
     private static final int VERTEX_SIZE = 5;
@@ -531,12 +532,12 @@ public class Renderer2D implements Resource {
     }
 
     @Override
-    public void free() {
-        defaultShader.free();
+    public void deleteAll() {
+        defaultShader.delete();
         GL30.glDeleteVertexArrays(vao);
         GL30.glDeleteBuffers(vbo);
         GL30.glDeleteBuffers(ebo);
-        whiteSinglePixelTexture.free();
+        whiteSinglePixelTexture.delete();
     }
 
     private static ShaderProgram createDefaultShaderProgram() {

@@ -18,9 +18,9 @@ class Asset implements Resource {
     }
 
     @Override
-    public void free() {
-        for (Asset dependency : dependencies) dependency.free();
+    public void delete() {
+        for (Asset dependency : dependencies) dependency.delete();
         refCount--;
-        if (refCount <= 0 && obj instanceof Resource) ((Resource) obj).free();
+        if (refCount <= 0 && obj instanceof Resource) ((Resource) obj).delete();
     }
 }

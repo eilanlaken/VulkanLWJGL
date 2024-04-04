@@ -333,7 +333,7 @@ public class Window implements Resource {
 
 
     @Override
-    public void free() {
+    public void delete() {
         GLFW.glfwSetWindowFocusCallback(handle, null);
         GLFW.glfwSetWindowIconifyCallback(handle, null);
         GLFW.glfwSetWindowCloseCallback(handle, null);

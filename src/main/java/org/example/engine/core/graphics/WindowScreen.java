@@ -1,12 +1,12 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.ResourceHolder;
 
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO: remove "implements Resource"
-public abstract class WindowScreen implements Resource {
+public abstract class WindowScreen implements ResourceHolder {
 
     protected Window window;
 

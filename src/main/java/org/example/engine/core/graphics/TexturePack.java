@@ -35,7 +35,7 @@ public class TexturePack implements Resource {
     }
 
     @Override
-    public void free() {
+    public void delete() {
         // TODO: see how should be implemented.
     }
 }
