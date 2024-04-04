@@ -64,8 +64,8 @@ public class SceneRendering2D_4 extends WindowScreen {
 
         polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
         polygon.angle(30);
-        polygon.scaleX(-1.2f);
-        polygon.scaleY(1.3f);
+        polygon.scaleX(-0.3f);
+        polygon.scaleY(0.3f);
 
         Array<Shape2D> islands = new Array<>();
         islands.add(circle);
@@ -94,11 +94,11 @@ public class SceneRendering2D_4 extends WindowScreen {
         //polygon.setRotation(time);
         renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(rectangle, null);
-        renderer2D.pushDebugShape(aabb, null);
+        //renderer2D.pushDebugShape(aabb, null);
         ////renderer2D.pushDebugShape(segment, null);
-        //renderer2D.pushDebugShape(polygon, null);
+        renderer2D.pushDebugShape(polygon, null);
 
-        renderBounds(circle);
+        renderBounds(polygon);
 
 
         renderer2D.end();
