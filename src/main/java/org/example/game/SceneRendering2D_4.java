@@ -11,11 +11,10 @@ import org.lwjgl.opengl.GL11;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SceneRendering2D_3 extends WindowScreen {
+public class SceneRendering2D_4 extends WindowScreen {
 
     private Renderer2D renderer2D;
     private Camera camera;
-    private ComponentGraphics2DShape shape;
 
     private Shape2DCircle circle1;
     private Shape2DCircle circle2;
@@ -32,7 +31,7 @@ public class SceneRendering2D_3 extends WindowScreen {
 
     private Shape2DCircle bounds;
 
-    public SceneRendering2D_3() {
+    public SceneRendering2D_4() {
         renderer2D = new Renderer2D();
     }
 
@@ -102,8 +101,6 @@ public class SceneRendering2D_3 extends WindowScreen {
         //renderer2D.pushDebugShape(aabb, null);
         ////renderer2D.pushDebugShape(segment, null);
         //renderer2D.pushDebugShape(polygon, null);
-        renderer2D.pushDebugShape(bounds, null);
-        renderer2D.pushDebugShape(compound, null);
 
         renderer2D.end();
         time++;
