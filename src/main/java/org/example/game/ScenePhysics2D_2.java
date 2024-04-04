@@ -1,7 +1,7 @@
 package org.example.game;
 
-import org.example.engine.components.ComponentGraphics2DShape;
-import org.example.engine.components.FactoryComponent;
+import org.example.engine.ecs.Component;
+import org.example.engine.ecs.ComponentGraphics2DShape;
 import org.example.engine.core.graphics.Camera;
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.Renderer2D;
@@ -20,7 +20,7 @@ public class ScenePhysics2D_2 extends WindowScreen {
 
     @Override
     public void show() {
-        shape = FactoryComponent.createShapeCircleHollow(30, 30,3, new Color(0,0.5f,1,1), null, null);
+        shape = Component.createShapeCircleHollow(30, 30,3, new Color(0,0.5f,1,1), null, null);
         camera = new Camera(640*2,480*2, 1);
         camera.update();
     }

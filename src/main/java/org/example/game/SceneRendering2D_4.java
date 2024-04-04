@@ -1,6 +1,5 @@
 package org.example.game;
 
-import org.example.engine.components.ComponentGraphics2DShape;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;

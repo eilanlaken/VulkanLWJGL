@@ -1,7 +1,7 @@
 package org.example.game;
 
-import org.example.engine.components.ComponentGraphics2DShape;
-import org.example.engine.components.FactoryComponent;
+import org.example.engine.ecs.Component;
+import org.example.engine.ecs.ComponentGraphics2DShape;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.memory.Resource;
@@ -45,8 +45,8 @@ public class SceneRendering2D_1 extends WindowScreen {
         //shape = FactoryComponent.createShapeLine(0, 0, 100, 0, 2, new Color(1,0,1,1), null, null);
         //shape = FactoryComponent.createShapeRectangleFilled(100, 30, new Color(1,0,1,1), null, null);
 
-        shape = FactoryComponent.createShapeCircleFilled(30, 1500, new Color(0,0.5f,1,1), null, null);
-        shape2 = FactoryComponent.createShapeCircleFilled(30, 501, new Color(0,0.5f,1,1), null, null);
+        shape = Component.createShapeCircleFilled(30, 1500, new Color(0,0.5f,1,1), null, null);
+        shape2 = Component.createShapeCircleFilled(30, 501, new Color(0,0.5f,1,1), null, null);
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();

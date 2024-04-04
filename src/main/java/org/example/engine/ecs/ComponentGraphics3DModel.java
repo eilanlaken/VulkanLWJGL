@@ -1,4 +1,4 @@
-package org.example.engine.components;
+package org.example.engine.ecs;
 
 public class ComponentGraphics3DModel extends Component {
 

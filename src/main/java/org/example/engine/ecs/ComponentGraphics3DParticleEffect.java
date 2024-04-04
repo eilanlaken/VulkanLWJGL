@@ -1,4 +1,4 @@
-package org.example.engine.components;
+package org.example.engine.ecs;
 
 public class ComponentGraphics3DParticleEffect extends Component {
 

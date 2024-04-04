@@ -1,4 +1,4 @@
-package org.example.engine.components;
+package org.example.engine.ecs;
 
 import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Quaternion;

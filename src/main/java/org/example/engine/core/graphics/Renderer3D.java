@@ -1,6 +1,6 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.components.ComponentTransform;
+import org.example.engine.ecs.ComponentTransform;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.lwjgl.opengl.GL11;

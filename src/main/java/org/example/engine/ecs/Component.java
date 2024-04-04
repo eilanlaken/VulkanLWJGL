@@ -1,14 +1,37 @@
-package org.example.engine.components;
+package org.example.engine.ecs;
 
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.TextureRegion;
 import org.example.engine.core.math.Algorithms;
-import org.example.engine.core.math.Shape2DPolygon;
 
 import java.util.HashMap;
 
-public final class FactoryComponent {
+public abstract class Component {
+
+    public final Category category;
+
+    public Component(final Category category) {
+        this.category = category;
+    }
+
+    public enum Category {
+
+        TRANSFORM,
+        PHYSICS,
+        GRAPHICS,
+        AUDIO,
+        LOGIC,
+        CHEMISTRY,
+        ;
+
+        public final int bitMask;
+
+        Category() {
+            this.bitMask = 0b000001 << ordinal();
+        }
+
+    }
 
     /** Transforms **/
     public static ComponentTransform createTransform() {
@@ -64,5 +87,6 @@ public final class FactoryComponent {
     public static ComponentGraphics2DShape createShapePolygonHollow(float[] vertices, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
         return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, Algorithms.createPolygonHollow(vertices, stroke), customShader, customAttributes);
     }
+
 
 }
