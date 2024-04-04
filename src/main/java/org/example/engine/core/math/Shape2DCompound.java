@@ -59,8 +59,14 @@ public class Shape2DCompound extends Shape2D {
 
     @Override
     protected void updateWorldCoordinates() {
-        for (Shape2D island : islands) island.update(x, y, angle, scaleX, scaleY);
-        for (Shape2D hole : holes) hole.update(x, y, angle, scaleX, scaleY);
+        for (Shape2D island : islands) {
+            island.transform(x, y, angle, scaleX, scaleY);
+            island.update();
+        }
+        for (Shape2D hole : holes) {
+            hole.transform(x, y, angle, scaleX, scaleY);
+            hole.update();
+        }
     }
 
 }

@@ -46,14 +46,17 @@ public class SceneRendering2D_4 extends WindowScreen {
         region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
         circle = new Shape2DCircle(150, 0,0);
-        circle.setRotation(30);
-        circle.setTranslation(250,100);
+        circle.angle(30);
+        circle.x(250);
+        circle.y(100);
+
         circle.applyTransform();
-        circle.setScale(0.3f,0.3f);
+        circle.scaleX(0.3f);
+        circle.scaleY(0.3f);
         //circle.update();
 
         rectangle = new Shape2DRectangle(200,300);
-        rectangle.setRotation(30);
+        rectangle.angle(30);
         rectangle.update();
 
         aabb = new Shape2DAABB(40,40, 240, 240);
@@ -63,8 +66,9 @@ public class SceneRendering2D_4 extends WindowScreen {
         segment.update();
 
         polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
-        polygon.setRotation(30);
-        polygon.setScale(-1.2f,1.3f);
+        polygon.angle(30);
+        polygon.scaleX(-1.2f);
+        polygon.scaleY(1.3f);
 
         Array<Shape2D> islands = new Array<>();
         islands.add(circle);
@@ -75,7 +79,7 @@ public class SceneRendering2D_4 extends WindowScreen {
 
         compound = new Shape2DCompound(islands, holes);
         //compound.update();
-        bounds = new Shape2DCircle(compound.getBoundingRadius(), compound.getX(), compound.getY());
+        bounds = new Shape2DCircle(compound.getBoundingRadius(), compound.x(), compound.y());
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -106,8 +110,7 @@ public class SceneRendering2D_4 extends WindowScreen {
 
     private void renderBounds(Shape2D shape2D) {
         float r = shape2D.getBoundingRadius();
-        System.out.println(r);
-        Shape2DCircle bounds = new Shape2DCircle(r, shape2D.getX(), shape2D.getY());
+        Shape2DCircle bounds = new Shape2DCircle(r, shape2D.x(), shape2D.y());
         renderer2D.pushDebugShape(bounds,new Color(1,1,0,1));
     }
 

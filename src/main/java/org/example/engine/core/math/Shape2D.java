@@ -26,40 +26,7 @@ public abstract class Shape2D {
         return contains(point.x, point.y);
     }
 
-    public final void setTranslation(float x, float y) {
-        this.x = x;
-        this.y = y;
-        updated = false;
-    }
 
-    public final void setRotation(float degrees) {
-        this.angle = degrees;
-        updated = false;
-    }
-
-    public final void setScale(float scaleX, float scaleY) {
-        this.scaleX = scaleX;
-        this.scaleY = scaleY;
-        updated = false;
-    }
-
-    public final void resetTransform() {
-        this.x = 0;
-        this.y = 0;
-        this.scaleX = 1;
-        this.scaleY = 1;
-        this.angle = 0;
-        updated = false;
-    }
-
-    public final void setTransform(float x, float y, float angle, float scaleX, float scaleY) {
-        this.x = x;
-        this.y = y;
-        this.angle = angle;
-        this.scaleX = scaleX;
-        this.scaleY = scaleY;
-        updated = false;
-    }
 
     public final float getArea() {
         if (originalArea < 0.0f) {
@@ -70,18 +37,11 @@ public abstract class Shape2D {
     }
 
     public final float getBoundingRadius() {
-        System.out.println("ok");
         if (originalBoundingRadius < 0.0f) {
-            System.out.println("nn");
             originalBoundingRadius = calculateOriginalBoundingRadius();
             boundingRadius = originalBoundingRadius * Math.max(Math.abs(scaleX), Math.abs(scaleY));
         }
         return boundingRadius;
-    }
-
-    public final void update(float x, float y, float angle, float scaleX, float scaleY) {
-        setTransform(x, y, angle, scaleX, scaleY);
-        update();
     }
 
     public final void update() {
@@ -95,22 +55,50 @@ public abstract class Shape2D {
         bakeCurrentTransformToLocalCoordinates();
         originalBoundingRadius = -1;//calculateOriginalBoundingRadius();
         originalArea = calculateOriginalArea();
-        resetTransform();
+        transform(0,0,0,1,1); // reset transform
     }
 
-    public final float getX() {
+    public final void x(float x) {
+        this.x = x;
+        updated = false;
+    }
+    public final void y(float y) {
+        this.y = y;
+        updated = false;
+    }
+    public final void angle(float angle) {
+        this.angle = angle;
+        updated = false;
+    }
+    public final void scaleX(float scaleX) {
+        this.scaleX = scaleX;
+        updated = false;
+    }
+    public final void scaleY(float scaleY) {
+        this.scaleY = scaleY;
+        updated = false;
+    }
+    public final void transform(float x, float y, float angle, float scaleX, float scaleY) {
+        this.x = x;
+        this.y = y;
+        this.angle = angle;
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+        updated = false;
+    }
+    public final float x() {
         return x;
     }
-    public final float getY() {
+    public final float y() {
         return y;
     }
-    public final float getAngle() {
+    public final float angle() {
         return angle;
     }
-    public float getScaleX() {
+    public float scaleX() {
         return scaleX;
     }
-    public float getScaleY() {
+    public float scaleY() {
         return scaleY;
     }
 

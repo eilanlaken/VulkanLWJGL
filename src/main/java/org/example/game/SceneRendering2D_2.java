@@ -52,11 +52,11 @@ public class SceneRendering2D_2 extends WindowScreen {
         //shape = FactoryComponent.createShapeRectangleHollow(30, 30,3, new Color(0,0.5f,1,1), null, null);
 
         circle = new Shape2DCircle(150, 0,0);
-        circle.setRotation(30);
+        circle.angle(30);
         circle.update();
 
         rectangle = new Shape2DRectangle(200, 400);
-        rectangle.setRotation(30);
+        rectangle.angle(30);
         rectangle.update();
 
         aabb = new Shape2DAABB(40,40, 240, 240);
@@ -66,10 +66,9 @@ public class SceneRendering2D_2 extends WindowScreen {
         segment.update();
 
         polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
-        polygon.setRotation(30);
-        polygon.setScale(-1.2f,1.3f);
+        polygon.angle(30);
 
-        bounds = new Shape2DCircle(polygon.getBoundingRadius(), polygon.getX(), polygon.getY());
+        bounds = new Shape2DCircle(polygon.getBoundingRadius(), polygon.x(), polygon.y());
         System.out.println(bounds);
 
         camera = new Camera(640*2,480*2, 1);
@@ -85,7 +84,7 @@ public class SceneRendering2D_2 extends WindowScreen {
         renderer2D.begin(camera);
         renderer2D.pushTextureRegion(region, new Color(1,1,1,1),-350 + 10,10,0,0,0,0.2f,0.2f,null,null);
 
-        polygon.setRotation(time);
+        polygon.angle(time);
         //renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(rectangle, null);
         //renderer2D.pushDebugShape(aabb, null);

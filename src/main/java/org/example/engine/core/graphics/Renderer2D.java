@@ -1,7 +1,6 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.math.*;
-import org.example.engine.core.memory.Resource;
 import org.example.engine.core.memory.ResourceHolder;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
@@ -217,9 +216,7 @@ public class Renderer2D implements ResourceHolder {
         if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
         if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
 
-        polygon.setScale(scaleX, scaleY);
-        polygon.setRotation(angleZ);
-        polygon.setTranslation(x, y);
+        polygon.transform(x, y, angleZ, scaleX, scaleY);
         polygon.update();
 
         float t = tint == null ? WHITE_TINT : tint.toFloatBits();
@@ -287,7 +284,7 @@ public class Renderer2D implements ResourceHolder {
             ;
         }
         verticesBuffer.put(x).put(y).put(tintFloatBits).put(0.5f).put(0.5f);
-        verticesBuffer.put(x + r * MathUtils.cosDeg(circle.getAngle())).put(y + r * MathUtils.sinDeg(circle.getAngle())).put(tintFloatBits).put(0.5f).put(0.5f);
+        verticesBuffer.put(x + r * MathUtils.cosDeg(circle.angle())).put(y + r * MathUtils.sinDeg(circle.angle())).put(tintFloatBits).put(0.5f).put(0.5f);
         vertexIndex += 17 * 5;
     }
 

@@ -44,7 +44,7 @@ public class ScenePhysics2D_1 extends WindowScreen {
     float time = 0;
     @Override
     protected void refresh() {
-        rect.setRotation(time);
+        rect.angle(time);
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,0);
