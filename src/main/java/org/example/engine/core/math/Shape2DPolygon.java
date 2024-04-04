@@ -45,7 +45,7 @@ public class Shape2DPolygon extends Shape2D {
     }
 
     @Override
-    protected float calculateOriginalBoundingRadius() {
+    protected float getUnscaledBoundingRadius() {
         float max = 0;
         for (int i = 0; i < localPoints.length - 1; i += 2) {
             float l2 = localPoints[i] * localPoints[i] + localPoints[i+1] * localPoints[i+1];
@@ -92,13 +92,8 @@ public class Shape2DPolygon extends Shape2D {
     }
 
     @Override
-    protected float calculateOriginalArea() {
+    protected float getUnscaledArea() {
         return Math.abs(Algorithms.calculatePolygonSignedArea(localPoints));
-    }
-
-    @Override
-    protected void bakeCurrentTransformToLocalCoordinates() {
-        System.arraycopy(worldPoints, 0, localPoints, 0, worldPoints.length);
     }
 
     public static float getVertexX(int index, float[] vertices) {

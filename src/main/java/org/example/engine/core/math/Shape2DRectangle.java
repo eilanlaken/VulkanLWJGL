@@ -46,7 +46,7 @@ public class Shape2DRectangle extends Shape2D {
     }
 
     @Override
-    protected float calculateOriginalBoundingRadius() {
+    protected float getUnscaledBoundingRadius() {
         return (float) Math.sqrt(MathUtils.max(c1.len2(), c2.len2(), c3.len2(), c4.len2()));
     }
 
@@ -68,7 +68,7 @@ public class Shape2DRectangle extends Shape2D {
     }
 
     @Override
-    protected float calculateOriginalArea() {
+    protected float getUnscaledArea() {
         return area;
     }
 
@@ -97,11 +97,6 @@ public class Shape2DRectangle extends Shape2D {
         c2World.add(x, y);
         c3World.add(x, y);
         c4World.add(x, y);
-    }
-
-    @Override
-    protected void bakeCurrentTransformToLocalCoordinates() {
-
     }
 
     public Vector2 c1() {

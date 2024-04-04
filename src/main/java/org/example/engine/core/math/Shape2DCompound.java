@@ -35,25 +35,20 @@ public class Shape2DCompound extends Shape2D {
     }
 
     @Override
-    protected float calculateOriginalBoundingRadius() {
+    protected float getUnscaledBoundingRadius() {
         float max = -1.0f;
         for (Shape2D island : islands) {
-            float r = island.calculateOriginalBoundingRadius();
+            float r = island.getUnscaledBoundingRadius();
             max = Math.max(max, r);
         }
         return max;
     }
 
     @Override
-    protected void bakeCurrentTransformToLocalCoordinates() {
-        // TODO: implement
-    }
-
-    @Override
-    protected float calculateOriginalArea() {
+    protected float getUnscaledArea() {
         float area = 0;
-        for (Shape2D shape : islands) area += shape.calculateOriginalArea();
-        for (Shape2D shape2D : holes) area -= shape2D.calculateOriginalArea();
+        for (Shape2D shape : islands) area += shape.getUnscaledArea();
+        for (Shape2D shape2D : holes) area -= shape2D.getUnscaledArea();
         return area;
     }
 

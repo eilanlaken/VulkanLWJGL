@@ -2,44 +2,45 @@ package org.example.engine.core.math;
 
 public abstract class Shape2D {
 
-    protected float x;
-    protected float y;
-    protected float angle;
-    protected float scaleX, scaleY;
-    protected boolean updated;
+    protected float x = 0;
+    protected float y = 0;
+    protected float angle = 0;
+    protected float scaleX = 1;
+    protected float scaleY = 1;
+    protected boolean updated = false;
 
-    protected float originalArea = -1.0f;
     protected float area;
-    protected float originalBoundingRadius = -1.0f;
     private float boundingRadius;
+    private float boundingRadiusSquared;
+    private boolean areaUpdated = false;
+    private boolean boundingRadiusUpdated = false;
 
-    public Shape2D() {
-        this.x = 0;
-        this.y = 0;
-        this.angle = 0;
-        this.scaleX = 1;
-        this.scaleY = 1;
-        updated = false;
-    }
-
-    public boolean contains(final Vector2 point) {
+    public final boolean contains(final Vector2 point) {
         return contains(point.x, point.y);
     }
 
-
-
     public final float getArea() {
-        if (originalArea < 0.0f) {
-            originalArea = calculateOriginalArea();
-            area = originalArea * Math.abs(scaleX) * Math.abs(scaleY);
+        if (!areaUpdated) {
+            area = getUnscaledArea() * Math.abs(scaleX) * Math.abs(scaleY);
+            areaUpdated = true;
         }
         return area;
     }
 
     public final float getBoundingRadius() {
-        if (originalBoundingRadius < 0.0f) {
-            originalBoundingRadius = calculateOriginalBoundingRadius();
-            boundingRadius = originalBoundingRadius * Math.max(Math.abs(scaleX), Math.abs(scaleY));
+        if (!boundingRadiusUpdated) {
+            boundingRadius = getUnscaledBoundingRadius() * Math.max(Math.abs(scaleX), Math.abs(scaleY));
+            boundingRadiusSquared = boundingRadius * boundingRadius;
+            boundingRadiusUpdated = true;
+        }
+        return boundingRadius;
+    }
+
+    public final float getBoundingRadiusSquared() {
+        if (!boundingRadiusUpdated) {
+            boundingRadius = getUnscaledBoundingRadius() * Math.max(Math.abs(scaleX), Math.abs(scaleY));
+            boundingRadiusSquared = boundingRadius * boundingRadius;
+            boundingRadiusUpdated = true;
         }
         return boundingRadius;
     }
@@ -50,19 +51,16 @@ public abstract class Shape2D {
         updated = true;
     }
 
-    public void applyTransform() {
-        updateWorldCoordinates();
-        bakeCurrentTransformToLocalCoordinates();
-        originalBoundingRadius = -1;//calculateOriginalBoundingRadius();
-        originalArea = calculateOriginalArea();
-        transform(0,0,0,1,1); // reset transform
-    }
-
     public final void x(float x) {
         this.x = x;
         updated = false;
     }
     public final void y(float y) {
+        this.y = y;
+        updated = false;
+    }
+    public final void xy(float x, float y) {
+        this.x = x;
         this.y = y;
         updated = false;
     }
@@ -72,10 +70,21 @@ public abstract class Shape2D {
     }
     public final void scaleX(float scaleX) {
         this.scaleX = scaleX;
+        boundingRadiusUpdated = false;
+        areaUpdated = false;
         updated = false;
     }
     public final void scaleY(float scaleY) {
         this.scaleY = scaleY;
+        boundingRadiusUpdated = false;
+        areaUpdated = false;
+        updated = false;
+    }
+    public final void scaleXY(float scaleX, float scaleY) {
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+        boundingRadiusUpdated = false;
+        areaUpdated = false;
         updated = false;
     }
     public final void transform(float x, float y, float angle, float scaleX, float scaleY) {
@@ -84,6 +93,8 @@ public abstract class Shape2D {
         this.angle = angle;
         this.scaleX = scaleX;
         this.scaleY = scaleY;
+        boundingRadiusUpdated = false;
+        areaUpdated = false;
         updated = false;
     }
     public final float x() {
@@ -103,9 +114,7 @@ public abstract class Shape2D {
     }
 
     public abstract boolean contains(float x, float y);
-    protected abstract void bakeCurrentTransformToLocalCoordinates();
     protected abstract void updateWorldCoordinates();
-    protected abstract float calculateOriginalArea();
-    protected abstract float calculateOriginalBoundingRadius();
-
+    protected abstract float getUnscaledArea();
+    protected abstract float getUnscaledBoundingRadius();
 }

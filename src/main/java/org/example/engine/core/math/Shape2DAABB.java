@@ -1,7 +1,6 @@
 package org.example.engine.core.math;
 
 // AABB = axis aligned bonding box
-// TODO: deprecate?
 public class Shape2DAABB extends Shape2D {
 
     private final Vector2 localMin;
@@ -24,7 +23,7 @@ public class Shape2DAABB extends Shape2D {
     }
 
     @Override
-    protected float calculateOriginalBoundingRadius() {
+    protected float getUnscaledBoundingRadius() {
         float x1 = localMin.x;
         float y1 = localMin.y;
         float x2 = localMax.x;
@@ -40,7 +39,7 @@ public class Shape2DAABB extends Shape2D {
     }
 
     @Override
-    protected float calculateOriginalArea() {
+    protected float getUnscaledArea() {
         return Math.abs((localMax.x - localMin.x) * (localMax.y - localMin.y));
     }
 
@@ -49,12 +48,6 @@ public class Shape2DAABB extends Shape2D {
         if (angle != 0.0f) throw new IllegalStateException("Cannot rotate an AABB: must remain aligned to axis. angle must remain 0. Current value: angle = " + angle);
         this.worldMin.set(localMin).scl(scaleX, scaleY).add(x, y);
         this.worldMax.set(localMax).scl(scaleX, scaleY).add(x, y);
-    }
-
-    @Override
-    protected void bakeCurrentTransformToLocalCoordinates() {
-        localMin.set(worldMin);
-        localMax.set(worldMax);
     }
 
     @Override

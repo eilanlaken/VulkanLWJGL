@@ -50,7 +50,6 @@ public class SceneRendering2D_4 extends WindowScreen {
         circle.x(250);
         circle.y(100);
 
-        circle.applyTransform();
         circle.scaleX(0.3f);
         circle.scaleY(0.3f);
         //circle.update();

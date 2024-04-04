@@ -7,12 +7,18 @@ public class Shape2DCircle extends Shape2D {
     public Vector2 worldCenter;
     public float worldRadius;
 
+    private final float unscaledArea;
+    private final float unscaledBoundingRadius;
+
     public Shape2DCircle(float r, float x, float y) {
         if (r < 0) throw new IllegalArgumentException("Radius must be positive. Got: " + r);
         this.localCenter = new Vector2(x, y);
         this.localRadius = r;
         this.worldCenter = new Vector2(localCenter);
         this.worldRadius = r;
+
+        this.unscaledArea = MathUtils.PI * localRadius * localRadius;
+        this.unscaledBoundingRadius = r;
     }
 
     public Shape2DCircle(float r) {
@@ -30,25 +36,19 @@ public class Shape2DCircle extends Shape2D {
     }
 
     @Override
-    protected void bakeCurrentTransformToLocalCoordinates() {
-        localCenter.set(worldCenter);
-        localRadius = worldRadius;
-    }
-
-    @Override
-    protected float calculateOriginalBoundingRadius() {
-        return localCenter.len() + localRadius;
-    }
-
-    @Override
     public boolean contains(float x, float y) {
         if (!updated) update();
         return (x - worldCenter.x) * (x - worldCenter.x) + (y - worldCenter.y) * (y - worldCenter.y) <= worldRadius;
     }
 
     @Override
-    protected float calculateOriginalArea() {
-        return (float) (Math.PI * localRadius * localRadius);
+    protected float getUnscaledBoundingRadius() {
+        return unscaledBoundingRadius;
+    }
+
+    @Override
+    protected float getUnscaledArea() {
+        return unscaledArea;
     }
 
     @Override

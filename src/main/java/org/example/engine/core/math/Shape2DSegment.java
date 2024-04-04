@@ -15,7 +15,7 @@ public class Shape2DSegment extends Shape2D {
     }
 
     @Override
-    protected float calculateOriginalBoundingRadius() {
+    protected float getUnscaledBoundingRadius() {
         float x1 = a.x;
         float y1 = a.y;
         float x2 = b.x;
@@ -26,13 +26,7 @@ public class Shape2DSegment extends Shape2D {
     }
 
     @Override
-    protected void bakeCurrentTransformToLocalCoordinates() {
-        a.set(world_a);
-        b.set(world_b);
-    }
-
-    @Override
-    protected float calculateOriginalArea() {
+    protected float getUnscaledArea() {
         return 0;
     }
 
