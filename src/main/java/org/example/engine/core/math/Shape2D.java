@@ -42,7 +42,7 @@ public abstract class Shape2D {
             boundingRadiusSquared = boundingRadius * boundingRadius;
             boundingRadiusUpdated = true;
         }
-        return boundingRadius;
+        return boundingRadiusSquared;
     }
 
     public final void update() {

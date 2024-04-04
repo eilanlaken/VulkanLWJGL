@@ -53,13 +53,14 @@ public class SceneRendering2D_4 extends WindowScreen {
         //circle.update();
 
         rectangle = new Shape2DRectangle(200,300);
-        rectangle.angle(30);
-        rectangle.update();
+        rectangle = new Shape2DRectangle(200,-100,200,300,-45);
+        //rectangle.angle(30);
+        //rectangle.update();
 
         aabb = new Shape2DAABB(40,40, 100, 100);
         //aabb.update();
 
-        segment = new Shape2DSegment(-100,-200,300,300);
+        segment = new Shape2DSegment(0,0,150,200);
         segment.update();
 
         polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
@@ -92,13 +93,15 @@ public class SceneRendering2D_4 extends WindowScreen {
         renderer2D.pushTextureRegion(region, new Color(1,1,1,1),-350 + 10,10,0,0,0,0.2f,0.2f,null,null);
 
         //polygon.setRotation(time);
-        renderer2D.pushDebugShape(circle, null);
+        //renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(rectangle, null);
         //renderer2D.pushDebugShape(aabb, null);
-        ////renderer2D.pushDebugShape(segment, null);
-        renderer2D.pushDebugShape(polygon, null);
+        renderer2D.pushDebugShape(segment, null);
+        //renderer2D.pushDebugShape(polygon, null);
 
-        renderBounds(polygon);
+        renderBounds(segment);
+        segment.angle(time);
+        segment.xy(0,200);
 
 
         renderer2D.end();
