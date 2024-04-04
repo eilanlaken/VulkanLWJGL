@@ -9,7 +9,7 @@ public abstract class Shape2D {
     protected float scaleY = 1;
     protected boolean updated = false;
 
-    protected float area;
+    private float area;
     private float boundingRadius;
     private float boundingRadiusSquared;
     private boolean areaUpdated = false;

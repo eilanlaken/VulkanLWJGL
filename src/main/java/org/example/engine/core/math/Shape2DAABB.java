@@ -3,6 +3,9 @@ package org.example.engine.core.math;
 // AABB = axis aligned bonding box
 public class Shape2DAABB extends Shape2D {
 
+    private final float unscaledArea;
+    private final float unscaledBoundingRadius;
+
     private final Vector2 localMin;
     private final Vector2 localMax;
     public Vector2 worldMin;
@@ -13,24 +16,15 @@ public class Shape2DAABB extends Shape2D {
         this.localMax = new Vector2(x2, y2);
         this.worldMin = new Vector2(localMin);
         this.worldMax = new Vector2(localMax);
+        this.unscaledArea = Math.abs(x2 - x1) * Math.abs(y2 - y1);
+        float localCenterX = (x1 + x2) * 0.5f;
+        float localCenterY = (y1 + y1) * 0.5f;
+        unscaledBoundingRadius = Vector2.len(localCenterX, localCenterY) + (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
+
     }
 
     public Shape2DAABB(float width, float height) {
-        this.localMin = new Vector2(-width * 0.5f, -height * 0.5f);
-        this.localMax = new Vector2(width * 0.5f, height * 0.5f);
-        this.worldMin = new Vector2(localMin);
-        this.worldMax = new Vector2(localMax);
-    }
-
-    @Override
-    protected float getUnscaledBoundingRadius() {
-        float x1 = localMin.x;
-        float y1 = localMin.y;
-        float x2 = localMax.x;
-        float y2 = localMax.y;
-        float localCenterX = (x1 + x2) * 0.5f;
-        float localCenterY = (y1 + y1) * 0.5f;
-        return Vector2.len(localCenterX, localCenterY) + (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
+        this(-width * 0.5f, -height * 0.5f, width * 0.5f, height * 0.5f);
     }
 
     @Override
@@ -39,8 +33,13 @@ public class Shape2DAABB extends Shape2D {
     }
 
     @Override
+    protected float getUnscaledBoundingRadius() {
+        return unscaledBoundingRadius;
+    }
+
+    @Override
     protected float getUnscaledArea() {
-        return Math.abs((localMax.x - localMin.x) * (localMax.y - localMin.y));
+        return unscaledArea;
     }
 
     @Override

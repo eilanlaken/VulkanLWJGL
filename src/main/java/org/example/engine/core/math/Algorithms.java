@@ -187,6 +187,15 @@ public class Algorithms {
         return area * 0.5f;
     }
 
+    public static float calculatePolygonBoundingRadius(final float[] vertices) {
+        float max = 0;
+        for (int i = 0; i < vertices.length - 1; i += 2) {
+            float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
+            if (l2 > max) max = l2;
+        }
+        return (float) Math.sqrt(max);
+    }
+
     /**
      * Triangulates the given polygon
      *

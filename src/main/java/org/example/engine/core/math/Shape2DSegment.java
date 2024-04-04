@@ -2,6 +2,8 @@ package org.example.engine.core.math;
 
 public class Shape2DSegment extends Shape2D {
 
+    private final float unscaledBoundingRadius;
+
     private final Vector2 a;
     private final Vector2 b;
     public Vector2 world_a;
@@ -12,17 +14,12 @@ public class Shape2DSegment extends Shape2D {
         this.b = new Vector2(x2, y2);
         this.world_a = new Vector2(a);
         this.world_b = new Vector2(b);
+        this.unscaledBoundingRadius = a.len() + Vector2.dst(a, b);
     }
 
     @Override
     protected float getUnscaledBoundingRadius() {
-        float x1 = a.x;
-        float y1 = a.y;
-        float x2 = b.x;
-        float y2 = b.y;
-        float localCenterX = (x1 + x2) * 0.5f;
-        float localCenterY = (y1 + y1) * 0.5f;
-        return Vector2.len(localCenterX, localCenterY) + (float) Math.sqrt((x2-x1) * (x2-x1) * 0.25f + (y2-y1) * (y2-y1) * 0.25f);
+        return unscaledBoundingRadius;
     }
 
     @Override

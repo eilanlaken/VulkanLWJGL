@@ -2,25 +2,27 @@ package org.example.engine.core.math;
 
 public class Shape2DPolygon extends Shape2D {
 
+    private final float unscaledArea;
+    private final float unscaledBoundingRadius;
+
     public final int vertexCount;
     public final float[] localPoints;
     public final int[] indices;
     private final float[] worldPoints;
     public final boolean isConvex;
-    private float area = Float.NaN;
 
     private final Vector2 tmp = new Vector2();
 
     protected Shape2DPolygon(int[] indices, float[] vertices) {
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
-
         this.vertexCount = vertices.length / 2;
         this.localPoints = vertices;
         this.worldPoints = new float[vertices.length];
         this.indices = indices;
         this.isConvex = Algorithms.isPolygonConvex(vertices);
-        updated = false;
+        this.unscaledArea = Math.abs(Algorithms.calculatePolygonSignedArea(localPoints));
+        this.unscaledBoundingRadius = Algorithms.calculatePolygonBoundingRadius(localPoints);
     }
 
     public Shape2DPolygon(float[] vertices) {
@@ -30,28 +32,18 @@ public class Shape2DPolygon extends Shape2D {
     public Shape2DPolygon(float[] vertices, int[] holes) {
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
-
         this.vertexCount = vertices.length / 2;
         this.localPoints = vertices;
         this.worldPoints = new float[vertices.length];
         this.indices = Algorithms.triangulatePolygon(localPoints, holes, 2);
         this.isConvex = (holes == null || holes.length == 0) && Algorithms.isPolygonConvex(vertices);
-        float max = 0;
-        for (int i = 0; i < vertices.length - 1; i += 2) {
-            float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
-            if (l2 > max) max = l2;
-        }
-        updated = false;
+        this.unscaledArea = Math.abs(Algorithms.calculatePolygonSignedArea(localPoints));
+        this.unscaledBoundingRadius = Algorithms.calculatePolygonBoundingRadius(localPoints);
     }
 
     @Override
     protected float getUnscaledBoundingRadius() {
-        float max = 0;
-        for (int i = 0; i < localPoints.length - 1; i += 2) {
-            float l2 = localPoints[i] * localPoints[i] + localPoints[i+1] * localPoints[i+1];
-            if (l2 > max) max = l2;
-        }
-        return (float) Math.sqrt(max);
+        return unscaledBoundingRadius;
     }
 
     @Override
@@ -93,7 +85,7 @@ public class Shape2DPolygon extends Shape2D {
 
     @Override
     protected float getUnscaledArea() {
-        return Math.abs(Algorithms.calculatePolygonSignedArea(localPoints));
+        return unscaledArea;
     }
 
     public static float getVertexX(int index, float[] vertices) {
