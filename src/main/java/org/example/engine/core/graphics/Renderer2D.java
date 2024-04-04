@@ -31,7 +31,6 @@ public class Renderer2D implements ResourceHolder {
     private Camera camera;
     private ShaderProgram currentShader;
     private Texture lastTexture;
-    private HashMap<String, Object> currentCustomAttributes;
     private boolean drawing = false;
     private int vertexIndex = 0;
     private int triangleIndex = 0;
@@ -475,8 +474,8 @@ public class Renderer2D implements ResourceHolder {
     }
 
     private void useCustomAttributes(HashMap<String, Object> customAttributes) {
-        //flush();
-
+        flush();
+        currentShader.bindUniforms(customAttributes);
     }
 
     private void useMode(final int mode) {
