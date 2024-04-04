@@ -54,7 +54,7 @@ public class SceneRendering2D_4 extends WindowScreen {
         //rectangle.angle(30);
         //rectangle.update();
 
-        aabb = new Shape2DAABB(40,40, 100, 100);
+        aabb = new Shape2DAABB(400,400, 500, 500);
         //aabb.update();
 
         segment = new Shape2DSegment(0,0,150,200);
@@ -91,18 +91,19 @@ public class SceneRendering2D_4 extends WindowScreen {
         //renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(rectangle, null);
         //renderer2D.pushDebugShape(aabb, null);
-        renderer2D.pushDebugShape(segment, null);
+        renderer2D.pushDebugShape(compound, null);
         //renderer2D.pushDebugShape(polygon, null);
 
-        renderBounds(segment);
-        segment.angle(time);
-        segment.xy(0,200);
+        renderBounds(compound);
+
 
 
         renderer2D.end();
         time++;
 
-        if (Keyboard.isKeyJustPressed(Keyboard.Key.Q)) aabb.scaleXY(2.5f, 2.5f);
+        if (Keyboard.isKeyJustPressed(Keyboard.Key.Q)) {
+            compound.addIsland(aabb);
+        }
     }
 
     private void renderBounds(Shape2D shape2D) {
