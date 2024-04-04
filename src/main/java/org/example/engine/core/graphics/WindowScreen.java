@@ -5,6 +5,7 @@ import org.example.engine.core.memory.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO: remove "implements Resource"
 public abstract class WindowScreen implements Resource {
 
     protected Window window;

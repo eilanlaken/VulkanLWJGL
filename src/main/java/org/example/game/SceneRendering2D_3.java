@@ -119,7 +119,8 @@ public class SceneRendering2D_3 extends WindowScreen {
 
     @Override
     public void free() {
-
+        System.out.println("free");
+        renderer2D.free();
     }
 
 

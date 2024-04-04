@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-// TODO: move to main/resources based architecture.
 public class Renderer2D implements Resource {
 
     private static final int BATCH_SIZE = 4000;
@@ -533,9 +532,11 @@ public class Renderer2D implements Resource {
 
     @Override
     public void free() {
-        // free shader
-        // free dynamic mesh
-        // free used textures
+        defaultShader.free();
+        GL30.glDeleteVertexArrays(vao);
+        GL30.glDeleteBuffers(vbo);
+        GL30.glDeleteBuffers(ebo);
+        whiteSinglePixelTexture.free();
     }
 
     private static ShaderProgram createDefaultShaderProgram() {
