@@ -3,6 +3,7 @@ package org.example.game;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
+import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.math.*;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL11;
@@ -45,10 +46,7 @@ public class SceneRendering2D_4 extends WindowScreen {
         texture0 = AssetStore.get("assets/atlases/pack2_0.png");
         region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
-        circle = new Shape2DCircle(150, 0,0);
-        circle.angle(30);
-        circle.x(250);
-        circle.y(100);
+        circle = new Shape2DCircle(150, 100,100);
 
         circle.scaleX(0.3f);
         circle.scaleY(0.3f);
@@ -58,8 +56,8 @@ public class SceneRendering2D_4 extends WindowScreen {
         rectangle.angle(30);
         rectangle.update();
 
-        aabb = new Shape2DAABB(40,40, 240, 240);
-        aabb.update();
+        aabb = new Shape2DAABB(40,40, 100, 100);
+        //aabb.update();
 
         segment = new Shape2DSegment(-100,-200,300,300);
         segment.update();
@@ -96,7 +94,7 @@ public class SceneRendering2D_4 extends WindowScreen {
         //polygon.setRotation(time);
         renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(rectangle, null);
-        //renderer2D.pushDebugShape(aabb, null);
+        renderer2D.pushDebugShape(aabb, null);
         ////renderer2D.pushDebugShape(segment, null);
         //renderer2D.pushDebugShape(polygon, null);
 
@@ -105,6 +103,8 @@ public class SceneRendering2D_4 extends WindowScreen {
 
         renderer2D.end();
         time++;
+
+        if (Keyboard.isKeyJustPressed(Keyboard.Key.Q)) aabb.scaleXY(2.5f, 2.5f);
     }
 
     private void renderBounds(Shape2D shape2D) {

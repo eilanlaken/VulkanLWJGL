@@ -18,7 +18,7 @@ public class Shape2DCircle extends Shape2D {
         this.worldRadius = r;
 
         this.unscaledArea = MathUtils.PI * localRadius * localRadius;
-        this.unscaledBoundingRadius = r;
+        this.unscaledBoundingRadius = localCenter.len() + r;
     }
 
     public Shape2DCircle(float r) {
