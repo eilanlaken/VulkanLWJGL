@@ -21,7 +21,7 @@ public class SceneRendering2D_4 extends WindowScreen {
     private Shape2DAABB aabb;
     private Shape2DSegment segment;
     private Shape2DPolygon polygon;
-    private Shape2DCompound compound;
+    private Shape2DMorphed compound;
 
     private Texture texture0;
     private TextureRegion region;
@@ -47,9 +47,6 @@ public class SceneRendering2D_4 extends WindowScreen {
         region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
         circle = new Shape2DCircle(150, 100,100);
-
-        circle.scaleX(0.3f);
-        circle.scaleY(0.3f);
         //circle.update();
 
         rectangle = new Shape2DRectangle(200,300);
@@ -64,9 +61,7 @@ public class SceneRendering2D_4 extends WindowScreen {
         segment.update();
 
         polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
-        polygon.angle(30);
-        polygon.scaleX(-0.3f);
-        polygon.scaleY(0.3f);
+
 
         Array<Shape2D> islands = new Array<>();
         islands.add(circle);
@@ -75,7 +70,7 @@ public class SceneRendering2D_4 extends WindowScreen {
         Array<Shape2D> holes = new Array<>();
         holes.add(new Shape2DCircle(90, 0,0));
 
-        compound = new Shape2DCompound(islands, holes);
+        compound = new Shape2DMorphed(islands, holes);
         //compound.update();
         bounds = new Shape2DCircle(compound.getBoundingRadius(), compound.x(), compound.y());
 

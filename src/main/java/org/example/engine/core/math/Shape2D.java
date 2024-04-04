@@ -45,6 +45,17 @@ public abstract class Shape2D {
         return boundingRadiusSquared;
     }
 
+    protected void forceUpdateArea() {
+        area = getUnscaledArea() * Math.abs(scaleX) * Math.abs(scaleY);
+        areaUpdated = true;
+    }
+
+    protected void forceUpdateBoundingRadius() {
+        boundingRadius = getUnscaledBoundingRadius() * Math.max(Math.abs(scaleX), Math.abs(scaleY));
+        boundingRadiusSquared = boundingRadius * boundingRadius;
+        boundingRadiusUpdated = true;
+    }
+
     public final void update() {
         if (updated) return;
         updateWorldCoordinates();
@@ -117,4 +128,11 @@ public abstract class Shape2D {
     protected abstract void updateWorldCoordinates();
     protected abstract float getUnscaledArea();
     protected abstract float getUnscaledBoundingRadius();
+
+    protected static boolean isTransformIdentity(final Shape2D shape) {
+        return MathUtils.isZero(shape.x) && MathUtils.isZero(shape.y)
+                && MathUtils.isZero(shape.angle % 360)
+                && MathUtils.isEqual(shape.scaleX, 1.0f) && MathUtils.isEqual(shape.scaleY, 1.0f);
+    }
+
 }

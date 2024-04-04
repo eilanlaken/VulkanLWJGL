@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Shape2DCompoundTest {
+class Shape2DMorphedTest {
 
     @Test
     void contains() {
