@@ -14,6 +14,7 @@ public class ComponentGraphics2DShape extends Component {
     public static final int RECTANGLE = 1;
     public static final int CIRCLE    = 2;
     public static final int POLYGON   = 3;
+    public static final int CURVE     = 4; // TODO: implement.
 
     public final int shape;
     public Color tint;
