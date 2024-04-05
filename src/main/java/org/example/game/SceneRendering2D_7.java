@@ -2,22 +2,26 @@ package org.example.game;
 
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
-import org.example.engine.core.math.*;
+import org.example.engine.core.math.AlgorithmsCollisions2D;
+import org.example.engine.core.math.Shape2D;
+import org.example.engine.core.math.Shape2DAABB;
+import org.example.engine.core.math.Shape2DCircle;
 import org.example.engine.core.memory.Resource;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SceneRendering2D_6 extends WindowScreen {
+public class SceneRendering2D_7 extends WindowScreen {
 
     private Renderer2D renderer2D;
     private Camera camera;
 
-    private Shape2DCircle circle1;
-    private Shape2DCircle circle2;
+    private Shape2D first;
+    private Shape2D second;
+    private AlgorithmsCollisions2D.Penetration penetration = new AlgorithmsCollisions2D.Penetration();
 
-    public SceneRendering2D_6() {
+    public SceneRendering2D_7() {
         renderer2D = new Renderer2D();
     }
 
@@ -32,35 +36,8 @@ public class SceneRendering2D_6 extends WindowScreen {
 
     @Override
     public void show() {
-        circle1 = new Shape2DCircle(150, 0,0);
-        circle2 = new Shape2DCircle(300, 0,0);
-
-        circle1.xy(-200, 200);
-        circle1.update();
-        //circle.update();
-
-        //rectangle = new Shape2DRectangle(200,300);
-        //rectangle = new Shape2DRectangle(200,-100,200,300,-45);
-        //rectangle.angle(30);
-        //rectangle.update();
-
-        //aabb = new Shape2DAABB(400,400, 500, 500);
-        //aabb.update();
-
-        //segment = new Shape2DSegment(0,0,150,200);
-        //segment.update();
-
-        //polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
-
-
-//        Array<Shape2D> islands = new Array<>();
-//        islands.add(circle1);
-//        islands.add(polygon);
-//
-//        Array<Shape2D> holes = new Array<>();
-//        holes.add(new Shape2DCircle(90, 0,0));
-
-        //compound = new Shape2DMorphed(islands, holes);
+        first = new Shape2DCircle(100);
+        second = new Shape2DCircle(50);
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -82,9 +59,12 @@ public class SceneRendering2D_6 extends WindowScreen {
         //renderer2D.pushDebugShape(polygon, null);
         //renderBounds(compound);
 
-        renderer2D.pushDebugShape(circle1, null);
-        renderer2D.pushDebugShape(circle2, null);
+        renderer2D.pushDebugShape(first, null);
+        renderer2D.pushDebugShape(second, null);
 
+
+        //renderBounds(first);
+        //renderBounds(second);
 
         renderer2D.end();
 
@@ -96,13 +76,16 @@ public class SceneRendering2D_6 extends WindowScreen {
         if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 10;
         if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 10;
 
-        circle2.dx(dx);
-        circle2.dy(dy);
-        circle2.update();
+        first.dx(dx);
+        first.dy(dy);
 
-        if (AlgorithmsCollisions2D.boundingCirclesCollide(circle1, circle2)) {
-            System.out.println("collision");
+        if (AlgorithmsCollisions2D.collide(first, second, penetration)) {
+            System.out.println("normal: " + penetration.normal);
+            System.out.println("depth: " + penetration.depth);
         }
+
+
+
     }
 
     private void renderBounds(Shape2D shape2D) {

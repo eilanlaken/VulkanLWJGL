@@ -17,7 +17,13 @@ public class Shape2DAABB extends Shape2D {
         this.worldMin = new Vector2(localMin);
         this.worldMax = new Vector2(localMax);
         this.unscaledArea = Math.abs(x2 - x1) * Math.abs(y2 - y1);
-        unscaledBoundingRadius = localMin.len() + Vector2.dst(localMax, localMin);
+        //unscaledBoundingRadius = localMin.len() + Vector2.dst(localMax, localMin);
+
+        float centerX = (localMin.x + localMax.x) * 0.5f;
+        float centerY = (localMin.y + localMax.y) * 0.5f;
+        float halfDiagonal = Vector2.dst(localMin, localMax) * 0.5f;
+        unscaledBoundingRadius = Vector2.len(centerX, centerY) + halfDiagonal;
+
     }
 
     public Shape2DAABB(float width, float height) {

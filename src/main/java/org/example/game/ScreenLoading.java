@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class ScreenLoading extends WindowScreen {
 
-    private WindowScreen screen = new SceneRendering2D_6();
+    private WindowScreen screen = new SceneRendering2D_7();
 
     @Override
     public void show() {
