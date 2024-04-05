@@ -80,12 +80,12 @@ public abstract class Component {
 
     // TODO: test
     public static ComponentGraphics2DShape createShapePolygonFilled(float[] vertices, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
-        return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, AlgorithmsPolygons.createPolygonFilled(vertices), customShader, customAttributes);
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.POLYGON, tint, AlgorithmsPolygons.createPolygonFilled(vertices), customShader, customAttributes);
     }
 
     // TODO: test
     public static ComponentGraphics2DShape createShapePolygonHollow(float[] vertices, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
-        return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, AlgorithmsPolygons.createPolygonHollow(vertices, stroke), customShader, customAttributes);
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.POLYGON, tint, AlgorithmsPolygons.createPolygonHollow(vertices, stroke), customShader, customAttributes);
     }
 
 
