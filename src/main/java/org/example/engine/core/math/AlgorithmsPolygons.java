@@ -5,6 +5,7 @@ import org.example.engine.core.collections.TuplePair;
 import org.example.engine.core.collections.TupleTriple;
 
 import java.util.*;
+import java.util.function.Function;
 
 //https://github.com/earcut4j/earcut4j/blob/master/src/test/java/earcut4j/Test01.java
 public class AlgorithmsPolygons {
@@ -140,6 +141,13 @@ public class AlgorithmsPolygons {
             cachedHollowPolygonIndices.put(vertices, indices);
         }
         return new Shape2DPolygon(indices, expandedVertices);
+    }
+
+    // TODO: implement
+    public static Shape2DPolygon createPolygonCurve(float xMin, float xMax, int refinement, float stroke, Function<Float, Float> function) {
+        final float step = (xMax - xMin) / refinement;
+
+        return null;
     }
 
     public static boolean isPolygonConvex(final float[] vertices) {

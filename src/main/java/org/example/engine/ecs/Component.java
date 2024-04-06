@@ -6,6 +6,7 @@ import org.example.engine.core.graphics.TextureRegion;
 import org.example.engine.core.math.AlgorithmsPolygons;
 
 import java.util.HashMap;
+import java.util.function.Function;
 
 public abstract class Component {
 
@@ -86,6 +87,11 @@ public abstract class Component {
     // TODO: test
     public static ComponentGraphics2DShape createShapePolygonHollow(float[] vertices, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
         return new ComponentGraphics2DShape(ComponentGraphics2DShape.POLYGON, tint, AlgorithmsPolygons.createPolygonHollow(vertices, stroke), customShader, customAttributes);
+    }
+
+    // TODO: implement
+    public static ComponentGraphics2DShape createShapeCurve(float xMin, float xMax, float stroke, int refinement, Function<Float, Float> function, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.CURVE, tint, AlgorithmsPolygons.createPolygonCurve(xMin, xMax, refinement, stroke, function), customShader, customAttributes);
     }
 
 
