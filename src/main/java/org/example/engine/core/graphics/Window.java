@@ -2,7 +2,7 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.application.Application;
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.*;
@@ -15,7 +15,7 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class Window implements Resource {
+public class Window implements MemoryResource {
 
     // compute and auxiliary buffers
     private final IntBuffer tmpBuffer = BufferUtils.createIntBuffer(1);

@@ -4,7 +4,7 @@ import org.example.engine.ecs.ComponentGraphics2DShape;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.math.*;
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
@@ -32,8 +32,8 @@ public class SceneRendering2D_2 extends WindowScreen {
     }
 
     @Override
-    public Map<String, Class<? extends Resource>> getRequiredAssets() {
-        Map<String, Class<? extends Resource>> requiredAssets = new HashMap<>();
+    public Map<String, Class<? extends MemoryResource>> getRequiredAssets() {
+        Map<String, Class<? extends MemoryResource>> requiredAssets = new HashMap<>();
 
         requiredAssets.put("assets/atlases/pack2_0.png", Texture.class);
 

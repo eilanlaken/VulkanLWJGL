@@ -7,7 +7,7 @@ import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.math.Matrix4;
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
@@ -37,8 +37,8 @@ public class SceneRendering3D_1 extends WindowScreen {
     }
 
     @Override
-    public Map<String, Class<? extends Resource>> getRequiredAssets() {
-        Map<String, Class<? extends Resource>> requiredAssets = new HashMap<>();
+    public Map<String, Class<? extends MemoryResource>> getRequiredAssets() {
+        Map<String, Class<? extends MemoryResource>> requiredAssets = new HashMap<>();
 
         requiredAssets.put("assets/models/cube-blue.fbx", Model.class);
 

@@ -1,20 +1,17 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.WindowAttributes;
+import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.memory.MemoryPool;
+import org.example.engine.core.memory.MemoryPooled;
 import org.example.game.ScreenLoading;
 
 public class Main {
 
     public static void main(String[] args) {
 
-//
-//        System.out.println("world: " + Arrays.toString(p.getWorldPoints()));
-//
-//        p.setScale(2,2);
-//
-//        p.update();
-//        System.out.println("world: " + Arrays.toString(p.getWorldPoints()));
 
 
 //        try {
@@ -28,12 +25,28 @@ public class Main {
 //            e.printStackTrace();
 //        }
 
-        //if (true) return;
+        if (true) return;
 
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);
         Application.launch(new ScreenLoading());
 
+    }
+
+    public static class Nums implements MemoryPooled {
+
+        public int a;
+        public int b;
+
+        public Nums() {
+
+        }
+
+        @Override
+        public void reset() {
+            a = 0;
+            b = 0;
+        }
     }
 
 }

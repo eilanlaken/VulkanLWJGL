@@ -1,9 +1,9 @@
 package org.example.engine.core.assets;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 
-class Asset implements Resource {
+class Asset implements MemoryResource {
 
     public int refCount;
     public final Object obj;
@@ -21,6 +21,6 @@ class Asset implements Resource {
     public void delete() {
         for (Asset dependency : dependencies) dependency.delete();
         refCount--;
-        if (refCount <= 0 && obj instanceof Resource) ((Resource) obj).delete();
+        if (refCount <= 0 && obj instanceof MemoryResource) ((MemoryResource) obj).delete();
     }
 }

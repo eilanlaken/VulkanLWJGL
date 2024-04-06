@@ -1,6 +1,6 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 
 import java.util.HashMap;
 
@@ -8,7 +8,7 @@ import java.util.HashMap;
 // example:
 // named regions: <my_anim_1->region1, my_anim_2->region2>
 // named animations: <my_anim->[region1,region2]>
-public class TexturePack implements Resource {
+public class TexturePack implements MemoryResource {
 
     protected final Texture[] textures;
     protected final TexturePacker.Options options;

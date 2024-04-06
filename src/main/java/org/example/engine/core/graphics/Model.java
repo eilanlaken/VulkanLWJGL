@@ -1,8 +1,8 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 
-public class Model implements Resource {
+public class Model implements MemoryResource {
 
     public final ModelPart[] parts;
     public final ModelArmature armature;

@@ -1,6 +1,6 @@
 package org.example.engine.core.memory;
 
-public interface Pooled {
+public interface MemoryPooled {
 
     void reset();
 

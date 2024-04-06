@@ -3,19 +3,19 @@ package org.example.game;
 import org.example.engine.core.application.Application;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.WindowScreen;
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Map;
 
 public class ScreenLoading extends WindowScreen {
 
-    private WindowScreen screen = new SceneRendering2D_7();
+    private WindowScreen screen = new ScenePhysics2D_1();
 
     @Override
     public void show() {
-        Map<String, Class<? extends Resource>> requiredAssets = screen.getRequiredAssets();
-        for (Map.Entry<String, Class<? extends Resource>> requiredAsset : requiredAssets.entrySet()) {
+        Map<String, Class<? extends MemoryResource>> requiredAssets = screen.getRequiredAssets();
+        for (Map.Entry<String, Class<? extends MemoryResource>> requiredAsset : requiredAssets.entrySet()) {
             AssetStore.loadAsset(requiredAsset.getValue(), requiredAsset.getKey());
         }
     }

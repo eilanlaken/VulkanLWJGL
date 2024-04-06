@@ -5,7 +5,7 @@ import org.example.engine.core.math.Matrix4;
 import org.example.engine.core.math.Quaternion;
 import org.example.engine.core.math.Vector3;
 import org.example.engine.core.math.Vector4;
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20;
 
@@ -13,7 +13,7 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ShaderProgram implements Resource {
+public class ShaderProgram implements MemoryResource {
 
     public final String vertexShaderSource;
     public final String fragmentShaderSource;

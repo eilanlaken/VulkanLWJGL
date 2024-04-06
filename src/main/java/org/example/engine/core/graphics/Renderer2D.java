@@ -1,7 +1,7 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.math.*;
-import org.example.engine.core.memory.ResourceHolder;
+import org.example.engine.core.memory.MemoryResourceHolder;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 
@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-public class Renderer2D implements ResourceHolder {
+public class Renderer2D implements MemoryResourceHolder {
 
     private static final int BATCH_SIZE = 4000;
     private static final int VERTEX_SIZE = 5;

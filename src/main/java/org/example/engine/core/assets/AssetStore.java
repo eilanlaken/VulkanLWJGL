@@ -7,7 +7,7 @@ import org.example.engine.core.graphics.Model;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.Texture;
 import org.example.engine.core.graphics.TexturePack;
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +18,7 @@ import java.util.Set;
 
 public final class AssetStore {
 
-    private final static HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> loaders = getLoadersMap();
+    private final static HashMap<Class<? extends MemoryResource>, Class<? extends AssetLoader<? extends MemoryResource>>> loaders = getLoadersMap();
     private static final Queue<AssetDescriptor> loadQueue = new Queue<>();
     private static final HashMap<String, Asset> store = new HashMap<>();
     private static final Set<AssetStoreLoadingTask> completedAsyncTasks = new HashSet<>();
@@ -79,7 +79,7 @@ public final class AssetStore {
         return store.get(path) != null;
     }
 
-    public static synchronized void loadAsset(final Class<? extends Resource> type, final String path) {
+    public static synchronized void loadAsset(final Class<? extends MemoryResource> type, final String path) {
         final Asset asset = store.get(path);
         if (asset != null) {
             asset.refCount++;
@@ -93,7 +93,7 @@ public final class AssetStore {
 
     }
 
-    public static synchronized <T extends Resource> T get(final String path) {
+    public static synchronized <T extends MemoryResource> T get(final String path) {
         return (T) store.get(path).obj;
     }
 
@@ -117,12 +117,12 @@ public final class AssetStore {
         return !loadQueue.isEmpty() || !asyncTasks.isEmpty() || !createTasks.isEmpty();
     }
 
-    protected static synchronized AssetLoader<? extends Resource> getNewLoader(Class<? extends Resource> type) {
-        Class<? extends AssetLoader<? extends Resource>> loaderClass = AssetStore.loaders.get(type);
-        AssetLoader<? extends Resource> loaderInstance;
+    protected static synchronized AssetLoader<? extends MemoryResource> getNewLoader(Class<? extends MemoryResource> type) {
+        Class<? extends AssetLoader<? extends MemoryResource>> loaderClass = AssetStore.loaders.get(type);
+        AssetLoader<? extends MemoryResource> loaderInstance;
         try {
             Constructor<?> constructor = loaderClass.getConstructor();
-            loaderInstance = (AssetLoader<? extends Resource>) constructor.newInstance();
+            loaderInstance = (AssetLoader<? extends MemoryResource>) constructor.newInstance();
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException  | InvocationTargetException e) {
             e.printStackTrace();
             throw new RuntimeException("Could not get loader for type: " + type.getSimpleName());
@@ -130,8 +130,8 @@ public final class AssetStore {
         return loaderInstance;
     }
 
-    private static HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> getLoadersMap() {
-        HashMap<Class<? extends Resource>, Class<? extends AssetLoader<? extends Resource>>> loaders = new HashMap<>();
+    private static HashMap<Class<? extends MemoryResource>, Class<? extends AssetLoader<? extends MemoryResource>>> getLoadersMap() {
+        HashMap<Class<? extends MemoryResource>, Class<? extends AssetLoader<? extends MemoryResource>>> loaders = new HashMap<>();
         loaders.put(Texture.class, AssetLoaderTexture.class);
         loaders.put(Model.class, AssetLoaderModel.class);
         loaders.put(ShaderProgram.class, AssetLoaderShaderProgram.class);

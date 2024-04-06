@@ -1,6 +1,6 @@
 package org.example.engine.core.memory;
 
-public interface ResourceHolder {
+public interface MemoryResourceHolder {
 
     void deleteAll();
 

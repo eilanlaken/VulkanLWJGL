@@ -1,10 +1,10 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.math.Shape3DSphere;
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL30;
 
-public class ModelPartMesh implements Resource {
+public class ModelPartMesh implements MemoryResource {
 
     public final int vaoId;
     public final int vertexCount;

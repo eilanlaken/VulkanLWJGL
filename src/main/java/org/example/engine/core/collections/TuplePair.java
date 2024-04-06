@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class TuplePair<T, U> {
 
-    public final T first;
-    public final U second;
+    public T first;
+    public U second;
 
     public TuplePair(T first, U second) {
         this.first = first;
@@ -25,4 +25,5 @@ public class TuplePair<T, U> {
     public int hashCode() {
         return Objects.hash(first, second);
     }
+
 }

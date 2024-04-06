@@ -1,11 +1,11 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 // TODO: finish
-public class Texture implements Resource {
+public class Texture implements MemoryResource {
 
     protected int handle;
     private int slot;

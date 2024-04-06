@@ -5,31 +5,39 @@ import org.example.engine.core.collections.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class Pool<T extends Pooled> {
+public class MemoryPool<T extends MemoryPooled> {
 
     private final Array<T> freeObjects;
     private final Constructor<T> constructor;
+    private final int initialCapacity;
 
-    public Pool(Class<T> type) throws RuntimeException {
-        this(type, 400);
+    public MemoryPool(Class<T> type) throws RuntimeException {
+        this(type, 1000);
     }
 
-    public Pool(Class<T> type, int initialCapacity) {
+    public MemoryPool(Class<T> type, int initialCapacity) {
+        if (initialCapacity <= 0) throw new IllegalArgumentException("Memory pool initial capacity must be greater than 0. Got: " + initialCapacity);
+        this.initialCapacity = initialCapacity;
         this.freeObjects = new Array<>(initialCapacity);
         try {
             this.constructor = type.getConstructor();
             for (int i = 0; i < freeObjects.size; i++) {
-                freeObjects.add((T) constructor.newInstance());
+                freeObjects.add(constructor.newInstance());
             }
         } catch (NoSuchMethodException | SecurityException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
-            throw new RuntimeException("Classes managed by a " + Pool.class.getSimpleName() + " MUST declare a no-args constructor.");
+            throw new RuntimeException("Classes managed by a " + MemoryPool.class.getSimpleName() + " MUST declare a no-args constructor.");
         }
     }
 
     public T grabOne() throws RuntimeException {
         try {
-            return this.freeObjects.size == 0 ? this.constructor.newInstance() : this.freeObjects.pop();
+            if (this.freeObjects.size == 0) {
+                for (int i = 0; i < initialCapacity; i++) {
+                    freeObjects.add(constructor.newInstance());
+                }
+            }
+            return this.freeObjects.pop();
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
             throw new RuntimeException("Unable to create new instance: " + this.constructor.getDeclaringClass().getName(), e);

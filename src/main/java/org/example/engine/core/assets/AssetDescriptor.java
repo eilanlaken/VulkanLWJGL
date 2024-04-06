@@ -1,18 +1,18 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.memory.Resource;
+import org.example.engine.core.memory.MemoryResource;
 
 import java.io.IOException;
 import java.util.Objects;
 
 class AssetDescriptor {
 
-    public final Class<? extends Resource> type;
+    public final Class<? extends MemoryResource> type;
     public final String path;
     public final long size;
 
     // TODO: error handling.
-    public AssetDescriptor(Class<? extends Resource> type, String path) {
+    public AssetDescriptor(Class<? extends MemoryResource> type, String path) {
         this.type = type;
         this.path = path;
         long s = 0;
