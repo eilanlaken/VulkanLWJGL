@@ -2,15 +2,22 @@ package org.example;
 
 import org.example.engine.core.application.Application;
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.memory.MemoryPooled;
 import org.example.game.ScreenLoading;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 public class Main {
 
     public static void main(String[] args) {
+
 
 
 

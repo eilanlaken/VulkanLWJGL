@@ -544,7 +544,6 @@ public class Renderer2D implements MemoryResourceHolder {
 
             String vertexShader = vertexShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
             String fragmentShader = fragmentShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
-
             return new ShaderProgram(vertexShader, fragmentShader);
         } catch (Exception e) {
             System.err.println("Could not create shader program from resources: ");

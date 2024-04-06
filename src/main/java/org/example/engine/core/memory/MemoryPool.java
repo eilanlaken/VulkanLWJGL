@@ -11,6 +11,7 @@ public class MemoryPool<T extends MemoryPooled> {
     private final Constructor<T> constructor;
     private final int initialCapacity;
 
+    // TODO: create a dev and release
     public MemoryPool(Class<T> type) throws RuntimeException {
         this(type, 1000);
     }
