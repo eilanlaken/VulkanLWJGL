@@ -1,5 +1,6 @@
 package org.example.engine.core.math;
 
+@Deprecated
 public class AlgorithmsCollisions2D {
 
     private AlgorithmsCollisions2D() {}
@@ -22,8 +23,10 @@ public class AlgorithmsCollisions2D {
 
     /** AABB vs ____ **/
     private static boolean AABBvsAABB(Shape2DAABB a, Shape2DAABB b, Penetration penetration) {
+        if (a.worldMax.x < b.worldMin.x || a.worldMin.x > b.worldMax.x) return false;
+        if (a.worldMax.y < b.worldMin.y || a.worldMin.y > b.worldMax.y) return false;
 
-        return false;
+        return true;
     }
 
     private static boolean AABBvsCircle(Shape2DAABB aabb, Shape2DCircle circle, Penetration penetration) {
