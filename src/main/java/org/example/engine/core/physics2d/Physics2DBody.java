@@ -3,7 +3,7 @@ package org.example.engine.core.physics2d;
 import org.example.engine.core.math.Shape2D;
 import org.example.engine.core.math.Vector2;
 
-public class Physics2DBody {
+public final class Physics2DBody {
 
     public Object owner;
     public boolean active;
