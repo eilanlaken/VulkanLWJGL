@@ -32,16 +32,4 @@ public class Physics2DWorldCollisionPhaseBroad {
 
     }
 
-    public static class CollisionCandidates extends TuplePair<Physics2DBody, Physics2DBody> {
-
-        public CollisionCandidates() {
-            super(null, null);
-        }
-
-        CollisionCandidates(Physics2DBody a, Physics2DBody b) {
-            super(a,b);
-        }
-
-    }
-
 }
