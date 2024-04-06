@@ -14,7 +14,10 @@ public class Shape2DSegment extends Shape2D {
         this.b = new Vector2(x2, y2);
         this.world_a = new Vector2(a);
         this.world_b = new Vector2(b);
-        this.unscaledBoundingRadius = a.len() + Vector2.dst(a, b);
+        float centerX = (a.x + b.x) * 0.5f;
+        float centerY = (a.y + b.y) * 0.5f;
+        float halfDiagonal = Vector2.dst(a, b) * 0.5f;
+        unscaledBoundingRadius = Vector2.len(centerX, centerY) + halfDiagonal;
     }
 
     @Override
