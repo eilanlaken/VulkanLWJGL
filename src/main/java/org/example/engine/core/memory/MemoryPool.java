@@ -5,7 +5,7 @@ import org.example.engine.core.collections.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class MemoryPool<T extends MemoryPooled> {
+public class MemoryPool<T> {
 
     private final Array<T> freeObjects;
     private final Constructor<T> constructor;
@@ -48,7 +48,6 @@ public class MemoryPool<T extends MemoryPooled> {
     public void letGo(T obj) {
         if (obj == null) throw new IllegalArgumentException("object cannot be null.");
         this.freeObjects.add(obj);
-        obj.reset();
     }
 
 }

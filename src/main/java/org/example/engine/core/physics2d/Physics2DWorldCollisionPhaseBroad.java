@@ -2,7 +2,6 @@ package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.TuplePair;
-import org.example.engine.core.memory.MemoryPooled;
 
 public class Physics2DWorldCollisionPhaseBroad {
 
@@ -33,7 +32,7 @@ public class Physics2DWorldCollisionPhaseBroad {
 
     }
 
-    public static class CollisionCandidates extends TuplePair<Physics2DBody, Physics2DBody> implements MemoryPooled {
+    public static class CollisionCandidates extends TuplePair<Physics2DBody, Physics2DBody> {
 
         public CollisionCandidates() {
             super(null, null);
@@ -41,12 +40,6 @@ public class Physics2DWorldCollisionPhaseBroad {
 
         CollisionCandidates(Physics2DBody a, Physics2DBody b) {
             super(a,b);
-        }
-
-        @Override
-        public void reset() {
-            first = null;
-            second = null;
         }
 
     }
