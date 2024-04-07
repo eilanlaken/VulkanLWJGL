@@ -55,7 +55,7 @@ public class ScenePhysics2D_1 extends WindowScreen {
         for (int i = 0; i < stale.length; i++) {
             renderer2D.pushDebugShape(stale[i], staleTint);
         }
-
+        //System.out.println("draw calls: " + renderer2D.getDrawCalls());
 
         renderer2D.end();
 
@@ -71,7 +71,7 @@ public class ScenePhysics2D_1 extends WindowScreen {
         moving.dy(dy);
 
         int hash = hash(moving.x(), moving.y(), 4096);
-        System.out.println(hash);
+        //System.out.println(hash);
 
     }
 

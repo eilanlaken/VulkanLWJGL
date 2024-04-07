@@ -248,6 +248,7 @@ public class Renderer2D implements MemoryResourceHolder {
     private void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 34 > indicesBuffer.limit() || vertexIndex + 17 * 5 > BATCH_SIZE * 4) {
+            System.out.println("flashing: " + drawCalls);
             flush();
         }
 
@@ -473,13 +474,17 @@ public class Renderer2D implements MemoryResourceHolder {
         currentShader.bindUniform("u_texture", lastTexture);
     }
 
-    private void useCustomAttributes(HashMap<String, Object> customAttributes) {
-        flush();
-        currentShader.bindUniforms(customAttributes);
+    // TODO: unify with shader switching?
+    @Deprecated private void useCustomAttributes(HashMap<String, Object> customAttributes) {
+        if (customAttributes != null) {
+            flush();
+            currentShader.bindUniforms(customAttributes);
+        }
     }
 
     private void useMode(final int mode) {
         if (mode != this.mode) {
+            System.out.println("change draw mode");
             flush();
         }
         this.mode = mode;
