@@ -31,7 +31,7 @@ public class MemoryPool<T> {
         }
     }
 
-    public T grabOne() throws RuntimeException {
+    public synchronized T grabOne() throws RuntimeException {
         try {
             if (this.freeObjects.size == 0) {
                 for (int i = 0; i < initialCapacity; i++) {
@@ -45,7 +45,7 @@ public class MemoryPool<T> {
         }
     }
 
-    public void letGo(T obj) {
+    public synchronized void letGo(T obj) {
         if (obj == null) throw new IllegalArgumentException("object cannot be null.");
         this.freeObjects.add(obj);
     }

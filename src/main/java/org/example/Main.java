@@ -2,15 +2,14 @@ package org.example;
 
 import org.example.engine.core.application.Application;
 import org.example.engine.core.graphics.WindowAttributes;
+import org.example.engine.core.math.Shape2D;
+import org.example.engine.core.math.Shape2DCircle;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.game.ScreenLoading;
 
 public class Main {
 
     public static void main(String[] args) {
-
-        MemoryPool<Nums> pool = new MemoryPool<>(Nums.class, 100);
-        System.out.println(pool.grabOne().a);
 
 
 //        try {
@@ -24,7 +23,7 @@ public class Main {
 //            e.printStackTrace();
 //        }
 
-        if (true) return;
+        //if (true) return;
 
         WindowAttributes config = new WindowAttributes();
         Application.createSingleWindowApplication(config);

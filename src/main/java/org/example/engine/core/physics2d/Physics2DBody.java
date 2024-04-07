@@ -20,7 +20,7 @@ public final class Physics2DBody {
     public boolean sensor;
     public int bitmask;
 
-    protected Physics2DBody() {
+    public Physics2DBody() {
 
     }
 
