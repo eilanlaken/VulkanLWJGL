@@ -28,7 +28,7 @@ public class ScenePhysics2D_1 extends WindowScreen {
     @Override
     public Map<String, Class<? extends MemoryResource>> getRequiredAssets() {
         Map<String, Class<? extends MemoryResource>> requiredAssets = new HashMap<>();
-        requiredAssets.put("assets/atlases/pack2_0.png", Texture.class);
+        //requiredAssets.put("assets/atlases/pack2_0.png", Texture.class);
         return requiredAssets;
     }
 
@@ -78,21 +78,15 @@ public class ScenePhysics2D_1 extends WindowScreen {
         first.dy(dy);
 
         int hash = hash(first.x(), first.y(), 4096);
-        //System.out.println(hash);
+        System.out.println(hash);
 
     }
 
     public static int hash(float x, float y, int tableSize) {
-        final int a = 4297;
-        final int b = 7349;
-        //return (int) Math.abs((Math.floor(x / 2) * 64 + Math.floor(y / 2) ) % tableSize);
-        //return (int) Math.abs((Math.floor(x / 2) * a + Math.floor(y / 2) * b) % tableSize);
         int i = (int) Math.floor(x / 2) % 64;
         if (i < 0) i += 64;
         int j = (int) Math.floor(y / 2) % 64;
         if (j < 0) j += 64;
-
-        System.out.println(i);
         return i * 64 + j;
     }
 
