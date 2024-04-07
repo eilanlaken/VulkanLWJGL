@@ -1,13 +1,11 @@
 package org.example.game;
 
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Shape2D;
 import org.example.engine.core.math.Shape2DCircle;
-import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.memory.MemoryResource;
-import org.example.engine.core.physics2d.Physics2DWorldCollisionPhaseBroad;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
@@ -18,8 +16,9 @@ public class ScenePhysics2D_1 extends WindowScreen {
     private Renderer2D renderer2D;
     private Camera camera;
 
-    private Shape2D first;
-    private Shape2D second;
+    private Shape2D moving;
+    private Shape2D[] stale;
+    private Color staleTint = new Color(1,0,0,1);
 
     public ScenePhysics2D_1() {
         renderer2D = new Renderer2D();
@@ -34,8 +33,11 @@ public class ScenePhysics2D_1 extends WindowScreen {
 
     @Override
     public void show() {
-        first = new Shape2DCircle(100);
-        second = new Shape2DCircle(50);
+        moving = new Shape2DCircle(100);
+        stale = new Shape2DCircle[4000];
+        for (int i = 0; i < stale.length; i++) {
+            stale[i] = new Shape2DCircle(150 + 80 * (float) Math.random(), -4096 + 8281 * (float) Math.random(), -4096 + 8281 * (float) Math.random());
+        }
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -49,20 +51,11 @@ public class ScenePhysics2D_1 extends WindowScreen {
         GL11.glClearColor(0,0,0,1);
         renderer2D.begin(camera);
 
-        //polygon.setRotation(time);
-        //renderer2D.pushDebugShape(circle, null);
-        //renderer2D.pushDebugShape(rectangle, null);
-        //renderer2D.pushDebugShape(aabb, null);
-        //renderer2D.pushDebugShape(compound, null);
-        //renderer2D.pushDebugShape(polygon, null);
-        //renderBounds(compound);
+        renderer2D.pushDebugShape(moving, null);
+        for (int i = 0; i < stale.length; i++) {
+            renderer2D.pushDebugShape(stale[i], staleTint);
+        }
 
-        renderer2D.pushDebugShape(first, null);
-        renderer2D.pushDebugShape(second, null);
-
-
-        //renderBounds(first);
-        //renderBounds(second);
 
         renderer2D.end();
 
@@ -74,10 +67,10 @@ public class ScenePhysics2D_1 extends WindowScreen {
         if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 10;
         if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 10;
 
-        first.dx(dx);
-        first.dy(dy);
+        moving.dx(dx);
+        moving.dy(dy);
 
-        int hash = hash(first.x(), first.y(), 4096);
+        int hash = hash(moving.x(), moving.y(), 4096);
         System.out.println(hash);
 
     }
