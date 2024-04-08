@@ -6,11 +6,16 @@ public final class Physics2DWorldCollisionDetection {
 
     private Physics2DWorldCollisionDetection() {}
 
-    public static boolean boundingCirclesCollide(final Shape2D a, final Shape2D b) {
+    public static boolean broadPhaseCollision(final Shape2D a, final Shape2D b) {
         final float dx = b.x() - a.x();
         final float dy = b.y() - a.y();
         final float sum = a.getBoundingRadius() + b.getBoundingRadius();
         return dx * dx + dy * dy < sum * sum;
+    }
+
+    public static boolean narrowPhaseCollision(Physics2DBody a, Physics2DBody b, Physics2DWorldCollisionManifold manifold) {
+        if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) return circleVsCircle(a, b, manifold);
+        return false;
     }
 
     /** AABB vs ____ **/
@@ -48,7 +53,9 @@ public final class Physics2DWorldCollisionDetection {
     }
 
     // TODO: modify to use manifold etc.
-    private static boolean circleVsCircle(Shape2DCircle c1, Shape2DCircle c2, Physics2DWorldCollisionManifold manifold) {
+    private static boolean circleVsCircle(Physics2DBody a, Physics2DBody b, Physics2DWorldCollisionManifold manifold) {
+        Shape2DCircle c1 = (Shape2DCircle) a.shape;
+        Shape2DCircle c2 = (Shape2DCircle) b.shape;
         final float dx = c2.x() - c1.x();
         final float dy = c2.y() - c1.y();
         final float radiusSum = c1.worldRadius + c2.worldRadius;
@@ -57,11 +64,15 @@ public final class Physics2DWorldCollisionDetection {
         if (distanceSquared > radiusSum * radiusSum) return false;
 
         final float distance = (float) Math.sqrt(distanceSquared);
+        manifold.a = a;
+        manifold.b = b;
+        manifold.contactsCount = 1;
         if (distance != 0) {
-            manifold.penetrationDepth = radiusSum - distance;
+
+            manifold.depth = radiusSum - distance;
             manifold.normal.set(dx, dy).scl(1.0f / distance);
         } else {
-            manifold.penetrationDepth = c1.worldRadius;
+            manifold.depth = c1.worldRadius;
             manifold.normal.set(1, 0);
         }
         return true;

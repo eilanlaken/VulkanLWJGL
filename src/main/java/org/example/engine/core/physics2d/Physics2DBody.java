@@ -51,6 +51,18 @@ public final class Physics2DBody {
         this.forces = new Array<>(false, 2);
     }
 
+    public void setPosition(float x, float y) {
+
+    }
+
+    public void setVelocity(float x, float y) {
+
+    }
+
+    public void dx_dy_rot(float dx, float dy, float da) {
+        shape.dx_dy_rot(dx, dy, da);
+    }
+
     public enum Type {
         STATIC,
         KINEMATIC,
