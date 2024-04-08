@@ -1,8 +1,8 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.math.Shape2D;
 import org.example.engine.core.math.Vector2;
-import org.example.engine.core.memory.MemoryPool;
 
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
@@ -11,16 +11,22 @@ import org.example.engine.core.memory.MemoryPool;
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
 public class Physics2DWorld {
 
+    private static final short PHASE_INTEGRATION = 0;
+    private static final short PHASE_BROAD       = 1;
+    private static final short PHASE_NARROW      = 2;
+    private static final short PHASE_RESOLUTION  = 3;
+
     private Array<Physics2DBody> allBodies = new Array<>(false, 500);
     private Array<Physics2DBody> bodiesToAdd = new Array<>(false, 100);
     private Array<Physics2DBody> bodiesToRemove = new Array<>(false, 500);
-
+    private short phase;
 
     public Physics2DWorld() {
 
     }
 
     public void update(final float delta) {
+        this.phase = PHASE_INTEGRATION;
         allBodies.removeAll(bodiesToRemove, true);
         allBodies.addAll(bodiesToAdd);
 
@@ -34,7 +40,7 @@ public class Physics2DWorld {
             for (Vector2 force : forces) {
                 body.velocity.add(body.massInv * delta * force.x, body.massInv * delta * force.y);
             }
-            body.shape.dx_dy_da(delta * body.velocity.x, delta * body.velocity.y, delta * body.angularVelocity);
+            body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.angularVelocity);
             body.shape.update();
         }
 
@@ -46,8 +52,10 @@ public class Physics2DWorld {
 
     }
 
-    public void createBody() {
-
+    // TODO: change to create using shapes.
+    public void createBody(Shape2D shape, Vector2 position, Vector2 velocity) {
+        Physics2DBody body = new Physics2DBody(shape, position, velocity);
+        this.bodiesToAdd.add(body);
     }
 
     public void destroyBody() {

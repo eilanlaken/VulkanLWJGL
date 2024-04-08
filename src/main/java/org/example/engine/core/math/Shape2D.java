@@ -72,10 +72,12 @@ public abstract class Shape2D {
         updated = false;
     }
 
-    public final void dx_dy_da(float dx, float dy, float da) {
+    public final void dx_dy_rot(float dx, float dy, float da) {
         this.x += dx;
         this.y += dy;
-        this.angle += dx;
+        angle += da;
+        angle %= 360.0f;
+        if (angle < 0) angle += 360.0f;
         updated = false;
     }
 

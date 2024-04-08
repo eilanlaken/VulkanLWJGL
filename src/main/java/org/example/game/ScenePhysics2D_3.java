@@ -1,13 +1,12 @@
 package org.example.game;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.graphics.Camera;
-import org.example.engine.core.graphics.Color;
-import org.example.engine.core.graphics.Renderer2D;
-import org.example.engine.core.graphics.WindowScreen;
+import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.math.Shape2D;
 import org.example.engine.core.math.Shape2DCircle;
+import org.example.engine.core.math.Vector2;
+import org.example.engine.core.physics2d.Physics2DWorld;
 import org.lwjgl.opengl.GL11;
 
 public class ScenePhysics2D_3 extends WindowScreen {
@@ -19,7 +18,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
     private Shape2D other;
     private Color staleTint = new Color(1,0,0,1);
 
-
+    Physics2DWorld world = new Physics2DWorld();
 
     public ScenePhysics2D_3() {
         renderer2D = new Renderer2D();
@@ -34,6 +33,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
         camera = new Camera(640f/64,480f/64, 1);
         camera.update();
+
+        world.createBody(circle, new Vector2(0,0), new Vector2(0.1f, 0));
     }
 
 
@@ -49,16 +50,17 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
         renderer2D.end();
 
+        world.update(GraphicsUtils.getDeltaTime());
 
-        float dx = 0;
-        float dy = 0;
-        if (Keyboard.isKeyPressed(Keyboard.Key.A)) dx -= 0.1f;
-        if (Keyboard.isKeyPressed(Keyboard.Key.D)) dx += 0.1f;
-        if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 0.1f;
-        if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 0.1f;
-
-        circle.dx(dx);
-        circle.dy(dy);
+//
+//        float dx = 0;
+//        float dy = 0;
+//        if (Keyboard.isKeyPressed(Keyboard.Key.A)) dx -= 0.1f;
+//        if (Keyboard.isKeyPressed(Keyboard.Key.D)) dx += 0.1f;
+//        if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 0.1f;
+//        if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 0.1f;
+//        circle.dx(dx);
+//        circle.dy(dy);
 
 
     }

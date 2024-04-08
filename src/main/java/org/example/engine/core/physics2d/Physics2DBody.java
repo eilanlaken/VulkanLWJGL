@@ -6,10 +6,10 @@ import org.example.engine.core.math.Vector2;
 
 public final class Physics2DBody {
 
-    public final Object owner;
+    public Object owner;
     public boolean active;
 
-    public final Type type;
+    public Type type;
     public Shape2D shape;
     public Vector2 velocity;
     public float angularVelocity;
@@ -22,6 +22,7 @@ public final class Physics2DBody {
     public boolean ghost;
     public int bitmask;
 
+    // todo: change to protected.
     public Physics2DBody(Object owner, boolean active, Type type, Shape2D shape, Vector2 position, Vector2 velocity, float angularVelocity, float density, float friction, float restitution, boolean ghost, int bitmask) {
         this.owner = owner;
         this.active = active;
@@ -38,6 +39,16 @@ public final class Physics2DBody {
         this.restitution = restitution;
         this.ghost = ghost;
         this.bitmask = bitmask;
+    }
+
+    public Physics2DBody(Shape2D shape, Vector2 position, Vector2 velocity) {
+        this.owner = null;
+        this.active = true;
+        this.type = Type.DYNAMIC;
+        this.shape = shape;
+        this.shape.xy(position.x, position.y);
+        this.velocity = new Vector2(velocity);
+        this.forces = new Array<>(false, 2);
     }
 
     public enum Type {
