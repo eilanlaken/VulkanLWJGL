@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
 
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
@@ -10,20 +11,38 @@ import org.example.engine.core.memory.MemoryPool;
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
 public class Physics2DWorld {
 
-    private static final int IMPULSE_RESOLUTION_ITERATIONS = 4;
-    private final MemoryPool<Physics2DBody> bodyMemoryPool = new MemoryPool<>(Physics2DBody.class, 300);
-
     private Array<Physics2DBody> allBodies = new Array<>(false, 500);
     private Array<Physics2DBody> bodiesToAdd = new Array<>(false, 100);
     private Array<Physics2DBody> bodiesToRemove = new Array<>(false, 500);
 
-    private Physics2DWorldCollisionPhaseBroad broadPhase;
 
     public Physics2DWorld() {
 
     }
 
     public void update(final float delta) {
+        allBodies.removeAll(bodiesToRemove, true);
+        allBodies.addAll(bodiesToAdd);
+
+        bodiesToAdd.clear();
+        bodiesToRemove.clear();
+
+        for (Physics2DBody body : allBodies) {
+            if (!body.active) continue;
+            if (body.type == Physics2DBody.Type.STATIC) continue;
+            Array<Vector2> forces = body.forces;
+            for (Vector2 force : forces) {
+                body.velocity.add(body.massInv * delta * force.x, body.massInv * delta * force.y);
+            }
+            body.shape.dx_dy_da(delta * body.velocity.x, delta * body.velocity.y, delta * body.angularVelocity);
+            body.shape.update();
+        }
+
+        // broad phase
+
+        // narrow phase
+
+        // resolution
 
     }
 
@@ -40,6 +59,11 @@ public class Physics2DWorld {
     }
 
     public void destroyJoint() {
+
+    }
+
+    // TODO
+    public void castRay() {
 
     }
 

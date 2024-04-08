@@ -47,7 +47,7 @@ public final class Physics2DWorldCollisionDetection {
         return false;
     }
 
-    // TODO: modify to use manifol etc.
+    // TODO: modify to use manifold etc.
     private static boolean circleVsCircle(Shape2DCircle c1, Shape2DCircle c2, Physics2DWorldCollisionManifold manifold) {
         final float dx = c2.x() - c1.x();
         final float dy = c2.y() - c1.y();

@@ -66,45 +66,61 @@ public abstract class Shape2D {
         this.x += dx;
         updated = false;
     }
+
     public final void dy(float dy) {
         this.y += dy;
         updated = false;
     }
+
+    public final void dx_dy_da(float dx, float dy, float da) {
+        this.x += dx;
+        this.y += dy;
+        this.angle += dx;
+        updated = false;
+    }
+
     public final void rot(float da) {
         angle += da;
         angle %= 360.0f;
         if (angle < 0) angle += 360.0f;
         updated = false;
     }
+
     public final void x(float x) {
         this.x = x;
         updated = false;
     }
+
     public final void y(float y) {
         this.y = y;
         updated = false;
     }
+
     public final void xy(float x, float y) {
         this.x = x;
         this.y = y;
         updated = false;
     }
+
     public final void angle(float angle) {
         this.angle = angle;
         updated = false;
     }
+
     public final void scaleX(float scaleX) {
         this.scaleX = scaleX;
         boundingRadiusUpdated = false;
         areaUpdated = false;
         updated = false;
     }
+
     public final void scaleY(float scaleY) {
         this.scaleY = scaleY;
         boundingRadiusUpdated = false;
         areaUpdated = false;
         updated = false;
     }
+
     public final void scaleXY(float scaleX, float scaleY) {
         this.scaleX = scaleX;
         this.scaleY = scaleY;
@@ -112,6 +128,7 @@ public abstract class Shape2D {
         areaUpdated = false;
         updated = false;
     }
+
     public final void transform(float x, float y, float angle, float scaleX, float scaleY) {
         this.x = x;
         this.y = y;
@@ -122,6 +139,7 @@ public abstract class Shape2D {
         areaUpdated = false;
         updated = false;
     }
+
     public final float x() {
         return x;
     }
