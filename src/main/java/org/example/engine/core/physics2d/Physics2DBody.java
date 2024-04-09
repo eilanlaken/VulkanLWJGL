@@ -52,7 +52,7 @@ public final class Physics2DBody {
     }
 
     public void setPosition(float x, float y) {
-
+        shape.xy(x, y);
     }
 
     public void setVelocity(float x, float y) {

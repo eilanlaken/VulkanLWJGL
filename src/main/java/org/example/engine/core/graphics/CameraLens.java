@@ -36,7 +36,7 @@ public class CameraLens {
     }
 
     public void update(Vector3 position, Vector3 direction, Vector3 up) {
-        if (mode == Mode.ORTHOGRAPHIC) projection.setToOrthographicProjection(zoom * -viewportWidth / 2.0f, zoom * (viewportWidth / 2.0f), zoom * -(viewportHeight / 2.0f), zoom * viewportHeight / 2.0f, 0, Float.MAX_VALUE);
+        if (mode == Mode.ORTHOGRAPHIC) projection.setToOrthographicProjection(zoom * -viewportWidth / 2.0f, zoom * (viewportWidth / 2.0f), zoom * -(viewportHeight / 2.0f), zoom * viewportHeight / 2.0f, 0, far);
         else if (mode == Mode.PERSPECTIVE) this.projection.setToPerspectiveProjection(Math.abs(near), Math.abs(far), fov, viewportWidth / viewportHeight);
         view.setToLookAt(position, tmp.set(position).add(direction), up);
         combined.set(projection);
@@ -46,17 +46,17 @@ public class CameraLens {
         frustum.update(invProjectionView);
     }
 
+    public Vector3 unproject(Vector3 screenCoordinates) {
+        unproject(screenCoordinates, 0, 0, GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight());
+        return screenCoordinates;
+    }
+
     public Vector3 unproject(Vector3 screenCoordinates, float viewportX, float viewportY, float viewportWidth, float viewportHeight) {
         float x = screenCoordinates.x - viewportX, y = GraphicsUtils.getWindowHeight() - screenCoordinates.y - viewportY;
         screenCoordinates.x = (2 * x) / viewportWidth - 1;
         screenCoordinates.y = (2 * y) / viewportHeight - 1;
         screenCoordinates.z = 2 * screenCoordinates.z - 1;
         screenCoordinates.prj(invProjectionView);
-        return screenCoordinates;
-    }
-
-    public Vector3 unproject(Vector3 screenCoordinates) {
-        unproject(screenCoordinates, 0, 0, GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight());
         return screenCoordinates;
     }
 
@@ -71,6 +71,14 @@ public class CameraLens {
         worldCoordinates.y = viewportHeight * (worldCoordinates.y + 1) / 2 + viewportY;
         worldCoordinates.z = (worldCoordinates.z + 1) / 2;
         return worldCoordinates;
+    }
+
+    public float getViewportWidth() {
+        return viewportWidth;
+    }
+
+    public float getViewportHeight() {
+        return viewportHeight;
     }
 
     public enum Mode {

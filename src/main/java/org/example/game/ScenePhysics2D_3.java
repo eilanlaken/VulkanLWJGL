@@ -3,11 +3,11 @@ package org.example.game;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
-import org.example.engine.core.math.Shape2D;
-import org.example.engine.core.math.Shape2DCircle;
-import org.example.engine.core.math.Vector2;
+import org.example.engine.core.input.Mouse;
+import org.example.engine.core.math.*;
 import org.example.engine.core.physics2d.Physics2DBody;
 import org.example.engine.core.physics2d.Physics2DWorld;
+import org.example.engine.core.physics2d.Physics2DWorldCollisionManifold;
 import org.lwjgl.opengl.GL11;
 
 public class ScenePhysics2D_3 extends WindowScreen {
@@ -21,9 +21,17 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
     Physics2DWorld world = new Physics2DWorld();
     Physics2DBody body;
+    private Shape2DPolygon contactIndicator = AlgorithmsPolygons.createPolygonCircleFilled(1, 10);
+
+    Physics2DWorldCollisionManifold manifold;
 
     public ScenePhysics2D_3() {
         renderer2D = new Renderer2D();
+        manifold = new Physics2DWorldCollisionManifold();
+        manifold.contactPoint1 = new Vector2(0,0);
+        manifold.contactPoint2 = new Vector2(1,1);
+        manifold.normal = new Vector2(-3,4).nor();
+        manifold.depth = 0.2f;
     }
 
     @Override
@@ -52,22 +60,48 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
         renderer2D.end();
 
+
+
         world.update(GraphicsUtils.getDeltaTime());
+        Vector3 screen = new Vector3(Mouse.getCursorX(), Mouse.getCursorY(), 0);
+        camera.lens.unproject(screen);
+        body.setPosition(screen.x, screen.y);
 
 
-        float dx = 0;
-        float dy = 0;
-        if (Keyboard.isKeyPressed(Keyboard.Key.A)) dx -= 0.1f;
-        if (Keyboard.isKeyPressed(Keyboard.Key.D)) dx += 0.1f;
-        if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 0.1f;
-        if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 0.1f;
-        body.dx_dy_rot(dx, dy, 0);
-        //circle.dx(dx);
-        //circle.dy(dy);
-
-
+        // render physics 2d debug:
+        renderer2D.begin(camera);
+        renderManifold(manifold);
+        renderer2D.end();
     }
 
+    // TODO: refactor out into the physics debug renderer. For now, use to implement correct narrow phase.
+    private void renderManifold(Physics2DWorldCollisionManifold manifold) {
+        Vector2 penetration = new Vector2(manifold.normal).scl(manifold.depth);
+
+        // calculate points scale
+        final float pointPixelRadius = 6;
+        float scaleX = camera.lens.getViewportWidth() * pointPixelRadius / GraphicsUtils.getWindowWidth();
+        float scaleY = camera.lens.getViewportHeight() * pointPixelRadius / GraphicsUtils.getWindowHeight();
+
+        // render contact points
+        if (manifold.contactPoint1 != null)
+            renderer2D.pushPolygon(contactIndicator, new Color(1,0,0,1), manifold.contactPoint1.x, manifold.contactPoint1.y, 0,0,0,scaleX,scaleY,null,null);
+        if (manifold.contactPoint2 != null)
+            renderer2D.pushPolygon(contactIndicator, new Color(1,0,0,1), manifold.contactPoint2.x, manifold.contactPoint2.y, 0,0,0,scaleX,scaleY,null,null);
+
+        Vector2 contactsCenter = new Vector2();
+
+        if (manifold.contactPoint1 != null && manifold.contactPoint2 != null) {
+            contactsCenter.set(manifold.contactPoint1).add(manifold.contactPoint2).scl(0.5f);
+        } else if (manifold.contactPoint1 != null) {
+            contactsCenter.set(manifold.contactPoint1);
+        } else if (manifold.contactPoint2 != null) {
+            contactsCenter.set(manifold.contactPoint2);
+        }
+
+        Shape2DSegment segment = new Shape2DSegment(contactsCenter.x, contactsCenter.y, contactsCenter.x + penetration.x, contactsCenter.y + penetration.y);
+        renderer2D.pushDebugShape(segment, new Color(1,0,1,1));
+    }
 
     private void renderBounds(Shape2D shape2D) {
         float r = shape2D.getBoundingRadius();
