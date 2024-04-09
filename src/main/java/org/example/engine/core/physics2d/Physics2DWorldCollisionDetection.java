@@ -1,5 +1,6 @@
 package org.example.engine.core.physics2d;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.*;
 
 public final class Physics2DWorldCollisionDetection {
@@ -13,9 +14,8 @@ public final class Physics2DWorldCollisionDetection {
         return dx * dx + dy * dy < sum * sum;
     }
 
-    public static boolean narrowPhaseCollision(Physics2DBody a, Physics2DBody b, Physics2DWorldCollisionManifold manifold) {
-        if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) return circleVsCircle(a, b, manifold);
-        return false;
+    public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
+        if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) circleVsCircle(a, b, manifolds);
     }
 
     /** AABB vs ____ **/
@@ -53,29 +53,37 @@ public final class Physics2DWorldCollisionDetection {
     }
 
     // TODO: modify to use manifold etc.
-    private static boolean circleVsCircle(Physics2DBody a, Physics2DBody b, Physics2DWorldCollisionManifold manifold) {
+    private static void circleVsCircle(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
         Shape2DCircle c1 = (Shape2DCircle) a.shape;
         Shape2DCircle c2 = (Shape2DCircle) b.shape;
         final float dx = c2.x() - c1.x();
         final float dy = c2.y() - c1.y();
+        // todo: what if world radius is not updated?
         final float radiusSum = c1.worldRadius + c2.worldRadius;
         final float distanceSquared = dx * dx + dy * dy;
 
-        if (distanceSquared > radiusSum * radiusSum) return false;
+        if (distanceSquared > radiusSum * radiusSum) return;
 
         final float distance = (float) Math.sqrt(distanceSquared);
+
+        // todo: grab from pool
+        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
         manifold.a = a;
         manifold.b = b;
         manifold.contactsCount = 1;
+        manifold.normal = new Vector2();
         if (distance != 0) {
-
             manifold.depth = radiusSum - distance;
             manifold.normal.set(dx, dy).scl(1.0f / distance);
         } else {
             manifold.depth = c1.worldRadius;
             manifold.normal.set(1, 0);
         }
-        return true;
+
+        manifold.contactPoint1 = new Vector2(manifold.normal).scl(c1.worldRadius).add(c1.worldCenter);
+
+
+        manifolds.add(manifold);
     }
 
     private static boolean circleVsMorphed(Shape2DCircle circle, Shape2DMorphed morphed, Physics2DWorldCollisionManifold manifold) {

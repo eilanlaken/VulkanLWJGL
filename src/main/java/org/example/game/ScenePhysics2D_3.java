@@ -23,28 +23,21 @@ public class ScenePhysics2D_3 extends WindowScreen {
     Physics2DBody body;
     private Shape2DPolygon contactIndicator = AlgorithmsPolygons.createPolygonCircleFilled(1, 10);
 
-    Physics2DWorldCollisionManifold manifold;
-
     public ScenePhysics2D_3() {
         renderer2D = new Renderer2D();
-        manifold = new Physics2DWorldCollisionManifold();
-        manifold.contactPoint1 = new Vector2(0,0);
-        manifold.contactPoint2 = new Vector2(1,1);
-        manifold.normal = new Vector2(-3,4).nor();
-        manifold.depth = 0.2f;
     }
 
     @Override
     public void show() {
         circle = new Shape2DCircle(1);
         other = new Shape2DCircle(1.5f,0,0);
-        other.xy(3, 1.5f);
-        other.update();
 
         camera = new Camera(640f/64,480f/64, 1);
         camera.update();
 
         body = world.createBody(circle, new Vector2(0,0), new Vector2(0.f, 0));
+        world.createBody(other, new Vector2(3,1.5f), new Vector2(0.f, 0));
+
     }
 
 
@@ -70,7 +63,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
         // render physics 2d debug:
         renderer2D.begin(camera);
-        renderManifold(manifold);
+        for (Physics2DWorldCollisionManifold manifold : world.collisionManifolds)
+            renderManifold(manifold);
         renderer2D.end();
     }
 

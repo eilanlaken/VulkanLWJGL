@@ -12,18 +12,21 @@ import org.example.engine.core.math.Vector2;
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
 public class Physics2DWorld {
 
+    // todo: change everything to private or protected
     private static final short PHASE_PREPARATION = 0;
     private static final short PHASE_INTEGRATION = 1;
     private static final short PHASE_BROAD       = 2;
     private static final short PHASE_NARROW      = 3;
     private static final short PHASE_RESOLUTION  = 4;
 
-    private Array<Physics2DBody> allBodies      = new Array<>(false, 500);
-    private Array<Physics2DBody> bodiesToAdd    = new Array<>(false, 100);
-    private Array<Physics2DBody> bodiesToRemove = new Array<>(false, 500);
-    private short phase;
+    public Array<Physics2DBody> allBodies      = new Array<>(false, 500);
+    public Array<Physics2DBody> bodiesToAdd    = new Array<>(false, 100);
+    public Array<Physics2DBody> bodiesToRemove = new Array<>(false, 500);
+    public short phase;
 
-    private Array<TuplePair<Physics2DBody, Physics2DBody>> collisionCandidates = new Array<>(false, 200);
+    // [i, i+1] are collision candidates.
+    public final Array<Physics2DBody> collisionCandidates                  = new Array<>(false, 400);
+    public final Array<Physics2DWorldCollisionManifold> collisionManifolds = new Array<>(false, 200);
 
     public Physics2DWorld() {
 
@@ -37,6 +40,8 @@ public class Physics2DWorld {
             bodiesToAdd.clear();
             bodiesToRemove.clear();
             collisionCandidates.clear();
+            // todo: see what is up with poolable objects.
+            collisionManifolds.clear();
         }
 
         this.phase = PHASE_INTEGRATION;
@@ -57,12 +62,19 @@ public class Physics2DWorld {
 
         this.phase = PHASE_BROAD;
         {
-
+            // for now.
+            collisionCandidates.addAll(allBodies);
         }
 
         this.phase = PHASE_NARROW;
         {
-
+            System.out.println("m " + collisionManifolds.size);
+            System.out.println("b " + collisionCandidates.size);
+            for (int i = 0; i < collisionCandidates.size - 1; i += 2) {
+                Physics2DBody a = collisionCandidates.get(i);
+                Physics2DBody b = collisionCandidates.get(i + 1);
+                Physics2DWorldCollisionDetection.narrowPhaseCollision(a, b, collisionManifolds);
+            }
         }
 
         // resolution
