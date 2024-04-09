@@ -16,6 +16,8 @@ public final class Physics2DWorldCollisionDetection {
 
     public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
         if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) circleVsCircle(a, b, manifolds);
+        if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DAABB) circleVsAABB(a, b, manifolds);
+        if (a.shape instanceof Shape2DAABB && b.shape instanceof Shape2DCircle) AABBvsCircle(a, b, manifolds);
     }
 
     /** AABB vs ____ **/
@@ -26,9 +28,27 @@ public final class Physics2DWorldCollisionDetection {
         return true;
     }
 
-    private static boolean AABBvsCircle(Shape2DAABB aabb, Shape2DCircle circle, Physics2DWorldCollisionManifold manifold) {
+    private static void AABBvsCircle(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
 
-        return false;
+        System.out.println("check aabb circle");
+
+        Shape2DAABB aabb = (Shape2DAABB) a.shape;
+        Shape2DCircle circle = (Shape2DCircle) b.shape;
+        Vector2 centerPositiveQuadrant = new Vector2(circle.worldCenter);
+        centerPositiveQuadrant.x = Math.abs(centerPositiveQuadrant.x);
+        centerPositiveQuadrant.y = Math.abs(centerPositiveQuadrant.y);
+
+        Vector2 cm_box = new Vector2(aabb.worldMin).add(aabb.worldMax).scl(0.5f);
+        Vector2 cornerTopRight = new Vector2(aabb.worldMax).sub(cm_box);
+
+        Vector2 c = new Vector2(centerPositiveQuadrant).sub(cornerTopRight);
+        c.x = Math.max(c.x, 0);
+        c.y = Math.max(c.y, 0);
+
+        if (c.len2() >= circle.worldRadius * circle.worldRadius) return;
+
+        System.out.println("intersection");
+
     }
 
     private static boolean AABBvsMorphed(Shape2DAABB aabb, Shape2DMorphed morphed, Physics2DWorldCollisionManifold manifold) {
@@ -46,10 +66,21 @@ public final class Physics2DWorldCollisionDetection {
         return false;
     }
 
+    // TODO: continue
     /** Circle vs ____ **/
-    private static boolean circleVsAABB(Shape2DCircle circle, Shape2DAABB aabb, Physics2DWorldCollisionManifold manifold) {
+    private static void circleVsAABB(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
+        Shape2DCircle circle = (Shape2DCircle) a.shape;
+        Shape2DAABB aabb = (Shape2DAABB) b.shape;
 
-        return false;
+        float eX = Math.max(0, aabb.worldMin.x - circle.worldCenter.x) + Math.max(0, circle.worldCenter.x - aabb.worldMax.x);
+        if (eX > circle.worldRadius) return;
+
+        float eY = Math.max(0, aabb.worldMin.y - circle.worldCenter.y) + Math.max(0, circle.worldCenter.y - aabb.worldMax.y);
+        if (eY > circle.worldRadius) return;
+
+        if (eX * eX + eY * eY > circle.worldRadius * circle.worldRadius) return;
+
+        System.out.println("intersection");
     }
 
     // TODO: modify to use manifold etc.

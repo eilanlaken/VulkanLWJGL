@@ -68,8 +68,6 @@ public class Physics2DWorld {
 
         this.phase = PHASE_NARROW;
         {
-            System.out.println("m " + collisionManifolds.size);
-            System.out.println("b " + collisionCandidates.size);
             for (int i = 0; i < collisionCandidates.size - 1; i += 2) {
                 Physics2DBody a = collisionCandidates.get(i);
                 Physics2DBody b = collisionCandidates.get(i + 1);

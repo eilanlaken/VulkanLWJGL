@@ -2,7 +2,6 @@ package org.example.game;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
 import org.example.engine.core.math.*;
 import org.example.engine.core.physics2d.Physics2DBody;
@@ -16,7 +15,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
     private Camera camera;
 
     private Shape2D circle;
-    private Shape2D other;
+    private Shape2D otherCircle;
+    private Shape2D otherAABB;
     private Color staleTint = new Color(1,0,0,1);
 
     Physics2DWorld world = new Physics2DWorld();
@@ -30,13 +30,15 @@ public class ScenePhysics2D_3 extends WindowScreen {
     @Override
     public void show() {
         circle = new Shape2DCircle(1);
-        other = new Shape2DCircle(1.5f,0,0);
+        otherCircle = new Shape2DCircle(1.5f,0,0);
+        otherAABB = new Shape2DAABB(4, 2);
 
         camera = new Camera(640f/64,480f/64, 1);
         camera.update();
 
         body = world.createBody(circle, new Vector2(0,0), new Vector2(0.f, 0));
-        world.createBody(other, new Vector2(3,1.5f), new Vector2(0.f, 0));
+        //world.createBody(otherCircle, new Vector2(3,1.5f), new Vector2(0.f, 0));
+        world.createBody(otherAABB, new Vector2(-2, -2.5f), new Vector2(0.f, 0));
 
     }
 
@@ -49,7 +51,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
         renderer2D.begin(camera);
 
         renderer2D.pushDebugShape(circle, null);
-        renderer2D.pushDebugShape(other, staleTint);
+        renderer2D.pushDebugShape(otherCircle, staleTint);
+        renderer2D.pushDebugShape(otherAABB, staleTint);
 
         renderer2D.end();
 
