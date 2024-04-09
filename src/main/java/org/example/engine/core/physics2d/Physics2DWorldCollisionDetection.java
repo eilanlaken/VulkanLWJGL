@@ -16,8 +16,8 @@ public final class Physics2DWorldCollisionDetection {
 
     public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
         if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) circleVsCircle(a, b, manifolds);
-        if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DAABB) circleVsAABB(a, b, manifolds);
-        if (a.shape instanceof Shape2DAABB && b.shape instanceof Shape2DCircle) AABBvsCircle(a, b, manifolds);
+        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DAABB) circleVsAABB(a, b, manifolds);
+        else if (a.shape instanceof Shape2DAABB && b.shape instanceof Shape2DCircle) AABBvsCircle(a, b, manifolds);
     }
 
     /** AABB vs ____ **/
@@ -80,7 +80,28 @@ public final class Physics2DWorldCollisionDetection {
 
         if (eX * eX + eY * eY > circle.worldRadius * circle.worldRadius) return;
 
-        System.out.println("intersection");
+        // create the manifold.
+        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
+        manifold.normal = new Vector2();
+
+        float dst2 = Float.MAX_VALUE;
+        dst2 = Math.min(dst2, Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, aabb.worldMin.x, circle.worldCenter.y));
+        dst2 = Math.min(dst2, Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, circle.worldCenter.x, aabb.worldMax.y));
+        dst2 = Math.min(dst2, Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, aabb.worldMax.x, circle.worldCenter.y));
+        dst2 = Math.min(dst2, Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, circle.worldCenter.x, aabb.worldMin.y));
+
+
+        if (aabb.contains(circle.worldCenter)) {
+            manifold.depth = (float) Math.sqrt(dst2);
+            manifold.normal.set(circle.worldCenter).sub(aabb.getWorldCenter()).nor();
+            manifold.contactPoint1 = new Vector2(circle.worldCenter);
+        } else {
+            manifold.depth = circle.worldRadius - (float) Math.sqrt(dst2);
+        }
+
+
+        manifolds.add(manifold);
+
     }
 
     // TODO: modify to use manifold etc.

@@ -68,11 +68,19 @@ public class Physics2DWorld {
 
         this.phase = PHASE_NARROW;
         {
-            for (int i = 0; i < collisionCandidates.size - 1; i += 2) {
-                Physics2DBody a = collisionCandidates.get(i);
-                Physics2DBody b = collisionCandidates.get(i + 1);
-                Physics2DWorldCollisionDetection.narrowPhaseCollision(a, b, collisionManifolds);
+            // TODO: use enhanced loop below. (delete this).
+            for (int i = 0; i < allBodies.size - 1; i++) {
+                for (int j = i + 1; j < allBodies.size; j++) {
+                    Physics2DBody a = allBodies.get(i);
+                    Physics2DBody b = allBodies.get(j);
+                    Physics2DWorldCollisionDetection.narrowPhaseCollision(a, b, collisionManifolds);
+                }
             }
+//            for (int i = 0; i < collisionCandidates.size - 1; i += 2) {
+//                Physics2DBody a = collisionCandidates.get(i);
+//                Physics2DBody b = collisionCandidates.get(i + 1);
+//                Physics2DWorldCollisionDetection.narrowPhaseCollision(a, b, collisionManifolds);
+//            }
         }
 
         // resolution

@@ -11,6 +11,8 @@ public class Shape2DAABB extends Shape2D {
     public Vector2 worldMin;
     public Vector2 worldMax;
 
+    private Vector2 tmp = new Vector2();
+
     public Shape2DAABB(float x1, float y1, float x2, float y2) {
         this.localMin = new Vector2(x1, y1);
         this.localMax = new Vector2(x2, y2);
@@ -25,6 +27,10 @@ public class Shape2DAABB extends Shape2D {
 
     public Shape2DAABB(float width, float height) {
         this(-width * 0.5f, -height * 0.5f, width * 0.5f, height * 0.5f);
+    }
+
+    public Vector2 getWorldCenter() {
+        return tmp.set(worldMin).add(worldMax).scl(0.5f);
     }
 
     @Override

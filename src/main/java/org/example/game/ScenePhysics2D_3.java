@@ -37,7 +37,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
         camera.update();
 
         body = world.createBody(circle, new Vector2(0,0), new Vector2(0.f, 0));
-        //world.createBody(otherCircle, new Vector2(3,1.5f), new Vector2(0.f, 0));
+        world.createBody(otherCircle, new Vector2(3,1.5f), new Vector2(0.f, 0));
         world.createBody(otherAABB, new Vector2(-2, -2.5f), new Vector2(0.f, 0));
 
     }
