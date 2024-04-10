@@ -83,21 +83,43 @@ public final class Physics2DWorldCollisionDetection {
         // create the manifold.
         Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
         manifold.normal = new Vector2();
+        manifold.contactPoint1 = new Vector2();
 
-        float dst2 = Float.MAX_VALUE;
-        dst2 = Math.min(dst2, Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, aabb.worldMin.x, circle.worldCenter.y));
-        dst2 = Math.min(dst2, Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, circle.worldCenter.x, aabb.worldMax.y));
-        dst2 = Math.min(dst2, Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, aabb.worldMax.x, circle.worldCenter.y));
-        dst2 = Math.min(dst2, Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, circle.worldCenter.x, aabb.worldMin.y));
+        float dstASquared = Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, aabb.worldMin.x, circle.worldCenter.y);
+        float dstBSquared = Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, circle.worldCenter.x, aabb.worldMax.y);
+        float dstCSquared = Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, aabb.worldMax.x, circle.worldCenter.y);
+        float dstDSquared = Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, circle.worldCenter.x, aabb.worldMin.y);
 
+        float minDstSquared = MathUtils.min(dstASquared, dstBSquared, dstCSquared, dstDSquared);
+
+        // for now, let's set the contact point to the closest point on the aabb.
+        Vector2 closest = new Vector2(circle.worldCenter).clamp(aabb.worldMin, aabb.worldMax);
+        manifold.contactPoint1.set(closest);
 
         if (aabb.contains(circle.worldCenter)) {
-            manifold.depth = (float) Math.sqrt(dst2);
-            manifold.normal.set(circle.worldCenter).sub(aabb.getWorldCenter()).nor();
-            manifold.contactPoint1 = new Vector2(circle.worldCenter);
+
+            if (MathUtils.isEqual(minDstSquared, dstASquared)) closest.set(aabb.worldMin.x, circle.worldCenter.y);
+            else if (MathUtils.isEqual(minDstSquared, dstBSquared)) closest.set(circle.worldCenter.x, aabb.worldMax.y);
+            else if (MathUtils.isEqual(minDstSquared, dstCSquared)) closest.set(aabb.worldMax.x, circle.worldCenter.y);
+            else if (MathUtils.isEqual(minDstSquared, dstDSquared)) closest.set(circle.worldCenter.x, aabb.worldMin.y);
         } else {
-            manifold.depth = circle.worldRadius - (float) Math.sqrt(dst2);
+
         }
+
+//        if (aabb.contains(circle.worldCenter)) {
+//            manifold.depth = circle.worldRadius - (float) Math.sqrt(minDstSquared);
+//            manifold.normal.set(circle.worldCenter).sub(aabb.getWorldCenter()).nor();
+//            manifold.contactPoint1 = new Vector2(circle.worldCenter);
+//        } else {
+//            manifold.depth = circle.worldRadius - (float) Math.sqrt(minDstSquared);
+//            Vector2 closest = new Vector2();
+//            if (MathUtils.isEqual(minDstSquared, dstASquared)) closest.set(aabb.worldMin.x, circle.worldCenter.y);
+//            else if (MathUtils.isEqual(minDstSquared, dstBSquared)) closest.set(circle.worldCenter.x, aabb.worldMax.y);
+//            else if (MathUtils.isEqual(minDstSquared, dstCSquared)) closest.set(aabb.worldMax.x, circle.worldCenter.y);
+//            else if (MathUtils.isEqual(minDstSquared, dstDSquared)) closest.set(circle.worldCenter.x, aabb.worldMin.y);
+//            manifold.normal.set(circle.worldCenter).sub(closest).nor();
+//            manifold.contactPoint1 = new Vector2(closest);
+//        }
 
 
         manifolds.add(manifold);

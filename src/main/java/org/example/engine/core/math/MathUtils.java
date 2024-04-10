@@ -113,6 +113,14 @@ public final class MathUtils {
         return Math.max(a, MathUtils.max(b, c, d));
     }
 
+    public static float min(float a, float b, float c) {
+        return Math.min(a, Math.min(b, c));
+    }
+
+    public static float min(float a, float b, float c, float d) {
+        return Math.min(a, MathUtils.min(b, c, d));
+    }
+
     public static float sin(float radians) {
         return Sin.lookup[(int)(radians * RADIANS_TO_INDEX) & SIN_MASK];
     }

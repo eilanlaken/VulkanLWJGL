@@ -301,6 +301,21 @@ public class Vector2 {
         return this;
     }
 
+    // TODO: test
+    public Vector2 clamp(Vector2 min, Vector2 max) {
+        if (this.x < min.x)
+            this.x = min.x;
+        else if (this.x > max.x)
+            this.x = max.x;
+
+        if (this.y < min.y)
+            this.y = min.y;
+        else if (this.y > max.y)
+            this.y = max.y;
+
+        return this;
+    }
+
     public Vector2 lerp(Vector2 target, float alpha) {
         final float invAlpha = 1.0f - alpha;
         this.x = (x * invAlpha) + (target.x * alpha);
