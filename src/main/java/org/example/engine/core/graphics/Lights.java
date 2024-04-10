@@ -4,7 +4,7 @@ import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector3;
 
-public class Lights {
+@Deprecated public class Lights {
 
     private final Color finalAmbient = new Color(0,0,0,1);
     private final Vector3 totalAmbient = new Vector3(0,0,0);

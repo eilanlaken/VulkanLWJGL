@@ -25,7 +25,7 @@ public class CollectionsSorter {
             this.arraySorterComparable = new CollectionsSorterArrayComparable();
         }
 
-        this.arraySorterComparable.doSort(a, 0, a.length);
+        this.arraySorterComparable.doSort(a,0, a.length);
     }
 
     public void sort(Object[] a, int fromIndex, int toIndex) {
