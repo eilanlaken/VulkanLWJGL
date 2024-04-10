@@ -4,7 +4,7 @@ import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.*;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
@@ -104,7 +104,7 @@ public class SceneRendering2D_5 extends WindowScreen {
         renderer2D.end();
         time++;
 
-        if (Keyboard.isKeyJustPressed(Keyboard.Key.Q)) {
+        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.Q)) {
             compound.addIsland(aabb);
         }
     }

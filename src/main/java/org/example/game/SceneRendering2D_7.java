@@ -1,8 +1,7 @@
 package org.example.game;
 
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.Keyboard;
-import org.example.engine.core.math.AlgorithmsCollisions2D;
+import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.Shape2D;
 import org.example.engine.core.math.Shape2DCircle;
 import org.example.engine.core.memory.MemoryResource;
@@ -18,7 +17,6 @@ public class SceneRendering2D_7 extends WindowScreen {
 
     private Shape2D first;
     private Shape2D second;
-    private AlgorithmsCollisions2D.Penetration penetration = new AlgorithmsCollisions2D.Penetration();
 
     public SceneRendering2D_7() {
         renderer2D = new Renderer2D();
@@ -70,20 +68,13 @@ public class SceneRendering2D_7 extends WindowScreen {
 
         float dx = 0;
         float dy = 0;
-        if (Keyboard.isKeyPressed(Keyboard.Key.A)) dx -= 10;
-        if (Keyboard.isKeyPressed(Keyboard.Key.D)) dx += 10;
-        if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 10;
-        if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.A)) dx -= 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.D)) dx += 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) dy += 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) dy -= 10;
 
         first.dx(dx);
         first.dy(dy);
-
-        if (AlgorithmsCollisions2D.collide(first, second, penetration)) {
-            System.out.println("normal: " + penetration.normal);
-            System.out.println("depth: " + penetration.depth);
-        }
-
-
 
     }
 

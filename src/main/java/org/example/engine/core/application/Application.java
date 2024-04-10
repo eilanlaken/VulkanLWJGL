@@ -8,8 +8,8 @@ import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Window;
 import org.example.engine.core.graphics.WindowAttributes;
 import org.example.engine.core.graphics.WindowScreen;
-import org.example.engine.core.input.Keyboard;
-import org.example.engine.core.input.Mouse;
+import org.example.engine.core.input.InputKeyboard;
+import org.example.engine.core.input.InputMouse;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -32,8 +32,8 @@ public class Application {
         GL.createCapabilities();
         GraphicsUtils.init(window);
         AssetUtils.init(window);
-        Mouse.init(window);
-        Keyboard.init(window);
+        InputMouse.init(window);
+        InputKeyboard.init(window);
         // init OpenGL Context
         initialized = true;
     }
@@ -58,8 +58,8 @@ public class Application {
 
             // asset loading
             AssetStore.update();
-            Mouse.resetInternalState();
-            Keyboard.resetInternalState();
+            InputMouse.resetInternalState();
+            InputKeyboard.resetInternalState();
             GLFW.glfwPollEvents();
 
             boolean requestRendering;

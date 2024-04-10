@@ -1,7 +1,7 @@
 package org.example.game;
 
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.*;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
@@ -91,18 +91,14 @@ public class SceneRendering2D_6 extends WindowScreen {
 
         float dx = 0;
         float dy = 0;
-        if (Keyboard.isKeyPressed(Keyboard.Key.A)) dx -= 10;
-        if (Keyboard.isKeyPressed(Keyboard.Key.D)) dx += 10;
-        if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 10;
-        if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.A)) dx -= 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.D)) dx += 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) dy += 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) dy -= 10;
 
         circle2.dx(dx);
         circle2.dy(dy);
         circle2.update();
-
-        if (AlgorithmsCollisions2D.boundingCirclesCollide(circle1, circle2)) {
-            System.out.println("collision");
-        }
     }
 
     private void renderBounds(Shape2D shape2D) {

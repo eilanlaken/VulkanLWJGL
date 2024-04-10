@@ -2,7 +2,7 @@ package org.example.game;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.Mouse;
+import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.*;
 import org.example.engine.core.physics2d.Physics2DBody;
 import org.example.engine.core.physics2d.Physics2DWorld;
@@ -59,7 +59,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
 
         world.update(GraphicsUtils.getDeltaTime());
-        Vector3 screen = new Vector3(Mouse.getCursorX(), Mouse.getCursorY(), 0);
+        Vector3 screen = new Vector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
         camera.lens.unproject(screen);
         body.setPosition(screen.x, screen.y);
 

@@ -1,8 +1,7 @@
 package org.example.game;
 
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.Keyboard;
-import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.Shape2D;
 import org.example.engine.core.math.Shape2DCircle;
 import org.example.engine.core.memory.MemoryResource;
@@ -62,10 +61,10 @@ public class ScenePhysics2D_1 extends WindowScreen {
 
         float dx = 0;
         float dy = 0;
-        if (Keyboard.isKeyPressed(Keyboard.Key.A)) dx -= 10;
-        if (Keyboard.isKeyPressed(Keyboard.Key.D)) dx += 10;
-        if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 10;
-        if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.A)) dx -= 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.D)) dx += 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) dy += 10;
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) dy -= 10;
 
         moving.dx(dx);
         moving.dy(dy);
