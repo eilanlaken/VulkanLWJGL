@@ -96,6 +96,10 @@ public class Vector2 {
         return x1 * x2 + y1 * y2;
     }
 
+    public static float dot(final Vector2 a, final Vector2 b) {
+        return a.x * b.x + a.y * b.y;
+    }
+
     public float dot(Vector2 v) {
         return x * v.x + y * v.y;
     }

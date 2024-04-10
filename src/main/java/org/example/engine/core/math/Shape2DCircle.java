@@ -2,8 +2,10 @@ package org.example.engine.core.math;
 
 public class Shape2DCircle extends Shape2D {
 
-    public Vector2 localCenter;
-    public float localRadius;
+    public final Vector2 localCenter;
+    public final float localRadius;
+
+    // TODO: change to private with getters and setters.
     public Vector2 worldCenter;
     public float worldRadius;
 

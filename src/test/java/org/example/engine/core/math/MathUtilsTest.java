@@ -1,5 +1,6 @@
 package org.example.engine.core.math;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class MathUtilsTest {
@@ -126,5 +127,147 @@ class MathUtilsTest {
 
     @Test
     void log() {
+    }
+
+    @Test
+    void testRandom1() {
+    }
+
+    @Test
+    void testRandom2() {
+    }
+
+    @Test
+    void testClamp4() {
+    }
+
+    @Test
+    void testClamp5() {
+    }
+
+    @Test
+    void testClamp6() {
+    }
+
+    @Test
+    void testClamp7() {
+    }
+
+    @Test
+    void testClamp8() {
+    }
+
+    @Test
+    void testNextPowerOfTwo() {
+    }
+
+    @Test
+    void testAtanUnchecked() {
+    }
+
+    @Test
+    void testAtan2() {
+    }
+
+    @Test
+    void testAreaTriangle1() {
+    }
+
+    @Test
+    void testAreaTriangle2() {
+    }
+
+    @Test
+    void testMax1() {
+    }
+
+    @Test
+    void testMax2() {
+    }
+
+    @Test
+    void min() {
+    }
+
+    @Test
+    void testMin() {
+    }
+
+    @Test
+    void intervalsOverlap() {
+        Assertions.assertEquals(0.0f, MathUtils.intervalsOverlap(0.0f, 1.0f, 2.0f, 4.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.0f, MathUtils.intervalsOverlap(9.0f, 8.0f, 4.0f, 2.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(2.0f, MathUtils.intervalsOverlap(0.0f, 4.0f, 1.0f, 3.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(3.0f, MathUtils.intervalsOverlap(1.0f, 5.0f, 2.0f, 6.5f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(1.2f, MathUtils.intervalsOverlap(-1.2f, 1.2f,0.0f, 1.2f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(2.0f, MathUtils.intervalsOverlap(2.0f, 4.0f, 2.0f, 4.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+    }
+
+    @Test
+    void testSin() {
+    }
+
+    @Test
+    void testCos() {
+    }
+
+    @Test
+    void testSinDeg() {
+    }
+
+    @Test
+    void testCosDeg() {
+    }
+
+    @Test
+    void testTan() {
+    }
+
+    @Test
+    void testAcos() {
+    }
+
+    @Test
+    void testAsin() {
+    }
+
+    @Test
+    void testTanDeg() {
+    }
+
+    @Test
+    void testAtan() {
+    }
+
+    @Test
+    void testAsinDeg() {
+    }
+
+    @Test
+    void testAcosDeg() {
+    }
+
+    @Test
+    void testAtanDeg() {
+    }
+
+    @Test
+    void testIsZero1() {
+    }
+
+    @Test
+    void testIsZero2() {
+    }
+
+    @Test
+    void testIsEqual1() {
+    }
+
+    @Test
+    void testIsEqual2() {
+    }
+
+    @Test
+    void testLog() {
     }
 }

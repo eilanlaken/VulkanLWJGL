@@ -121,6 +121,25 @@ public final class MathUtils {
         return Math.min(a, MathUtils.min(b, c, d));
     }
 
+    // [x1, x2] and [x3, x4] are intervals.
+    public static float intervalsOverlap(float x1, float x2, float x3, float x4) {
+        if (x1 > x2) {
+            float tmp = x1;
+            x1 = x2;
+            x2 = tmp;
+        }
+        if (x3 > x4) {
+            float tmp = x3;
+            x3 = x4;
+            x4 = tmp;
+        }
+        if (x2 <= x3 || x4 <= x1) return 0;
+        if (x3 <= x1 && x4 < x2) return x4 - x1;
+        if (x1 <= x3 && x4 <= x2) return x4 - x3;
+        if (x1 <= x3) return x2 - x3;
+        return x2 - x1;
+    }
+
     public static float sin(float radians) {
         return Sin.lookup[(int)(radians * RADIANS_TO_INDEX) & SIN_MASK];
     }

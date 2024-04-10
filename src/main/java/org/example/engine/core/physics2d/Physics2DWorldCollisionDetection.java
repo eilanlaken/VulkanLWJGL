@@ -15,9 +15,10 @@ public final class Physics2DWorldCollisionDetection {
     }
 
     public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
+        // circle vs ____ //
         if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) circleVsCircle(a, b, manifolds);
         else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DAABB) circleVsAABB(a, b, manifolds);
-        else if (a.shape instanceof Shape2DAABB && b.shape instanceof Shape2DCircle) AABBvsCircle(a, b, manifolds);
+        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DRectangle) circleVsRectangle(a, b, manifolds);
     }
 
     /** AABB vs ____ **/
@@ -153,9 +154,24 @@ public final class Physics2DWorldCollisionDetection {
         return false;
     }
 
-    private static boolean circleVsRectangle(Shape2DCircle circle, Shape2DRectangle rectangle, Physics2DWorldCollisionManifold manifold) {
+    private static void circleVsRectangle(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
+        Shape2DCircle circle = (Shape2DCircle) a.shape;
+        Shape2DRectangle rect = (Shape2DRectangle) b.shape;
 
-        return false;
+        Vector2 circleWorldCenter = circle.worldCenter;
+        float circleWorldRadius = circle.worldRadius;
+
+        Vector2 c1 = rect.c1();
+        Vector2 c2 = rect.c2();
+        Vector2 c3 = rect.c3();
+
+        Vector2 axis1 = new Vector2(c2).sub(c1).rotate90(-1);
+
+        float minExtentRect = Vector2.dot(c1, axis1);
+        float maxExtentRect = Vector2.dot(c3, axis1);
+        float minExtentCircle = Vector2.dot(circleWorldCenter, axis1) - circleWorldRadius;
+        float maxExtentCircle = Vector2.dot(circleWorldCenter, axis1) + circleWorldRadius;
+
     }
 
     /** Morphed vs ___ **/
