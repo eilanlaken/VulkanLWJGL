@@ -85,8 +85,8 @@ public final class Physics2DWorldCollisionDetection {
             else if (MathUtils.isEqual(minDstSquared, dstCSquared)) closest.set(aabb.worldMax.x, circleWorldCenter.y);
             else if (MathUtils.isEqual(minDstSquared, dstDSquared)) closest.set(circleWorldCenter.x, aabb.worldMin.y);
             manifold.contactPoint1.set(closest);
-            manifold.normal.set(circleWorldCenter).sub(closest).nor();
-            manifold.depth = MathVector2.dst(circleWorldCenter, manifold.contactPoint1);
+            manifold.normal.set(closest).sub(circleWorldCenter).nor();
+            manifold.depth = circleWorldRadius + MathVector2.dst(circleWorldCenter, manifold.contactPoint1);
         } else {
             MathVector2 closest = new MathVector2(circleWorldCenter).clamp(aabb.worldMin, aabb.worldMax);
             manifold.contactPoint1.set(closest);
@@ -116,13 +116,13 @@ public final class Physics2DWorldCollisionDetection {
         manifold.normal = new MathVector2();
         if (distance != 0) {
             manifold.depth = radiusSum - distance;
-            manifold.normal.set(dx, dy).scl(1.0f / distance);
+            manifold.normal.set(dx, dy).scl(-1.0f / distance);
         } else {
             manifold.depth = c1.getWorldRadius();
             manifold.normal.set(1, 0);
         }
 
-        manifold.contactPoint1 = new MathVector2(manifold.normal).scl(c1.getWorldRadius()).add(c1.getWorldCenter());
+        manifold.contactPoint1 = new MathVector2(manifold.normal).scl(-c1.getWorldRadius()).add(c1.getWorldCenter());
 
 
         manifolds.add(manifold);
