@@ -415,4 +415,10 @@ public class MathVector2 {
         return dx * dx + dy * dy;
     }
 
+    public static float dst2(final MathVector2 a, final MathVector2 b) {
+        final float dx = b.x - a.x;
+        final float dy = b.y - a.y;
+        return dx * dx + dy * dy;
+    }
+
 }
