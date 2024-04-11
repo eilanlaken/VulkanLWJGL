@@ -1,9 +1,9 @@
 package org.example.game;
 
+import org.example.engine.core.shape.*;
 import org.example.engine.ecs.ComponentGraphics2DShape;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.math.*;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 

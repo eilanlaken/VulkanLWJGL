@@ -6,7 +6,7 @@ import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
-import org.example.engine.core.math.Matrix4;
+import org.example.engine.core.math.MathMatrix4;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 
@@ -63,7 +63,7 @@ public class SceneRendering3D_1 extends WindowScreen {
         float delta = GraphicsUtils.getDeltaTime();
         float angularSpeed = 200; // degrees per second
 
-        Matrix4 m = transform.computeMatrix();
+        MathMatrix4 m = transform.computeMatrix();
         // rotate
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
             transform.angleX += 0.01f;

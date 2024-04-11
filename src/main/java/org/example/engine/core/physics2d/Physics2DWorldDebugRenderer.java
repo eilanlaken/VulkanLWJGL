@@ -2,8 +2,8 @@ package org.example.engine.core.physics2d;
 
 import org.example.engine.core.graphics.CameraLens;
 import org.example.engine.core.graphics.Renderer2D;
-import org.example.engine.core.math.ShapeUtils;
-import org.example.engine.core.math.Shape2DPolygon;
+import org.example.engine.core.shape.ShapeUtils;
+import org.example.engine.core.shape.Shape2DPolygon;
 
 public class Physics2DWorldDebugRenderer {
 

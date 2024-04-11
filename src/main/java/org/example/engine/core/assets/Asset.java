@@ -1,6 +1,6 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.memory.MemoryResource;
 
 class Asset implements MemoryResource {
@@ -8,9 +8,9 @@ class Asset implements MemoryResource {
     public int refCount;
     public final Object obj;
     public final AssetDescriptor descriptor;
-    public final Array<Asset> dependencies;
+    public final CollectionsArray<Asset> dependencies;
 
-    Asset(final Object obj, final AssetDescriptor descriptor, Array<Asset> dependencies) {
+    Asset(final Object obj, final AssetDescriptor descriptor, CollectionsArray<Asset> dependencies) {
         this.refCount = 1;
         this.obj = obj;
         this.descriptor = descriptor;

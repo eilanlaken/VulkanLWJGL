@@ -2,6 +2,7 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.math.*;
 import org.example.engine.core.memory.MemoryResourceHolder;
+import org.example.engine.core.shape.*;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 

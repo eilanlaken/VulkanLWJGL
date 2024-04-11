@@ -1,32 +1,32 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.math.Matrix4;
-import org.example.engine.core.math.Quaternion;
-import org.example.engine.core.math.Vector3;
+import org.example.engine.core.math.MathMatrix4;
+import org.example.engine.core.math.MathQuaternion;
+import org.example.engine.core.math.MathVector3;
 
 public class Camera {
 
-    private final Vector3 tmp = new Vector3();
-    public Vector3 position;
-    public Vector3 direction;
-    public Vector3 up;
-    public Vector3 left;
+    private final MathVector3 tmp = new MathVector3();
+    public MathVector3 position;
+    public MathVector3 direction;
+    public MathVector3 up;
+    public MathVector3 left;
     public CameraLens lens;
 
     public Camera(float viewportWidth, float viewportHeight, float zoom, float near, float far, float fov) {
-        this.position = new Vector3(0,0,0);
-        this.direction = new Vector3(0,0,-1);
-        this.up = new Vector3(0,1,0);
-        this.left = new Vector3();
+        this.position = new MathVector3(0,0,0);
+        this.direction = new MathVector3(0,0,-1);
+        this.up = new MathVector3(0,1,0);
+        this.left = new MathVector3();
         this.lens = new CameraLens(CameraLens.Mode.ORTHOGRAPHIC, viewportWidth, viewportHeight, zoom, near, far, fov);
         update();
     }
 
     public Camera(float viewportWidth, float viewportHeight, float zoom) {
-        this.position = new Vector3(0,0,0);
-        this.direction = new Vector3(0,0,-1);
-        this.up = new Vector3(0,1,0);
-        this.left = new Vector3();
+        this.position = new MathVector3(0,0,0);
+        this.direction = new MathVector3(0,0,-1);
+        this.up = new MathVector3(0,1,0);
+        this.left = new MathVector3();
         this.lens = new CameraLens(CameraLens.Mode.ORTHOGRAPHIC, viewportWidth, viewportHeight, zoom, 0.1f, 100, 70);
     }
 
@@ -46,7 +46,7 @@ public class Camera {
     public void lookAt(float x, float y, float z) {
         tmp.set(x, y, z).sub(position).nor();
         if (tmp.isZero()) return;
-        float dot = Vector3.dot(tmp, up);
+        float dot = MathVector3.dot(tmp, up);
         if (Math.abs(dot - 1) < 0.000000001f) up.set(direction).scl(-1);
         else if (Math.abs(dot + 1) < 0.000000001f) up.set(direction);
         direction.set(tmp);
@@ -64,22 +64,22 @@ public class Camera {
         up.rotate(angle, axisX, axisY, axisZ);
     }
 
-    public void rotate(Vector3 axis, float angle) {
+    public void rotate(MathVector3 axis, float angle) {
         direction.rotate(axis, angle);
         up.rotate(axis, angle);
     }
 
-    public void rotate(final Matrix4 transform) {
+    public void rotate(final MathMatrix4 transform) {
         direction.rot(transform);
         up.rot(transform);
     }
 
-    public void rotate(final Quaternion q) {
+    public void rotate(final MathQuaternion q) {
         q.transform(direction);
         q.transform(up);
     }
 
-    public void rotateAround(Vector3 point, Vector3 axis, float angle) {
+    public void rotateAround(MathVector3 point, MathVector3 axis, float angle) {
         tmp.set(point);
         tmp.sub(position);
         translate(tmp);
@@ -88,7 +88,7 @@ public class Camera {
         translate(-tmp.x, -tmp.y, -tmp.z);
     }
 
-    public void transform(final Matrix4 transform) {
+    public void transform(final MathMatrix4 transform) {
         position.mul(transform);
         rotate(transform);
     }
@@ -97,7 +97,7 @@ public class Camera {
         position.add(x, y, z);
     }
 
-    public void translate(Vector3 vec) {
+    public void translate(MathVector3 vec) {
         position.add(vec);
     }
 

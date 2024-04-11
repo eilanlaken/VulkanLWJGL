@@ -12,7 +12,7 @@ public class CollectionsSorter {
     protected CollectionsSorter() {
     }
 
-    public <T extends Comparable> void sort(Array<T> a) {
+    public <T extends Comparable> void sort(CollectionsArray<T> a) {
         if (this.arraySorterComparable == null) {
             this.arraySorterComparable = new CollectionsSorterArrayComparable();
         }
@@ -36,7 +36,7 @@ public class CollectionsSorter {
         this.arraySorterComparable.doSort(a, fromIndex, toIndex);
     }
 
-    public <T> void sort(Array<T> a, Comparator<? super T> c) {
+    public <T> void sort(CollectionsArray<T> a, Comparator<? super T> c) {
         if (this.arraySorter == null) {
             this.arraySorter = new CollectionsSorterArray();
         }

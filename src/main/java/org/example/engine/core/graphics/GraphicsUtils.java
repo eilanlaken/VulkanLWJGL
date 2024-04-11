@@ -7,12 +7,12 @@ import org.lwjgl.opengl.GL20;
 
 import java.nio.IntBuffer;
 
-public class GraphicsUtils {
+public final class GraphicsUtils {
 
     private static boolean initialized = false;
     private static Window window;
 
-    protected static volatile boolean isContinuous = true;
+    private static volatile boolean isContinuous = true;
     private static long lastFrameTime = -1;
     private static float deltaTime;
     private static boolean resetDeltaTime = false;

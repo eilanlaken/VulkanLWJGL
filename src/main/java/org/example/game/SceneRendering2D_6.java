@@ -2,8 +2,9 @@ package org.example.game;
 
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
-import org.example.engine.core.math.*;
 import org.example.engine.core.memory.MemoryResource;
+import org.example.engine.core.shape.Shape2D;
+import org.example.engine.core.shape.Shape2DCircle;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;

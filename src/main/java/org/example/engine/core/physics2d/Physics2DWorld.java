@@ -1,9 +1,8 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.collections.Array;
-import org.example.engine.core.collections.TuplePair;
-import org.example.engine.core.math.Shape2D;
-import org.example.engine.core.math.Vector2;
+import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.shape.Shape2D;
+import org.example.engine.core.math.MathVector2;
 
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
@@ -19,14 +18,14 @@ public class Physics2DWorld {
     private static final short PHASE_NARROW      = 3;
     private static final short PHASE_RESOLUTION  = 4;
 
-    public Array<Physics2DBody> allBodies      = new Array<>(false, 500);
-    public Array<Physics2DBody> bodiesToAdd    = new Array<>(false, 100);
-    public Array<Physics2DBody> bodiesToRemove = new Array<>(false, 500);
+    public CollectionsArray<Physics2DBody> allBodies      = new CollectionsArray<>(false, 500);
+    public CollectionsArray<Physics2DBody> bodiesToAdd    = new CollectionsArray<>(false, 100);
+    public CollectionsArray<Physics2DBody> bodiesToRemove = new CollectionsArray<>(false, 500);
     public short phase;
 
     // [i, i+1] are collision candidates.
-    public final Array<Physics2DBody> collisionCandidates                  = new Array<>(false, 400);
-    public final Array<Physics2DWorldCollisionManifold> collisionManifolds = new Array<>(false, 200);
+    public final CollectionsArray<Physics2DBody> collisionCandidates                  = new CollectionsArray<>(false, 400);
+    public final CollectionsArray<Physics2DWorldCollisionManifold> collisionManifolds = new CollectionsArray<>(false, 200);
 
     public Physics2DWorld() {
 
@@ -49,8 +48,8 @@ public class Physics2DWorld {
             for (Physics2DBody body : allBodies) {
                 if (!body.active) continue;
                 if (body.type == Physics2DBody.Type.STATIC) continue;
-                Array<Vector2> forces = body.forces;
-                for (Vector2 force : forces) {
+                CollectionsArray<MathVector2> forces = body.forces;
+                for (MathVector2 force : forces) {
                     body.velocity.add(body.massInv * delta * force.x, body.massInv * delta * force.y);
                 }
                 body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.angularVelocity);
@@ -92,7 +91,7 @@ public class Physics2DWorld {
     }
 
     // TODO: change to create using shapes.
-    public Physics2DBody createBody(Shape2D shape, Vector2 position, Vector2 velocity) {
+    public Physics2DBody createBody(Shape2D shape, MathVector2 position, MathVector2 velocity) {
         Physics2DBody body = new Physics2DBody(shape, position, velocity);
         this.bodiesToAdd.add(body);
         return body;

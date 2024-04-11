@@ -1,13 +1,13 @@
 package org.example.engine.core.memory;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class MemoryPool<T> {
 
-    private final Array<T> freeObjects;
+    private final CollectionsArray<T> freeObjects;
     private final Constructor<T> constructor;
     private final int initialCapacity;
 
@@ -19,7 +19,7 @@ public class MemoryPool<T> {
     public MemoryPool(Class<T> type, int initialCapacity) {
         if (initialCapacity <= 0) throw new IllegalArgumentException("Memory pool initial capacity must be greater than 0. Got: " + initialCapacity);
         this.initialCapacity = initialCapacity;
-        this.freeObjects = new Array<>(initialCapacity);
+        this.freeObjects = new CollectionsArray<>(initialCapacity);
         try {
             this.constructor = type.getConstructor();
             for (int i = 0; i < freeObjects.size; i++) {

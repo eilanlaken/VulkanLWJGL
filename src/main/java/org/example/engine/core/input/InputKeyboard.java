@@ -1,6 +1,6 @@
 package org.example.engine.core.input;
 
-import org.example.engine.core.collections.ArrayInt;
+import org.example.engine.core.collections.CollectionsArrayInt;
 import org.example.engine.core.graphics.Window;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -11,9 +11,9 @@ public class InputKeyboard {
 
     private static int[] keysCurrentState = new int[Key.ketMaxKeyCode()];
     private static int[] keysPrevState = new int[keysCurrentState.length];
-    private static ArrayInt keysPressed = new ArrayInt(12);
-    private static ArrayInt keysHeld = new ArrayInt(12);
-    private static ArrayInt keysJustPressed = new ArrayInt(12);
+    private static CollectionsArrayInt keysPressed = new CollectionsArrayInt(12);
+    private static CollectionsArrayInt keysHeld = new CollectionsArrayInt(12);
+    private static CollectionsArrayInt keysJustPressed = new CollectionsArrayInt(12);
 
     private InputKeyboard() {}
 

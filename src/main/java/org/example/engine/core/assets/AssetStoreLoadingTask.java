@@ -1,12 +1,12 @@
 package org.example.engine.core.assets;
 
 import org.example.engine.core.async.AsyncTask;
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 
 public class AssetStoreLoadingTask extends AsyncTask {
 
     private final AssetDescriptor descriptor;
-    private Array<AssetDescriptor> dependencies;
+    private CollectionsArray<AssetDescriptor> dependencies;
     private final AssetLoader loader;
 
     AssetStoreLoadingTask(AssetDescriptor descriptor) {
@@ -34,7 +34,7 @@ public class AssetStoreLoadingTask extends AsyncTask {
 
     protected Asset create() {
         final Object obj = loader.create();
-        final Array<Asset> assetDependencies = AssetStore.getDependencies(dependencies);
+        final CollectionsArray<Asset> assetDependencies = AssetStore.getDependencies(dependencies);
         return new Asset(obj, descriptor, assetDependencies);
     }
 }

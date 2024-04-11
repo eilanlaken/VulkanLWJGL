@@ -1,7 +1,8 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.*;
+import org.example.engine.core.shape.*;
 
 public final class Physics2DWorldCollisionDetection {
 
@@ -14,7 +15,7 @@ public final class Physics2DWorldCollisionDetection {
         return dx * dx + dy * dy < sum * sum;
     }
 
-    public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
+    public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
         // circle vs ____ //
         if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) circleVsCircle(a, b, manifolds);
         else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DAABB) circleVsAABB(a, b, manifolds);
@@ -29,20 +30,20 @@ public final class Physics2DWorldCollisionDetection {
         return true;
     }
 
-    private static void AABBvsCircle(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
+    private static void AABBvsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
 
         System.out.println("check aabb circle");
 
         Shape2DAABB aabb = (Shape2DAABB) a.shape;
         Shape2DCircle circle = (Shape2DCircle) b.shape;
-        Vector2 centerPositiveQuadrant = new Vector2(circle.worldCenter);
+        MathVector2 centerPositiveQuadrant = new MathVector2(circle.worldCenter);
         centerPositiveQuadrant.x = Math.abs(centerPositiveQuadrant.x);
         centerPositiveQuadrant.y = Math.abs(centerPositiveQuadrant.y);
 
-        Vector2 cm_box = new Vector2(aabb.worldMin).add(aabb.worldMax).scl(0.5f);
-        Vector2 cornerTopRight = new Vector2(aabb.worldMax).sub(cm_box);
+        MathVector2 cm_box = new MathVector2(aabb.worldMin).add(aabb.worldMax).scl(0.5f);
+        MathVector2 cornerTopRight = new MathVector2(aabb.worldMax).sub(cm_box);
 
-        Vector2 c = new Vector2(centerPositiveQuadrant).sub(cornerTopRight);
+        MathVector2 c = new MathVector2(centerPositiveQuadrant).sub(cornerTopRight);
         c.x = Math.max(c.x, 0);
         c.y = Math.max(c.y, 0);
 
@@ -69,7 +70,7 @@ public final class Physics2DWorldCollisionDetection {
 
     // TODO: continue
     /** Circle vs ____ **/
-    private static void circleVsAABB(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
+    private static void circleVsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
         Shape2DCircle circle = (Shape2DCircle) a.shape;
         Shape2DAABB aabb = (Shape2DAABB) b.shape;
 
@@ -83,27 +84,27 @@ public final class Physics2DWorldCollisionDetection {
 
         Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
         manifold.contactsCount = 1;
-        manifold.normal = new Vector2();
-        manifold.contactPoint1 = new Vector2();
+        manifold.normal = new MathVector2();
+        manifold.contactPoint1 = new MathVector2();
 
         if (aabb.contains(circle.worldCenter)) {
-            float dstASquared = Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, aabb.worldMin.x, circle.worldCenter.y);
-            float dstBSquared = Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, circle.worldCenter.x, aabb.worldMax.y);
-            float dstCSquared = Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, aabb.worldMax.x, circle.worldCenter.y);
-            float dstDSquared = Vector2.dst2(circle.worldCenter.x, circle.worldCenter.y, circle.worldCenter.x, aabb.worldMin.y);
+            float dstASquared = MathVector2.dst2(circle.worldCenter.x, circle.worldCenter.y, aabb.worldMin.x, circle.worldCenter.y);
+            float dstBSquared = MathVector2.dst2(circle.worldCenter.x, circle.worldCenter.y, circle.worldCenter.x, aabb.worldMax.y);
+            float dstCSquared = MathVector2.dst2(circle.worldCenter.x, circle.worldCenter.y, aabb.worldMax.x, circle.worldCenter.y);
+            float dstDSquared = MathVector2.dst2(circle.worldCenter.x, circle.worldCenter.y, circle.worldCenter.x, aabb.worldMin.y);
             float minDstSquared = MathUtils.min(dstASquared, dstBSquared, dstCSquared, dstDSquared);
-            Vector2 closest = new Vector2();
+            MathVector2 closest = new MathVector2();
             if (MathUtils.isEqual(minDstSquared, dstASquared)) closest.set(aabb.worldMin.x, circle.worldCenter.y);
             else if (MathUtils.isEqual(minDstSquared, dstBSquared)) closest.set(circle.worldCenter.x, aabb.worldMax.y);
             else if (MathUtils.isEqual(minDstSquared, dstCSquared)) closest.set(aabb.worldMax.x, circle.worldCenter.y);
             else if (MathUtils.isEqual(minDstSquared, dstDSquared)) closest.set(circle.worldCenter.x, aabb.worldMin.y);
             manifold.contactPoint1.set(closest);
             manifold.normal.set(circle.worldCenter).sub(closest).nor();
-            manifold.depth = Vector2.dst(circle.worldCenter, manifold.contactPoint1);
+            manifold.depth = MathVector2.dst(circle.worldCenter, manifold.contactPoint1);
         } else {
-            Vector2 closest = new Vector2(circle.worldCenter).clamp(aabb.worldMin, aabb.worldMax);
+            MathVector2 closest = new MathVector2(circle.worldCenter).clamp(aabb.worldMin, aabb.worldMax);
             manifold.contactPoint1.set(closest);
-            manifold.depth = circle.worldRadius - Vector2.dst(circle.worldCenter, manifold.contactPoint1);
+            manifold.depth = circle.worldRadius - MathVector2.dst(circle.worldCenter, manifold.contactPoint1);
             manifold.normal.set(circle.worldCenter).sub(closest).nor();
         }
 
@@ -111,7 +112,7 @@ public final class Physics2DWorldCollisionDetection {
     }
 
     // TODO: modify to use manifold etc.
-    private static void circleVsCircle(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
+    private static void circleVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
         Shape2DCircle c1 = (Shape2DCircle) a.shape;
         Shape2DCircle c2 = (Shape2DCircle) b.shape;
         final float dx = c2.x() - c1.x();
@@ -129,7 +130,7 @@ public final class Physics2DWorldCollisionDetection {
         manifold.a = a;
         manifold.b = b;
         manifold.contactsCount = 1;
-        manifold.normal = new Vector2();
+        manifold.normal = new MathVector2();
         if (distance != 0) {
             manifold.depth = radiusSum - distance;
             manifold.normal.set(dx, dy).scl(1.0f / distance);
@@ -138,7 +139,7 @@ public final class Physics2DWorldCollisionDetection {
             manifold.normal.set(1, 0);
         }
 
-        manifold.contactPoint1 = new Vector2(manifold.normal).scl(c1.worldRadius).add(c1.worldCenter);
+        manifold.contactPoint1 = new MathVector2(manifold.normal).scl(c1.worldRadius).add(c1.worldCenter);
 
 
         manifolds.add(manifold);
@@ -154,23 +155,23 @@ public final class Physics2DWorldCollisionDetection {
         return false;
     }
 
-    private static void circleVsRectangle(Physics2DBody a, Physics2DBody b, Array<Physics2DWorldCollisionManifold> manifolds) {
+    private static void circleVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
         Shape2DCircle circle = (Shape2DCircle) a.shape;
         Shape2DRectangle rect = (Shape2DRectangle) b.shape;
 
-        Vector2 circleWorldCenter = circle.worldCenter;
+        MathVector2 circleWorldCenter = circle.worldCenter;
         float circleWorldRadius = circle.worldRadius;
 
-        Vector2 c1 = rect.c1();
-        Vector2 c2 = rect.c2();
-        Vector2 c3 = rect.c3();
+        MathVector2 c1 = rect.c1();
+        MathVector2 c2 = rect.c2();
+        MathVector2 c3 = rect.c3();
 
-        Vector2 axis1 = new Vector2(c2).sub(c1).rotate90(-1);
+        MathVector2 axis1 = new MathVector2(c2).sub(c1).rotate90(-1);
 
-        float minExtentRect = Vector2.dot(c1, axis1);
-        float maxExtentRect = Vector2.dot(c3, axis1);
-        float minExtentCircle = Vector2.dot(circleWorldCenter, axis1) - circleWorldRadius;
-        float maxExtentCircle = Vector2.dot(circleWorldCenter, axis1) + circleWorldRadius;
+        float minExtentRect = MathVector2.dot(c1, axis1);
+        float maxExtentRect = MathVector2.dot(c3, axis1);
+        float minExtentCircle = MathVector2.dot(circleWorldCenter, axis1) - circleWorldRadius;
+        float maxExtentCircle = MathVector2.dot(circleWorldCenter, axis1) + circleWorldRadius;
 
     }
 

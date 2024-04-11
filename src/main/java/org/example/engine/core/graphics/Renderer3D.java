@@ -1,7 +1,7 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.ecs.ComponentTransform;
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -73,7 +73,7 @@ public class Renderer3D {
         //ShaderProgramBinder.unbind();
     }
 
-    private void sort(Array<ModelPart> modelParts) {
+    private void sort(CollectionsArray<ModelPart> modelParts) {
         // minimize: shader switching, camera binding, lights binding, material uniform binding
     }
 

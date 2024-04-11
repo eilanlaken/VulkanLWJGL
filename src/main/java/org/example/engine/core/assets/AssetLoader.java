@@ -1,10 +1,10 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 
 public interface AssetLoader<T> {
 
-    Array<AssetDescriptor> getDependencies();
+    CollectionsArray<AssetDescriptor> getDependencies();
     void asyncLoad(final String path);
     T create();
 

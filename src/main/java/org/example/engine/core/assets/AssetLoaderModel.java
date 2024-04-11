@@ -1,11 +1,11 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.collections.Array;
-import org.example.engine.core.collections.ArrayInt;
-import org.example.engine.core.collections.MapObjectInt;
+import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.CollectionsArrayInt;
+import org.example.engine.core.collections.CollectionsMapObjectInt;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.math.Shape3DSphere;
-import org.example.engine.core.math.Vector3;
+import org.example.engine.core.shape.Shape3DSphere;
+import org.example.engine.core.math.MathVector3;
 import org.example.engine.core.memory.MemoryUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
@@ -24,11 +24,11 @@ import java.util.Map;
 // TODO: move stuff to model builder;
 public class AssetLoaderModel implements AssetLoader<Model> {
 
-    private static final MapObjectInt<String> namedTextureTypes;
+    private static final CollectionsMapObjectInt<String> namedTextureTypes;
     private static final Map<String, String> namedColorParams;
     private static final Map<String, String> namedProps;
     static {
-        namedTextureTypes = new MapObjectInt<>();
+        namedTextureTypes = new CollectionsMapObjectInt<>();
         namedTextureTypes.put("textureBaseColor", Assimp.aiTextureType_BASE_COLOR);
         namedTextureTypes.put("textureNormal", Assimp.aiTextureType_NORMALS);
         namedTextureTypes.put("textureDiffuse", Assimp.aiTextureType_DIFFUSE);
@@ -78,9 +78,9 @@ public class AssetLoaderModel implements AssetLoader<Model> {
     private ModelArmatureData armatureData;
 
     @Override
-    public Array<AssetDescriptor> getDependencies() {
+    public CollectionsArray<AssetDescriptor> getDependencies() {
         // TODO: see if the path is relative etc.
-        Array<AssetDescriptor> dependencies = new Array<>();
+        CollectionsArray<AssetDescriptor> dependencies = new CollectionsArray<>();
         for (ModelPartMaterialData materialData : materialsData) {
             Map<String, Object> attributesData = materialData.attributesData;
             for (Map.Entry<String, Object> entry : attributesData.entrySet()) {
@@ -168,7 +168,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
                 modelPartMaterialData.name = name.dataString();
             }
 
-            for (MapObjectInt.Entry<String> entry : namedTextureTypes) {
+            for (CollectionsMapObjectInt.Entry<String> entry : namedTextureTypes) {
                 final String uniform = entry.key;
                 AIString path = AIString.calloc();
                 IntBuffer mapping = stack.mallocInt(1);
@@ -236,11 +236,11 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         AIVector3D min = aiAABB.mMin();
         AIVector3D max = aiAABB.mMax();
 
-        Vector3 center = new Vector3();
+        MathVector3 center = new MathVector3();
         center.add(min.x(), min.y(), min.z());
         center.add(max.x(), max.y(), max.z());
         center.scl(0.5f);
-        float radius = Vector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+        float radius = MathVector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
         return new Shape3DSphere(center, radius);
     }
 
@@ -248,11 +248,11 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         AIAABB aiAABB = aiMesh.mAABB();
         AIVector3D min = aiAABB.mMin();
         AIVector3D max = aiAABB.mMax();
-        Vector3 center = new Vector3();
+        MathVector3 center = new MathVector3();
         center.add(min.x(), min.y(), min.z());
         center.add(max.x(), max.y(), max.z());
         center.scl(0.5f);
-        float radius = Vector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+        float radius = MathVector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
         return new Shape3DSphere(center, radius);
     }
 
@@ -368,8 +368,8 @@ public class AssetLoaderModel implements AssetLoader<Model> {
     }
 
     private ModelPartMesh create(final ModelPartMeshData meshData) {
-        Array<ModelVertexAttribute> attributesCollector = new Array<>();
-        ArrayInt vbosCollector = new ArrayInt();
+        CollectionsArray<ModelVertexAttribute> attributesCollector = new CollectionsArray<>();
+        CollectionsArrayInt vbosCollector = new CollectionsArrayInt();
         int vaoId = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vaoId);
         {
@@ -394,7 +394,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         return new ModelPartMesh(vaoId, meshData.vertexCount, bitmask,meshData.indices != null, meshData.boundingSphere, vbos);
     }
 
-    private void storeIndicesBuffer(int[] indices, ArrayInt vbosCollector) {
+    private void storeIndicesBuffer(int[] indices, CollectionsArrayInt vbosCollector) {
         if (indices == null) return;
         int vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vbo);
@@ -403,7 +403,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         vbosCollector.add(vbo);
     }
 
-    private void storeDataInAttributeList(final ModelVertexAttribute attribute, final ModelPartMeshData meshData, Array<ModelVertexAttribute> attributesCollector, ArrayInt vbosCollector) {
+    private void storeDataInAttributeList(final ModelVertexAttribute attribute, final ModelPartMeshData meshData, CollectionsArray<ModelVertexAttribute> attributesCollector, CollectionsArrayInt vbosCollector) {
         final float[] data = (float[]) meshData.vertexBuffers.get(attribute);
         if (data == null) return;
         final int attributeNumber = attribute.ordinal();
@@ -418,7 +418,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         vbosCollector.add(vbo);
     }
 
-    private short generateBitmask(final Array<ModelVertexAttribute> attributes) {
+    private short generateBitmask(final CollectionsArray<ModelVertexAttribute> attributes) {
         short bitmask = 0b0000;
         for (final ModelVertexAttribute attribute : attributes) {
             bitmask |= attribute.bitmask;

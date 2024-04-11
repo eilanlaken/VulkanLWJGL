@@ -1,11 +1,11 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 
 public class AssetLoaderString implements AssetLoader<String> {
 
     @Override
-    public Array<AssetDescriptor> getDependencies() {
+    public CollectionsArray<AssetDescriptor> getDependencies() {
         return null;
     }
 

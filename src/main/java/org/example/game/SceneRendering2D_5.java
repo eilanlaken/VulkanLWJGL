@@ -2,11 +2,11 @@ package org.example.game;
 
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
-import org.example.engine.core.math.*;
 import org.example.engine.core.memory.MemoryResource;
+import org.example.engine.core.shape.*;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
@@ -67,11 +67,11 @@ public class SceneRendering2D_5 extends WindowScreen {
         polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
 
 
-        Array<Shape2D> islands = new Array<>();
+        CollectionsArray<Shape2D> islands = new CollectionsArray<>();
         islands.add(circle);
         islands.add(polygon);
 
-        Array<Shape2D> holes = new Array<>();
+        CollectionsArray<Shape2D> holes = new CollectionsArray<>();
         holes.add(new Shape2DCircle(90, 0,0));
 
         compound = new Shape2DMorphed(islands, holes);

@@ -1,6 +1,6 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.math.Shape2D;
+import org.example.engine.core.shape.Shape2D;
 
 public class Physics2DUtils {
 

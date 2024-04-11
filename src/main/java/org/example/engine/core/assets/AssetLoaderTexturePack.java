@@ -1,6 +1,6 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.Texture;
 import org.example.engine.core.graphics.TexturePack;
 
@@ -13,10 +13,10 @@ import java.util.Map;
 public class AssetLoaderTexturePack implements AssetLoader<TexturePack> {
 
 
-    private Array<AssetDescriptor> dependencies;
+    private CollectionsArray<AssetDescriptor> dependencies;
 
     @Override
-    public Array<AssetDescriptor> getDependencies() {
+    public CollectionsArray<AssetDescriptor> getDependencies() {
         return null;
     }
 
@@ -26,7 +26,7 @@ public class AssetLoaderTexturePack implements AssetLoader<TexturePack> {
             FileInputStream inputStream = new FileInputStream(path);
             Map<String, Object> data = AssetUtils.yaml.load(inputStream);
             List<Map<String, Object>> textures = (List<Map<String, Object>>) data.get("textures");
-            dependencies = new Array<>(textures.size());
+            dependencies = new CollectionsArray<>(textures.size());
             for (Map<String, Object> texture : textures) {
                 String file = (String) texture.get("file");
                 dependencies.add(new AssetDescriptor(Texture.class, file));

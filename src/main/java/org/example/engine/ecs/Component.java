@@ -3,7 +3,7 @@ package org.example.engine.ecs;
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.ShaderProgram;
 import org.example.engine.core.graphics.TextureRegion;
-import org.example.engine.core.math.ShapeUtils;
+import org.example.engine.core.shape.ShapeUtils;
 
 import java.util.HashMap;
 import java.util.function.Function;

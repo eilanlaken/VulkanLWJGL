@@ -1,7 +1,7 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.assets.AssetUtils;
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.lwjgl.stb.STBRPContext;
 import org.lwjgl.stb.STBRPNode;
 import org.lwjgl.stb.STBRPRect;
@@ -28,7 +28,7 @@ public class TexturePacker {
 
     public static synchronized void packTextures(final Options options, final String ...texturePaths) throws IOException {
         if (alreadyPacked(options, texturePaths)) return;
-        Array<PackedRegionData> regionsData = new Array<>(texturePaths.length);
+        CollectionsArray<PackedRegionData> regionsData = new CollectionsArray<>(texturePaths.length);
         for (int i = 0; i < texturePaths.length; i++) {
             String texturePath = texturePaths[i];
             File sourceImageFile = new File(texturePath);
@@ -39,7 +39,7 @@ public class TexturePacker {
         }
         regionsData.sort();
 
-        Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack = new HashMap<>();
+        Map<IndexedBufferedImage, CollectionsArray<PackedRegionData>> texturePack = new HashMap<>();
         int index = 0;
         while (regionsData.size > 0) {
             int last = regionsData.size - 1;
@@ -51,7 +51,7 @@ public class TexturePacker {
         generatePackTextureFiles(options, texturePack);
     }
 
-    private static synchronized boolean pack(Options options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack, Array<PackedRegionData> remaining, int last, int currentImageIndex) {
+    private static synchronized boolean pack(Options options, Map<IndexedBufferedImage, CollectionsArray<PackedRegionData>> texturePack, CollectionsArray<PackedRegionData> remaining, int last, int currentImageIndex) {
         if (last < 0) return true;
         int size = 1;
         System.out.println("last: " + last);
@@ -73,7 +73,7 @@ public class TexturePacker {
                 System.out.println("packed!");
                 //BufferedImage bufferedImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
                 IndexedBufferedImage bufferedImage = new IndexedBufferedImage(currentImageIndex, size, size);
-                Array<PackedRegionData> regionsData = new Array<>();
+                CollectionsArray<PackedRegionData> regionsData = new CollectionsArray<>();
                 rects.position(0);
                 for (int i = 0; i < rects.capacity(); i++) {
                     rects.position(i);
@@ -124,7 +124,7 @@ public class TexturePacker {
         return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY, minX, minY);
     }
 
-    private static synchronized void generatePackFile(final Options options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) {
+    private static synchronized void generatePackFile(final Options options, Map<IndexedBufferedImage, CollectionsArray<PackedRegionData>> texturePack) {
         String outputName = options.outputName;
         TextureData[] texturesData = new TextureData[texturePack.size()];
         int i = 0;
@@ -144,8 +144,8 @@ public class TexturePacker {
         optionsData.put("uWrap", options.uWrap.name());
         optionsData.put("vWrap", options.vWrap.name());
 
-        Array<PackedRegionData> allRegions = new Array<>();
-        for (Map.Entry<IndexedBufferedImage, Array<PackedRegionData>> imageRegions : texturePack.entrySet()) {
+        CollectionsArray<PackedRegionData> allRegions = new CollectionsArray<>();
+        for (Map.Entry<IndexedBufferedImage, CollectionsArray<PackedRegionData>> imageRegions : texturePack.entrySet()) {
             allRegions.addAll(imageRegions.getValue());
         }
         allRegions.pack();
@@ -164,8 +164,8 @@ public class TexturePacker {
         }
     }
 
-    private static synchronized void generatePackTextureFiles(final Options options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) throws IOException {
-        for (Map.Entry<IndexedBufferedImage, Array<PackedRegionData>> imageRegions : texturePack.entrySet()) {
+    private static synchronized void generatePackTextureFiles(final Options options, Map<IndexedBufferedImage, CollectionsArray<PackedRegionData>> texturePack) throws IOException {
+        for (Map.Entry<IndexedBufferedImage, CollectionsArray<PackedRegionData>> imageRegions : texturePack.entrySet()) {
             IndexedBufferedImage texturePackImage = imageRegions.getKey();
             Graphics2D graphics = texturePackImage.createGraphics();
             for (PackedRegionData region : imageRegions.getValue()) {

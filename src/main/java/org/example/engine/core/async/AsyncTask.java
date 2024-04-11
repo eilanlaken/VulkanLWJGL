@@ -1,15 +1,15 @@
 package org.example.engine.core.async;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 
 public abstract class AsyncTask {
 
-    protected Array<AsyncTask> prerequisites;
+    protected CollectionsArray<AsyncTask> prerequisites;
     private volatile boolean inProgress = false;
     private volatile boolean runComplete = false;
 
     public AsyncTask(AsyncTask... prerequisites) {
-        this.prerequisites = new Array<>();
+        this.prerequisites = new CollectionsArray<>();
         this.prerequisites.addAll(prerequisites);
     }
 

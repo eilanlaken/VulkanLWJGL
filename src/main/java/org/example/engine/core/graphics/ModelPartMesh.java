@@ -1,6 +1,6 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.math.Shape3DSphere;
+import org.example.engine.core.shape.Shape3DSphere;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL30;
 

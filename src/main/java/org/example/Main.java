@@ -1,13 +1,7 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
-import org.example.engine.core.collections.Array;
-import org.example.engine.core.collections.TuplePair;
 import org.example.engine.core.graphics.WindowAttributes;
-import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.Shape2D;
-import org.example.engine.core.math.Shape2DCircle;
-import org.example.engine.core.memory.MemoryPool;
 
 import org.example.game.ScreenLoading;
 

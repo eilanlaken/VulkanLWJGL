@@ -1,10 +1,10 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.collections.MapObjectInt;
-import org.example.engine.core.math.Matrix4;
-import org.example.engine.core.math.Quaternion;
-import org.example.engine.core.math.Vector3;
-import org.example.engine.core.math.Vector4;
+import org.example.engine.core.collections.CollectionsMapObjectInt;
+import org.example.engine.core.math.MathMatrix4;
+import org.example.engine.core.math.MathQuaternion;
+import org.example.engine.core.math.MathVector3;
+import org.example.engine.core.math.MathVector4;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20;
@@ -22,13 +22,13 @@ public class ShaderProgram implements MemoryResource {
     protected final int fragmentShaderId;
     private String log;
     private boolean isCompiled;
-    private final MapObjectInt<String> uniformLocations;
-    private final MapObjectInt<String> uniformTypes;
-    private final MapObjectInt<String> uniformSizes;
+    private final CollectionsMapObjectInt<String> uniformLocations;
+    private final CollectionsMapObjectInt<String> uniformTypes;
+    private final CollectionsMapObjectInt<String> uniformSizes;
     private String[] uniformNames;
-    private final MapObjectInt<String> attributeLocations;
-    private final MapObjectInt<String> attributeTypes;
-    private final MapObjectInt<String> attributeSizes;
+    private final CollectionsMapObjectInt<String> attributeLocations;
+    private final CollectionsMapObjectInt<String> attributeTypes;
+    private final CollectionsMapObjectInt<String> attributeSizes;
     private String[] attributeNames;
     private Object[] uniformCache;
 
@@ -38,13 +38,13 @@ public class ShaderProgram implements MemoryResource {
         this.vertexShaderSource = vertexShaderSource;
         this.fragmentShaderSource = fragmentShaderSource;
         // attributes
-        this.attributeLocations = new MapObjectInt<>();
-        this.attributeTypes = new MapObjectInt<>();
-        this.attributeSizes = new MapObjectInt<>();
+        this.attributeLocations = new CollectionsMapObjectInt<>();
+        this.attributeTypes = new CollectionsMapObjectInt<>();
+        this.attributeSizes = new CollectionsMapObjectInt<>();
         // uniforms
-        this.uniformLocations = new MapObjectInt<>();
-        this.uniformTypes = new MapObjectInt<>();
-        this.uniformSizes = new MapObjectInt<>();
+        this.uniformLocations = new CollectionsMapObjectInt<>();
+        this.uniformTypes = new CollectionsMapObjectInt<>();
+        this.uniformSizes = new CollectionsMapObjectInt<>();
         this.program = GL20.glCreateProgram();
         if (program == 0)
             throw new RuntimeException("Could not create shader");
@@ -143,7 +143,7 @@ public class ShaderProgram implements MemoryResource {
         }
         this.uniformNames = new String[uniformLocations.size];
         int i = 0;
-        for(MapObjectInt.Entry<String> entry : uniformLocations) {
+        for(CollectionsMapObjectInt.Entry<String> entry : uniformLocations) {
             this.uniformNames[i] = entry.key;
             i++;
         }
@@ -190,14 +190,14 @@ public class ShaderProgram implements MemoryResource {
                 break;
 
             case GL20.GL_FLOAT_MAT4:
-                Matrix4 matrix4 = (Matrix4) value;
+                MathMatrix4 matrix4 = (MathMatrix4) value;
                 if (isUniformMatrix4Cached(location, matrix4)) return;
                 GL20.glUniformMatrix4fv(location, false, matrix4.val);
                 cacheUniformMatrix4(location, matrix4);
                 break;
 
             case GL20.GL_FLOAT_VEC3:
-                Vector3 vector3 = (Vector3) value;
+                MathVector3 vector3 = (MathVector3) value;
                 if (isUniformFloatTupleCached(location, vector3.x, vector3.y, vector3.z)) return;
                 GL20.glUniform3f(location, vector3.x, vector3.y, vector3.z);
                 cacheUniformFloatTuple(location, vector3.x, vector3.y, vector3.z);
@@ -209,13 +209,13 @@ public class ShaderProgram implements MemoryResource {
                     if (isUniformFloatTupleCached(location, color.r, color.g, color.b, color.a)) return;
                     GL20.glUniform4f(location, color.r, color.g, color.b, color.a);
                     cacheUniformFloatTuple(location, color.r, color.g, color.b, color.a);
-                } else if (value instanceof Vector4) {
-                    Vector4 vector4 = (Vector4) value;
+                } else if (value instanceof MathVector4) {
+                    MathVector4 vector4 = (MathVector4) value;
                     if (isUniformFloatTupleCached(location, vector4.x, vector4.y, vector4.z, vector4.w)) return;
                     GL20.glUniform4f(location, vector4.x, vector4.y, vector4.z, vector4.w);
                     cacheUniformFloatTuple(location, vector4.x, vector4.y, vector4.z, vector4.w);
-                } else if (value instanceof Quaternion) {
-                    Quaternion quaternion = (Quaternion) value;
+                } else if (value instanceof MathQuaternion) {
+                    MathQuaternion quaternion = (MathQuaternion) value;
                     if (isUniformFloatTupleCached(location, quaternion.x, quaternion.y, quaternion.z, quaternion.w)) return;
                     GL20.glUniform4f(location, quaternion.x, quaternion.y, quaternion.z, quaternion.w);
                     cacheUniformFloatTuple(location, quaternion.x, quaternion.y, quaternion.z, quaternion.w);
@@ -261,7 +261,7 @@ public class ShaderProgram implements MemoryResource {
         return cached.x == x && cached.y == y && cached.z == z && cached.w == w;
     }
 
-    private boolean isUniformMatrix4Cached(final int location, final Matrix4 value) {
+    private boolean isUniformMatrix4Cached(final int location, final MathMatrix4 value) {
         final Matrix4Cache cached = (Matrix4Cache) uniformCache[location];
         if (cached == null) return false;
         return cached.value.equals(value);
@@ -306,7 +306,7 @@ public class ShaderProgram implements MemoryResource {
         cache.w = w;
     }
 
-    private void cacheUniformMatrix4(final int location, final Matrix4 value) {
+    private void cacheUniformMatrix4(final int location, final MathMatrix4 value) {
         if (uniformCache[location] == null) uniformCache[location] = new Matrix4Cache();
         Matrix4Cache cache = (Matrix4Cache) uniformCache[location];
         cache.value.set(value);
@@ -316,7 +316,7 @@ public class ShaderProgram implements MemoryResource {
         // validate that the number of sampled textures does not exceed the allowed maximum on current GPU
         final int maxSampledTextures = GraphicsUtils.getMaxFragmentShaderTextureUnits();
         int sampledTextures = 0;
-        for (MapObjectInt.Entry<String> uniform : uniformTypes.entries()) {
+        for (CollectionsMapObjectInt.Entry<String> uniform : uniformTypes.entries()) {
             int type = uniform.value;
             if (type == GL20.GL_SAMPLER_2D) sampledTextures++;
         }
@@ -363,7 +363,7 @@ public class ShaderProgram implements MemoryResource {
     }
 
     private static class Matrix4Cache {
-        private Matrix4 value = new Matrix4();
+        private MathMatrix4 value = new MathMatrix4();
     }
 
 }

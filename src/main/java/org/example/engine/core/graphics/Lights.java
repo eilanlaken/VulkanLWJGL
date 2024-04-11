@@ -1,17 +1,17 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.Vector3;
+import org.example.engine.core.math.MathVector3;
 
 @Deprecated public class Lights {
 
     private final Color finalAmbient = new Color(0,0,0,1);
-    private final Vector3 totalAmbient = new Vector3(0,0,0);
-    public Array<LightAmbient> ambientLights = new Array<>();
-    public Array<LightDirectional> directionalLights = new Array<>();
-    public Array<LightPoint> pointLights = new Array<>();
-    public Array<LightSpot> spotLights = new Array<>();
+    private final MathVector3 totalAmbient = new MathVector3(0,0,0);
+    public CollectionsArray<LightAmbient> ambientLights = new CollectionsArray<>();
+    public CollectionsArray<LightDirectional> directionalLights = new CollectionsArray<>();
+    public CollectionsArray<LightPoint> pointLights = new CollectionsArray<>();
+    public CollectionsArray<LightSpot> spotLights = new CollectionsArray<>();
 
     public void add(final Light light) {
         if (light instanceof LightPoint) pointLights.add((LightPoint) light);

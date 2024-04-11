@@ -1,18 +1,18 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.core.math.Vector3;
+import org.example.engine.core.math.MathVector3;
 
 public class LightSpot extends Light {
 
-    public Vector3 position;
-    public Vector3 direction;
+    public MathVector3 position;
+    public MathVector3 direction;
     public float cutoffAngle;
     public float exponent;
 
-    public LightSpot(Color color, float intensity, final Vector3 position, final Vector3 direction, float cutoffAngle, float exponent) {
+    public LightSpot(Color color, float intensity, final MathVector3 position, final MathVector3 direction, float cutoffAngle, float exponent) {
         super(color.r, color.g, color.b, intensity);
-        this.position = new Vector3(position);
-        this.direction = new Vector3(direction);
+        this.position = new MathVector3(position);
+        this.direction = new MathVector3(direction);
         this.cutoffAngle = cutoffAngle;
         this.exponent = exponent;
     }

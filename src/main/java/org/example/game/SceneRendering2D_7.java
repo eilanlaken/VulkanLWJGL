@@ -2,8 +2,8 @@ package org.example.game;
 
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
-import org.example.engine.core.math.Shape2D;
-import org.example.engine.core.math.Shape2DCircle;
+import org.example.engine.core.shape.Shape2D;
+import org.example.engine.core.shape.Shape2DCircle;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 

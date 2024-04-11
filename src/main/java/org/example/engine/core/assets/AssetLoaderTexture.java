@@ -1,6 +1,6 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
@@ -56,7 +56,7 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
     }
 
     @Override
-    public Array<AssetDescriptor> getDependencies() {
+    public CollectionsArray<AssetDescriptor> getDependencies() {
         return null;
     }
 

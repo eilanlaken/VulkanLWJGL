@@ -1,7 +1,5 @@
 package org.example.engine.core.math;
 
-import org.lwjgl.system.MathUtil;
-
 import java.util.Random;
 
 public final class MathUtils {
@@ -23,9 +21,9 @@ public final class MathUtils {
     private static final float RADIANS_TO_INDEX = SIN_COUNT / RADIANS_FULL;
     private static final float DEGREES_TO_INDEX = SIN_COUNT / DEGREES_FULL;
     private static final Random random = new Random();
-    public static final Vector3[] canonicalCubeCorners = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
-            new Vector3(-1, -1, -1), new Vector3(1, -1, -1), new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clipping plane corners
-            new Vector3(-1, -1, 1), new Vector3(1, -1, 1), new Vector3(1, 1, 1), new Vector3(-1, 1, 1), // far clipping plane corners
+    public static final MathVector3[] canonicalCubeCorners = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
+            new MathVector3(-1, -1, -1), new MathVector3(1, -1, -1), new MathVector3(1, 1, -1), new MathVector3(-1, 1, -1), // near clipping plane corners
+            new MathVector3(-1, -1, 1), new MathVector3(1, -1, 1), new MathVector3(1, 1, 1), new MathVector3(-1, 1, 1), // far clipping plane corners
     };
 
     private MathUtils() {}
@@ -101,7 +99,7 @@ public final class MathUtils {
         return x + y; // returns 0 for 0,0 or NaN if either y or x is NaN
     }
 
-    public static float areaTriangle(Vector2 a, Vector2 b, Vector2 c) { return 0.5f * Math.abs((a.x - c.x) * (b.y - a.y) - (a.x - b.x) * (c.y - a.y)); }
+    public static float areaTriangle(MathVector2 a, MathVector2 b, MathVector2 c) { return 0.5f * Math.abs((a.x - c.x) * (b.y - a.y) - (a.x - b.x) * (c.y - a.y)); }
 
     public static float areaTriangle(float x1, float y1, float x2, float y2, float x3, float y3) { return 0.5f * Math.abs((x1 - x3) * (y2 - y2) - (x1 - x2) * (y3 - y1)); }
 

@@ -1,10 +1,10 @@
 package org.example.game;
 
+import org.example.engine.core.shape.*;
 import org.example.engine.ecs.ComponentGraphics2DShape;
 import org.example.engine.core.assets.AssetStore;
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.math.*;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 
@@ -71,11 +71,11 @@ public class SceneRendering2D_3 extends WindowScreen {
         polygon = new Shape2DPolygon(new float[] {0,0, 200,0, 100,200, -300,200, -400,100});
         polygon.angle(30);
 
-        Array<Shape2D> islands = new Array<>();
+        CollectionsArray<Shape2D> islands = new CollectionsArray<>();
         islands.add(circle1);
         islands.add(polygon);
 
-        Array<Shape2D> holes = new Array<>();
+        CollectionsArray<Shape2D> holes = new CollectionsArray<>();
         holes.add(circle2);
 
         compound = new Shape2DMorphed(islands, holes);

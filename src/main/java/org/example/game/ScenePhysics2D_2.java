@@ -1,10 +1,10 @@
 package org.example.game;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.math.Shape2D;
-import org.example.engine.core.math.Shape2DCircle;
-import org.example.engine.core.math.Vector2;
+import org.example.engine.core.shape.Shape2D;
+import org.example.engine.core.shape.Shape2DCircle;
+import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.physics2d.Physics2DWorld;
 import org.lwjgl.opengl.GL11;
 
@@ -33,7 +33,7 @@ public class ScenePhysics2D_2 extends WindowScreen {
         camera = new Camera(640f/64,480f/64, 1);
         camera.update();
 
-        world.createBody(circle, new Vector2(0,0), new Vector2(0.01f, 0));
+        world.createBody(circle, new MathVector2(0,0), new MathVector2(0.01f, 0));
     }
 
 
@@ -88,7 +88,7 @@ public class ScenePhysics2D_2 extends WindowScreen {
     public static class Cell {
 
         public static float CELL_SIZE = 10;
-        Array<Shape2D> shapes = new Array<>();
+        CollectionsArray<Shape2D> shapes = new CollectionsArray<>();
 
     }
 

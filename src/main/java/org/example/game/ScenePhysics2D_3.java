@@ -1,12 +1,13 @@
 package org.example.game;
 
-import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.*;
 import org.example.engine.core.physics2d.Physics2DBody;
 import org.example.engine.core.physics2d.Physics2DWorld;
 import org.example.engine.core.physics2d.Physics2DWorldCollisionManifold;
+import org.example.engine.core.shape.*;
 import org.lwjgl.opengl.GL11;
 
 public class ScenePhysics2D_3 extends WindowScreen {
@@ -36,9 +37,9 @@ public class ScenePhysics2D_3 extends WindowScreen {
         camera = new Camera(640f/64,480f/64, 1);
         camera.update();
 
-        body = world.createBody(circle, new Vector2(0,0), new Vector2(0.f, 0));
-        world.createBody(otherCircle, new Vector2(3,1.5f), new Vector2(0.f, 0));
-        world.createBody(otherAABB, new Vector2(-2, -2.5f), new Vector2(0.f, 0));
+        body = world.createBody(circle, new MathVector2(0,0), new MathVector2(0.f, 0));
+        world.createBody(otherCircle, new MathVector2(3,1.5f), new MathVector2(0.f, 0));
+        world.createBody(otherAABB, new MathVector2(-2, -2.5f), new MathVector2(0.f, 0));
 
     }
 
@@ -59,7 +60,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
 
         world.update(GraphicsUtils.getDeltaTime());
-        Vector3 screen = new Vector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
+        MathVector3 screen = new MathVector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
         camera.lens.unproject(screen);
         body.setPosition(screen.x, screen.y);
 
@@ -73,7 +74,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
     // TODO: refactor out into the physics debug renderer. For now, use to implement correct narrow phase.
     private void renderManifold(Physics2DWorldCollisionManifold manifold) {
-        Vector2 penetration = new Vector2(manifold.normal).scl(manifold.depth);
+        MathVector2 penetration = new MathVector2(manifold.normal).scl(manifold.depth);
 
         // calculate points scale
         final float pointPixelRadius = 6;
@@ -86,7 +87,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
         if (manifold.contactPoint2 != null)
             renderer2D.pushPolygon(contactIndicator, new Color(1,0,0,1), manifold.contactPoint2.x, manifold.contactPoint2.y, 0,0,0,scaleX,scaleY,null,null);
 
-        Vector2 contactsCenter = new Vector2();
+        MathVector2 contactsCenter = new MathVector2();
 
         if (manifold.contactPoint1 != null && manifold.contactPoint2 != null) {
             contactsCenter.set(manifold.contactPoint1).add(manifold.contactPoint2).scl(0.5f);
@@ -123,7 +124,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
     public static class Cell {
 
         public static float CELL_SIZE = 10;
-        Array<Shape2D> shapes = new Array<>();
+        CollectionsArray<Shape2D> shapes = new CollectionsArray<>();
 
     }
 
