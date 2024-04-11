@@ -124,7 +124,6 @@ public final class Physics2DWorldCollisionDetection {
 
         manifold.contactPoint1 = new MathVector2(manifold.normal).scl(-c1.getWorldRadius()).add(c1.getWorldCenter());
 
-
         manifolds.add(manifold);
     }
 
@@ -145,56 +144,52 @@ public final class Physics2DWorldCollisionDetection {
         MathVector2 circleWorldCenter = circle.getWorldCenter();
         float circleWorldRadius = circle.getWorldRadius();
 
-        if (rect.contains(circleWorldCenter)) { // colliding - rectangle contains circle center.
-            MathVector2 c1 = rect.c1();
-            MathVector2 c2 = rect.c2();
-            MathVector2 c3 = rect.c3();
-            MathVector2 c4 = rect.c4();
+        MathVector2 c1 = rect.c1();
+        MathVector2 c2 = rect.c2();
+        MathVector2 c3 = rect.c3();
+        MathVector2 c4 = rect.c4();
 
-            float dx1 = c2.x - c1.x;
-            float dy1 = c2.y - c1.y;
-            float distance1 = MathVector2.dot(circleWorldCenter.x - c1.x, circleWorldCenter.y - c1.y, dx1, dy1) / MathVector2.len2(dx1, dy1);
-            final MathVector2 projection1 = new MathVector2(dx1, dy1).scl(distance1).add(c1);
+        float dx1 = c2.x - c1.x;
+        float dy1 = c2.y - c1.y;
+        float distance1 = MathVector2.dot(circleWorldCenter.x - c1.x, circleWorldCenter.y - c1.y, dx1, dy1) / MathVector2.len2(dx1, dy1);
 
-            float dx2 = c3.x - c2.x;
-            float dy2 = c3.y - c2.y;
-            float distance2 = MathVector2.dot(circleWorldCenter.x - c2.x, circleWorldCenter.y - c2.y, dx2, dy2) / MathVector2.len2(dx2, dy2);
+        float dx2 = c3.x - c2.x;
+        float dy2 = c3.y - c2.y;
+        float distance2 = MathVector2.dot(circleWorldCenter.x - c2.x, circleWorldCenter.y - c2.y, dx2, dy2) / MathVector2.len2(dx2, dy2);
 
-            float dx3 = c4.x - c3.x;
-            float dy3 = c4.y - c3.y;
-            float distance3 = MathVector2.dot(circleWorldCenter.x - c3.x, circleWorldCenter.y - c3.y, dx3, dy3) / MathVector2.len2(dx3, dy3);
+        float dx3 = c4.x - c3.x;
+        float dy3 = c4.y - c3.y;
+        float distance3 = MathVector2.dot(circleWorldCenter.x - c3.x, circleWorldCenter.y - c3.y, dx3, dy3) / MathVector2.len2(dx3, dy3);
 
-            float dx4 = c1.x - c4.x;
-            float dy4 = c1.y - c4.y;
-            float distance4 = MathVector2.dot(circleWorldCenter.x - c4.x, circleWorldCenter.y - c4.y, dx4, dy4) / MathVector2.len2(dx4, dy4);
+        float dx4 = c1.x - c4.x;
+        float dy4 = c1.y - c4.y;
+        float distance4 = MathVector2.dot(circleWorldCenter.x - c4.x, circleWorldCenter.y - c4.y, dx4, dy4) / MathVector2.len2(dx4, dy4);
 
-            float minDistance = MathUtils.min(distance1, distance2, distance3, distance4);
+        float minDistance = MathUtils.min(distance1, distance2, distance3, distance4);
 
-            //MathVector2 diff = new MathVector2(c2).sub(c1);
-            //MathVector2 projection = new MathVector2(diff).scl(distance1);
-
-            MathVector2 diff = new MathVector2(c1).sub(c4);
-            MathVector2 projection = new MathVector2();
-
-            if (MathUtils.isEqual(minDistance, distance1)) {
-                projection = new MathVector2(dx4, dy4).scl(distance4).add(c4);
-            } else if (MathUtils.isEqual(minDistance, distance2)) {
-                projection = new MathVector2(dx1, dy1).scl(distance1).add(c1);
-            } else if (MathUtils.isEqual(minDistance, distance3)) {
-                projection = new MathVector2(dx2, dy2).scl(distance2).add(c2);
-            } else {
-                projection = new MathVector2(dx3, dy3).scl(distance3).add(c3);
-            }
-
-
-
-            Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
-            manifold.normal = new MathVector2(projection).sub(circleWorldCenter).nor();
-            manifold.contactPoint1 = new MathVector2(projection);
-            manifold.depth = minDistance + circleWorldRadius;
-            manifolds.add(manifold);
+        MathVector2 projection;
+        if (MathUtils.isEqual(minDistance, distance1)) {
+            projection = new MathVector2(dx4, dy4).scl(distance4).add(c4);
+        } else if (MathUtils.isEqual(minDistance, distance2)) {
+            projection = new MathVector2(dx1, dy1).scl(distance1).add(c1);
+        } else if (MathUtils.isEqual(minDistance, distance3)) {
+            projection = new MathVector2(dx2, dy2).scl(distance2).add(c2);
+        } else {
+            projection = new MathVector2(dx3, dy3).scl(distance3).add(c3);
         }
 
+        final boolean rectContainsCenter = rect.contains(circleWorldCenter);
+        if (!rectContainsCenter) return;
+
+        System.out.println("coll");
+
+        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
+        manifold.contactPoint1 = new MathVector2(projection);
+        if (rectContainsCenter) {
+            manifold.normal = new MathVector2(projection).sub(circleWorldCenter).nor();
+            manifold.depth = minDistance + circleWorldRadius;
+        }
+        manifolds.add(manifold);
     }
 
     /** Morphed vs ___ **/
