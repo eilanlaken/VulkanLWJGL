@@ -7,10 +7,8 @@ public class Shape2DCircle extends Shape2D {
 
     public final MathVector2 localCenter;
     public final float localRadius;
-
-    // TODO: change to private with getters and setters.
-    public MathVector2 worldCenter;
-    public float worldRadius;
+    private MathVector2 worldCenter;
+    private float worldRadius;
 
     private final float unscaledArea;
     private final float unscaledBoundingRadius;
@@ -54,6 +52,16 @@ public class Shape2DCircle extends Shape2D {
     @Override
     protected float getUnscaledArea() {
         return unscaledArea;
+    }
+
+    public MathVector2 getWorldCenter() {
+        if (!updated) update();
+        return worldCenter;
+    }
+
+    public float getWorldRadius() {
+        if (!updated) update();
+        return worldRadius;
     }
 
     @Override

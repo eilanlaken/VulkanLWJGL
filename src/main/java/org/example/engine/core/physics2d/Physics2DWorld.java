@@ -91,8 +91,8 @@ public class Physics2DWorld {
     }
 
     // TODO: change to create using shapes.
-    public Physics2DBody createBody(Shape2D shape, MathVector2 position, MathVector2 velocity) {
-        Physics2DBody body = new Physics2DBody(shape, position, velocity);
+    public Physics2DBody createBody(Shape2D shape, MathVector2 position, float angle, MathVector2 velocity) {
+        Physics2DBody body = new Physics2DBody(shape, position, angle, velocity);
         this.bodiesToAdd.add(body);
         return body;
     }

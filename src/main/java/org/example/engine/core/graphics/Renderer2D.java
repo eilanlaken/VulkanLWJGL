@@ -269,10 +269,11 @@ public class Renderer2D implements MemoryResourceHolder {
         indicesBuffer.put(startVertex + 16);
         triangleIndex += 34;
 
-        circle.update();
-        float x = circle.worldCenter.x;
-        float y = circle.worldCenter.y;
-        float r = circle.worldRadius;
+        MathVector2 worldCenter = circle.getWorldCenter();
+        float worldRadius = circle.getWorldRadius();
+        float x = worldCenter.x;
+        float y = worldCenter.y;
+        float r = worldRadius;
         float da = 360f / 15;
         for (int i = 0; i < 15; i++) {
             verticesBuffer

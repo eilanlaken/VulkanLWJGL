@@ -18,6 +18,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
     private Shape2D circle;
     private Shape2D otherCircle;
     private Shape2D otherAABB;
+    private Shape2D otherRectangle;
     private Color staleTint = new Color(1,0,0,1);
 
     Physics2DWorld world = new Physics2DWorld();
@@ -33,13 +34,15 @@ public class ScenePhysics2D_3 extends WindowScreen {
         circle = new Shape2DCircle(1);
         otherCircle = new Shape2DCircle(1.5f,0,0);
         otherAABB = new Shape2DAABB(4, 2);
+        otherRectangle = new Shape2DRectangle(3.5f,2.5f);
 
         camera = new Camera(640f/64,480f/64, 1);
         camera.update();
 
-        body = world.createBody(circle, new MathVector2(0,0), new MathVector2(0.f, 0));
-        world.createBody(otherCircle, new MathVector2(3,1.5f), new MathVector2(0.f, 0));
-        world.createBody(otherAABB, new MathVector2(-2, -2.5f), new MathVector2(0.f, 0));
+        body = world.createBody(circle, new MathVector2(0,0),0, new MathVector2(0.f, 0));
+        world.createBody(otherCircle, new MathVector2(3,1.5f), 0, new MathVector2(0.f, 0));
+        world.createBody(otherAABB, new MathVector2(-2, -2.5f), 0, new MathVector2(0.f, 0));
+        world.createBody(otherRectangle, new MathVector2(-2,1.5f), -30, new MathVector2(0.f, 0));
 
     }
 
@@ -54,6 +57,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
         renderer2D.pushDebugShape(circle, null);
         renderer2D.pushDebugShape(otherCircle, staleTint);
         renderer2D.pushDebugShape(otherAABB, staleTint);
+        renderer2D.pushDebugShape(otherRectangle, staleTint);
 
         renderer2D.end();
 
