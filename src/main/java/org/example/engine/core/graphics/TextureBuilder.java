@@ -14,9 +14,11 @@ import java.nio.IntBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
-public class TextureBuilder {
+public final class TextureBuilder {
 
     public static final int maxTextureSize = GraphicsUtils.getMaxTextureSize();
+
+    private TextureBuilder() {}
 
     public static Texture buildFromFilePath(final String path) {
         Data data = getTextureDataFromFilePath(path);
