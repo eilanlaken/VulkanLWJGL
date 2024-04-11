@@ -92,7 +92,6 @@ public class ScenePhysics2D_3 extends WindowScreen {
             renderer2D.pushPolygon(contactIndicator, new Color(1,0,0,1), manifold.contactPoint2.x, manifold.contactPoint2.y, 0,0,0,scaleX,scaleY,null,null);
 
         MathVector2 contactsCenter = new MathVector2();
-
         if (manifold.contactPoint1 != null && manifold.contactPoint2 != null) {
             contactsCenter.set(manifold.contactPoint1).add(manifold.contactPoint2).scl(0.5f);
         } else if (manifold.contactPoint1 != null) {
@@ -100,7 +99,6 @@ public class ScenePhysics2D_3 extends WindowScreen {
         } else if (manifold.contactPoint2 != null) {
             contactsCenter.set(manifold.contactPoint2);
         }
-
         Shape2DSegment segment = new Shape2DSegment(contactsCenter.x, contactsCenter.y, contactsCenter.x + penetration.x, contactsCenter.y + penetration.y);
         renderer2D.pushDebugShape(segment, new Color(1,0,1,1));
     }

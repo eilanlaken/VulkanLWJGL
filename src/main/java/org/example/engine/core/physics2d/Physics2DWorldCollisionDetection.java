@@ -228,7 +228,11 @@ public final class Physics2DWorldCollisionDetection {
         float scale4 = MathVector2.dot(circleWorldCenter.x - c4.x, circleWorldCenter.y - c4.y, dx4, dy4) / MathVector2.len2(dx4, dy4);
         MathVector2 projection4 = new MathVector2(dx4, dy4).scl(scale4).add(c4);
 
-
+        if (rect.contains(circleWorldCenter)) System.out.println("rect contains");
+        if (circle.contains(c1)) System.out.println("circle contains proj 1");
+        if (circle.contains(c2)) System.out.println("circle contains proj 2");
+        if (circle.contains(c3)) System.out.println("circle contains proj 3");
+        if (circle.contains(c4)) System.out.println("circle contains proj 4");
 
         Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
         manifold.contactPoint1 = new MathVector2(projection3);
