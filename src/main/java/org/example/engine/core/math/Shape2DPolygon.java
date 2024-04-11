@@ -20,9 +20,9 @@ public class Shape2DPolygon extends Shape2D {
         this.localPoints = vertices;
         this.worldPoints = new float[vertices.length];
         this.indices = indices;
-        this.isConvex = AlgorithmsPolygons.isPolygonConvex(vertices);
-        this.unscaledArea = Math.abs(AlgorithmsPolygons.calculatePolygonSignedArea(localPoints));
-        this.unscaledBoundingRadius = AlgorithmsPolygons.calculatePolygonBoundingRadius(localPoints);
+        this.isConvex = ShapeUtils.isPolygonConvex(vertices);
+        this.unscaledArea = Math.abs(ShapeUtils.calculatePolygonSignedArea(localPoints));
+        this.unscaledBoundingRadius = ShapeUtils.calculatePolygonBoundingRadius(localPoints);
     }
 
     public Shape2DPolygon(float[] vertices) {
@@ -35,10 +35,10 @@ public class Shape2DPolygon extends Shape2D {
         this.vertexCount = vertices.length / 2;
         this.localPoints = vertices;
         this.worldPoints = new float[vertices.length];
-        this.indices = AlgorithmsPolygons.triangulatePolygon(localPoints, holes, 2);
-        this.isConvex = (holes == null || holes.length == 0) && AlgorithmsPolygons.isPolygonConvex(vertices);
-        this.unscaledArea = Math.abs(AlgorithmsPolygons.calculatePolygonSignedArea(localPoints));
-        this.unscaledBoundingRadius = AlgorithmsPolygons.calculatePolygonBoundingRadius(localPoints);
+        this.indices = ShapeUtils.triangulatePolygon(localPoints, holes, 2);
+        this.isConvex = (holes == null || holes.length == 0) && ShapeUtils.isPolygonConvex(vertices);
+        this.unscaledArea = Math.abs(ShapeUtils.calculatePolygonSignedArea(localPoints));
+        this.unscaledBoundingRadius = ShapeUtils.calculatePolygonBoundingRadius(localPoints);
     }
 
     @Override

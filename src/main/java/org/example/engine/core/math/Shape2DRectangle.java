@@ -6,10 +6,10 @@ public class Shape2DRectangle extends Shape2D {
     private final float unscaledBoundingRadius;
 
     // original corners
-    private final Vector2 c1;
-    private final Vector2 c2;
-    private final Vector2 c3;
-    private final Vector2 c4;
+    private final Vector2 c1Local;
+    private final Vector2 c2Local;
+    private final Vector2 c3Local;
+    private final Vector2 c4Local;
 
     // world corners:
     /**
@@ -19,10 +19,10 @@ public class Shape2DRectangle extends Shape2D {
      *  |                 |
      *  c2 --------------c3
      */
-    private final Vector2 c1World = new Vector2();
-    private final Vector2 c2World = new Vector2();
-    private final Vector2 c3World = new Vector2();
-    private final Vector2 c4World = new Vector2();
+    private final Vector2 c1 = new Vector2();
+    private final Vector2 c2 = new Vector2();
+    private final Vector2 c3 = new Vector2();
+    private final Vector2 c4 = new Vector2();
 
     private final Vector2 tmp1 = new Vector2();
     private final Vector2 tmp2 = new Vector2();
@@ -30,36 +30,36 @@ public class Shape2DRectangle extends Shape2D {
     public Shape2DRectangle(float centerX, float centerY, float width, float height, float rotate) {
         final float widthHalf = width * 0.5f;
         final float heightHalf = height * 0.5f;
-        this.c1 = new Vector2(-widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.c2 = new Vector2(-widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.c3 = new Vector2(+widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.c4 = new Vector2(+widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
+        this.c1Local = new Vector2(-widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
+        this.c2Local = new Vector2(-widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
+        this.c3Local = new Vector2(+widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
+        this.c4Local = new Vector2(+widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
         this.unscaledArea = width * height;
-        this.unscaledBoundingRadius = (float) Math.sqrt(MathUtils.max(c1.len2(), c2.len2(), c3.len2(), c4.len2()));
+        this.unscaledBoundingRadius = (float) Math.sqrt(MathUtils.max(c1Local.len2(), c2Local.len2(), c3Local.len2(), c4Local.len2()));
     }
 
     public Shape2DRectangle(float width, float height) {
         final float widthHalf = width * 0.5f;
         final float heightHalf = height * 0.5f;
-        this.c1 = new Vector2(-widthHalf, +heightHalf);
-        this.c2 = new Vector2(-widthHalf, -heightHalf);
-        this.c3 = new Vector2(+widthHalf, -heightHalf);
-        this.c4 = new Vector2(+widthHalf, +heightHalf);
+        this.c1Local = new Vector2(-widthHalf, +heightHalf);
+        this.c2Local = new Vector2(-widthHalf, -heightHalf);
+        this.c3Local = new Vector2(+widthHalf, -heightHalf);
+        this.c4Local = new Vector2(+widthHalf, +heightHalf);
         this.unscaledArea = width * height;
-        this.unscaledBoundingRadius = (float) Math.sqrt(MathUtils.max(c1.len2(), c2.len2(), c3.len2(), c4.len2()));
+        this.unscaledBoundingRadius = (float) Math.sqrt(MathUtils.max(c1Local.len2(), c2Local.len2(), c3Local.len2(), c4Local.len2()));
     }
 
     @Override
     public boolean contains(float x, float y) {
         if (!updated) update();
 
-        tmp1.set(c4World).sub(c1World);
-        tmp2.set(x,y).sub(c1World);
+        tmp1.set(c4).sub(c1);
+        tmp2.set(x,y).sub(c1);
         float projection1 = tmp1.dot(tmp2);
         if (projection1 < 0 || projection1 > tmp1.dot(tmp1)) return false;
 
-        tmp1.set(c2World).sub(c1World);
-        tmp2.set(x,y).sub(c1World);
+        tmp1.set(c2).sub(c1);
+        tmp2.set(x,y).sub(c1);
         float projection2 = tmp1.dot(tmp2);
         if (projection2 < 0 || projection2 > tmp1.dot(tmp1)) return false;
 
@@ -78,54 +78,54 @@ public class Shape2DRectangle extends Shape2D {
 
     @Override
     protected void updateWorldCoordinates() {
-        c1World.set(c1);
-        c2World.set(c2);
-        c3World.set(c3);
-        c4World.set(c4);
+        c1.set(c1Local);
+        c2.set(c2Local);
+        c3.set(c3Local);
+        c4.set(c4Local);
         // scale
         if (!MathUtils.isEqual(scaleX,1.0f) || !MathUtils.isEqual(scaleY,1.0f)) {
-            c1World.scl(scaleX, scaleY);
-            c2World.scl(scaleX, scaleY);
-            c3World.scl(scaleX, scaleY);
-            c4World.scl(scaleX, scaleY);
+            c1.scl(scaleX, scaleY);
+            c2.scl(scaleX, scaleY);
+            c3.scl(scaleX, scaleY);
+            c4.scl(scaleX, scaleY);
         }
         // rotate
         if (!MathUtils.isZero(angle)) {
-            c1World.rotateDeg(angle);
-            c2World.rotateDeg(angle);
-            c3World.rotateDeg(angle);
-            c4World.rotateDeg(angle);
+            c1.rotateDeg(angle);
+            c2.rotateDeg(angle);
+            c3.rotateDeg(angle);
+            c4.rotateDeg(angle);
         }
         // translate
-        c1World.add(x, y);
-        c2World.add(x, y);
-        c3World.add(x, y);
-        c4World.add(x, y);
+        c1.add(x, y);
+        c2.add(x, y);
+        c3.add(x, y);
+        c4.add(x, y);
     }
 
     public Vector2 c1() {
         if (!updated) update();
-        return c1World;
+        return c1;
     }
 
     public Vector2 c2() {
         if (!updated) update();
-        return c2World;
+        return c2;
     }
 
     public Vector2 c3() {
         if (!updated) update();
-        return c3World;
+        return c3;
     }
 
     public Vector2 c4() {
         if (!updated) update();
-        return c4World;
+        return c4;
     }
 
     @Override
     public String toString() {
-        return "<" + this.getClass().getSimpleName() + "| c1: " + c1World + ", c2: " + c2World + ", c3: " + c3World + ", c4: " + c4World + ">";
+        return "<" + this.getClass().getSimpleName() + "| c1: " + c1 + ", c2: " + c2 + ", c3: " + c3 + ", c4: " + c4 + ">";
     }
 
 }

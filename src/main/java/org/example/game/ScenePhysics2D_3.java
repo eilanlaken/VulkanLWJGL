@@ -21,7 +21,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
     Physics2DWorld world = new Physics2DWorld();
     Physics2DBody body;
-    private Shape2DPolygon contactIndicator = AlgorithmsPolygons.createPolygonCircleFilled(1, 10);
+    private Shape2DPolygon contactIndicator = ShapeUtils.createPolygonCircleFilled(1, 10);
 
     public ScenePhysics2D_3() {
         renderer2D = new Renderer2D();
