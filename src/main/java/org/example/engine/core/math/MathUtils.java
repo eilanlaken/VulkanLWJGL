@@ -36,30 +36,40 @@ public final class MathUtils {
         return start + random.nextInt(end - start + 1);
     }
 
-    public static short clamp(short value, short min, short max) {
-        if (value < min) return min;
-        if (value > max) return max;
-        return value;
+    public static int clampInt(int value, int min, int max) {
+        if (min < max) {
+            if (value < min) return min;
+            return Math.min(value, max);
+        }
+        if (value < max) return max;
+        return Math.min(value, min);
     }
 
-    public static int clamp(int value, int min, int max) {
-        if (value < min) return min;
-        return Math.min(value, max);
+    public static long clampLong(long value, long min, long max) {
+        if (min < max) {
+            if (value < min) return min;
+            return Math.min(value, max);
+        }
+        if (value < max) return max;
+        return Math.min(value, min);
     }
 
-    public static long clamp(long value, long min, long max) {
-        if (value < min) return min;
-        return Math.min(value, max);
+    public static float clampFloat(float value, float min, float max) {
+        if (min < max) {
+            if (value < min) return min;
+            return Math.min(value, max);
+        }
+        if (value < max) return max;
+        return Math.min(value, min);
     }
 
-    public static float clamp(float value, float min, float max) {
-        if (value < min) return min;
-        return Math.min(value, max);
-    }
-
-    public static double clamp(double value, double min, double max) {
-        if (value < min) return min;
-        return Math.min(value, max);
+    public static double clampDouble(double value, double min, double max) {
+        if (min < max) {
+            if (value < min) return min;
+            return Math.min(value, max);
+        }
+        if (value < max) return max;
+        return Math.min(value, min);
     }
 
     public static int nextPowerOfTwo(int x) {

@@ -14,34 +14,27 @@ class MathUtilsTest {
     }
 
     @Test
-    void clamp() {
-        MathVector2 v1 = new MathVector2(3,3);
-        MathVector2 min1 = new MathVector2(1,1);
-        MathVector2 max1 = new MathVector2(4,5);
-        v1.clamp(min1, max1);
-        Assertions.assertEquals(3, v1.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(3, v1.y, MathUtils.FLOAT_ROUNDING_ERROR);
+    void clampFloat() {
+        float v1 = MathUtils.clampFloat(0.0f, -1.0f, 1.0f);
+        Assertions.assertEquals(0.0f, v1, MathUtils.FLOAT_ROUNDING_ERROR);
 
-        MathVector2 v2 = new MathVector2(3,6);
-        MathVector2 min2 = new MathVector2(1,1);
-        MathVector2 max2 = new MathVector2(2,2);
-        v2.clamp(min2, max2);
-        Assertions.assertEquals(2, v2.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(2, v2.y, MathUtils.FLOAT_ROUNDING_ERROR);
+        float v2 = MathUtils.clampFloat(-3.0f, -1.0f, 1.0f);
+        Assertions.assertEquals(-1.0f, v2, MathUtils.FLOAT_ROUNDING_ERROR);
 
-        MathVector2 v3 = new MathVector2(-1,0);
-        MathVector2 min3 = new MathVector2();
-        MathVector2 max3 = new MathVector2();
-        v3.clamp(min3, max3);
-        Assertions.assertEquals(0, v3.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0, v3.y, MathUtils.FLOAT_ROUNDING_ERROR);
+        float v3 = MathUtils.clampFloat(2.0f, -1.0f, 1.0f);
+        Assertions.assertEquals(1.0f, v3, MathUtils.FLOAT_ROUNDING_ERROR);
 
-        MathVector2 v4 = new MathVector2(-3,3);
-        MathVector2 min4 = new MathVector2(2,6);
-        MathVector2 max4 = new MathVector2(-2,4);
-        v4.clamp(min4, max4);
-        Assertions.assertEquals(-2, v4.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(4, v4.y, MathUtils.FLOAT_ROUNDING_ERROR);
+        float v4 = MathUtils.clampFloat(0.0f, 1.0f, -1.0f);
+        Assertions.assertEquals(0.0f, v4, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        float v5 = MathUtils.clampFloat(8.0f, -1.0f, 10.0f);
+        Assertions.assertEquals(8.0f, v5, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        float v6 = MathUtils.clampFloat(4.0f, 3.0f, -1.0f);
+        Assertions.assertEquals(3.0f, v6, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        float v7 = MathUtils.clampFloat(2.0f, 2.0f, 2.0f);
+        Assertions.assertEquals(2.0f, v7, MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test

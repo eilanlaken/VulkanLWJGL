@@ -152,7 +152,7 @@ public class MathQuaternion {
      * @return the rotation around the x-axis in radians (between -(PI/2) and +(PI/2)) */
     public float getPitchRad() {
         final int pole = getGimbalPole();
-        return pole == 0 ? (float)Math.asin(MathUtils.clamp(2f * (w * x - z * y), -1f, 1f)) : (float)pole * MathUtils.PI * 0.5f;
+        return pole == 0 ? (float)Math.asin(MathUtils.clampFloat(2f * (w * x - z * y), -1f, 1f)) : (float)pole * MathUtils.PI * 0.5f;
     }
 
     /** Get the pitch euler angle in degrees, which is the rotation around the x axis. Requires that this quaternion is normalized.
@@ -534,7 +534,7 @@ public class MathQuaternion {
      * @param v2 The target vector, which should be normalized.
      * @return This quaternion for chaining */
     public MathQuaternion setFromCross(final MathVector3 v1, final MathVector3 v2) {
-        final float dot = MathUtils.clamp(v1.dot(v2), -1f, 1f);
+        final float dot = MathUtils.clampFloat(v1.dot(v2), -1f, 1f);
         final float angle = (float)Math.acos(dot);
         return setFromAxisRad(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x, angle);
     }
@@ -549,7 +549,7 @@ public class MathQuaternion {
      * @return This quaternion for chaining */
     public MathQuaternion setFromCross(final float x1, final float y1, final float z1, final float x2, final float y2,
                                        final float z2) {
-        final float dot = MathUtils.clamp(MathVector3.dot(x1, y1, z1, x2, y2, z2), -1f, 1f);
+        final float dot = MathUtils.clampFloat(MathVector3.dot(x1, y1, z1, x2, y2, z2), -1f, 1f);
         final float angle = (float)Math.acos(dot);
         return setFromAxisRad(y1 * z2 - z1 * y2, z1 * x2 - x1 * z2, x1 * y2 - y1 * x2, angle);
     }
@@ -820,7 +820,7 @@ public class MathQuaternion {
         final float d = MathVector3.dot(this.x, this.y, this.z, axisX, axisY, axisZ);
         final float l2 = MathQuaternion.len2(axisX * d, axisY * d, axisZ * d, this.w);
         return l2 == 0 ? 0f
-                : (float)(2.0 * Math.acos(MathUtils.clamp((float)((d < 0 ? -this.w : this.w) / Math.sqrt(l2)), -1f, 1f)));
+                : (float)(2.0 * Math.acos(MathUtils.clampFloat((float)((d < 0 ? -this.w : this.w) / Math.sqrt(l2)), -1f, 1f)));
     }
 
     /** Get the angle in radians of the rotation around the specified axis. The axis must be normalized.
