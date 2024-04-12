@@ -1,5 +1,7 @@
 package org.example.engine.core.collections;
 
+import org.example.engine.core.math.MathUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -132,6 +134,18 @@ class CollectionsArrayTest {
 
     @Test
     void sort() {
+        CollectionsArray<Float> array = new CollectionsArray<>();
+        array.add(5f);
+        array.add(-1f);
+        array.add(2f);
+        array.add(0f);
+        array.add(0f);
+        array.sort();
+        Assertions.assertEquals(-1f, array.get(0), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0f, array.get(1), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0f, array.get(2), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(2f, array.get(3), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(5f, array.get(4), MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test

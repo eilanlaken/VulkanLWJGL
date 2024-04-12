@@ -300,13 +300,12 @@ public class CollectionsArray<T> implements Iterable<T> {
         return newItems;
     }
 
-
     public void sort() {
-        CollectionsSorter.instance().sort(items, 0, size);
+        CollectionsUtils.sort(items, 0, size);
     }
 
     public void sort(Comparator<? super T> comparator) {
-        CollectionsSorter.instance().sort(items, comparator, 0, size);
+        CollectionsUtils.sort(items, comparator, 0, size);
     }
 
     public void reverse() {
@@ -356,7 +355,7 @@ public class CollectionsArray<T> implements Iterable<T> {
         return items[MathUtils.random(0, size - 1)];
     }
 
-    /** Returns the items as an array. Note the array is typed, so the {@link #Array(Class)} constructor must have been used.
+    /** Returns the items as an array. Note the array is typed, so the {@link #CollectionsArray()}} constructor must have been used.
      * Otherwise use {@link #toArray(Class)} to specify the array type. */
     public T[] toArray () {
         return (T[])toArray(items.getClass().getComponentType());
