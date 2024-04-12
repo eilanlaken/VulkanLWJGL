@@ -21,6 +21,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
     private Shape2D otherAABB;
     private Shape2D otherRectangle;
     private Shape2D otherPolygonConvex;
+    private Shape2D otherPolygonConcave;
+    private Shape2D otherPolygonWithHoles;
 
     Physics2DWorld world = new Physics2DWorld();
     Physics2DBody body;

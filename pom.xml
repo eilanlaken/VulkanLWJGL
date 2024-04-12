@@ -573,6 +573,13 @@
             <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
+        <!-- static analysis -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>20.1.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

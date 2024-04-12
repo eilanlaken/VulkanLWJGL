@@ -17,4 +17,18 @@ public final class CollectionsUtils {
         return tableSize;
     }
 
+    public static boolean isSorted(int[] array, boolean ascending) {
+        if (array == null || array.length <= 1) {
+            return true;
+        }
+
+        for (int i = 0; i < array.length - 1; i++) {
+            boolean increment = array[i + 1] >= array[i];
+            if (ascending && !increment) return false;
+            if (!ascending && increment) return false;
+        }
+
+        return true;
+    }
+
 }

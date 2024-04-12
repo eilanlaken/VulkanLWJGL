@@ -198,7 +198,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
     public void pushPolygon(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (triangleIndex + polygon.indices.length > indicesBuffer.limit() || vertexIndex + polygon.localPoints.length > BATCH_SIZE * 4) {
+        if (triangleIndex + polygon.indices.length > indicesBuffer.limit() || vertexIndex + polygon.vertices.length > BATCH_SIZE * 4) {
             flush();
         }
         useShader(shader);
@@ -220,7 +220,7 @@ public class Renderer2D implements MemoryResourceHolder {
         polygon.update();
 
         float t = tint == null ? WHITE_TINT : tint.toFloatBits();
-        final float[] worldPoints = polygon.getWorldPoints();
+        final float[] worldPoints = polygon.getWorldVertices();
 
         for (int i = 0; i < worldPoints.length - 1; i += 2) {
             verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(t).put(0.5f).put(0.5f);
@@ -440,7 +440,7 @@ public class Renderer2D implements MemoryResourceHolder {
         triangleIndex += polygon.indices.length * 2;
 
         polygon.update();
-        final float[] worldPoints = polygon.getWorldPoints();
+        final float[] worldPoints = polygon.getWorldVertices();
         for (int i = 0; i < worldPoints.length - 1; i += 2) {
             verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(tintFloatBits).put(0.5f).put(0.5f);
         }

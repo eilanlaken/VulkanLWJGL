@@ -1,5 +1,6 @@
 package org.example.engine.core.shape;
 
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.collections.CollectionsArrayInt;
 import org.example.engine.core.collections.CollectionsTuplePair;
 import org.example.engine.core.collections.CollectionsTupleTriple;
@@ -173,6 +174,27 @@ public final class ShapeUtils {
             if (crossSignCurrent != crossSign) return false;
         }
         return true;
+    }
+
+    // [5, 8] -> [0,4] [5,7] [8, length - 1]
+    // [4, 8, 11] -> [0,3] [4,7] [8,10] [11, length-1]
+    protected static CollectionsArray<CollectionsTuplePair<Integer, Integer>> getLoops(final int[] holes, int vertexCount) {
+        CollectionsArray<CollectionsTuplePair<Integer, Integer>> loops = new CollectionsArray<>();
+        if (holes == null || holes.length == 0) {
+            loops.add(new CollectionsTuplePair<>(0, vertexCount - 1));
+            return loops;
+        }
+
+        int start = 0;
+        for (int hole : holes) {
+            int end = hole - 1;
+            loops.add(new CollectionsTuplePair<>(start, end));
+            start = hole;
+        }
+        if (start <= vertexCount - 1) {
+            loops.add(new CollectionsTuplePair<>(start, vertexCount - 1));
+        }
+        return loops;
     }
 
     public static MathVector2 calculateCenterOfGeometry(final float[] vertices) {

@@ -135,13 +135,38 @@ public final class Physics2DWorldCollisionDetection {
         return false;
     }
 
-    private static boolean circleVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    private static void circleVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
         Shape2DCircle circle = (Shape2DCircle) a.shape;
         Shape2DPolygon polygon = (Shape2DPolygon) b.shape;
 
-        System.out.println("circle vs poly");
+        MathVector2 circleWorldCenter = circle.getWorldCenter();
+        CollectionsArray<MathVector2> projections = new CollectionsArray<>(false, polygon.vertexCount);
+        for (int i = 0; i < polygon.vertexCount; i++) {
+            MathVector2 tail = new MathVector2();
+            MathVector2 head = new MathVector2();
+            polygon.getWorldEdge(i, tail, head);
+            float dx = head.x - tail.x;
+            float dy = head.y - tail.y;
 
-        return false;
+            if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) return;
+            float scale1 = MathVector2.dot(circleWorldCenter.x - tail.x, circleWorldCenter.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
+            MathVector2 projection = new MathVector2(dx, dy).scl(scale1).add(tail);
+            projection.clamp(tail, head);
+            projections.add(projection);
+        }
+
+        boolean collide = false;
+        if (polygon.contains(circleWorldCenter)) collide = true;
+        for (MathVector2 projection : projections) {
+            if (circle.contains(projection)) {
+                collide = true;
+                break;
+            }
+        }
+        if (!collide) return;
+
+        System.out.println("colliding");
+
     }
 
     private static void circleVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
