@@ -210,24 +210,28 @@ public final class Physics2DWorldCollisionDetection {
 
         float dx1 = c2.x - c1.x;
         float dy1 = c2.y - c1.y;
+        if (MathUtils.isZero(dx1) && MathUtils.isZero(dy1)) return;
         float scale1 = MathVector2.dot(circleWorldCenter.x - c1.x, circleWorldCenter.y - c1.y, dx1, dy1) / MathVector2.len2(dx1, dy1);
         MathVector2 projection1 = new MathVector2(dx1, dy1).scl(scale1).add(c1);
         projection1.clamp(c1, c2);
 
         float dx2 = c3.x - c2.x;
         float dy2 = c3.y - c2.y;
+        if (MathUtils.isZero(dx2) && MathUtils.isZero(dy2)) return;
         float scale2 = MathVector2.dot(circleWorldCenter.x - c2.x, circleWorldCenter.y - c2.y, dx2, dy2) / MathVector2.len2(dx2, dy2);
         MathVector2 projection2 = new MathVector2(dx2, dy2).scl(scale2).add(c2);
         projection2.clamp(c2, c3);
 
         float dx3 = c4.x - c3.x;
         float dy3 = c4.y - c3.y;
+        if (MathUtils.isZero(dx3) && MathUtils.isZero(dy3)) return;
         float scale3 = MathVector2.dot(circleWorldCenter.x - c3.x, circleWorldCenter.y - c3.y, dx3, dy3) / MathVector2.len2(dx3, dy3);
         MathVector2 projection3 = new MathVector2(dx3, dy3).scl(scale3).add(c3);
         projection3.clamp(c3, c4);
 
         float dx4 = c1.x - c4.x;
         float dy4 = c1.y - c4.y;
+        if (MathUtils.isZero(dx4) && MathUtils.isZero(dy4)) return;
         float scale4 = MathVector2.dot(circleWorldCenter.x - c4.x, circleWorldCenter.y - c4.y, dx4, dy4) / MathVector2.len2(dx4, dy4);
         MathVector2 projection4 = new MathVector2(dx4, dy4).scl(scale4).add(c4);
         projection4.clamp(c4, c1);
@@ -237,6 +241,8 @@ public final class Physics2DWorldCollisionDetection {
         manifold.normal = new MathVector2(1,0);
         manifold.depth = 1;
         manifolds.add(manifold);
+
+        System.out.println(MathVector2.dst(manifold.contactPoint1, circleWorldCenter));
 
     }
 
