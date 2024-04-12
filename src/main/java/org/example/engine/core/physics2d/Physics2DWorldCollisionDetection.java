@@ -138,71 +138,11 @@ public final class Physics2DWorldCollisionDetection {
         return false;
     }
 
-//    private static void circleVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
-//        Shape2DCircle circle = (Shape2DCircle) a.shape;
-//        Shape2DRectangle rect = (Shape2DRectangle) b.shape;
-//
-//        MathVector2 circleWorldCenter = circle.getWorldCenter();
-//        float circleWorldRadius = circle.getWorldRadius();
-//
-//        MathVector2 c1 = rect.c1();
-//        MathVector2 c2 = rect.c2();
-//        MathVector2 c3 = rect.c3();
-//        MathVector2 c4 = rect.c4();
-//
-//        float dx1 = c2.x - c1.x;
-//        float dy1 = c2.y - c1.y;
-//        float distance1 = MathVector2.dot(circleWorldCenter.x - c1.x, circleWorldCenter.y - c1.y, dx1, dy1) / MathVector2.len2(dx1, dy1);
-//
-//        float dx2 = c3.x - c2.x;
-//        float dy2 = c3.y - c2.y;
-//        float distance2 = MathVector2.dot(circleWorldCenter.x - c2.x, circleWorldCenter.y - c2.y, dx2, dy2) / MathVector2.len2(dx2, dy2);
-//
-//        float dx3 = c4.x - c3.x;
-//        float dy3 = c4.y - c3.y;
-//        float distance3 = MathVector2.dot(circleWorldCenter.x - c3.x, circleWorldCenter.y - c3.y, dx3, dy3) / MathVector2.len2(dx3, dy3);
-//
-//        float dx4 = c1.x - c4.x;
-//        float dy4 = c1.y - c4.y;
-//        float distance4 = MathVector2.dot(circleWorldCenter.x - c4.x, circleWorldCenter.y - c4.y, dx4, dy4) / MathVector2.len2(dx4, dy4);
-//
-//        float minDistance = MathUtils.min(distance1, distance2, distance3, distance4);
-//
-//        MathVector2 projection;
-//        if (MathUtils.isEqual(minDistance, distance1)) {
-//            projection = new MathVector2(dx4, dy4).scl(distance4).add(c4);
-//        } else if (MathUtils.isEqual(minDistance, distance2)) {
-//            projection = new MathVector2(dx1, dy1).scl(distance1).add(c1);
-//        } else if (MathUtils.isEqual(minDistance, distance3)) {
-//            projection = new MathVector2(dx2, dy2).scl(distance2).add(c2);
-//        } else {
-//            projection = new MathVector2(dx3, dy3).scl(distance3).add(c3);
-//        }
-//
-//        final boolean rectContainsCenter = rect.contains(circleWorldCenter);
-//        final boolean circleContainsEdge = circle.contains(projection);
-//
-//        if (circleContainsEdge) System.out.println("circle contains edge");
-//
-//        if (!rectContainsCenter) return;
-//
-//
-//        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
-//        manifold.contactPoint1 = new MathVector2(projection);
-//        if (rectContainsCenter) {
-//            manifold.normal = new MathVector2(projection).sub(circleWorldCenter).nor();
-//            manifold.depth = minDistance + circleWorldRadius;
-//        }
-//        manifolds.add(manifold);
-//    }
-
     private static void circleVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
         Shape2DCircle circle = (Shape2DCircle) a.shape;
         Shape2DRectangle rect = (Shape2DRectangle) b.shape;
 
         MathVector2 circleWorldCenter = circle.getWorldCenter();
-        float circleWorldRadius = circle.getWorldRadius();
-
         MathVector2 c1 = rect.c1();
         MathVector2 c2 = rect.c2();
         MathVector2 c3 = rect.c3();
@@ -236,14 +176,46 @@ public final class Physics2DWorldCollisionDetection {
         MathVector2 projection4 = new MathVector2(dx4, dy4).scl(scale4).add(c4);
         projection4.clamp(c4, c1);
 
+        final boolean rectContainsCenter = rect.contains(circleWorldCenter);
+        final boolean circleContainsEdge1 = circle.contains(projection1);
+        final boolean circleContainsEdge2 = circle.contains(projection2);
+        final boolean circleContainsEdge3 = circle.contains(projection3);
+        final boolean circleContainsEdge4 = circle.contains(projection4);
+
+        final boolean collide = rectContainsCenter || circleContainsEdge1 || circleContainsEdge2
+                || circleContainsEdge3 || circleContainsEdge4;
+        if (!collide) return;
+
+        // create manifold
+        final float dstEdge1Squared = MathVector2.dst2(circleWorldCenter, projection1);
+        final float dstEdge2Squared = MathVector2.dst2(circleWorldCenter, projection2);
+        final float dstEdge3Squared = MathVector2.dst2(circleWorldCenter, projection3);
+        final float dstEdge4Squared = MathVector2.dst2(circleWorldCenter, projection4);
+
+        final float minDstEdgeSquared = MathUtils.min(dstEdge1Squared, dstEdge2Squared, dstEdge3Squared, dstEdge4Squared);
+
+        MathVector2 projection;
+        if (MathUtils.isEqual(minDstEdgeSquared, dstEdge1Squared)) {
+            projection = projection1;
+        } else if (MathUtils.isEqual(minDstEdgeSquared, dstEdge2Squared)) {
+            projection = projection2;
+        } else if (MathUtils.isEqual(minDstEdgeSquared, dstEdge3Squared)) {
+            projection = projection3;
+        } else {
+            projection = projection4;
+        }
+
         Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
-        manifold.contactPoint1 = new MathVector2(projection3);
-        manifold.normal = new MathVector2(1,0);
-        manifold.depth = 1;
+        manifold.contactPoint1 = new MathVector2(projection);
+        final float minDstEdge = (float) Math.sqrt(minDstEdgeSquared);
+        if (rectContainsCenter) {
+            manifold.normal = new MathVector2(projection).sub(circleWorldCenter).nor();
+            manifold.depth = minDstEdge + circle.getWorldRadius();
+        } else {
+            manifold.normal = new MathVector2(circleWorldCenter).sub(projection).nor();
+            manifold.depth = circle.getWorldRadius() - minDstEdge;
+        }
         manifolds.add(manifold);
-
-        System.out.println(MathVector2.dst(manifold.contactPoint1, circleWorldCenter));
-
     }
 
     /** Morphed vs ___ **/
