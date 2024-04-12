@@ -5,6 +5,8 @@ import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.*;
 import org.example.engine.core.shape.*;
 
+
+// https://oercommons.s3.amazonaws.com/media/courseware/relatedresource/file/imth-6-1-9-6-1-coordinate_plane_plotter/index.html
 public final class Physics2DWorldCollisionDetection {
 
     private Physics2DWorldCollisionDetection() {}
