@@ -15,22 +15,33 @@ class MathUtilsTest {
 
     @Test
     void clamp() {
-    }
+        MathVector2 v1 = new MathVector2(3,3);
+        MathVector2 min1 = new MathVector2(1,1);
+        MathVector2 max1 = new MathVector2(4,5);
+        v1.clamp(min1, max1);
+        Assertions.assertEquals(3, v1.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(3, v1.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
-    @Test
-    void testClamp() {
-    }
+        MathVector2 v2 = new MathVector2(3,6);
+        MathVector2 min2 = new MathVector2(1,1);
+        MathVector2 max2 = new MathVector2(2,2);
+        v2.clamp(min2, max2);
+        Assertions.assertEquals(2, v2.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(2, v2.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
-    @Test
-    void testClamp1() {
-    }
+        MathVector2 v3 = new MathVector2(-1,0);
+        MathVector2 min3 = new MathVector2();
+        MathVector2 max3 = new MathVector2();
+        v3.clamp(min3, max3);
+        Assertions.assertEquals(0, v3.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0, v3.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
-    @Test
-    void testClamp2() {
-    }
-
-    @Test
-    void testClamp3() {
+        MathVector2 v4 = new MathVector2(-3,3);
+        MathVector2 min4 = new MathVector2(2,6);
+        MathVector2 max4 = new MathVector2(-2,4);
+        v4.clamp(min4, max4);
+        Assertions.assertEquals(-2, v4.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(4, v4.y, MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test

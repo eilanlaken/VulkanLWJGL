@@ -305,17 +305,19 @@ public class MathVector2 {
         return this;
     }
 
-    // TODO: test
+    // TODO: unit test.
     public MathVector2 clamp(MathVector2 min, MathVector2 max) {
-        if (this.x < min.x)
-            this.x = min.x;
-        else if (this.x > max.x)
-            this.x = max.x;
+        if (min.x < max.x) {
+            this.x = MathUtils.clamp(this.x, min.x, max.x);
+        } else {
+            this.x = MathUtils.clamp(this.x, max.x, min.x);
+        }
 
-        if (this.y < min.y)
-            this.y = min.y;
-        else if (this.y > max.y)
-            this.y = max.y;
+        if (min.y < max.y) {
+            this.y = MathUtils.clamp(this.y, min.y, max.y);
+        } else {
+            this.y = MathUtils.clamp(this.y, max.y, min.y);
+        }
 
         return this;
     }
