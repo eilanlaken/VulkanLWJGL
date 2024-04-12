@@ -21,8 +21,8 @@ public final class Physics2DWorldCollisionDetection {
         if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) circleVsCircle(a, b, manifolds);
         else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DAABB) circleVsAABB(a, b, manifolds);
         else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DRectangle) circleVsRectangle(a, b, manifolds);
+        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DPolygon) circleVsPolygon(a, b, manifolds);
 
-        else if (a.shape instanceof Shape2DRectangle && b.shape instanceof Shape2DCircle) rectangleVsCircle(a, b, manifolds);
     }
 
     /** AABB vs ____ **/
@@ -133,7 +133,11 @@ public final class Physics2DWorldCollisionDetection {
         return false;
     }
 
-    private static boolean circleVsPolygon(Shape2DCircle circle, Shape2DPolygon polygon, Physics2DWorldCollisionManifold manifold) {
+    private static boolean circleVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+        Shape2DCircle circle = (Shape2DCircle) a.shape;
+        Shape2DPolygon polygon = (Shape2DPolygon) b.shape;
+
+        System.out.println("circle vs poly");
 
         return false;
     }
