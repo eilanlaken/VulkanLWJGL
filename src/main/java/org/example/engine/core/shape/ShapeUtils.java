@@ -176,7 +176,7 @@ public final class ShapeUtils {
         return true;
     }
 
-    // [5, 8] -> [0,4] [5,7] [8, length - 1]
+    // [5, 8] -> [0,4] [5,7] [8, length - 1] 
     // [4, 8, 11] -> [0,3] [4,7] [8,10] [11, length-1]
     protected static CollectionsArray<CollectionsTuplePair<Integer, Integer>> getLoops(final int[] holes, int vertexCount) {
         CollectionsArray<CollectionsTuplePair<Integer, Integer>> loops = new CollectionsArray<>();
