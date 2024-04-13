@@ -14,7 +14,7 @@ class MathUtilsTest {
     }
 
     @Test
-    void clampFloat() {
+    public void clampFloat() {
         float v1 = MathUtils.clampFloat(0.0f, -1.0f, 1.0f);
         Assertions.assertEquals(0.0f, v1, MathUtils.FLOAT_ROUNDING_ERROR);
 
