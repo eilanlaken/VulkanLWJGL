@@ -1,7 +1,6 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.*;
 import org.example.engine.core.shape.*;
 
@@ -58,7 +57,7 @@ public final class Physics2DWorldCollisionDetection {
         circleVsAABB(b, a, manifolds);
     }
 
-    private static boolean AABBvsMorphed(Shape2DAABB aabb, Shape2DMorphed morphed, Physics2DWorldCollisionManifold manifold) {
+    private static boolean AABBvsMorphed(Shape2DAABB aabb, Shape2DComposite morphed, Physics2DWorldCollisionManifold manifold) {
 
         return false;
     }
@@ -149,7 +148,7 @@ public final class Physics2DWorldCollisionDetection {
         manifolds.add(manifold);
     }
 
-    private static boolean circleVsMorphed(Shape2DCircle circle, Shape2DMorphed morphed, Physics2DWorldCollisionManifold manifold) {
+    private static boolean circleVsMorphed(Shape2DCircle circle, Shape2DComposite morphed, Physics2DWorldCollisionManifold manifold) {
 
         return false;
     }
@@ -289,27 +288,27 @@ public final class Physics2DWorldCollisionDetection {
     }
 
     /** Morphed vs ___ **/
-    private static boolean morphedVsAABB(Shape2DMorphed morphed, Shape2DAABB aabb, Physics2DWorldCollisionManifold manifold) {
+    private static boolean morphedVsAABB(Shape2DComposite morphed, Shape2DAABB aabb, Physics2DWorldCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean morphedVsCircle(Shape2DMorphed morphed, Shape2DCircle circle, Physics2DWorldCollisionManifold manifold) {
+    private static boolean morphedVsCircle(Shape2DComposite morphed, Shape2DCircle circle, Physics2DWorldCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean morphedVsMorphed(Shape2DMorphed morphed1, Shape2DMorphed morphed2, Physics2DWorldCollisionManifold manifold) {
+    private static boolean morphedVsMorphed(Shape2DComposite morphed1, Shape2DComposite morphed2, Physics2DWorldCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean morphedVsPolygon(Shape2DMorphed morphed, Shape2DPolygon polygon, Physics2DWorldCollisionManifold manifold) {
+    private static boolean morphedVsPolygon(Shape2DComposite morphed, Shape2DPolygon polygon, Physics2DWorldCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean morphedVsRectangle(Shape2DMorphed morphed, Shape2DRectangle rectangle, Physics2DWorldCollisionManifold manifold) {
+    private static boolean morphedVsRectangle(Shape2DComposite morphed, Shape2DRectangle rectangle, Physics2DWorldCollisionManifold manifold) {
 
         return false;
     }
@@ -325,7 +324,7 @@ public final class Physics2DWorldCollisionDetection {
         return false;
     }
 
-    private static boolean polygonVsMorphed(Shape2DPolygon polygon, Shape2DMorphed morphed, Physics2DWorldCollisionManifold manifold) {
+    private static boolean polygonVsMorphed(Shape2DPolygon polygon, Shape2DComposite morphed, Physics2DWorldCollisionManifold manifold) {
 
         return false;
     }
@@ -350,7 +349,7 @@ public final class Physics2DWorldCollisionDetection {
         System.out.println("ggg");
     }
 
-    private static boolean rectangleVsMorphed(Shape2DRectangle rectangle, Shape2DMorphed morphed, Physics2DWorldCollisionManifold manifold) {
+    private static boolean rectangleVsMorphed(Shape2DRectangle rectangle, Shape2DComposite morphed, Physics2DWorldCollisionManifold manifold) {
 
         return false;
     }

@@ -34,7 +34,7 @@ public class Shape2DPolygon extends Shape2D {
         this.worldVertices = new float[vertices.length];
         this.indices = indices;
         this.isConvex = ShapeUtils.isPolygonConvex(vertices);
-        this.unscaledArea = Math.abs(ShapeUtils.calculatePolygonSignedArea(this.vertices));
+        this.unscaledArea = Math.abs(ShapeUtils.incorrect_calculatePolygonSignedArea(this.vertices));
         this.unscaledBoundingRadius = ShapeUtils.calculatePolygonBoundingRadius(this.vertices);
         this.holes = null;
         this.loops = ShapeUtils.getLoops(null, vertexCount);
@@ -61,7 +61,8 @@ public class Shape2DPolygon extends Shape2D {
         this.loops = ShapeUtils.getLoops(holes, vertexCount);
         this.hasHoles = holes != null && holes.length != 0;
         this.isConvex = !hasHoles && ShapeUtils.isPolygonConvex(vertices);
-        this.unscaledArea = Math.abs(ShapeUtils.calculatePolygonSignedArea(this.vertices));
+        // TODO: fix this one and write unit tests.
+        this.unscaledArea = Math.abs(ShapeUtils.incorrect_calculatePolygonSignedArea(this.vertices));
         this.unscaledBoundingRadius = ShapeUtils.calculatePolygonBoundingRadius(this.vertices);
     }
 

@@ -21,7 +21,7 @@ public class SceneRendering2D_4 extends WindowScreen {
     private Shape2DAABB aabb;
     private Shape2DSegment segment;
     private Shape2DPolygon polygon;
-    private Shape2DMorphed compound;
+    private Shape2DComposite compound;
 
     private Texture texture0;
     private TextureRegion region;
@@ -67,11 +67,7 @@ public class SceneRendering2D_4 extends WindowScreen {
         islands.add(circle);
         islands.add(polygon);
 
-        CollectionsArray<Shape2D> holes = new CollectionsArray<>();
-        holes.add(new Shape2DCircle(90, 0,0));
-
-        compound = new Shape2DMorphed(islands, holes);
-        //compound.update();
+        compound = new Shape2DComposite(islands);
         bounds = new Shape2DCircle(compound.getBoundingRadius(), compound.x(), compound.y());
 
         camera = new Camera(640*2,480*2, 1);
@@ -101,9 +97,6 @@ public class SceneRendering2D_4 extends WindowScreen {
         renderer2D.end();
         time++;
 
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.Q)) {
-            compound.addIsland(aabb);
-        }
     }
 
     private void renderBounds(Shape2D shape2D) {

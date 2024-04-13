@@ -178,7 +178,7 @@ public final class ShapeUtils {
 
     // [5, 8] -> [0,4] [5,7] [8, length - 1] 
     // [4, 8, 11] -> [0,3] [4,7] [8,10] [11, length-1]
-    protected static CollectionsArray<CollectionsTuplePair<Integer, Integer>> getLoops(final int[] holes, int vertexCount) {
+    static CollectionsArray<CollectionsTuplePair<Integer, Integer>> getLoops(final int[] holes, int vertexCount) {
         CollectionsArray<CollectionsTuplePair<Integer, Integer>> loops = new CollectionsArray<>();
         if (holes == null || holes.length == 0) {
             loops.add(new CollectionsTuplePair<>(0, vertexCount - 1));
@@ -205,7 +205,8 @@ public final class ShapeUtils {
         return center.scl(1f / (vertices.length * 0.5f));
     }
 
-    public static float calculatePolygonSignedArea(final float[] vertices) {
+    // TODO: test - doesn't work in the case of polygon with holes.
+    @Deprecated public static float incorrect_calculatePolygonSignedArea(final float[] vertices) {
         float area = 0;
         final int n = vertices.length;
         for (int i = 0; i < n - 1; i += 2) {
@@ -226,6 +227,18 @@ public final class ShapeUtils {
             if (l2 > max) max = l2;
         }
         return (float) Math.sqrt(max);
+    }
+
+    // TODO: bonus implement.
+    public CollectionsArray<Shape2D> fracture(Shape2D shape, MathVector2... controlPoints) {
+
+        return null;
+    }
+
+    // TODO: bonus implement.
+    public CollectionsArray<Shape2D> fracture(Shape2D shape, int n) {
+        // generate an array of n random control points, contained in shape.
+        return null;
     }
 
     /**

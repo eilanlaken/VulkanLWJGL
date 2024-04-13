@@ -243,7 +243,7 @@ public class Renderer2D implements MemoryResourceHolder {
         if (shape instanceof Shape2DAABB) pushDebugAABB((Shape2DAABB) shape, tintFloatBits);
         if (shape instanceof Shape2DSegment) pushDebugSegment((Shape2DSegment) shape, tintFloatBits);
         if (shape instanceof Shape2DPolygon) pushDebugPolygon((Shape2DPolygon) shape, tintFloatBits);
-        if (shape instanceof Shape2DMorphed) pushDebugCompoundShape((Shape2DMorphed) shape, tintFloatBits);
+        if (shape instanceof Shape2DComposite) pushDebugCompoundShape((Shape2DComposite) shape, tintFloatBits);
     }
 
     private void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
@@ -447,12 +447,9 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += polygon.vertexCount * 5;
     }
 
-    private void pushDebugCompoundShape(final Shape2DMorphed compound, final float tintFloatBits) {
-        for (Shape2D island : compound.islands) {
+    private void pushDebugCompoundShape(final Shape2DComposite compound, final float tintFloatBits) {
+        for (Shape2D island : compound.shapes) {
             pushDebugShape(island, tintFloatBits);
-        }
-        for (Shape2D hole : compound.holes) {
-            pushDebugShape(hole, RED_TINT);
         }
     }
 
