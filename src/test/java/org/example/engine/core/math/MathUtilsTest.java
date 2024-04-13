@@ -24,6 +24,16 @@ class MathUtilsTest {
     }
 
     @Test
+    void normalizeAngleRad() {
+        Assertions.assertEquals(0.0f, MathUtils.normalizeAngleRad(0.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.0f, MathUtils.normalizeAngleRad(MathUtils.PI2), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(1.0f, MathUtils.normalizeAngleRad(1.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.1f, MathUtils.normalizeAngleRad(MathUtils.PI2 + 0.1f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(MathUtils.PI2 - 0.1f, MathUtils.normalizeAngleRad(-0.1f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.1f, MathUtils.normalizeAngleRad(MathUtils.PI2 * 3 + 0.1f), MathUtils.FLOAT_ROUNDING_ERROR);
+    }
+
+    @Test
     public void clampFloat() {
         float v1 = MathUtils.clampFloat(0.0f, -1.0f, 1.0f);
         Assertions.assertEquals(0.0f, v1, MathUtils.FLOAT_ROUNDING_ERROR);

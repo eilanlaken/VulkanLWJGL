@@ -242,6 +242,12 @@ public final class MathUtils {
         return degrees;
     }
 
+    public static float normalizeAngleRad(float rad) {
+        rad %= PI2;
+        if (rad < 0) rad += PI2;
+        return rad;
+    }
+
     public static boolean isZero(float value) {
         return Math.abs(value) <= FLOAT_ROUNDING_ERROR;
     }

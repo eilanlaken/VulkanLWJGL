@@ -4,12 +4,12 @@ import java.util.Objects;
 
 public class CollectionsTuple2<T, U> {
 
-    public T first;
-    public U second;
+    public T t1;
+    public U t2;
 
-    public CollectionsTuple2(T first, U second) {
-        this.first = first;
-        this.second = second;
+    public CollectionsTuple2(T t1, U t2) {
+        this.t1 = t1;
+        this.t2 = t2;
     }
 
     @Override
@@ -17,18 +17,18 @@ public class CollectionsTuple2<T, U> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CollectionsTuple2<?, ?> tuplePair = (CollectionsTuple2<?, ?>) o;
-        return Objects.equals(first, tuplePair.first) &&
-               Objects.equals(second, tuplePair.second);
+        return Objects.equals(t1, tuplePair.t1) &&
+               Objects.equals(t2, tuplePair.t2);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(first, second);
+        return Objects.hash(t1, t2);
     }
 
     @Override
     public String toString() {
-        return "<" + first + ", " + second + ">";
+        return "<" + t1 + ", " + t2 + ">";
     }
 
 }

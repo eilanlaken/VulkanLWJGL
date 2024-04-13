@@ -4,14 +4,14 @@ import java.util.Objects;
 
 public class CollectionsTuple3<T, U, V> {
 
-    public final T first;
-    public final U second;
-    public final V third;
+    public final T t1;
+    public final U t2;
+    public final V t3;
 
-    public CollectionsTuple3(T first, U second, V third) {
-        this.first = first;
-        this.second = second;
-        this.third = third;
+    public CollectionsTuple3(T t1, U t2, V t3) {
+        this.t1 = t1;
+        this.t2 = t2;
+        this.t3 = t3;
     }
 
     @Override
@@ -19,14 +19,14 @@ public class CollectionsTuple3<T, U, V> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CollectionsTuple3<?, ?, ?> tupleTriple = (CollectionsTuple3<?, ?, ?>) o;
-        return Objects.equals(first, tupleTriple.first) &&
-               Objects.equals(second, tupleTriple.second) &&
-               Objects.equals(third, tupleTriple.third);
+        return Objects.equals(t1, tupleTriple.t1) &&
+               Objects.equals(t2, tupleTriple.t2) &&
+               Objects.equals(t3, tupleTriple.t3);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(first, second, third);
+        return Objects.hash(t1, t2, t3);
     }
 
 }

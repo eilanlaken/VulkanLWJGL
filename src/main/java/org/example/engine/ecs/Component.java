@@ -75,12 +75,16 @@ public abstract class Component {
         return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, ShapeUtils.createPolygonCircleFilled(r, refinement), customShader, customAttributes);
     }
 
-    public static ComponentGraphics2DShape createShapeCircleFilled(float r, int refinement, float angleStart, float angleEnd, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
-        return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, ShapeUtils.createPolygonCircleFilled(r, refinement, angleStart, angleEnd), customShader, customAttributes);
+    public static ComponentGraphics2DShape createShapeCircleFilled(float r, int refinement, float degStart, float degEnd, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, ShapeUtils.createPolygonCircleFilled(r, refinement, degStart, degEnd), customShader, customAttributes);
     }
 
     public static ComponentGraphics2DShape createShapeCircleHollow(float r, int refinement, float stroke, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
         return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, ShapeUtils.createPolygonCircleHollow(r, refinement, stroke), customShader, customAttributes);
+    }
+
+    public static ComponentGraphics2DShape createShapeCircleHollow(float r, int refinement, float stroke, float degStart, float degEnd, Color tint, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
+        return new ComponentGraphics2DShape(ComponentGraphics2DShape.CIRCLE, tint, ShapeUtils.createPolygonCircleHollow(r, refinement, stroke, degStart, degEnd), customShader, customAttributes);
     }
 
     // TODO: test

@@ -17,7 +17,9 @@ public final class ShapeUtils {
     private static final Map<CollectionsTuple2<Float, Integer>, int[]> cachedFilledCirclesIndices = new HashMap<>();
     private static final Map<CollectionsTuple4<Float, Integer, Float, Float>, int[]> cachedFilledCircleArcsIndices = new HashMap<>();
     private static final Map<CollectionsTuple3<Float, Integer, Float>, float[]> cachedHollowCirclesVertices = new HashMap<>();
+    private static final Map<CollectionsTuple5<Float, Integer, Float, Float, Float>, float[]> cachedHollowCircleArcsVertices = new HashMap<>();
     private static final Map<CollectionsTuple3<Float, Integer, Float>, int[]> cachedHollowCirclesIndices = new HashMap<>();
+    private static final Map<CollectionsTuple5<Float, Integer, Float, Float, Float>, int[]> cachedHollowCircleArcsIndices = new HashMap<>();
     private static final Map<float[], int[]> cachedFilledPolygonIndices = new HashMap<>();
     private static final Map<float[], float[]> cachedHollowPolygonVertices = new HashMap<>();
     private static final Map<float[], int[]> cachedHollowPolygonIndices = new HashMap<>();
@@ -79,14 +81,14 @@ public final class ShapeUtils {
     }
 
     public static Shape2DPolygon createPolygonCircleFilled(float r, int refinement, float degStart, float degEnd) {
-        if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
         degStart = MathUtils.normalizeAngleDeg(degStart);
-        float range = degEnd > degStart && MathUtils.isEqual(MathUtils.normalizeAngleDeg(degEnd), degStart) ? 360.0f : MathUtils.normalizeAngleDeg(degEnd);
+        float range = degEnd > degStart && MathUtils.isEqual(MathUtils.normalizeAngleDeg(degEnd), degStart) ? 360.0f : Math.abs(MathUtils.normalizeAngleDeg(degEnd) - degStart);
+        boolean fullRange = MathUtils.isEqual(360.0f, range);
+        if (fullRange) return createPolygonCircleFilled(r, refinement);
+        if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
         final CollectionsTuple4<Float, Integer, Float, Float> tuple4 = new CollectionsTuple4<>(r, refinement, degStart, degEnd);
         float[] vertices = cachedFilledCircleArcsVertices.get(new CollectionsTuple4<>(r, refinement, degStart, degEnd));
         int size = refinement * 2 + 2;
-        boolean fullRange = MathUtils.isEqual(360.0f, range);
-        if (fullRange) size -= 2; // we don't need an extra vertex for the center because the circle is whole.
         if (vertices == null) {
             vertices = new float[size]; // add extra vertex for center.
             for (int i = 0; i < refinement * 2; i += 2) {
@@ -94,10 +96,8 @@ public final class ShapeUtils {
                 vertices[i] = r * MathUtils.cosDeg(angle);
                 vertices[i+1] = r * MathUtils.sinDeg(angle);
             }
-            if (!fullRange) {
-                vertices[refinement * 2] = 0;
-                vertices[refinement * 2 + 1] = 0;
-            }
+            vertices[refinement * 2] = 0;
+            vertices[refinement * 2 + 1] = 0;
             cachedFilledCircleArcsVertices.put(tuple4, vertices);
         }
         int[] indices = cachedFilledCircleArcsIndices.get(tuple4);
@@ -123,7 +123,7 @@ public final class ShapeUtils {
                 vertices[i] = outerRadius * MathUtils.cosDeg(angle);
                 vertices[i+1] = outerRadius * MathUtils.sinDeg(angle);
             }
-            for (int i = refinement * 2; i < refinement * 2 * 2; i += 2) { // outer rim
+            for (int i = refinement * 2; i < refinement * 2 * 2; i += 2) { // inner rim
                 float angle = 360f * (i * 0.5f) / refinement;
                 vertices[i] = innerRadius * MathUtils.cosDeg(angle);
                 vertices[i+1] = innerRadius * MathUtils.sinDeg(angle);
@@ -135,6 +135,43 @@ public final class ShapeUtils {
         if (indices == null) {
             indices = triangulatePolygon(vertices, new int[] { refinement }, 2);
             cachedHollowCirclesIndices.put(radiusRefinementStroke, indices);
+        }
+        return new Shape2DPolygon(indices, vertices);
+    }
+
+    public static Shape2DPolygon createPolygonCircleHollow(float r, int refinement, float stroke, float degStart, float degEnd) {
+        degStart = MathUtils.normalizeAngleDeg(degStart);
+        float range = degEnd > degStart && MathUtils.isEqual(MathUtils.normalizeAngleDeg(degEnd), degStart) ? 360.0f : Math.abs(MathUtils.normalizeAngleDeg(degEnd) - degStart);
+
+        boolean fullRange = MathUtils.isEqual(360.0f, range);
+        if (fullRange) return createPolygonCircleHollow(r, refinement, stroke);
+        if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
+        if (stroke < 0) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+
+        final CollectionsTuple5<Float, Integer, Float, Float, Float> tuple5 = new CollectionsTuple5<>(r, refinement, stroke, degStart, degEnd);
+        float[] vertices = cachedHollowCircleArcsVertices.get(tuple5);
+        if (vertices == null) {
+            final float outerRadius = r + stroke * 0.5f;
+            final float innerRadius = r - stroke * 0.5f;
+            vertices = new float[refinement * 2 * 2]; // refinement * dimensions * rings count
+            float angleStep = range * 0.5f / (refinement - 1);
+            for (int i = 0; i < vertices.length / 2; i += 2) {
+                float angle = degStart + angleStep * i;
+                vertices[i] = outerRadius * MathUtils.cosDeg(angle);
+                vertices[i + 1] = outerRadius * MathUtils.sinDeg(angle);
+            }
+            for (int i = vertices.length / 2; i < vertices.length; i += 2) { // inner rim
+                float angle = (degStart + range) - angleStep * (i - vertices.length / 2f);
+                vertices[i] = innerRadius * MathUtils.cosDeg(angle);
+                vertices[i+1] = innerRadius * MathUtils.sinDeg(angle);
+            }
+            cachedHollowCircleArcsVertices.put(tuple5, vertices);
+        }
+
+        int[] indices = cachedHollowCircleArcsIndices.get(tuple5);
+        if (indices == null) {
+            indices = triangulatePolygon(vertices);
+            cachedHollowCircleArcsIndices.put(tuple5, indices);
         }
         return new Shape2DPolygon(indices, vertices);
     }

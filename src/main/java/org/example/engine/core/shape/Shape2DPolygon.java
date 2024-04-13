@@ -123,7 +123,7 @@ public class Shape2DPolygon extends Shape2D {
         getWorldVertex(index, tail);
         int next = index + 1;
         for (CollectionsTuple2<Integer, Integer> loop : loops) {
-            if (index == loop.second) next = loop.first;
+            if (index == loop.t2) next = loop.t1;
         }
         getWorldVertex(next, head);
     }
