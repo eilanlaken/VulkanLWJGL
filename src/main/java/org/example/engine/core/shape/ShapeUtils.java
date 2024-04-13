@@ -1,9 +1,6 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.collections.CollectionsArrayInt;
-import org.example.engine.core.collections.CollectionsTuplePair;
-import org.example.engine.core.collections.CollectionsTupleTriple;
+import org.example.engine.core.collections.*;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 
@@ -14,11 +11,13 @@ import java.util.function.Function;
 public final class ShapeUtils {
 
     private static final int[] rectanglePolygonIndices = new int[] {2, 3, 0, 0, 1, 2};
-    private static final Map<CollectionsTupleTriple<Float, Float, Float>, int[]> cachedHollowRectangleIndices = new HashMap<>();
-    private static final Map<CollectionsTuplePair<Float, Integer>, float[]> cachedFilledCirclesVertices = new HashMap<>();
-    private static final Map<CollectionsTuplePair<Float, Integer>, int[]> cachedFilledCirclesIndices = new HashMap<>();
-    private static final Map<CollectionsTupleTriple<Float, Integer, Float>, float[]> cachedHollowCirclesVertices = new HashMap<>();
-    private static final Map<CollectionsTupleTriple<Float, Integer, Float>, int[]> cachedHollowCirclesIndices = new HashMap<>();
+    private static final Map<CollectionsTuple3<Float, Float, Float>, int[]> cachedHollowRectangleIndices = new HashMap<>();
+    private static final Map<CollectionsTuple2<Float, Integer>, float[]> cachedFilledCirclesVertices = new HashMap<>();
+    private static final Map<CollectionsTuple4<Float, Integer, Float, Float>, float[]> cachedFilledCircleArcsVertices = new HashMap<>();
+    private static final Map<CollectionsTuple2<Float, Integer>, int[]> cachedFilledCirclesIndices = new HashMap<>();
+    private static final Map<CollectionsTuple4<Float, Integer, Float, Float>, int[]> cachedFilledCircleArcsIndices = new HashMap<>();
+    private static final Map<CollectionsTuple3<Float, Integer, Float>, float[]> cachedHollowCirclesVertices = new HashMap<>();
+    private static final Map<CollectionsTuple3<Float, Integer, Float>, int[]> cachedHollowCirclesIndices = new HashMap<>();
     private static final Map<float[], int[]> cachedFilledPolygonIndices = new HashMap<>();
     private static final Map<float[], float[]> cachedHollowPolygonVertices = new HashMap<>();
     private static final Map<float[], int[]> cachedHollowPolygonIndices = new HashMap<>();
@@ -49,7 +48,7 @@ public final class ShapeUtils {
                 -widthHalf - strokeHalf, heightHalf + strokeHalf, -widthHalf - strokeHalf, -heightHalf - strokeHalf, widthHalf + strokeHalf, -heightHalf - strokeHalf, widthHalf + strokeHalf, heightHalf + strokeHalf,
                 -widthHalf + strokeHalf, heightHalf - strokeHalf, -widthHalf + strokeHalf, -heightHalf + strokeHalf, widthHalf - strokeHalf, -heightHalf + strokeHalf, widthHalf - strokeHalf, heightHalf - strokeHalf
         };
-        final CollectionsTupleTriple<Float, Float, Float> widthHeightStroke = new CollectionsTupleTriple<>(width, height, stroke);
+        final CollectionsTuple3<Float, Float, Float> widthHeightStroke = new CollectionsTuple3<>(width, height, stroke);
         int[] indices = cachedHollowRectangleIndices.get(widthHeightStroke);
         if (indices == null) {
             indices = ShapeUtils.triangulatePolygon(vertices, new int[] { 4 }, 2);
@@ -60,8 +59,8 @@ public final class ShapeUtils {
 
     public static Shape2DPolygon createPolygonCircleFilled(float r, int refinement) {
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
-        final CollectionsTuplePair<Float, Integer> radiusRefinement = new CollectionsTuplePair<>(r, refinement);
-        float[] vertices = cachedFilledCirclesVertices.get(new CollectionsTuplePair<>(r, refinement));
+        final CollectionsTuple2<Float, Integer> radiusRefinement = new CollectionsTuple2<>(r, refinement);
+        float[] vertices = cachedFilledCirclesVertices.get(new CollectionsTuple2<>(r, refinement));
         if (vertices == null) {
             vertices = new float[refinement * 2];
             for (int i = 0; i < refinement * 2; i += 2) {
@@ -79,11 +78,41 @@ public final class ShapeUtils {
         return new Shape2DPolygon(indices, vertices);
     }
 
+    public static Shape2DPolygon createPolygonCircleFilled(float r, int refinement, float degStart, float degEnd) {
+        if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
+        degStart = MathUtils.normalizeAngleDeg(degStart);
+        float range = degEnd > degStart && MathUtils.isEqual(MathUtils.normalizeAngleDeg(degEnd), degStart) ? 360.0f : MathUtils.normalizeAngleDeg(degEnd);
+        final CollectionsTuple4<Float, Integer, Float, Float> tuple4 = new CollectionsTuple4<>(r, refinement, degStart, degEnd);
+        float[] vertices = cachedFilledCircleArcsVertices.get(new CollectionsTuple4<>(r, refinement, degStart, degEnd));
+        int size = refinement * 2 + 2;
+        boolean fullRange = MathUtils.isEqual(360.0f, range);
+        if (fullRange) size -= 2; // we don't need an extra vertex for the center because the circle is whole.
+        if (vertices == null) {
+            vertices = new float[size]; // add extra vertex for center.
+            for (int i = 0; i < refinement * 2; i += 2) {
+                float angle = degStart + range * (i * 0.5f) / refinement;
+                vertices[i] = r * MathUtils.cosDeg(angle);
+                vertices[i+1] = r * MathUtils.sinDeg(angle);
+            }
+            if (!fullRange) {
+                vertices[refinement * 2] = 0;
+                vertices[refinement * 2 + 1] = 0;
+            }
+            cachedFilledCircleArcsVertices.put(tuple4, vertices);
+        }
+        int[] indices = cachedFilledCircleArcsIndices.get(tuple4);
+        if (indices == null) {
+            indices = triangulatePolygon(vertices);
+            cachedFilledCircleArcsIndices.put(tuple4, indices);
+        }
+        return new Shape2DPolygon(indices, vertices);
+    }
+
     public static Shape2DPolygon createPolygonCircleHollow(float r, int refinement, float stroke) {
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
         if (stroke < 0) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
 
-        final CollectionsTupleTriple<Float, Integer, Float> radiusRefinementStroke = new CollectionsTupleTriple<>(r, refinement, stroke);
+        final CollectionsTuple3<Float, Integer, Float> radiusRefinementStroke = new CollectionsTuple3<>(r, refinement, stroke);
         float[] vertices = cachedHollowCirclesVertices.get(radiusRefinementStroke);
         if (vertices == null) {
             final float outerRadius = r + stroke * 0.5f;
@@ -178,21 +207,21 @@ public final class ShapeUtils {
 
     // [5, 8] -> [0,4] [5,7] [8, length - 1] 
     // [4, 8, 11] -> [0,3] [4,7] [8,10] [11, length-1]
-    static CollectionsArray<CollectionsTuplePair<Integer, Integer>> getLoops(final int[] holes, int vertexCount) {
-        CollectionsArray<CollectionsTuplePair<Integer, Integer>> loops = new CollectionsArray<>();
+    static CollectionsArray<CollectionsTuple2<Integer, Integer>> getLoops(final int[] holes, int vertexCount) {
+        CollectionsArray<CollectionsTuple2<Integer, Integer>> loops = new CollectionsArray<>();
         if (holes == null || holes.length == 0) {
-            loops.add(new CollectionsTuplePair<>(0, vertexCount - 1));
+            loops.add(new CollectionsTuple2<>(0, vertexCount - 1));
             return loops;
         }
 
         int start = 0;
         for (int hole : holes) {
             int end = hole - 1;
-            loops.add(new CollectionsTuplePair<>(start, end));
+            loops.add(new CollectionsTuple2<>(start, end));
             start = hole;
         }
         if (start <= vertexCount - 1) {
-            loops.add(new CollectionsTuplePair<>(start, vertexCount - 1));
+            loops.add(new CollectionsTuple2<>(start, vertexCount - 1));
         }
         return loops;
     }

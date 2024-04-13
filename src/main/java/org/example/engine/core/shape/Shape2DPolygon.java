@@ -1,7 +1,7 @@
 package org.example.engine.core.shape;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.collections.CollectionsTuplePair;
+import org.example.engine.core.collections.CollectionsTuple2;
 import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
@@ -19,7 +19,7 @@ public class Shape2DPolygon extends Shape2D {
 
     public final int[] holes;
     public final boolean hasHoles;
-    private final CollectionsArray<CollectionsTuplePair<Integer, Integer>> loops;
+    private final CollectionsArray<CollectionsTuple2<Integer, Integer>> loops;
 
     private final float unscaledArea;
     private final float unscaledBoundingRadius;
@@ -122,7 +122,7 @@ public class Shape2DPolygon extends Shape2D {
 
         getWorldVertex(index, tail);
         int next = index + 1;
-        for (CollectionsTuplePair<Integer, Integer> loop : loops) {
+        for (CollectionsTuple2<Integer, Integer> loop : loops) {
             if (index == loop.second) next = loop.first;
         }
         getWorldVertex(next, head);

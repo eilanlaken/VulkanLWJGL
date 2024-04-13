@@ -2,13 +2,13 @@ package org.example.engine.core.collections;
 
 import java.util.Objects;
 
-public class CollectionsTupleTriple<T, U, V> {
+public class CollectionsTuple3<T, U, V> {
 
     public final T first;
     public final U second;
     public final V third;
 
-    public CollectionsTupleTriple(T first, U second, V third) {
+    public CollectionsTuple3(T first, U second, V third) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -18,7 +18,7 @@ public class CollectionsTupleTriple<T, U, V> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CollectionsTupleTriple<?, ?, ?> tupleTriple = (CollectionsTupleTriple<?, ?, ?>) o;
+        CollectionsTuple3<?, ?, ?> tupleTriple = (CollectionsTuple3<?, ?, ?>) o;
         return Objects.equals(first, tupleTriple.first) &&
                Objects.equals(second, tupleTriple.second) &&
                Objects.equals(third, tupleTriple.third);
