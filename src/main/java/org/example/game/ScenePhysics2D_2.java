@@ -3,21 +3,20 @@ package org.example.game;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputMouse;
-import org.example.engine.core.math.MathVector2;
-import org.example.engine.core.math.MathVector3;
+import org.example.engine.core.math.*;
 import org.example.engine.core.physics2d.Physics2DBody;
 import org.example.engine.core.physics2d.Physics2DWorld;
 import org.example.engine.core.physics2d.Physics2DWorldCollisionManifold;
 import org.example.engine.core.shape.*;
 import org.lwjgl.opengl.GL11;
 
-public class ScenePhysics2D_3 extends WindowScreen {
+public class ScenePhysics2D_2 extends WindowScreen {
 
     private Renderer2D renderer2D;
     private Color staleTint = new Color(1,0,0,1);
     private Camera camera;
 
-    private Shape2D aabb;
+    private Shape2D circle;
     private Shape2D otherCircle;
     private Shape2D otherAABB;
     private Shape2D otherRectangle;
@@ -29,13 +28,13 @@ public class ScenePhysics2D_3 extends WindowScreen {
     Physics2DBody body;
     private Shape2DPolygon contactIndicator = ShapeUtils.createPolygonCircleFilled(1, 10);
 
-    public ScenePhysics2D_3() {
+    public ScenePhysics2D_2() {
         renderer2D = new Renderer2D();
     }
 
     @Override
     public void show() {
-        aabb = new Shape2DAABB(5,2.5f);
+        circle = new Shape2DCircle(1);
         otherCircle = new Shape2DCircle(1.5f,0,0);
         otherAABB = new Shape2DAABB(4, 2);
         otherRectangle = new Shape2DRectangle(4.5f,2.2f);
@@ -47,11 +46,11 @@ public class ScenePhysics2D_3 extends WindowScreen {
         camera = new Camera(640f/64,480f/64, 1);
         camera.update();
 
-        body = world.createBody(aabb, new MathVector2(0,0),0, new MathVector2(0.f, 0));
+        body = world.createBody(circle, new MathVector2(0,0),0, new MathVector2(0.f, 0));
         //world.createBody(otherCircle, new MathVector2(3,1.5f), 0, new MathVector2(0.f, 0));
-        world.createBody(otherAABB, new MathVector2(-2, -2.5f), 0, new MathVector2(0.f, 0));
+        //world.createBody(otherAABB, new MathVector2(-2, -2.5f), 0, new MathVector2(0.f, 0));
         //world.createBody(otherRectangle, new MathVector2(0,0.0f), 30, new MathVector2(0.f, 0));
-        //world.createBody(otherPolygonWithHoles, new MathVector2(0.0f,0f), 0, new MathVector2(0.f, 0));
+        world.createBody(otherPolygonWithHoles, new MathVector2(0.0f,0f), 0, new MathVector2(0.f, 0));
 
     }
 
@@ -63,13 +62,13 @@ public class ScenePhysics2D_3 extends WindowScreen {
         GL11.glClearColor(0,0,0,1);
         renderer2D.begin(camera);
 
-        renderer2D.pushDebugShape(aabb, null);
+        renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(otherCircle, staleTint);
-        renderer2D.pushDebugShape(otherAABB, staleTint);
+        //renderer2D.pushDebugShape(otherAABB, staleTint);
         //renderer2D.pushDebugShape(otherRectangle, staleTint);
         //renderer2D.pushDebugShape(otherPolygonConvex, staleTint);
         //renderer2D.pushDebugShape(otherPolygonConcave, staleTint);
-        //renderer2D.pushDebugShape(otherPolygonWithHoles, staleTint);
+        renderer2D.pushDebugShape(otherPolygonWithHoles, staleTint);
 
         renderer2D.end();
 

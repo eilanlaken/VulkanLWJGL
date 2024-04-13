@@ -19,24 +19,43 @@ public final class Physics2DWorldCollisionDetection {
     }
 
     public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
-        // circle vs ____ //
-        if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) circleVsCircle(a, b, manifolds);
-        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DAABB) circleVsAABB(a, b, manifolds);
-        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DRectangle) circleVsRectangle(a, b, manifolds);
-        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DPolygon) circleVsPolygon(a, b, manifolds);
+        // TODO: remove the commented out part.
+//        if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) circleVsCircle(a, b, manifolds);
+//        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DAABB) circleVsAABB(a, b, manifolds);
+//        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DRectangle) circleVsRectangle(a, b, manifolds);
+//        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DPolygon) circleVsPolygon(a, b, manifolds);
+//
 
+        // TODO: "sort" if order by expected frequency
+        // circle vs **** //
+        if (a.shape instanceof Shape2DCircle) {
+            if      (b.shape instanceof Shape2DCircle)    circleVsCircle(a,    b, manifolds);
+            else if (b.shape instanceof Shape2DAABB)      circleVsAABB(a,      b, manifolds);
+            else if (b.shape instanceof Shape2DRectangle) circleVsRectangle(a, b, manifolds);
+            else if (b.shape instanceof Shape2DPolygon)   circleVsPolygon(a,   b, manifolds);
+            return;
+        }
+
+        // AABB vs **** //
+        if (a.shape instanceof Shape2DAABB) {
+            if      (b.shape instanceof Shape2DCircle)    AABBvsCircle(a,      b, manifolds);
+            else if (b.shape instanceof Shape2DAABB)      AABBvsAABB(a,        b, manifolds);
+            else if (b.shape instanceof Shape2DRectangle) circleVsRectangle(a, b, manifolds);
+            else if (b.shape instanceof Shape2DPolygon)   circleVsPolygon(a,   b, manifolds);
+            return;
+        }
     }
 
     /** AABB vs ____ **/
-    private static boolean AABBvsAABB(Shape2DAABB a, Shape2DAABB b, Physics2DWorldCollisionManifold manifold) {
-        if (a.worldMax.x < b.worldMin.x || a.worldMin.x > b.worldMax.x) return false;
-        if (a.worldMax.y < b.worldMin.y || a.worldMin.y > b.worldMax.y) return false;
+    private static void AABBvsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+        Shape2DAABB aabb1 = (Shape2DAABB) a.shape;
+        Shape2DAABB aabb2 = (Shape2DAABB) b.shape;
 
-        return true;
+
     }
 
     private static void AABBvsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
-
+        circleVsAABB(b, a, manifolds);
     }
 
     private static boolean AABBvsMorphed(Shape2DAABB aabb, Shape2DMorphed morphed, Physics2DWorldCollisionManifold manifold) {
