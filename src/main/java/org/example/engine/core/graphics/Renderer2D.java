@@ -364,11 +364,12 @@ public class Renderer2D implements MemoryResourceHolder {
         indicesBuffer.put(startVertex + 5);
         triangleIndex += 10;
 
-        aabb.update();
-        float x1 = aabb.worldMin.x, y1 = aabb.worldMax.y;
-        float x2 = aabb.worldMin.x, y2 = aabb.worldMin.y;
-        float x3 = aabb.worldMax.x, y3 = aabb.worldMin.y;
-        float x4 = aabb.worldMax.x, y4 = aabb.worldMax.y;
+        MathVector2 worldMin = aabb.getWorldMin();
+        MathVector2 worldMax = aabb.getWorldMax();
+        float x1 = worldMin.x, y1 = worldMax.y;
+        float x2 = worldMin.x, y2 = worldMin.y;
+        float x3 = worldMax.x, y3 = worldMin.y;
+        float x4 = worldMax.x, y4 = worldMax.y;
         verticesBuffer
                 .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // V1
                 .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // V2

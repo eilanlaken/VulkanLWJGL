@@ -50,6 +50,7 @@ public final class Physics2DWorldCollisionDetection {
         Shape2DAABB aabb1 = (Shape2DAABB) a.shape;
         Shape2DAABB aabb2 = (Shape2DAABB) b.shape;
 
+        System.out.println("hhhh");
 
     }
 
@@ -81,10 +82,13 @@ public final class Physics2DWorldCollisionDetection {
         MathVector2 circleWorldCenter = circle.getWorldCenter();
         float circleWorldRadius = circle.getWorldRadius();
 
-        float eX = Math.max(0, aabb.worldMin.x - circleWorldCenter.x) + Math.max(0, circleWorldCenter.x - aabb.worldMax.x);
+        MathVector2 worldMin = aabb.getWorldMin();
+        MathVector2 worldMax = aabb.getWorldMax();
+
+        float eX = Math.max(0, worldMin.x - circleWorldCenter.x) + Math.max(0, circleWorldCenter.x - worldMax.x);
         if (eX > circleWorldRadius) return;
 
-        float eY = Math.max(0, aabb.worldMin.y - circleWorldCenter.y) + Math.max(0, circleWorldCenter.y - aabb.worldMax.y);
+        float eY = Math.max(0, worldMin.y - circleWorldCenter.y) + Math.max(0, circleWorldCenter.y - worldMax.y);
         if (eY > circleWorldRadius) return;
 
         if (eX * eX + eY * eY > circleWorldRadius * circleWorldRadius) return;
@@ -95,21 +99,21 @@ public final class Physics2DWorldCollisionDetection {
         manifold.contactPoint1 = new MathVector2();
 
         if (aabb.contains(circleWorldCenter)) {
-            float dstASquared = MathVector2.dst2(circleWorldCenter.x, circleWorldCenter.y, aabb.worldMin.x, circleWorldCenter.y);
-            float dstBSquared = MathVector2.dst2(circleWorldCenter.x, circleWorldCenter.y, circleWorldCenter.x, aabb.worldMax.y);
-            float dstCSquared = MathVector2.dst2(circleWorldCenter.x, circleWorldCenter.y, aabb.worldMax.x, circleWorldCenter.y);
-            float dstDSquared = MathVector2.dst2(circleWorldCenter.x, circleWorldCenter.y, circleWorldCenter.x, aabb.worldMin.y);
+            float dstASquared = MathVector2.dst2(circleWorldCenter.x, circleWorldCenter.y, worldMin.x, circleWorldCenter.y);
+            float dstBSquared = MathVector2.dst2(circleWorldCenter.x, circleWorldCenter.y, circleWorldCenter.x, worldMax.y);
+            float dstCSquared = MathVector2.dst2(circleWorldCenter.x, circleWorldCenter.y, worldMax.x, circleWorldCenter.y);
+            float dstDSquared = MathVector2.dst2(circleWorldCenter.x, circleWorldCenter.y, circleWorldCenter.x, worldMin.y);
             float minDstSquared = MathUtils.min(dstASquared, dstBSquared, dstCSquared, dstDSquared);
             MathVector2 closest = new MathVector2();
-            if (MathUtils.isEqual(minDstSquared, dstASquared)) closest.set(aabb.worldMin.x, circleWorldCenter.y);
-            else if (MathUtils.isEqual(minDstSquared, dstBSquared)) closest.set(circleWorldCenter.x, aabb.worldMax.y);
-            else if (MathUtils.isEqual(minDstSquared, dstCSquared)) closest.set(aabb.worldMax.x, circleWorldCenter.y);
-            else if (MathUtils.isEqual(minDstSquared, dstDSquared)) closest.set(circleWorldCenter.x, aabb.worldMin.y);
+            if (MathUtils.isEqual(minDstSquared, dstASquared)) closest.set(worldMin.x, circleWorldCenter.y);
+            else if (MathUtils.isEqual(minDstSquared, dstBSquared)) closest.set(circleWorldCenter.x, worldMax.y);
+            else if (MathUtils.isEqual(minDstSquared, dstCSquared)) closest.set(worldMax.x, circleWorldCenter.y);
+            else if (MathUtils.isEqual(minDstSquared, dstDSquared)) closest.set(circleWorldCenter.x, worldMin.y);
             manifold.contactPoint1.set(closest);
             manifold.normal.set(closest).sub(circleWorldCenter).nor();
             manifold.depth = circleWorldRadius + MathVector2.dst(circleWorldCenter, manifold.contactPoint1);
         } else {
-            MathVector2 closest = new MathVector2(circleWorldCenter).clamp(aabb.worldMin, aabb.worldMax);
+            MathVector2 closest = new MathVector2(circleWorldCenter).clamp(worldMin, worldMax);
             manifold.contactPoint1.set(closest);
             manifold.depth = circleWorldRadius - MathVector2.dst(circleWorldCenter, manifold.contactPoint1);
             manifold.normal.set(circleWorldCenter).sub(closest).nor();

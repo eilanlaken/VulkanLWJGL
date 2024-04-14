@@ -1,5 +1,6 @@
 package org.example.engine.core.shape;
 
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 
 // AABB = axis aligned bonding box
@@ -10,14 +11,18 @@ public class Shape2DAABB extends Shape2D {
 
     private final MathVector2 localMin;
     private final MathVector2 localMax;
-    public MathVector2 worldMin;
-    public MathVector2 worldMax;
+    private final MathVector2 worldMin;
+    private final MathVector2 worldMax;
 
     private MathVector2 tmp = new MathVector2();
 
     public Shape2DAABB(float x1, float y1, float x2, float y2) {
-        this.localMin = new MathVector2(x1, y1);
-        this.localMax = new MathVector2(x2, y2);
+        float xMin = Math.min(x1, x2);
+        float xMax = Math.max(x1, x2);
+        float yMin = Math.min(y1, y2);
+        float yMax = Math.max(y1, y2);
+        this.localMin = new MathVector2(xMin, yMin);
+        this.localMax = new MathVector2(xMax, yMax);
         this.worldMin = new MathVector2(localMin);
         this.worldMax = new MathVector2(localMax);
         this.unscaledArea = Math.abs(x2 - x1) * Math.abs(y2 - y1);
@@ -53,8 +58,25 @@ public class Shape2DAABB extends Shape2D {
     @Override
     public void updateWorldCoordinates() {
         if (angle != 0.0f) throw new IllegalStateException("Cannot rotate an AABB: must remain aligned to axis. angle must remain 0. Current value: angle = " + angle);
-        this.worldMin.set(localMin).scl(scaleX, scaleY).add(x, y);
-        this.worldMax.set(localMax).scl(scaleX, scaleY).add(x, y);
+        if (MathUtils.isEqual(scaleX, 1.0f) && MathUtils.isEqual(scaleY, 1.0f)) {
+            this.worldMin.set(localMin).add(x, y);
+            this.worldMax.set(localMax).add(x, y);
+            return;
+        }
+        float absScaleX = Math.abs(scaleX); // to maintain correct min-max relations
+        float absScaleY = Math.abs(scaleY); // to maintain correct min-max relations
+        this.worldMin.set(localMin).scl(absScaleX, absScaleY).add(x, y);
+        this.worldMax.set(localMax).scl(absScaleX, absScaleY).add(x, y);
+    }
+
+    public MathVector2 getWorldMin() {
+        if (!updated) update();
+        return worldMin;
+    }
+
+    public MathVector2 getWorldMax() {
+        if (!updated) update();
+        return worldMax;
     }
 
     @Override
