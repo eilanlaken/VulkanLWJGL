@@ -27,7 +27,6 @@ public final class ShapeUtils {
     private ShapeUtils() {}
 
     public static Shape2DPolygon createPolygonLine(float x1, float y1, float x2, float y2, float stroke) {
-        if (stroke < 1) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
         float dx = x2 - x1;
         float dy = y2 - y1;
         MathVector2 strokeVector = new MathVector2(dx, dy).rotate90(1).nor().scl(stroke * 0.5f, stroke * 0.5f);
@@ -110,7 +109,7 @@ public final class ShapeUtils {
 
     public static Shape2DPolygon createPolygonCircleHollow(float r, int refinement, float stroke) {
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
-        if (stroke < 0) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+        stroke = Math.abs(stroke);
 
         final CollectionsTuple3<Float, Integer, Float> radiusRefinementStroke = new CollectionsTuple3<>(r, refinement, stroke);
         float[] vertices = cachedHollowCirclesVertices.get(radiusRefinementStroke);
@@ -139,7 +138,6 @@ public final class ShapeUtils {
         return new Shape2DPolygon(indices, vertices);
     }
 
-    // TODO: ref
     public static Shape2DPolygon createPolygonCircleHollow(float r, int refinement, float stroke, float degStart, float degEnd) {
         degStart = MathUtils.normalizeAngleDeg(degStart);
         float range = degEnd > degStart && MathUtils.isEqual(MathUtils.normalizeAngleDeg(degEnd), degStart) ? 360.0f : Math.abs(MathUtils.normalizeAngleDeg(degEnd) - degStart);
@@ -147,7 +145,7 @@ public final class ShapeUtils {
         boolean fullRange = MathUtils.isEqual(360.0f, range);
         if (fullRange) return createPolygonCircleHollow(r, refinement, stroke);
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
-        if (stroke < 0) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+        stroke = Math.abs(stroke);
 
         final CollectionsTuple5<Float, Integer, Float, Float, Float> tuple5 = new CollectionsTuple5<>(r, refinement, stroke, degStart, degEnd);
         float[] vertices = cachedHollowCircleArcsVertices.get(tuple5);
@@ -187,7 +185,7 @@ public final class ShapeUtils {
     }
 
     public static Shape2DPolygon createPolygonHollow(float[] vertices, float stroke) {
-        if (stroke < 0) throw new IllegalArgumentException("Stroke must be at least 1. Got: " + stroke);
+        stroke = Math.abs(stroke);
         float[] expandedVertices = cachedHollowPolygonVertices.get(vertices);
         if (expandedVertices == null) {
             MathVector2 centerOfGeometry = calculateCenterOfGeometry(vertices);
@@ -213,7 +211,6 @@ public final class ShapeUtils {
         return new Shape2DPolygon(indices, expandedVertices);
     }
 
-    // TODO: implement
     public static Shape2DPolygon createPolygonCurve(float xMin, float xMax, int refinement, float stroke, Function<Float, Float> function) {
         if (refinement <= 0) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 0. Got: " + refinement);
         if (refinement == 1) return createPolygonCircleFilled(stroke, 15);
@@ -223,7 +220,7 @@ public final class ShapeUtils {
             xMax = tmp;
         }
         final float step = (xMax - xMin) / (refinement - 1);
-        final float halfStroke = stroke * 0.5f;
+        final float halfStroke = Math.abs(stroke) * 0.5f;
         float[] vertices = new float[refinement * 2 * 2]; // refinement * dimensions * paths
         // bottom line
         for (int i = 0; i < vertices.length / 2; i += 2) {
