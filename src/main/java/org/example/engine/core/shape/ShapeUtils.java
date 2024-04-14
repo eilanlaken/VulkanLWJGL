@@ -139,6 +139,7 @@ public final class ShapeUtils {
         return new Shape2DPolygon(indices, vertices);
     }
 
+    // TODO: ref
     public static Shape2DPolygon createPolygonCircleHollow(float r, int refinement, float stroke, float degStart, float degEnd) {
         degStart = MathUtils.normalizeAngleDeg(degStart);
         float range = degEnd > degStart && MathUtils.isEqual(MathUtils.normalizeAngleDeg(degEnd), degStart) ? 360.0f : Math.abs(MathUtils.normalizeAngleDeg(degEnd) - degStart);
@@ -214,9 +215,27 @@ public final class ShapeUtils {
 
     // TODO: implement
     public static Shape2DPolygon createPolygonCurve(float xMin, float xMax, int refinement, float stroke, Function<Float, Float> function) {
-        final float step = (xMax - xMin) / refinement;
+        if (refinement <= 0) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 0. Got: " + refinement);
+        if (refinement == 1) return createPolygonCircleFilled(stroke, 15);
+        if (xMin < xMax) {
+            float tmp = xMin;
+            xMin = xMax;
+            xMax = tmp;
+        }
+        final float step = (xMax - xMin) / (refinement - 1);
+        final float halfStroke = stroke * 0.5f;
+        float[] vertices = new float[refinement * 2 * 2]; // refinement * dimensions * paths
+        // bottom line
+        for (int i = 0; i < vertices.length / 2; i += 2) {
+            float x = xMin + step * i;
+            vertices[i] = x;
+            vertices[i + 1] = function.apply(x) - halfStroke;
+            vertices[vertices.length - i - 2] = x;
+            vertices[vertices.length - i - 2 + 1] = function.apply(x) + halfStroke;
+        }
 
-        return null;
+        int[] indices = triangulatePolygon(vertices);
+        return new Shape2DPolygon(indices, vertices);
     }
 
     public static boolean isPolygonConvex(final float[] vertices) {

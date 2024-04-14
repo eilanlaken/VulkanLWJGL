@@ -2,6 +2,7 @@ package org.example.game;
 
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.ecs.Component;
 import org.example.engine.ecs.ComponentGraphics2DShape;
@@ -17,6 +18,7 @@ public class SceneRendering2D_8 extends WindowScreen {
 
     private ComponentGraphics2DShape shape;
     private ComponentGraphics2DShape shape2;
+    private ComponentGraphics2DShape shape3;
 
 
     public SceneRendering2D_8() {
@@ -34,7 +36,8 @@ public class SceneRendering2D_8 extends WindowScreen {
     public void show() {
 
         shape = Component.createShapeCircleFilled(30, 400, 0,90, new Color(0,0.5f,1,1), null, null);
-        shape2 = Component.createShapeCircleHollow(300, 50, 4,-30, -30, new Color(0,0.5f,1,1), null, null);
+        shape2 = Component.createShapeCircleHollow(300, 50, 4,0, 30, new Color(0,0.5f,1,1), null, null);
+        shape3 = Component.createShapeCurve(-300, 300, 20,100, x -> 400 * MathUtils.sinDeg(x), new Color(0,0.5f,1,1), null, null);
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -46,8 +49,9 @@ public class SceneRendering2D_8 extends WindowScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,0);
         renderer2D.begin(camera);
-        renderer2D.pushPolygon(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
+        //renderer2D.pushPolygon(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
         //renderer2D.pushPolygon(shape2.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
+        renderer2D.pushPolygon(shape3.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);
         renderer2D.end();
         time++;
     }
