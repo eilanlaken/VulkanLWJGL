@@ -33,7 +33,7 @@ public final class Physics2DWorldCollisionDetection {
         if (a.shape instanceof Shape2DAABB) {
             if      (b.shape instanceof Shape2DCircle)    AABBvsCircle(a,      b, manifolds);
             else if (b.shape instanceof Shape2DAABB)      AABBvsAABB(a,        b, manifolds);
-            else if (b.shape instanceof Shape2DRectangle) circleVsRectangle(a, b, manifolds);
+            else if (b.shape instanceof Shape2DRectangle) AABBvsRectangle(a, b, manifolds);
             else if (b.shape instanceof Shape2DPolygon)   circleVsPolygon(a,   b, manifolds);
             return;
         }
@@ -89,9 +89,11 @@ public final class Physics2DWorldCollisionDetection {
         return false;
     }
 
-    private static boolean AABBvsRectangle(Shape2DAABB aabb, Shape2DRectangle rectangle, Physics2DWorldCollisionManifold manifold) {
+    private static void AABBvsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+        Shape2DAABB aabb = (Shape2DAABB) a.shape;
+        Shape2DRectangle rect = (Shape2DRectangle) b.shape;
 
-        return false;
+        System.out.println("vs");
     }
 
     // TODO: fix penetration depth and normal direction.

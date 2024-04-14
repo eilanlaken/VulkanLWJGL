@@ -2,6 +2,7 @@ package org.example.game;
 
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.*;
+import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.math.MathVector3;
@@ -51,8 +52,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
         body = world.createBody(aabb, new MathVector2(0,0),0, new MathVector2(0.f, 0));
         //world.createBody(otherCircle, new MathVector2(3,1.5f), 0, new MathVector2(0.f, 0));
-        world.createBody(otherAABB, new MathVector2(0, 0), 0, new MathVector2(0.f, 0));
-        //world.createBody(otherRectangle, new MathVector2(0,0.0f), 30, new MathVector2(0.f, 0));
+        //world.createBody(otherAABB, new MathVector2(0, 0), 0, new MathVector2(0.f, 0));
+        world.createBody(otherRectangle, new MathVector2(0,0.0f), 30, new MathVector2(0.f, 0));
         //world.createBody(otherPolygonWithHoles, new MathVector2(0.0f,0f), 0, new MathVector2(0.f, 0));
 
     }
@@ -67,8 +68,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
         renderer2D.pushDebugShape(aabb, null);
         //renderer2D.pushDebugShape(otherCircle, staleTint);
-        renderer2D.pushDebugShape(otherAABB, staleTint);
-        //renderer2D.pushDebugShape(otherRectangle, staleTint);
+        //renderer2D.pushDebugShape(otherAABB, staleTint);
+        renderer2D.pushDebugShape(otherRectangle, staleTint);
         //renderer2D.pushDebugShape(otherPolygonConvex, staleTint);
         //renderer2D.pushDebugShape(otherPolygonConcave, staleTint);
         //renderer2D.pushDebugShape(otherPolygonWithHoles, staleTint);
@@ -88,6 +89,10 @@ public class ScenePhysics2D_3 extends WindowScreen {
         for (Physics2DWorldCollisionManifold manifold : world.collisionManifolds)
             renderManifold(manifold);
         renderer2D.end();
+
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
+            otherRectangle.rot(-1);
+        }
     }
 
     // TODO: refactor out into the physics debug renderer. For now, use to implement correct narrow phase.
