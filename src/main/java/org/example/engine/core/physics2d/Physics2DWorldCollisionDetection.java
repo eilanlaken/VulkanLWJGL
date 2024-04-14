@@ -50,6 +50,15 @@ public final class Physics2DWorldCollisionDetection {
         Shape2DAABB aabb1 = (Shape2DAABB) a.shape;
         Shape2DAABB aabb2 = (Shape2DAABB) b.shape;
 
+        MathVector2 min1 = aabb1.getWorldMin();
+        MathVector2 max1 = aabb1.getWorldMax();
+        MathVector2 min2 = aabb2.getWorldMin();
+        MathVector2 max2 = aabb2.getWorldMax();
+
+        if (min1.x > max2.x || max1.x < min2.x) return;
+        if (min1.y > max2.y || max1.y < min2.y) return;
+
+
         System.out.println("hhhh");
 
     }

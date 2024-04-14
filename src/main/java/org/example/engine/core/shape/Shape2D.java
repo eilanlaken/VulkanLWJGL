@@ -3,6 +3,7 @@ package org.example.engine.core.shape;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 
+// TODO: change from bounding radius to bounding AABB
 public abstract class Shape2D {
 
     protected float x = 0;
