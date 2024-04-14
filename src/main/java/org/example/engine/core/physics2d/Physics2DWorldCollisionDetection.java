@@ -4,7 +4,8 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.*;
 import org.example.engine.core.shape.*;
 
-
+// TODO: SOLVED: contact points explained:
+// https://www.youtube.com/watch?v=5gDC1GU3Ivg
 // https://oercommons.s3.amazonaws.com/media/courseware/relatedresource/file/imth-6-1-9-6-1-coordinate_plane_plotter/index.html
 public final class Physics2DWorldCollisionDetection {
 
@@ -18,13 +19,6 @@ public final class Physics2DWorldCollisionDetection {
     }
 
     public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
-        // TODO: remove the commented out part.
-//        if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DCircle) circleVsCircle(a, b, manifolds);
-//        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DAABB) circleVsAABB(a, b, manifolds);
-//        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DRectangle) circleVsRectangle(a, b, manifolds);
-//        else if (a.shape instanceof Shape2DCircle && b.shape instanceof Shape2DPolygon) circleVsPolygon(a, b, manifolds);
-//
-
         // TODO: "sort" if order by expected frequency
         // circle vs **** //
         if (a.shape instanceof Shape2DCircle) {
@@ -50,17 +44,35 @@ public final class Physics2DWorldCollisionDetection {
         Shape2DAABB aabb1 = (Shape2DAABB) a.shape;
         Shape2DAABB aabb2 = (Shape2DAABB) b.shape;
 
-        MathVector2 min1 = aabb1.getWorldMin();
-        MathVector2 max1 = aabb1.getWorldMax();
-        MathVector2 min2 = aabb2.getWorldMin();
-        MathVector2 max2 = aabb2.getWorldMax();
+        MathVector2 a_min = aabb1.getWorldMin();
+        MathVector2 a_max = aabb1.getWorldMax();
+        MathVector2 b_min = aabb2.getWorldMin();
+        MathVector2 b_max = aabb2.getWorldMax();
 
-        if (min1.x > max2.x || max1.x < min2.x) return;
-        if (min1.y > max2.y || max1.y < min2.y) return;
+        if (a_min.x > b_max.x || a_max.x < b_min.x || a_min.y > b_max.y || a_max.y < b_min.y) return; // no collision
 
+        float x_overlap = MathUtils.intervalsOverlap(a_min.x, a_max.x, b_min.x, b_max.x);
+        float y_overlap = MathUtils.intervalsOverlap(a_min.y, a_max.y, b_min.y, b_max.y);
 
-        System.out.println("hhhh");
-
+        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
+        manifold.depth = Math.min(x_overlap, y_overlap);
+        manifold.contactsCount = 2;
+        if (x_overlap < y_overlap) {
+            manifold.normal = new MathVector2(1,0);
+            float left = Math.max(a_min.x, b_min.x);
+            float right = Math.min(a_max.x, b_max.x);
+            float top = Math.min(a_max.y, b_max.y);
+            manifold.contactPoint1 = new MathVector2(left, top);
+            manifold.contactPoint2 = new MathVector2(right, top);
+        } else {
+            manifold.normal = new MathVector2(0,1);
+            float left = Math.max(a_min.x, b_min.x);
+            float top = Math.min(a_max.y, b_max.y);
+            float bottom = Math.max(a_min.y, b_min.y);
+            manifold.contactPoint1 = new MathVector2(left, top);
+            manifold.contactPoint2 = new MathVector2(left, bottom);
+        }
+        manifolds.add(manifold);
     }
 
     private static void AABBvsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {

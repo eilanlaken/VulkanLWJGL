@@ -130,22 +130,22 @@ public final class MathUtils {
     }
 
     // [x1, x2] and [x3, x4] are intervals.
-    public static float intervalsOverlap(float x1, float x2, float x3, float x4) {
-        if (x1 > x2) {
-            float tmp = x1;
-            x1 = x2;
-            x2 = tmp;
+    public static float intervalsOverlap(float a_min, float a_max, float b_min, float b_max) {
+        if (a_min > a_max) {
+            float tmp = a_min;
+            a_min = a_max;
+            a_max = tmp;
         }
-        if (x3 > x4) {
-            float tmp = x3;
-            x3 = x4;
-            x4 = tmp;
+        if (b_min > b_max) {
+            float tmp = b_min;
+            b_min = b_max;
+            b_max = tmp;
         }
-        if (x2 <= x3 || x4 <= x1) return 0;
-        if (x3 <= x1 && x4 < x2) return x4 - x1;
-        if (x1 <= x3 && x4 <= x2) return x4 - x3;
-        if (x1 <= x3) return x2 - x3;
-        return x2 - x1;
+        if (a_max <= b_min || b_max <= a_min) return 0;
+        if (b_min <= a_min && b_max < a_max) return b_max - a_min;
+        if (a_min <= b_min && b_max <= a_max) return b_max - b_min;
+        if (a_min <= b_min) return a_max - b_min;
+        return a_max - a_min;
     }
 
     public static float sin(float radians) {

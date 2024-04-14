@@ -11,6 +11,8 @@ import org.example.engine.core.physics2d.Physics2DWorldCollisionManifold;
 import org.example.engine.core.shape.*;
 import org.lwjgl.opengl.GL11;
 
+// contact points polygon vs polygon:
+// https://www.youtube.com/watch?v=5gDC1GU3Ivg
 public class ScenePhysics2D_3 extends WindowScreen {
 
     private Renderer2D renderer2D;
@@ -35,7 +37,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
     @Override
     public void show() {
-        aabb = new Shape2DAABB(5,2.5f);
+        aabb = new Shape2DAABB(5f,2.5f);
         otherCircle = new Shape2DCircle(1.5f,0,0);
         otherAABB = new Shape2DAABB(4, 2);
         otherRectangle = new Shape2DRectangle(4.5f,2.2f);
