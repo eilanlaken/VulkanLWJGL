@@ -3,6 +3,7 @@ package org.example.engine.core.physics2d;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.*;
 import org.example.engine.core.shape.*;
+import org.jetbrains.annotations.NotNull;
 
 // TODO: SOLVED: contact points explained:
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
@@ -89,80 +90,6 @@ public final class Physics2DWorldCollisionDetection {
         return false;
     }
 
-//    // TODO:
-//    private static void AABBvsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
-//        Shape2DAABB aabb = (Shape2DAABB) a.shape;
-//        Shape2DRectangle rect = (Shape2DRectangle) b.shape;
-//
-//        // aabb corners
-//        MathVector2 aabb_min = aabb.getWorldMin();
-//        MathVector2 aabb_max = aabb.getWorldMax();
-//
-//        // rect corners
-//        MathVector2 c1 = rect.c1();
-//        MathVector2 c2 = rect.c2();
-//        MathVector2 c3 = rect.c3();
-//        MathVector2 c4 = rect.c4();
-//
-//
-//        // SAT - X axis
-//        float aabb_min_x = aabb_min.x;
-//        float aabb_max_x = aabb_max.x;
-//        float rect_min_x = MathUtils.min(c1.x, c2.x, c3.x, c4.x);
-//        float rect_max_x = MathUtils.max(c1.x, c2.x, c3.x, c4.x);
-//        float x_overlap = MathUtils.intervalsOverlap(aabb_min_x, aabb_max_x, rect_min_x, rect_max_x);
-//        //if (MathUtils.isZero(x_overlap)) return; // no collision
-//
-//        // SAT - Y axis
-//        float aabb_min_y = aabb_min.y;
-//        float aabb_max_y = aabb_max.y;
-//        float rect_min_y = MathUtils.min(c1.y, c2.y, c3.y, c4.y);
-//        float rect_max_y = MathUtils.max(c1.y, c2.y, c3.y, c4.y);
-//        float y_overlap = MathUtils.intervalsOverlap(aabb_min_y, aabb_max_y, rect_min_y, rect_max_y);
-//        //if (MathUtils.isZero(y_overlap)) return; // no collision
-//
-//        // C1-C2 axis:
-//        MathVector2 axis1 = new MathVector2(c3).sub(c2).nor();
-//        MathVector2 axis1 = new MathVector2(c3).sub(c2).nor();
-//        float aabb_c1_axis1 = MathVector2.dot(aabb_min.x - c2.x, aabb_max.y - c2.y, axis1.x, axis1.y);
-//        float aabb_c2_axis1 = MathVector2.dot(aabb_min.x - c2.x, aabb_min.y - c2.y, axis1.x, axis1.y);
-//        float aabb_c3_axis1 = MathVector2.dot(aabb_max.x - c2.x, aabb_max.y - c2.y, axis1.x, axis1.y);
-//        float aabb_c4_axis1 = MathVector2.dot(aabb_max.x - c2.x, aabb_max.y - c2.y, axis1.x, axis1.y);
-//        float aabb_min_axis1 = MathUtils.min(aabb_c1_axis1, aabb_c2_axis1, aabb_c3_axis1, aabb_c4_axis1);
-//        float aabb_max_axis1 = MathUtils.max(aabb_c1_axis1, aabb_c2_axis1, aabb_c3_axis1, aabb_c4_axis1);
-//        float axis1_overlap = MathUtils.intervalsOverlap(aabb_min_axis1, aabb_max_axis1, 0, rect.unscaledWidth * rect.scaleX());
-//        //if (MathUtils.isZero(axis1_overlap)) return; // no collision
-//
-//        // C2-C3 axis
-//        MathVector2 axis2 = new MathVector2(c4).sub(c3).nor();
-//        float aabb_c1_axis2 = MathVector2.dot(aabb_min.x - c3.x, aabb_max.y - c3.y, axis2.x, axis2.y);
-//        float aabb_c2_axis2 = MathVector2.dot(aabb_min.x - c3.x, aabb_min.y - c3.y, axis2.x, axis2.y);
-//        float aabb_c3_axis2 = MathVector2.dot(aabb_max.x - c3.x, aabb_max.y - c3.y, axis2.x, axis2.y);
-//        float aabb_c4_axis2 = MathVector2.dot(aabb_max.x - c3.x, aabb_max.y - c3.y, axis2.x, axis2.y);
-//        float aabb_min_axis2 = MathUtils.min(aabb_c1_axis2, aabb_c2_axis2, aabb_c3_axis2, aabb_c4_axis2);
-//        float aabb_max_axis2 = MathUtils.max(aabb_c1_axis2, aabb_c2_axis2, aabb_c3_axis2, aabb_c4_axis2);
-//        float axis2_overlap = MathUtils.intervalsOverlap(aabb_min_axis2, aabb_max_axis2, 0, rect.unscaledHeight * rect.scaleY());
-//        //if (MathUtils.isZero(axis2_overlap)) return; // no collision
-//
-//        // TODO: remove
-//        float vx = c4.x - c3.x;
-//        float vy = c4.y - c3.y;
-//        float wx = aabb_max.x - c3.x;
-//        float wy = aabb_min.y - c3.y;
-//        MathVector2 v = new MathVector2(vx, vy);
-//        MathVector2 w = new MathVector2(wx, wy);
-//        float pc3 = MathVector2.dot(v, w) / v.len2();
-//
-//        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
-//        manifold.contactPoint1 = new MathVector2();
-//        //manifold.contactPoint2 = new MathVector2();
-//        manifold.normal = new MathVector2(0,1);
-//        manifold.depth = pc3;
-//        manifolds.add(manifold);
-//
-//
-//    }
-
     // TODO:
     private static void AABBvsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
         Shape2DAABB aabb = (Shape2DAABB) a.shape;
@@ -177,7 +104,6 @@ public final class Physics2DWorldCollisionDetection {
         MathVector2 c2 = rect.c2();
         MathVector2 c3 = rect.c3();
         MathVector2 c4 = rect.c4();
-
 
         // SAT - X axis
         float aabb_min_x = aabb_min.x;
@@ -196,38 +122,37 @@ public final class Physics2DWorldCollisionDetection {
         if (MathUtils.isZero(y_overlap)) return; // no collision
 
         // C1-C2 axis
-        float a1_x = c3.x - c2.x;
-        float a1_y = c3.y - c2.y;
-        float len1 = MathVector2.len(a1_x, a1_y);
-        float aabb_c1_axis1 = MathVector2.dot(a1_x, a1_y, aabb_min.x - c2.x, aabb_max.y - c2.y) / len1;
-        float aabb_c2_axis1 = MathVector2.dot(a1_x, a1_y, aabb_min.x - c2.x, aabb_min.y - c2.y) / len1;
-        float aabb_c3_axis1 = MathVector2.dot(a1_x, a1_y, aabb_max.x - c2.x, aabb_min.y - c2.y) / len1;
-        float aabb_c4_axis1 = MathVector2.dot(a1_x, a1_y, aabb_max.x - c2.x, aabb_max.y - c2.y) / len1;
+        float ax = c3.x - c2.x;
+        float ay = c3.y - c2.y;
+        float aLen = MathVector2.len(ax, ay);
+        float aabb_c1_axis1 = MathVector2.dot(ax, ay, aabb_min.x - c2.x, aabb_max.y - c2.y) / aLen;
+        float aabb_c2_axis1 = MathVector2.dot(ax, ay, aabb_min.x - c2.x, aabb_min.y - c2.y) / aLen;
+        float aabb_c3_axis1 = MathVector2.dot(ax, ay, aabb_max.x - c2.x, aabb_min.y - c2.y) / aLen;
+        float aabb_c4_axis1 = MathVector2.dot(ax, ay, aabb_max.x - c2.x, aabb_max.y - c2.y) / aLen;
         float aabb_min_axis1 = MathUtils.min(aabb_c1_axis1, aabb_c2_axis1, aabb_c3_axis1, aabb_c4_axis1);
         float aabb_max_axis1 = MathUtils.max(aabb_c1_axis1, aabb_c2_axis1, aabb_c3_axis1, aabb_c4_axis1);
         float axis1_overlap = MathUtils.intervalsOverlap(aabb_min_axis1, aabb_max_axis1, 0, rect.unscaledWidth * rect.scaleX());
         if (MathUtils.isZero(axis1_overlap)) return; // no collision
 
         // C2-C3 axis
-        float a2_x = c4.x - c3.x;
-        float a2_y = c4.y - c3.y;
-        float len2 = MathVector2.len(a2_x, a2_y);
-        float aabb_c1_axis2 = MathVector2.dot(a2_x, a2_y, aabb_min.x - c3.x, aabb_max.y - c3.y) / len2;
-        float aabb_c2_axis2 = MathVector2.dot(a2_x, a2_y, aabb_min.x - c3.x, aabb_min.y - c3.y) / len2;
-        float aabb_c3_axis2 = MathVector2.dot(a2_x, a2_y, aabb_max.x - c3.x, aabb_min.y - c3.y) / len2;
-        float aabb_c4_axis2 = MathVector2.dot(a2_x, a2_y, aabb_max.x - c3.x, aabb_max.y - c3.y) / len2;
+        float bx = c4.x - c3.x;
+        float by = c4.y - c3.y;
+        float bLen = MathVector2.len(bx, by);
+        float aabb_c1_axis2 = MathVector2.dot(bx, by, aabb_min.x - c3.x, aabb_max.y - c3.y) / bLen;
+        float aabb_c2_axis2 = MathVector2.dot(bx, by, aabb_min.x - c3.x, aabb_min.y - c3.y) / bLen;
+        float aabb_c3_axis2 = MathVector2.dot(bx, by, aabb_max.x - c3.x, aabb_min.y - c3.y) / bLen;
+        float aabb_c4_axis2 = MathVector2.dot(bx, by, aabb_max.x - c3.x, aabb_max.y - c3.y) / bLen;
         float aabb_min_axis2 = MathUtils.min(aabb_c1_axis2, aabb_c2_axis2, aabb_c3_axis2, aabb_c4_axis2);
         float aabb_max_axis2 = MathUtils.max(aabb_c1_axis2, aabb_c2_axis2, aabb_c3_axis2, aabb_c4_axis2);
         float axis2_overlap = MathUtils.intervalsOverlap(aabb_min_axis2, aabb_max_axis2, 0, rect.unscaledHeight * rect.scaleY());
         if (MathUtils.isZero(axis2_overlap)) return; // no collision
 
+        // TODO: continue and fix
         Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
-        manifold.contactPoint1 = new MathVector2();
-        //manifold.contactPoint2 = new MathVector2();
+        setContactPoints(aabb, rect, manifold);
         manifold.normal = new MathVector2(0,1);
         manifold.depth = aabb_c1_axis1;
         manifolds.add(manifold);
-
         System.out.println(aabb_c1_axis1);
     }
 
@@ -524,6 +449,130 @@ public final class Physics2DWorldCollisionDetection {
     private static boolean rectangleVsRectangle(Shape2DRectangle r1, Shape2DRectangle r2, Physics2DWorldCollisionManifold manifold) {
 
         return false;
+    }
+
+    // TODO: continue and fix
+    private static void setContactPoints(Shape2DAABB aabb, Shape2DRectangle rect, Physics2DWorldCollisionManifold manifold) {
+        MathVector2 aabb_worldMin = aabb.getWorldMin();
+        MathVector2 aabb_worldMax = aabb.getWorldMax();
+
+        // aabb vertices:
+        MathVector2 a_1 = new MathVector2(aabb_worldMin.x, aabb_worldMax.y);
+        MathVector2 a_2 = aabb_worldMin;
+        MathVector2 a_3 = new MathVector2(aabb_worldMax.x, aabb_worldMin.y);
+        MathVector2 a_4 = aabb_worldMax;
+        CollectionsArray<MathVector2> aabb_vertices = new CollectionsArray<>(true, 4);
+        aabb_vertices.add(a_1);
+        aabb_vertices.add(a_2);
+        aabb_vertices.add(a_3);
+        aabb_vertices.add(a_4);
+
+        // rect vertices
+        MathVector2 c1 = rect.c1();
+        MathVector2 c2 = rect.c2();
+        MathVector2 c3 = rect.c3();
+        MathVector2 c4 = rect.c4();
+        CollectionsArray<MathVector2> rect_vertices = new CollectionsArray<>(true, 4);
+        rect_vertices.add(c1);
+        rect_vertices.add(c2);
+        rect_vertices.add(c3);
+        rect_vertices.add(c4);
+
+        CollectionsArray<Projection> projections = new CollectionsArray<>();
+
+        // aabb vertices against rect edges
+        for (MathVector2 vertex : aabb_vertices) {
+            for (int i = 0; i < rect_vertices.size; i++) {
+                MathVector2 tail = rect_vertices.getCircular(i);
+                MathVector2 head = rect_vertices.getCircular(i + 1);
+                float dx = head.x - tail.x;
+                float dy = head.y - tail.y;
+                if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;
+                float scale = MathVector2.dot(vertex.x - tail.x, vertex.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
+                MathVector2 projection = new MathVector2(dx, dy).scl(scale).add(tail);
+                projection.clamp(tail, head);
+                Projection p = new Projection(projection, MathVector2.dst2(vertex, projection));
+                projections.add(p);
+            }
+        }
+
+        for (MathVector2 vertex : rect_vertices) {
+            for (int i = 0; i < aabb_vertices.size; i++) {
+                MathVector2 tail = aabb_vertices.getCircular(i);
+                MathVector2 head = aabb_vertices.getCircular(i + 1);
+                float dx = head.x - tail.x;
+                float dy = head.y - tail.y;
+                if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;
+                float scale = MathVector2.dot(vertex.x - tail.x, vertex.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
+                MathVector2 projection = new MathVector2(dx, dy).scl(scale).add(tail);
+                projection.clamp(tail, head);
+                Projection p = new Projection(projection, MathVector2.dst2(vertex, projection));
+                projections.add(p);
+            }
+        }
+
+        projections.sort();
+        manifold.contactPoint1 = projections.get(0).p;
+        manifold.contactPoint2 = projections.get(1).p;
+    }
+
+    // TODO
+    private static CollectionsArray<MathVector2> getContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB) {
+        CollectionsArray<Projection> projections = new CollectionsArray<>(false, verticesA.size + verticesB.size);
+
+        for (MathVector2 vertex : verticesA) {
+            for (int i = 0; i < verticesB.size; i++) {
+                MathVector2 tail = verticesB.getCircular(i);
+                MathVector2 head = verticesB.getCircular(i + 1);
+                float dx = head.x - tail.x;
+                float dy = head.y - tail.y;
+                if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;
+                float scale = MathVector2.dot(vertex.x - tail.x, vertex.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
+                MathVector2 projection = new MathVector2(dx, dy).scl(scale).add(tail);
+                projection.clamp(tail, head);
+                Projection p = new Projection(projection, MathVector2.dst2(vertex, projection));
+                projections.add(p);
+            }
+        }
+
+        for (MathVector2 vertex : verticesB) {
+            for (int i = 0; i < verticesA.size; i++) {
+                MathVector2 tail = verticesA.getCircular(i);
+                MathVector2 head = verticesA.getCircular(i + 1);
+                float dx = head.x - tail.x;
+                float dy = head.y - tail.y;
+                if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;
+                float scale = MathVector2.dot(vertex.x - tail.x, vertex.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
+                MathVector2 projection = new MathVector2(dx, dy).scl(scale).add(tail);
+                projection.clamp(tail, head);
+                Projection p = new Projection(projection, MathVector2.dst2(vertex, projection));
+                projections.add(p);
+            }
+        }
+
+        projections.sort();
+
+        CollectionsArray<MathVector2> contactPoints = new CollectionsArray<>(false, 2);
+        contactPoints.add(projections.get(0).p);
+        contactPoints.add(projections.get(1).p);
+
+        return contactPoints;
+    }
+
+    private static final class Projection implements Comparable<Projection> {
+
+        public MathVector2 p;
+        public float dst;
+
+        public Projection(MathVector2 p, float dst) {
+            this.p = p;
+            this.dst = dst;
+        }
+
+        @Override
+        public int compareTo(@NotNull Physics2DWorldCollisionDetection.Projection o) {
+            return Float.compare(this.dst, o.dst);
+        }
     }
 
 }
