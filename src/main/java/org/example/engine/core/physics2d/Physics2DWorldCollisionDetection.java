@@ -148,11 +148,15 @@ public final class Physics2DWorldCollisionDetection {
         float axis2_overlap = MathUtils.intervalsOverlap(aabb_min_axis2, aabb_max_axis2, 0, rect.unscaledHeight * rect.scaleY());
         if (MathUtils.isZero(axis2_overlap)) return; // no collision
 
-        // TODO: continue and fix
+        // TODO: see if correct.
         Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
         setContactPoints(aabb, rect, manifold);
-        manifold.normal = new MathVector2(0,1);
-        manifold.depth = aabb_c1_axis1;
+        float min_overlap = MathUtils.min(x_overlap, y_overlap, axis1_overlap, axis2_overlap);
+        if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
+        else if (MathUtils.isEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
+        else if (MathUtils.isEqual(min_overlap, axis1_overlap)) manifold.normal = new MathVector2(ax, ay).nor();
+        else manifold.normal = new MathVector2(bx, by).nor();
+        manifold.depth = min_overlap;
         manifolds.add(manifold);
     }
 
