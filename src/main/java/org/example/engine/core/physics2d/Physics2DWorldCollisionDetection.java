@@ -9,6 +9,10 @@ import org.jetbrains.annotations.NotNull;
 // TODO: SOLVED: contact points explained:
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
 // https://oercommons.s3.amazonaws.com/media/courseware/relatedresource/file/imth-6-1-9-6-1-coordinate_plane_plotter/index.html
+
+
+// TODO: concave polygons and polygons with holes:
+// for now, simply support convex polygons, and concave polygons will be represented as compound shapes of convex polygons.
 public final class Physics2DWorldCollisionDetection {
 
     private Physics2DWorldCollisionDetection() {}
@@ -35,7 +39,7 @@ public final class Physics2DWorldCollisionDetection {
         if (a.shape instanceof Shape2DAABB) {
             if      (b.shape instanceof Shape2DCircle)    AABBvsCircle(a,      b, manifolds);
             else if (b.shape instanceof Shape2DAABB)      AABBvsAABB(a,        b, manifolds);
-            else if (b.shape instanceof Shape2DRectangle) AABBvsRectangle(a, b, manifolds);
+            else if (b.shape instanceof Shape2DRectangle) AABBvsRectangle(a,   b, manifolds);
             else if (b.shape instanceof Shape2DPolygon)   circleVsPolygon(a,   b, manifolds);
             return;
         }
@@ -81,14 +85,21 @@ public final class Physics2DWorldCollisionDetection {
         circleVsAABB(b, a, manifolds);
     }
 
-    private static boolean AABBvsMorphed(Shape2DAABB aabb, Shape2DComposite morphed, Physics2DWorldCollisionManifold manifold) {
+    private static boolean AABBvsComplex(Shape2DAABB aabb, Shape2DComposite morphed, Physics2DWorldCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean AABBvsPolygon(Shape2DAABB aabb, Shape2DPolygon polygon, Physics2DWorldCollisionManifold manifold) {
+    private static void AABBvsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+        Shape2DAABB aabb = (Shape2DAABB) a.shape;
+        Shape2DPolygon polygon = (Shape2DPolygon) b.shape;
 
-        return false;
+        // aabb corners
+        MathVector2 aabb_min = aabb.getWorldMin();
+        MathVector2 aabb_max = aabb.getWorldMax();
+
+
+
     }
 
     // TODO:
@@ -149,6 +160,7 @@ public final class Physics2DWorldCollisionDetection {
         if (MathUtils.isZero(axis2_overlap)) return; // no collision
 
         // TODO: see if correct.
+        // TODO: fix normal direction.
         Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
         setContactPoints(aabb, rect, manifold);
         float min_overlap = MathUtils.min(x_overlap, y_overlap, axis1_overlap, axis2_overlap);
