@@ -141,11 +141,16 @@ public final class MathUtils {
             b_min = b_max;
             b_max = tmp;
         }
-        if (a_max <= b_min || b_max <= a_min) return 0;
-        if (b_min <= a_min && b_max < a_max) return b_max - a_min;
-        if (a_min <= b_min && b_max <= a_max) return b_max - b_min;
-        if (a_min <= b_min) return a_max - b_min;
-        return a_max - a_min;
+        if (a_max <= b_min) return 0;
+        if (b_max <= a_min) return 0;
+
+        if (b_min <= a_min) {
+            if (b_max <= a_max) return b_max - a_min;
+            else return a_max - a_min;
+        } else { //  a_min < b_min < a_max
+            if (b_max <= a_max) return b_max - b_min;
+            else return a_max - b_min;
+        }
     }
 
     public static float sin(float radians) {

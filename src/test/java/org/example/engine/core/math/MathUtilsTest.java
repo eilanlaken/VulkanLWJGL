@@ -225,6 +225,10 @@ class MathUtilsTest {
         Assertions.assertEquals(3.0f, MathUtils.intervalsOverlap(1.0f, 5.0f, 2.0f, 6.5f), MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(1.2f, MathUtils.intervalsOverlap(-1.2f, 1.2f,0.0f, 1.2f), MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(2.0f, MathUtils.intervalsOverlap(2.0f, 4.0f, 2.0f, 4.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(1.0f, MathUtils.intervalsOverlap(2.0f, 4.0f, 1.0f, 3.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(2.0f, MathUtils.intervalsOverlap(2.0f, -2.0f, 0.0f, 2.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(2.0f, MathUtils.intervalsOverlap(0.0f, -2.0f, 0.0f, -2.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(1.0f, MathUtils.intervalsOverlap(-1.0f, 1.0f, 0.0f, -3.0f), MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test
