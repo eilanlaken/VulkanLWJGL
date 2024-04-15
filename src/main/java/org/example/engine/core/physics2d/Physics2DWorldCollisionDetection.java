@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.*;
 import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.NotNull;
@@ -153,7 +154,6 @@ public final class Physics2DWorldCollisionDetection {
         manifold.normal = new MathVector2(0,1);
         manifold.depth = aabb_c1_axis1;
         manifolds.add(manifold);
-        System.out.println(aabb_c1_axis1);
     }
 
     // TODO: fix penetration depth and normal direction.
@@ -481,39 +481,23 @@ public final class Physics2DWorldCollisionDetection {
         CollectionsArray<Projection> projections = new CollectionsArray<>();
 
         // aabb vertices against rect edges
-        for (MathVector2 vertex : aabb_vertices) {
-            for (int i = 0; i < rect_vertices.size; i++) {
-                MathVector2 tail = rect_vertices.getCircular(i);
-                MathVector2 head = rect_vertices.getCircular(i + 1);
-                float dx = head.x - tail.x;
-                float dy = head.y - tail.y;
-                if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;
-                float scale = MathVector2.dot(vertex.x - tail.x, vertex.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
-                MathVector2 projection = new MathVector2(dx, dy).scl(scale).add(tail);
-                projection.clamp(tail, head);
-                Projection p = new Projection(projection, MathVector2.dst2(vertex, projection));
-                projections.add(p);
-            }
+        for (MathVector2 point : aabb_vertices) {
+            Projection p = getClosestProjection(point, rect_vertices);
+            projections.add(p);
         }
 
-        for (MathVector2 vertex : rect_vertices) {
-            for (int i = 0; i < aabb_vertices.size; i++) {
-                MathVector2 tail = aabb_vertices.getCircular(i);
-                MathVector2 head = aabb_vertices.getCircular(i + 1);
-                float dx = head.x - tail.x;
-                float dy = head.y - tail.y;
-                if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;
-                float scale = MathVector2.dot(vertex.x - tail.x, vertex.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
-                MathVector2 projection = new MathVector2(dx, dy).scl(scale).add(tail);
-                projection.clamp(tail, head);
-                Projection p = new Projection(projection, MathVector2.dst2(vertex, projection));
-                projections.add(p);
-            }
+        // rect vertices against aabb edges
+        for (MathVector2 point : rect_vertices) {
+            Projection p = getClosestProjection(point, aabb_vertices);
+            projections.add(p);
         }
 
         projections.sort();
-        manifold.contactPoint1 = projections.get(0).p;
-        manifold.contactPoint2 = projections.get(1).p;
+        Projection p0 = projections.get(0);
+        Projection p1 = projections.get(1);
+        if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) System.out.println(projections);
+        if (p0 != null) manifold.contactPoint1 = projections.get(0).p;
+        if (p0 != null && p1 != null && MathUtils.isEqual(p0.dst, p1.dst)) manifold.contactPoint2 = p1.p;
     }
 
     // TODO
@@ -559,6 +543,30 @@ public final class Physics2DWorldCollisionDetection {
         return contactPoints;
     }
 
+    private static Projection getClosestProjection(MathVector2 point, CollectionsArray<MathVector2> vertices) {
+        float minDst2 = Float.MAX_VALUE;
+        float px = Float.NaN;
+        float py = Float.NaN;
+        for (int i = 0; i < vertices.size; i++) {
+            MathVector2 tail = vertices.getCircular(i);
+            MathVector2 head = vertices.getCircular(i + 1);
+            float dx = head.x - tail.x;
+            float dy = head.y - tail.y;
+            if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;
+            float scale = MathVector2.dot(point.x - tail.x, point.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
+            MathVector2 projection = new MathVector2(dx, dy).scl(scale).add(tail);
+            projection.clamp(tail, head);
+            float dst2 = MathVector2.dst2(point, projection);
+            if (dst2 <= minDst2) {
+                minDst2 = dst2;
+                px = projection.x;
+                py = projection.y;
+            }
+        }
+
+        return new Projection(new MathVector2(px, py), (float) Math.sqrt(minDst2));
+    }
+
     private static final class Projection implements Comparable<Projection> {
 
         public MathVector2 p;
@@ -572,6 +580,15 @@ public final class Physics2DWorldCollisionDetection {
         @Override
         public int compareTo(@NotNull Physics2DWorldCollisionDetection.Projection o) {
             return Float.compare(this.dst, o.dst);
+        }
+
+        // TODO: delete
+        @Override
+        public String toString() {
+            return "Projection{" +
+                    "p=" + p +
+                    ", dst=" + dst +
+                    '}';
         }
     }
 
