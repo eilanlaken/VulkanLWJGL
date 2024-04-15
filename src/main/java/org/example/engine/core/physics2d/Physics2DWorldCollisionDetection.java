@@ -12,7 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 
 // TODO: concave polygons and polygons with holes:
-// for now, simply support convex polygons, and concave polygons will be represented as compound shapes of convex polygons.
+// TODO: for now, simply support convex polygons, and concave polygons will be represented as compound shapes of convex polygons.
+// TODO: will need to create a great way (API, tools, ...) to intuitively create shapes
 public final class Physics2DWorldCollisionDetection {
 
     private Physics2DWorldCollisionDetection() {}
@@ -40,7 +41,7 @@ public final class Physics2DWorldCollisionDetection {
             if      (b.shape instanceof Shape2DCircle)    AABBvsCircle(a,      b, manifolds);
             else if (b.shape instanceof Shape2DAABB)      AABBvsAABB(a,        b, manifolds);
             else if (b.shape instanceof Shape2DRectangle) AABBvsRectangle(a,   b, manifolds);
-            else if (b.shape instanceof Shape2DPolygon)   circleVsPolygon(a,   b, manifolds);
+            else if (b.shape instanceof Shape2DPolygon)   AABBvsPolygon(a,   b, manifolds);
             return;
         }
     }
@@ -98,7 +99,7 @@ public final class Physics2DWorldCollisionDetection {
         MathVector2 aabb_min = aabb.getWorldMin();
         MathVector2 aabb_max = aabb.getWorldMax();
 
-
+        System.out.println("ok");
 
     }
 
