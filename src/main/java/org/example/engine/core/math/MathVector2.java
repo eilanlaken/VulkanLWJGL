@@ -2,9 +2,9 @@ package org.example.engine.core.math;
 
 public class MathVector2 {
 
-    public final static MathVector2 X = new MathVector2(1, 0);
-    public final static MathVector2 Y = new MathVector2(0, 1);
-    public final static MathVector2 Zero = new MathVector2(0, 0);
+    public final static MathVector2 X_UNIT = new MathVector2(1, 0);
+    public final static MathVector2 Y_UNIT = new MathVector2(0, 1);
+    public final static MathVector2 Zero   = new MathVector2(0, 0);
 
     public float x;
     public float y;

@@ -5,8 +5,10 @@ import org.example.engine.core.math.MathVector2;
 
 public class Shape2DRectangle extends Shape2D {
 
-    private final float unscaledArea;
-    private final float unscaledBoundingRadius;
+    public final float unscaledArea;
+    public final float unscaledBoundingRadius;
+    public final float unscaledWidth;
+    public final float unscaledHeight;
 
     // original corners
     private final MathVector2 c1Local;
@@ -31,6 +33,8 @@ public class Shape2DRectangle extends Shape2D {
     private final MathVector2 tmp2 = new MathVector2();
 
     public Shape2DRectangle(float centerX, float centerY, float width, float height, float rotate) {
+        this.unscaledWidth = width;
+        this.unscaledHeight = height;
         final float widthHalf = width * 0.5f;
         final float heightHalf = height * 0.5f;
         this.c1Local = new MathVector2(-widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
@@ -42,6 +46,8 @@ public class Shape2DRectangle extends Shape2D {
     }
 
     public Shape2DRectangle(float width, float height) {
+        this.unscaledWidth = width;
+        this.unscaledHeight = height;
         final float widthHalf = width * 0.5f;
         final float heightHalf = height * 0.5f;
         this.c1Local = new MathVector2(-widthHalf, +heightHalf);
@@ -67,6 +73,14 @@ public class Shape2DRectangle extends Shape2D {
         if (projection2 < 0 || projection2 > tmp1.dot(tmp1)) return false;
 
         return true;
+    }
+
+    public float getWidth() {
+        return unscaledWidth * Math.abs(unscaledWidth);
+    }
+
+    public float getHeight() {
+        return unscaledHeight * Math.abs(unscaledHeight);
     }
 
     @Override

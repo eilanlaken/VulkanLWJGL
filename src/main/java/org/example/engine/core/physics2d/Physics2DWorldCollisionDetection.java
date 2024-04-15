@@ -93,6 +93,55 @@ public final class Physics2DWorldCollisionDetection {
         Shape2DAABB aabb = (Shape2DAABB) a.shape;
         Shape2DRectangle rect = (Shape2DRectangle) b.shape;
 
+        // aabb corners
+        MathVector2 aabb_min = aabb.getWorldMin();
+        MathVector2 aabb_max = aabb.getWorldMax();
+
+        // rect corners
+        MathVector2 c1 = rect.c1();
+        MathVector2 c2 = rect.c2();
+        MathVector2 c3 = rect.c3();
+        MathVector2 c4 = rect.c4();
+
+        // SAT - X axis
+        float aabb_min_x = aabb_min.x;
+        float aabb_max_x = aabb_max.x;
+        float rect_min_x = MathUtils.min(c1.x, c2.x, c3.x, c4.x);
+        float rect_max_x = MathUtils.max(c1.x, c2.x, c3.x, c4.x);
+        float x_overlap = MathUtils.intervalsOverlap(aabb_min_x, aabb_max_x, rect_min_x, rect_max_x);
+        if (MathUtils.isZero(x_overlap)) return; // no collision
+
+        // SAT - Y axis
+        float aabb_min_y = aabb_min.y;
+        float aabb_max_y = aabb_max.y;
+        float rect_min_y = MathUtils.min(c1.y, c2.y, c3.y, c4.y);
+        float rect_max_y = MathUtils.max(c1.y, c2.y, c3.y, c4.y);
+        float y_overlap = MathUtils.intervalsOverlap(aabb_min_y, aabb_max_y, rect_min_y, rect_max_y);
+        if (MathUtils.isZero(y_overlap)) return; // no collision
+
+        // TODO: fix
+        // aabb projections onto axis1:
+        MathVector2 axis1 = new MathVector2(c3).sub(c2).nor();
+        float aabb_c1_axis1 = MathVector2.dot(aabb_min.x - c2.x, aabb_max.y - c2.y, axis1.x, axis1.y);
+        float aabb_c2_axis1 = MathVector2.dot(aabb_min.x - c2.x, aabb_min.y - c2.y, axis1.x, axis1.y);
+        float aabb_c3_axis1 = MathVector2.dot(aabb_max.x - c2.x, aabb_max.y - c2.y, axis1.x, axis1.y);
+        float aabb_c4_axis1 = MathVector2.dot(aabb_max.x - c2.x, aabb_max.y - c2.y, axis1.x, axis1.y);
+        float aabb_min_axis1 = MathUtils.min(aabb_c1_axis1, aabb_c2_axis1, aabb_c3_axis1, aabb_c4_axis1);
+        float aabb_max_axis1 = MathUtils.max(aabb_c1_axis1, aabb_c2_axis1, aabb_c3_axis1, aabb_c4_axis1);
+        float axis1_overlap = MathUtils.intervalsOverlap(aabb_min_axis1, aabb_max_axis1, 0, rect.unscaledWidth * rect.scaleX());
+        if (MathUtils.isZero(axis1_overlap)) return; // no collision
+
+        // TODO: fix
+        MathVector2 axis2 = new MathVector2(c4).sub(c3).nor();
+        float aabb_c1_axis2 = MathVector2.dot(aabb_min.x - c3.x, aabb_max.y - c3.y, axis2.x, axis2.y);
+        float aabb_c2_axis2 = MathVector2.dot(aabb_min.x - c3.x, aabb_min.y - c3.y, axis2.x, axis2.y);
+        float aabb_c3_axis2 = MathVector2.dot(aabb_max.x - c3.x, aabb_max.y - c3.y, axis2.x, axis2.y);
+        float aabb_c4_axis2 = MathVector2.dot(aabb_max.x - c3.x, aabb_max.y - c3.y, axis2.x, axis2.y);
+        float aabb_min_axis2 = MathUtils.min(aabb_c1_axis2, aabb_c2_axis2, aabb_c3_axis2, aabb_c4_axis2);
+        float aabb_max_axis2 = MathUtils.max(aabb_c1_axis2, aabb_c2_axis2, aabb_c3_axis2, aabb_c4_axis2);
+        float axis2_overlap = MathUtils.intervalsOverlap(aabb_min_axis2, aabb_max_axis2, 0, rect.unscaledHeight * rect.scaleY());
+        if (MathUtils.isZero(axis2_overlap)) return; // no collision
+
         System.out.println("vs");
     }
 
