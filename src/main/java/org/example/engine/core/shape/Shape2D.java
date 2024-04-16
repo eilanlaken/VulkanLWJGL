@@ -84,8 +84,7 @@ public abstract class Shape2D {
     }
 
     public final void rot(float da) {
-        angle += da;
-        angle = MathUtils.normalizeAngleDeg(angle);
+        angle = MathUtils.normalizeAngleDeg(angle + da);
         updated = false;
     }
 

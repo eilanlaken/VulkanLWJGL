@@ -169,9 +169,9 @@ public abstract class Shape3D {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.angleX = angleX;
-        this.angleY = angleY;
-        this.angleZ = angleZ;
+        this.angleX = MathUtils.normalizeAngleDeg(angleX);
+        this.angleY = MathUtils.normalizeAngleDeg(angleY);
+        this.angleZ = MathUtils.normalizeAngleDeg(angleZ);
         this.scaleX = scaleX;
         this.scaleY = scaleY;
         this.scaleZ = scaleZ;
