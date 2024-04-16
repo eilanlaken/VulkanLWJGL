@@ -4,7 +4,7 @@ import org.example.engine.core.math.MathMatrix4;
 import org.example.engine.core.math.MathVector3;
 
 // TODO: redo entire Shape2D
-public class Shape3DSphere implements Shape3D {
+public class Shape3DSphere implements Shape3D_old {
 
     public final MathVector3 center;
     public final float radius;

@@ -4,7 +4,7 @@ import org.example.engine.core.math.MathMatrix4;
 import org.example.engine.core.math.MathVector3;
 
 // TODO: redo entire Shape2D
-public class Shape3DCube implements Shape3D {
+public class Shape3DCube implements Shape3D_old {
 
     // for the purpose of intermediate computations
     private static final MathVector3 vector = new MathVector3();

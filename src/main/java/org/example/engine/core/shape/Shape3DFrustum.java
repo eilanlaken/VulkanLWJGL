@@ -13,7 +13,7 @@ import org.example.engine.core.math.MathVector3;
  *
  */
 // TODO: redo entire Shape2D
-public class Shape3DFrustum implements Shape3D {
+public class Shape3DFrustum implements Shape3D_old {
 
     // for the purpose of intermediate computations
     private final MathVector3 vector = new MathVector3();

@@ -3,7 +3,7 @@ package org.example.engine.core.shape;
 import org.example.engine.core.math.MathMatrix4;
 
 // TODO: redo entire Shape2D
-public class Shape3DPath implements Shape3D {
+public class Shape3DPath implements Shape3D_old {
 
     @Override
     public boolean contains(float x, float y, float z) {
