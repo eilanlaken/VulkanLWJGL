@@ -123,17 +123,17 @@ public abstract class Shape3D {
     }
 
     public final void angleX(float angleX) {
-        this.angleX = angleX;
+        this.angleX = MathUtils.normalizeAngleDeg(angleX);
         updated = false;
     }
 
     public final void angleY(float angleY) {
-        this.angleY = angleY;
+        this.angleY = MathUtils.normalizeAngleDeg(angleY);
         updated = false;
     }
 
     public final void angleZ(float angleZ) {
-        this.angleZ = angleZ;
+        this.angleZ = MathUtils.normalizeAngleDeg(angleZ);
         updated = false;
     }
 

@@ -3,20 +3,19 @@ package org.example.engine.core.shape;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 
-// TODO: change from bounding radius to bounding AABB
 public abstract class Shape2D {
 
-    protected float x = 0;
-    protected float y = 0;
-    protected float angle = 0;
+    protected float x      = 0;
+    protected float y      = 0;
+    protected float angle  = 0;
     protected float scaleX = 1;
     protected float scaleY = 1;
-    protected boolean updated = false;
 
     private float area;
     private float boundingRadius;
     private float boundingRadiusSquared;
-    private boolean areaUpdated = false;
+    protected boolean updated             = false;
+    private boolean areaUpdated           = false;
     private boolean boundingRadiusUpdated = false;
 
     public final boolean contains(final MathVector2 point) {
@@ -80,15 +79,13 @@ public abstract class Shape2D {
         this.x += dx;
         this.y += dy;
         angle += da;
-        angle %= 360.0f;
-        if (angle < 0) angle += 360.0f;
+        angle = MathUtils.normalizeAngleDeg(angle);
         updated = false;
     }
 
     public final void rot(float da) {
         angle += da;
-        angle %= 360.0f;
-        if (angle < 0) angle += 360.0f;
+        angle = MathUtils.normalizeAngleDeg(angle);
         updated = false;
     }
 
@@ -109,7 +106,7 @@ public abstract class Shape2D {
     }
 
     public final void angle(float angle) {
-        this.angle = angle;
+        this.angle = MathUtils.normalizeAngleDeg(angle);
         updated = false;
     }
 
@@ -138,7 +135,7 @@ public abstract class Shape2D {
     public final void transform(float x, float y, float angle, float scaleX, float scaleY) {
         this.x = x;
         this.y = y;
-        this.angle = angle;
+        this.angle = MathUtils.normalizeAngleDeg(angle);
         this.scaleX = scaleX;
         this.scaleY = scaleY;
         boundingRadiusUpdated = false;
