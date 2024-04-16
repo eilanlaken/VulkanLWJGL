@@ -160,7 +160,7 @@ public class MathVector2 {
         return x_d * x_d + y_d * y_d;
     }
 
-    public float dst2 (float x, float y) {
+    public float dst2(float x, float y) {
         final float x_d = x - this.x;
         final float y_d = y - this.y;
         return x_d * x_d + y_d * y_d;

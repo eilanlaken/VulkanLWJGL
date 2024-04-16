@@ -17,6 +17,7 @@ public class InputKeyboard {
 
     private InputKeyboard() {}
 
+    // TODO: change window to application context.
     public static void init(Window window) {
         if (initialized)
             throw new IllegalStateException("Device input " + InputKeyboard.class.getSimpleName() + " already initialized.");

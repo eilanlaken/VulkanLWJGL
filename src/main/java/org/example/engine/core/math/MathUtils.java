@@ -2,6 +2,7 @@ package org.example.engine.core.math;
 
 import java.util.Random;
 
+// TODO: implement init() block that will take care of configuration.
 public final class MathUtils {
 
     public static final float NANO_TO_SEC = 1 / 1000000000f;
@@ -12,7 +13,6 @@ public final class MathUtils {
     public static final float E = (float) Math.E;
     public static final float radiansToDegrees = 180f / PI;
     public static final float degreesToRadians = PI / 180;
-
     private static final int SIN_BITS = 14; // 16KB. Adjust for accuracy.
     private static final int SIN_MASK = ~(-1 << SIN_BITS);
     private static final int SIN_COUNT = SIN_MASK + 1;
@@ -274,6 +274,7 @@ public final class MathUtils {
         return (float)(Math.log(value) / Math.log(a));
     }
 
+    // TODO: move to init block
     private static class Sin {
 
         private static final float[] lookup = new float[SIN_COUNT];

@@ -23,6 +23,7 @@ public class InputMouse {
 
     private InputMouse() {}
 
+    // TODO: change window to application context.
     public static void init(Window window) {
         if (initialized) throw new IllegalStateException("Device input " + InputMouse.class.getSimpleName() + " already initialized.");
         InputMouse.window = window;
@@ -167,4 +168,5 @@ public class InputMouse {
         }
 
     }
+
 }
