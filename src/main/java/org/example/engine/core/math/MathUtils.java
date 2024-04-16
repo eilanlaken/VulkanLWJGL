@@ -28,6 +28,10 @@ public final class MathUtils {
 
     private MathUtils() {}
 
+    public static float random() {
+        return random.nextFloat();
+    }
+
     public static int random(final int range) {
         return random.nextInt(range);
     }

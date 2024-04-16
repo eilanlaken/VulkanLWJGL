@@ -2,19 +2,16 @@ package org.example.engine.core.math;
 
 public class MathVector3 {
 
-    /** the x-component of this vector **/
+    public static final MathVector3 X_UNIT = new MathVector3(1, 0, 0);
+    public static final MathVector3 Y_UNIT = new MathVector3(0, 1, 0);
+    public static final MathVector3 Z_UNIT = new MathVector3(0, 0, 1);
+    public static final MathVector3 Zero   = new MathVector3(0, 0, 0);
+
+    private static final MathMatrix4 tmpMat = new MathMatrix4();
+
     public float x;
-    /** the y-component of this vector **/
     public float y;
-    /** the z-component of this vector **/
     public float z;
-
-    public final static MathVector3 X = new MathVector3(1, 0, 0);
-    public final static MathVector3 Y = new MathVector3(0, 1, 0);
-    public final static MathVector3 Z = new MathVector3(0, 0, 1);
-    public final static MathVector3 Zero = new MathVector3(0, 0, 0);
-
-    private final static MathMatrix4 tmpMat = new MathMatrix4();
 
     /** Constructs a vector at (0,0,0) */
     public MathVector3() {

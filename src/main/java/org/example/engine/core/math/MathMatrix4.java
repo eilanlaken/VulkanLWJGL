@@ -1310,13 +1310,13 @@ public class MathMatrix4 {
     }
 
     public MathMatrix4 spin(float degrees) {
-        return rotateSelfAxis(MathVector3.X, degrees);
+        return rotateSelfAxis(MathVector3.X_UNIT, degrees);
     }
 
-    public MathMatrix4 roll(float degrees) { return rotateSelfAxis(MathVector3.Y, degrees); }
+    public MathMatrix4 roll(float degrees) { return rotateSelfAxis(MathVector3.Y_UNIT, degrees); }
 
     public MathMatrix4 turn(float degrees) {
-        return rotateSelfAxis(MathVector3.Z, degrees);
+        return rotateSelfAxis(MathVector3.Z_UNIT, degrees);
     }
 
     /** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
