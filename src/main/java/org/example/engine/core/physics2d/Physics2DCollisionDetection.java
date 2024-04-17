@@ -119,10 +119,11 @@ public final class Physics2DCollisionDetection {
 
         // SAT - polygon normals
         // AABB corners
-        MathVector2 aabb_c1 = new MathVector2(aabb_min_x, aabb_max_y);
-        MathVector2 aabb_c2 = new MathVector2(aabb_min_x, aabb_min_y);
-        MathVector2 aabb_c3 = new MathVector2(aabb_max_x, aabb_min_y);
-        MathVector2 aabb_c4 = new MathVector2(aabb_max_x, aabb_max_y);
+        CollectionsArray<MathVector2> aabb_vertices = aabb.worldVertices();
+        MathVector2 aabb_c0 = aabb_vertices.get(0);
+        MathVector2 aabb_c1 = aabb_vertices.get(1);
+        MathVector2 aabb_c2 = aabb_vertices.get(2);
+        MathVector2 aabb_c3 = aabb_vertices.get(3);
         MathVector2 tail = new MathVector2();
         MathVector2 head = new MathVector2();
         MathVector2 normal = new MathVector2();
@@ -130,12 +131,12 @@ public final class Physics2DCollisionDetection {
             polygon.getWorldEdge(i, tail, head);
             normal.set(head).sub(tail).nor().rotate90(1);
             // project aabb on the axis
+            float dot_c0 = MathVector2.dot(normal.x, normal.y, aabb_c0.x - tail.x, aabb_c0.y - tail.y);
             float dot_c1 = MathVector2.dot(normal.x, normal.y, aabb_c1.x - tail.x, aabb_c1.y - tail.y);
             float dot_c2 = MathVector2.dot(normal.x, normal.y, aabb_c2.x - tail.x, aabb_c2.y - tail.y);
             float dot_c3 = MathVector2.dot(normal.x, normal.y, aabb_c3.x - tail.x, aabb_c3.y - tail.y);
-            float dot_c4 = MathVector2.dot(normal.x, normal.y, aabb_c4.x - tail.x, aabb_c4.y - tail.y);
-            float aabb_axis_min = MathUtils.min(dot_c1, dot_c2, dot_c3, dot_c4);
-            float aabb_axis_max = MathUtils.max(dot_c1, dot_c2, dot_c3, dot_c4);
+            float aabb_axis_min = MathUtils.min(dot_c0, dot_c1, dot_c2, dot_c3);
+            float aabb_axis_max = MathUtils.max(dot_c0, dot_c1, dot_c2, dot_c3);
             // project polygon on the axis
             float polygon_axis_min = Float.MAX_VALUE;
             float polygon_axis_max = -Float.MAX_VALUE;
@@ -150,6 +151,7 @@ public final class Physics2DCollisionDetection {
             if (MathUtils.isZero(axis_overlap)) return;
         }
 
+        System.out.println("ok");
 
         // TODO: see if correct.
         // TODO: fix normal direction.
@@ -165,15 +167,17 @@ public final class Physics2DCollisionDetection {
 
     }
 
-    // TODO:
+    // TODO: revise
     private static void AABBvsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         Shape2DAABB aabb = (Shape2DAABB) a.shape;
         Shape2DRectangle rect = (Shape2DRectangle) b.shape;
 
+        // TODO: use worldVertices()
         // aabb corners
         MathVector2 aabb_min = aabb.getWorldMin();
         MathVector2 aabb_max = aabb.getWorldMax();
 
+        // TODO: use worldVertices()
         // rect corners
         MathVector2 c1 = rect.c1();
         MathVector2 c2 = rect.c2();
