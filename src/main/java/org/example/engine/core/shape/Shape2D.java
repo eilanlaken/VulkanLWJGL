@@ -11,9 +11,9 @@ public abstract class Shape2D {
     protected float scaleX = 1;
     protected float scaleY = 1;
 
-    private float area;
-    private float boundingRadius;
-    private float boundingRadiusSquared;
+    private float area                    = 0;
+    private float boundingRadius          = 0;
+    private float boundingRadiusSquared   = 0;
     protected boolean updated             = false;
     private boolean areaUpdated           = false;
     private boolean boundingRadiusUpdated = false;
