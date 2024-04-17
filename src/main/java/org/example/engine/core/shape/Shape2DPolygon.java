@@ -137,6 +137,22 @@ public class Shape2DPolygon extends Shape2D {
         else return out.set(worldVertices[index * 2], worldVertices[index * 2 + 1]);
     }
 
+    public float getWorldVertexX(int index) {
+        if (!updated) update();
+        int n2 = worldVertices.length / 2;
+        if (index >= n2) return worldVertices[(index % n2) * 2];
+        else if (index < 0) return worldVertices[(index % n2 + n2) * 2];
+        else return worldVertices[index * 2];
+    }
+
+    public float getWorldVertexY(int index) {
+        if (!updated) update();
+        int n2 = worldVertices.length / 2;
+        if (index >= n2) return worldVertices[(index % n2) * 2 + 1];
+        else if (index < 0) return worldVertices[(index % n2 + n2) * 2 + 1];
+        else return worldVertices[index * 2 + 1];
+    }
+
     public static float getVertexX(int index, float[] vertices) {
         int n2 = vertices.length / 2;
         if (index >= n2) return vertices[(index % n2) * 2];

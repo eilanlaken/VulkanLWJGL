@@ -99,7 +99,34 @@ public final class Physics2DWorldCollisionDetection {
         MathVector2 aabb_min = aabb.getWorldMin();
         MathVector2 aabb_max = aabb.getWorldMax();
 
+        // polygon corners
 
+        // SAT - x axis, y axis
+        float aabb_min_x = aabb_min.x;
+        float aabb_max_x = aabb_max.x;
+        float aabb_min_y = aabb_min.y;
+        float aabb_max_y = aabb_max.y;
+        float polygon_min_x = Float.MAX_VALUE;
+        float polygon_max_x = -Float.MAX_VALUE;
+        float polygon_min_y = Float.MAX_VALUE;
+        float polygon_max_y = -Float.MAX_VALUE;
+        for (int i = 0; i < polygon.vertexCount; i++) {
+            float x = polygon.getWorldVertexX(i);
+            float y = polygon.getWorldVertexY(i);
+            if (x > polygon_max_x) polygon_max_x = x;
+            if (x < polygon_min_x) polygon_min_x = x;
+            if (y > polygon_max_y) polygon_max_y = y;
+            if (y < polygon_min_y) polygon_min_y = y;
+        }
+
+        float x_overlap = MathUtils.intervalsOverlap(aabb_min_x, aabb_max_x, polygon_min_x, polygon_max_x);
+        if (MathUtils.isZero(x_overlap)) return; // no collision
+
+        float y_overlap = MathUtils.intervalsOverlap(aabb_min_y, aabb_max_y, polygon_min_y, polygon_max_y);
+        if (MathUtils.isZero(y_overlap)) return; // no collision
+
+        // SAT - polygon normal axis
+        // TODO: continue
 
         System.out.println("ok");
 
@@ -120,7 +147,7 @@ public final class Physics2DWorldCollisionDetection {
         MathVector2 c3 = rect.c3();
         MathVector2 c4 = rect.c4();
 
-        // SAT - X axis
+        // SAT - x axis
         float aabb_min_x = aabb_min.x;
         float aabb_max_x = aabb_max.x;
         float rect_min_x = MathUtils.min(c1.x, c2.x, c3.x, c4.x);
@@ -128,7 +155,7 @@ public final class Physics2DWorldCollisionDetection {
         float x_overlap = MathUtils.intervalsOverlap(aabb_min_x, aabb_max_x, rect_min_x, rect_max_x);
         if (MathUtils.isZero(x_overlap)) return; // no collision
 
-        // SAT - Y axis
+        // SAT - y axis
         float aabb_min_y = aabb_min.y;
         float aabb_max_y = aabb_max.y;
         float rect_min_y = MathUtils.min(c1.y, c2.y, c3.y, c4.y);
@@ -136,7 +163,7 @@ public final class Physics2DWorldCollisionDetection {
         float y_overlap = MathUtils.intervalsOverlap(aabb_min_y, aabb_max_y, rect_min_y, rect_max_y);
         if (MathUtils.isZero(y_overlap)) return; // no collision
 
-        // C1-C2 axis
+        // c1-c2 axis
         float ax = c3.x - c2.x;
         float ay = c3.y - c2.y;
         float aLen = MathVector2.len(ax, ay);
@@ -149,7 +176,7 @@ public final class Physics2DWorldCollisionDetection {
         float axis1_overlap = MathUtils.intervalsOverlap(aabb_min_axis1, aabb_max_axis1, 0, rect.unscaledWidth * rect.scaleX());
         if (MathUtils.isZero(axis1_overlap)) return; // no collision
 
-        // C2-C3 axis
+        // c2-c3 axis
         float bx = c4.x - c3.x;
         float by = c4.y - c3.y;
         float bLen = MathVector2.len(bx, by);
