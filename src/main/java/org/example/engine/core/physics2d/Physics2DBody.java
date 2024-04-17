@@ -28,7 +28,7 @@ public final class Physics2DBody {
         this.active = active;
         this.type = type;
         this.shape = shape;
-        shape.transform(position.x, position.y, angle, 1,1);
+        shape.setTransform(position.x, position.y, angle, 1,1);
         this.velocity = new MathVector2(velocity);
         this.angularVelocity = angularVelocity;
         this.forces = new CollectionsArray<>(false, 2);
@@ -45,7 +45,7 @@ public final class Physics2DBody {
         this.active = true;
         this.type = Type.DYNAMIC;
         this.shape = shape;
-        this.shape.transform(position.x, position.y, angle, 1, 1);
+        this.shape.setTransform(position.x, position.y, angle, 1, 1);
         this.velocity = new MathVector2(velocity);
         this.forces = new CollectionsArray<>(false, 2);
     }

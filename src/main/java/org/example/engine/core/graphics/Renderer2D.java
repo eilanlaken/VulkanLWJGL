@@ -216,7 +216,7 @@ public class Renderer2D implements MemoryResourceHolder {
         if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
         if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
 
-        polygon.transform(x, y, angleZ, scaleX, scaleY);
+        polygon.setTransform(x, y, angleZ, scaleX, scaleY);
         polygon.update();
 
         float t = tint == null ? WHITE_TINT : tint.toFloatBits();

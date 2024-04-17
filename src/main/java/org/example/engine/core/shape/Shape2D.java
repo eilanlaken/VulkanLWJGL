@@ -131,7 +131,7 @@ public abstract class Shape2D {
         updated = false;
     }
 
-    public final void transform(float x, float y, float angle, float scaleX, float scaleY) {
+    public final void setTransform(float x, float y, float angle, float scaleX, float scaleY) {
         this.x = x;
         this.y = y;
         this.angle = MathUtils.normalizeAngleDeg(angle);

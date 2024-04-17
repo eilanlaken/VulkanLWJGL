@@ -53,7 +53,7 @@ public class Shape2DComposite extends Shape2D {
     @Override
     protected void updateWorldCoordinates() {
         for (Shape2D shape : shapes) {
-            shape.transform(x, y, angle, scaleX, scaleY);
+            shape.setTransform(x, y, angle, scaleX, scaleY);
             shape.update();
         }
     }
