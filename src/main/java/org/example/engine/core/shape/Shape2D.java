@@ -11,12 +11,12 @@ public abstract class Shape2D {
     protected float scaleX = 1;
     protected float scaleY = 1;
 
-    private float area                    = 0;
-    private float boundingRadius          = 0;
-    private float boundingRadiusSquared   = 0;
-    protected boolean updated             = false;
-    private boolean areaUpdated           = false;
-    private boolean boundingRadiusUpdated = false;
+    private float     area                  = 0;
+    private float     boundingRadius        = 0;
+    private float     boundingRadiusSquared = 0;
+    protected boolean updated               = false;
+    private boolean   areaUpdated           = false;
+    private boolean   boundingRadiusUpdated = false;
 
     public final boolean contains(final MathVector2 point) {
         return contains(point.x, point.y);
