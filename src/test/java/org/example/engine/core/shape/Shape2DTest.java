@@ -136,7 +136,7 @@ class Shape2DTest {
         shape.scaleX(0);
         Assertions.assertEquals(0.0f, shape.scaleX(),   MathUtils.FLOAT_ROUNDING_ERROR);
         shape.scaleX(Float.NaN);
-        Assertions.assertEquals(Float.NaN, shape.scaleX(),      MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(Float.NaN, shape.scaleX(),       MathUtils.FLOAT_ROUNDING_ERROR);
         shape.scaleX(1.0f);
         Assertions.assertEquals(1.0f, shape.scaleX(),   MathUtils.FLOAT_ROUNDING_ERROR);
         shape.scaleX(Float.MAX_VALUE);
@@ -148,11 +148,11 @@ class Shape2DTest {
     @Test
     void testScaleY() {
         shape.scaleY(0);
-        Assertions.assertEquals(0.0f, shape.scaleY(),    MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.0f, shape.scaleY(),   MathUtils.FLOAT_ROUNDING_ERROR);
         shape.scaleY(Float.NaN);
         Assertions.assertEquals(Float.NaN, shape.scaleY(),       MathUtils.FLOAT_ROUNDING_ERROR);
         shape.scaleY(1.0f);
-        Assertions.assertEquals(1.0f, shape.scaleY(),    MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(1.0f, shape.scaleY(),   MathUtils.FLOAT_ROUNDING_ERROR);
         shape.scaleY(Float.MAX_VALUE);
         Assertions.assertEquals(Float.MAX_VALUE, shape.scaleY(), MathUtils.FLOAT_ROUNDING_ERROR);
         shape.scaleY(Float.MIN_VALUE);
