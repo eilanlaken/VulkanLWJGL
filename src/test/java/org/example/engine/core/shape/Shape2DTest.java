@@ -1,6 +1,8 @@
 package org.example.engine.core.shape;
 
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.math.MathVector2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,11 @@ class Shape2DTest {
             @Override
             protected float getUnscaledBoundingRadius() {
                 return 0;
+            }
+
+            @Override
+            protected CollectionsArray<MathVector2> getWorldVertices() {
+                return null;
             }
         };
     }

@@ -1,5 +1,6 @@
 package org.example.engine.core.shape;
 
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 
@@ -28,9 +29,7 @@ public class Shape2DRectangle extends Shape2D {
     private final MathVector2 c2 = new MathVector2();
     private final MathVector2 c3 = new MathVector2();
     private final MathVector2 c4 = new MathVector2();
-
-    private final MathVector2 tmp1 = new MathVector2();
-    private final MathVector2 tmp2 = new MathVector2();
+    private final CollectionsArray<MathVector2> worldVertices;
 
     public Shape2DRectangle(float centerX, float centerY, float width, float height, float rotate) {
         this.unscaledWidth = width;
@@ -41,6 +40,8 @@ public class Shape2DRectangle extends Shape2D {
         this.c2Local = new MathVector2(-widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
         this.c3Local = new MathVector2(+widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
         this.c4Local = new MathVector2(+widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
+        this.worldVertices = new CollectionsArray<>(true, 4);
+        this.worldVertices.addAll(c1,c2,c3,c4);
         this.unscaledArea = width * height;
         this.unscaledBoundingRadius = (float) Math.sqrt(MathUtils.max(c1Local.len2(), c2Local.len2(), c3Local.len2(), c4Local.len2()));
     }
@@ -54,12 +55,17 @@ public class Shape2DRectangle extends Shape2D {
         this.c2Local = new MathVector2(-widthHalf, -heightHalf);
         this.c3Local = new MathVector2(+widthHalf, -heightHalf);
         this.c4Local = new MathVector2(+widthHalf, +heightHalf);
+        this.worldVertices = new CollectionsArray<>(true, 4);
+        this.worldVertices.addAll(c1,c2,c3,c4);
         this.unscaledArea = width * height;
         this.unscaledBoundingRadius = (float) Math.sqrt(MathUtils.max(c1Local.len2(), c2Local.len2(), c3Local.len2(), c4Local.len2()));
     }
 
     @Override
     protected boolean containsPoint(float x, float y) {
+        MathVector2 tmp1 = new MathVector2();
+        MathVector2 tmp2 = new MathVector2();
+
         tmp1.set(c4).sub(c1);
         tmp2.set(x,y).sub(c1);
         float projection1 = tmp1.dot(tmp2);
@@ -136,6 +142,11 @@ public class Shape2DRectangle extends Shape2D {
     public MathVector2 c4() {
         if (!updated) update();
         return c4;
+    }
+
+    @Override
+    protected CollectionsArray<MathVector2> getWorldVertices() {
+        return worldVertices;
     }
 
     @Override

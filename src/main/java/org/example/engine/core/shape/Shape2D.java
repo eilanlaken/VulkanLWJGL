@@ -1,5 +1,6 @@
 package org.example.engine.core.shape;
 
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 
@@ -21,9 +22,15 @@ public abstract class Shape2D {
     public final boolean contains(final MathVector2 point) {
         return contains(point.x, point.y);
     }
+
     public final boolean contains(float x, float y) {
         if (!updated) update();
         return containsPoint(x, y);
+    }
+
+    public final CollectionsArray<MathVector2> worldVertices() {
+        if (!updated) update();
+        return getWorldVertices();
     }
 
     public final float getArea() {
@@ -153,6 +160,7 @@ public abstract class Shape2D {
 
     protected abstract boolean containsPoint(float x, float y);
     protected abstract void updateWorldCoordinates();
+    protected abstract CollectionsArray<MathVector2> getWorldVertices();
     protected abstract float getUnscaledArea();
     protected abstract float getUnscaledBoundingRadius();
 

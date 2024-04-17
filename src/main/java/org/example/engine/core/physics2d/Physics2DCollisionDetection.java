@@ -95,28 +95,6 @@ public final class Physics2DCollisionDetection {
         Shape2DAABB aabb = (Shape2DAABB) a.shape;
         Shape2DPolygon polygon = (Shape2DPolygon) b.shape;
 
-        // debug, delete
-        {
-            Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
-            manifolds.add(manifold);
-            manifold.normal = new MathVector2(0, 0);
-            manifold.contactPoint1 = new MathVector2();
-
-            MathVector2 tail0 = polygon.getWorldVertex(0, null);
-            MathVector2 head0 = polygon.getWorldVertex(1, null);
-            MathVector2 axis = new MathVector2(head0).sub(tail0).nor();//rotate90(1);
-            MathVector2 tail_to_min = new MathVector2(aabb.getWorldMin().x - tail0.x, aabb.getWorldMin().y - tail0.y);
-            float dot = MathVector2.dot(axis, tail_to_min);
-
-            manifold.contactPoint1.set(tail0.x + dot * axis.x, tail0.y + dot * axis.y);
-
-            if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
-                System.out.println("dot   " + dot);
-                System.out.println("len   " + head0.sub(tail0).len());
-            }
-
-        }
-
         // SAT - AABB normals (x & y axis)
         float aabb_min_x = aabb.getWorldMin().x;
         float aabb_max_x = aabb.getWorldMax().x;
@@ -172,7 +150,18 @@ public final class Physics2DCollisionDetection {
             if (MathUtils.isZero(axis_overlap)) return;
         }
 
-        System.out.println("ok");
+
+        // TODO: see if correct.
+        // TODO: fix normal direction.
+//        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
+//        setContactPoints(aabb, rect, manifold);
+//        float min_overlap = MathUtils.min(x_overlap, y_overlap, axis1_overlap, axis2_overlap);
+//        if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
+//        else if (MathUtils.isEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
+//        else if (MathUtils.isEqual(min_overlap, axis1_overlap)) manifold.normal = new MathVector2(ax, ay).nor();
+//        else manifold.normal = new MathVector2(bx, by).nor();
+//        manifold.depth = min_overlap;
+//        manifolds.add(manifold);
 
     }
 
@@ -236,7 +225,7 @@ public final class Physics2DCollisionDetection {
         // TODO: see if correct.
         // TODO: fix normal direction.
         Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
-        setContactPoints(aabb, rect, manifold);
+        setContactPoints(aabb.worldVertices(), rect.worldVertices(), manifold);
         float min_overlap = MathUtils.min(x_overlap, y_overlap, axis1_overlap, axis2_overlap);
         if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
         else if (MathUtils.isEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
@@ -541,96 +530,26 @@ public final class Physics2DCollisionDetection {
         return false;
     }
 
-    // TODO: continue and fix
-    private static void setContactPoints(Shape2DAABB aabb, Shape2DRectangle rect, Physics2DCollisionManifold manifold) {
-        MathVector2 aabb_worldMin = aabb.getWorldMin();
-        MathVector2 aabb_worldMax = aabb.getWorldMax();
-
-        // aabb vertices:
-        MathVector2 a_1 = new MathVector2(aabb_worldMin.x, aabb_worldMax.y);
-        MathVector2 a_2 = aabb_worldMin;
-        MathVector2 a_3 = new MathVector2(aabb_worldMax.x, aabb_worldMin.y);
-        MathVector2 a_4 = aabb_worldMax;
-        CollectionsArray<MathVector2> aabb_vertices = new CollectionsArray<>(true, 4);
-        aabb_vertices.add(a_1);
-        aabb_vertices.add(a_2);
-        aabb_vertices.add(a_3);
-        aabb_vertices.add(a_4);
-
-        // rect vertices
-        MathVector2 c1 = rect.c1();
-        MathVector2 c2 = rect.c2();
-        MathVector2 c3 = rect.c3();
-        MathVector2 c4 = rect.c4();
-        CollectionsArray<MathVector2> rect_vertices = new CollectionsArray<>(true, 4);
-        rect_vertices.add(c1);
-        rect_vertices.add(c2);
-        rect_vertices.add(c3);
-        rect_vertices.add(c4);
-
+    private static void setContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB, Physics2DCollisionManifold manifold) {
         CollectionsArray<Projection> projections = new CollectionsArray<>();
 
-        // aabb vertices against rect edges
-        for (MathVector2 point : aabb_vertices) {
-            Projection p = getClosestProjection(point, rect_vertices);
+        // first polygon vs second
+        for (MathVector2 point : verticesA) {
+            Projection p = getClosestProjection(point, verticesB);
             projections.add(p);
         }
 
-        // rect vertices against aabb edges
-        for (MathVector2 point : rect_vertices) {
-            Projection p = getClosestProjection(point, aabb_vertices);
+        // second polygon vs first
+        for (MathVector2 point : verticesB) {
+            Projection p = getClosestProjection(point, verticesA);
             projections.add(p);
         }
 
         projections.sort();
         Projection p0 = projections.get(0);
         Projection p1 = projections.get(1);
-        if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) System.out.println(projections);
         if (p0 != null) manifold.contactPoint1 = projections.get(0).p;
         if (p0 != null && p1 != null && MathUtils.isEqual(p0.dst, p1.dst)) manifold.contactPoint2 = p1.p;
-    }
-
-    // TODO
-    private static CollectionsArray<MathVector2> getContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB) {
-        CollectionsArray<Projection> projections = new CollectionsArray<>(false, verticesA.size + verticesB.size);
-
-        for (MathVector2 vertex : verticesA) {
-            for (int i = 0; i < verticesB.size; i++) {
-                MathVector2 tail = verticesB.getCircular(i);
-                MathVector2 head = verticesB.getCircular(i + 1);
-                float dx = head.x - tail.x;
-                float dy = head.y - tail.y;
-                if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;
-                float scale = MathVector2.dot(vertex.x - tail.x, vertex.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
-                MathVector2 projection = new MathVector2(dx, dy).scl(scale).add(tail);
-                projection.clamp(tail, head);
-                Projection p = new Projection(projection, MathVector2.dst2(vertex, projection));
-                projections.add(p);
-            }
-        }
-
-        for (MathVector2 vertex : verticesB) {
-            for (int i = 0; i < verticesA.size; i++) {
-                MathVector2 tail = verticesA.getCircular(i);
-                MathVector2 head = verticesA.getCircular(i + 1);
-                float dx = head.x - tail.x;
-                float dy = head.y - tail.y;
-                if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;
-                float scale = MathVector2.dot(vertex.x - tail.x, vertex.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
-                MathVector2 projection = new MathVector2(dx, dy).scl(scale).add(tail);
-                projection.clamp(tail, head);
-                Projection p = new Projection(projection, MathVector2.dst2(vertex, projection));
-                projections.add(p);
-            }
-        }
-
-        projections.sort();
-
-        CollectionsArray<MathVector2> contactPoints = new CollectionsArray<>(false, 2);
-        contactPoints.add(projections.get(0).p);
-        contactPoints.add(projections.get(1).p);
-
-        return contactPoints;
     }
 
     private static Projection getClosestProjection(MathVector2 point, CollectionsArray<MathVector2> vertices) {

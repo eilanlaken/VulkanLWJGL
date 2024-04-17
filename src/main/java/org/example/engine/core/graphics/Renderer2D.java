@@ -220,7 +220,7 @@ public class Renderer2D implements MemoryResourceHolder {
         polygon.update();
 
         float t = tint == null ? WHITE_TINT : tint.toFloatBits();
-        final float[] worldPoints = polygon.getWorldVertices();
+        final float[] worldPoints = polygon.getWorldVertices_flat();
 
         for (int i = 0; i < worldPoints.length - 1; i += 2) {
             verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(t).put(0.5f).put(0.5f);
@@ -405,9 +405,10 @@ public class Renderer2D implements MemoryResourceHolder {
         ;
         triangleIndex += 2;
 
-        segment.update();
-        float x1 = segment.world_a.x, y1 = segment.world_a.y;
-        float x2 = segment.world_b.x, y2 = segment.world_b.y;
+        MathVector2 worldA = segment.getWorldA();
+        MathVector2 worldB = segment.getWorldB();
+        float x1 = worldA.x, y1 = worldA.y;
+        float x2 = worldB.x, y2 = worldB.y;
         verticesBuffer
                 .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // a
                 .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // b
@@ -441,7 +442,7 @@ public class Renderer2D implements MemoryResourceHolder {
         triangleIndex += polygon.indices.length * 2;
 
         polygon.update();
-        final float[] worldPoints = polygon.getWorldVertices();
+        final float[] worldPoints = polygon.getWorldVertices_flat();
         for (int i = 0; i < worldPoints.length - 1; i += 2) {
             verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(tintFloatBits).put(0.5f).put(0.5f);
         }

@@ -15,7 +15,8 @@ public class Shape2DPolygon extends Shape2D {
     public final float[] vertices;
     public final int[] indices;
     public final boolean isConvex;
-    private float[] worldVertices;
+    @Deprecated private float[] worldVertices_flat;
+    private final CollectionsArray<MathVector2> worldVertices;
 
     public final int[] holes;
     public final boolean hasHoles;
@@ -24,16 +25,22 @@ public class Shape2DPolygon extends Shape2D {
     private final float unscaledArea;
     private final float unscaledBoundingRadius;
 
-    private final MathVector2 tmp = new MathVector2();
-
     protected Shape2DPolygon(int[] indices, float[] vertices) {
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
         this.vertexCount = vertices.length / 2;
         this.vertices = vertices;
-        this.worldVertices = new float[vertices.length];
+
+        // todo: see if you can rid of flat.
+        this.worldVertices_flat = new float[vertices.length];
+        this.worldVertices = new CollectionsArray<>(true, vertexCount);
+        for (int i = 0; i < vertexCount; i++) {
+            this.worldVertices.add(new MathVector2());
+        }
+
         this.indices = indices;
         this.isConvex = ShapeUtils.isPolygonConvex(vertices);
+        // TODO: fix the area calculations.
         this.unscaledArea = Math.abs(ShapeUtils.incorrect_calculatePolygonSignedArea(this.vertices));
         this.unscaledBoundingRadius = ShapeUtils.calculatePolygonBoundingRadius(this.vertices);
         this.holes = null;
@@ -55,7 +62,14 @@ public class Shape2DPolygon extends Shape2D {
         if (holes != null && !CollectionsUtils.isSorted(holes, true)) Arrays.sort(holes);
         this.vertexCount = vertices.length / 2;
         this.vertices = vertices;
-        this.worldVertices = new float[vertices.length];
+
+        // todo: see if you can rid of flat.
+        this.worldVertices_flat = new float[vertices.length];
+        this.worldVertices = new CollectionsArray<>(true, vertexCount);
+        for (int i = 0; i < vertexCount; i++) {
+            this.worldVertices.add(new MathVector2());
+        }
+
         this.indices = ShapeUtils.triangulatePolygon(this.vertices, holes, 2);
         this.holes = holes;
         this.loops = ShapeUtils.getLoops(holes, vertexCount);
@@ -74,32 +88,52 @@ public class Shape2DPolygon extends Shape2D {
     @Override
     protected void updateWorldCoordinates() {
         if (MathUtils.isZero(angle)) {
-            for (int i = 0; i < vertices.length - 1; i += 2) {
-                worldVertices[i] = vertices[i] * scaleX + x;
-                worldVertices[i + 1] = vertices[i + 1] * scaleY + y;
+            for (int i = 0; i < vertexCount; i++) {
+                worldVertices.get(i).set(vertices[i * 2] * scaleX + x, vertices[i * 2 + 1] * scaleY + y);
             }
         } else {
+            MathVector2 vertex = new MathVector2();
+            for (int i = 0; i < vertexCount; i++) {
+                vertex.set(vertices[i * 2] * scaleX, vertices[i * 2 + 1] * scaleY).rotateDeg(angle).add(x, y);
+                worldVertices.get(i).set(vertex);
+            }
+        }
+
+
+        // TODO: this part is outdated. remove later.
+        if (MathUtils.isZero(angle)) {
             for (int i = 0; i < vertices.length - 1; i += 2) {
-                tmp.set(vertices[i] * scaleX, vertices[i + 1] * scaleY).rotateDeg(angle).add(x, y);
-                worldVertices[i] = tmp.x;
-                worldVertices[i + 1] = tmp.y;
+                worldVertices_flat[i] = vertices[i] * scaleX + x;
+                worldVertices_flat[i + 1] = vertices[i + 1] * scaleY + y;
+            }
+        } else {
+            MathVector2 vertex = new MathVector2();
+            for (int i = 0; i < vertices.length - 1; i += 2) {
+                vertex.set(vertices[i] * scaleX, vertices[i + 1] * scaleY).rotateDeg(angle).add(x, y);
+                worldVertices_flat[i] = vertex.x;
+                worldVertices_flat[i + 1] = vertex.y;
             }
         }
     }
 
-    public float[] getWorldVertices() {
+    @Deprecated public float[] getWorldVertices_flat() {
         if (!updated) update();
+        return worldVertices_flat;
+    }
+
+    @Override
+    protected CollectionsArray<MathVector2> getWorldVertices() {
         return worldVertices;
     }
 
     @Override
     protected boolean containsPoint(float x, float y) {
         boolean inside = false;
-        for (int i = 0, j = worldVertices.length - 2; i < worldVertices.length; i += 2) {
-            float x1 = worldVertices[i];
-            float y1 = worldVertices[i+1];
-            float x2 = worldVertices[j];
-            float y2 = worldVertices[j+1];
+        for (int i = 0, j = worldVertices_flat.length - 2; i < worldVertices_flat.length; i += 2) {
+            float x1 = worldVertices_flat[i];
+            float y1 = worldVertices_flat[i+1];
+            float x2 = worldVertices_flat[j];
+            float y2 = worldVertices_flat[j+1];
             if ( ((y1 > y) != (y2 > y)) )
                 if (x < (x2 - x1) * (y - y1) / (y2 - y1) + x1) inside = !inside;
             j = i;
@@ -130,26 +164,26 @@ public class Shape2DPolygon extends Shape2D {
     public MathVector2 getWorldVertex(int index, MathVector2 out) {
         if (!updated) update();
         if (out == null) out = new MathVector2();
-        int n2 = worldVertices.length / 2;
-        if (index >= n2) return out.set(worldVertices[(index % n2) * 2], worldVertices[(index % n2) * 2 + 1]);
-        else if (index < 0) return out.set(worldVertices[(index % n2 + n2) * 2], worldVertices[(index % n2 + n2) * 2 + 1]);
-        else return out.set(worldVertices[index * 2], worldVertices[index * 2 + 1]);
+        int n2 = worldVertices_flat.length / 2;
+        if (index >= n2) return out.set(worldVertices_flat[(index % n2) * 2], worldVertices_flat[(index % n2) * 2 + 1]);
+        else if (index < 0) return out.set(worldVertices_flat[(index % n2 + n2) * 2], worldVertices_flat[(index % n2 + n2) * 2 + 1]);
+        else return out.set(worldVertices_flat[index * 2], worldVertices_flat[index * 2 + 1]);
     }
 
     public float getWorldVertexX(int index) {
         if (!updated) update();
-        int n2 = worldVertices.length / 2;
-        if (index >= n2) return worldVertices[(index % n2) * 2];
-        else if (index < 0) return worldVertices[(index % n2 + n2) * 2];
-        else return worldVertices[index * 2];
+        int n2 = worldVertices_flat.length / 2;
+        if (index >= n2) return worldVertices_flat[(index % n2) * 2];
+        else if (index < 0) return worldVertices_flat[(index % n2 + n2) * 2];
+        else return worldVertices_flat[index * 2];
     }
 
     public float getWorldVertexY(int index) {
         if (!updated) update();
-        int n2 = worldVertices.length / 2;
-        if (index >= n2) return worldVertices[(index % n2) * 2 + 1];
-        else if (index < 0) return worldVertices[(index % n2 + n2) * 2 + 1];
-        else return worldVertices[index * 2 + 1];
+        int n2 = worldVertices_flat.length / 2;
+        if (index >= n2) return worldVertices_flat[(index % n2) * 2 + 1];
+        else if (index < 0) return worldVertices_flat[(index % n2 + n2) * 2 + 1];
+        else return worldVertices_flat[index * 2 + 1];
     }
 
     public static float getVertexX(int index, float[] vertices) {

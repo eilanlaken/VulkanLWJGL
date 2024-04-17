@@ -1,5 +1,6 @@
 package org.example.engine.core.shape;
 
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 
@@ -14,7 +15,7 @@ public class Shape2DAABB extends Shape2D {
     private final MathVector2 worldMin;
     private final MathVector2 worldMax;
 
-    private MathVector2 tmp = new MathVector2();
+    private CollectionsArray<MathVector2> worldVertices;
 
     public Shape2DAABB(float x1, float y1, float x2, float y2) {
         float xMin = Math.min(x1, x2);
@@ -25,6 +26,8 @@ public class Shape2DAABB extends Shape2D {
         this.localMax = new MathVector2(xMax, yMax);
         this.worldMin = new MathVector2(localMin);
         this.worldMax = new MathVector2(localMax);
+        this.worldVertices = new CollectionsArray<>(true, 4);
+        this.worldVertices.addAll(new MathVector2(), new MathVector2(), new MathVector2(), new MathVector2());
         this.unscaledArea = Math.abs(x2 - x1) * Math.abs(y2 - y1);
         float centerX = (localMin.x + localMax.x) * 0.5f;
         float centerY = (localMin.y + localMax.y) * 0.5f;
@@ -34,11 +37,6 @@ public class Shape2DAABB extends Shape2D {
 
     public Shape2DAABB(float width, float height) {
         this(-width * 0.5f, -height * 0.5f, width * 0.5f, height * 0.5f);
-    }
-
-    public MathVector2 getWorldCenter() {
-        if (!updated) update();
-        return tmp.set(worldMin).add(worldMax).scl(0.5f);
     }
 
     @Override
@@ -78,6 +76,15 @@ public class Shape2DAABB extends Shape2D {
     public MathVector2 getWorldMax() {
         if (!updated) update();
         return worldMax;
+    }
+
+    @Override
+    protected CollectionsArray<MathVector2> getWorldVertices() {
+        worldVertices.get(0).set(worldMin.x, worldMax.y);
+        worldVertices.get(0).set(worldMin);
+        worldVertices.get(0).set(worldMax.x, worldMin.y);
+        worldVertices.get(0).set(worldMax);
+        return worldVertices;
     }
 
     @Override

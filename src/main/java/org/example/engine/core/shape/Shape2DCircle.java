@@ -1,5 +1,6 @@
 package org.example.engine.core.shape;
 
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 
@@ -61,6 +62,11 @@ public class Shape2DCircle extends Shape2D {
     public float getWorldRadius() {
         if (!updated) update();
         return worldRadius;
+    }
+
+    @Override
+    protected CollectionsArray<MathVector2> getWorldVertices() {
+        throw new UnsupportedOperationException("Cannot get a world vertices list for " + Shape2DCircle.class.getSimpleName() + ": operation not supported. A circle: " + Shape2DCircle.class.getSimpleName() + " is only represented using a center: " + MathVector2.class.getSimpleName() + " and a radius: float.");
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.example.engine.core.shape;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.math.MathVector2;
 
 public class Shape2DComposite extends Shape2D {
 
@@ -48,6 +49,11 @@ public class Shape2DComposite extends Shape2D {
     @Override
     protected float getUnscaledArea() {
         return unscaledArea;
+    }
+
+    @Override
+    protected CollectionsArray<MathVector2> getWorldVertices() {
+        throw new UnsupportedOperationException("Cannot get a world vertices list for " + Shape2DComposite.class.getSimpleName() + ": operation not strictly defined.");
     }
 
     @Override
