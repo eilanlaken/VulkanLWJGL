@@ -140,10 +140,10 @@ public abstract class Shape2D {
     public final float angle() {
         return angle;
     }
-    public float scaleX() {
+    public final float scaleX() {
         return scaleX;
     }
-    public float scaleY() {
+    public final float scaleY() {
         return scaleY;
     }
 
