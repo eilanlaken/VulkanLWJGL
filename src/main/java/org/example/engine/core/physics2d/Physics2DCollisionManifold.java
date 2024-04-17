@@ -2,7 +2,7 @@ package org.example.engine.core.physics2d;
 
 import org.example.engine.core.math.MathVector2;
 
-public final class Physics2DWorldCollisionManifold {
+public final class Physics2DCollisionManifold {
 
     public Physics2DBody a;
     public Physics2DBody b;

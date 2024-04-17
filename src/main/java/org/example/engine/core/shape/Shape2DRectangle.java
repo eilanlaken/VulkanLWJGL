@@ -59,9 +59,7 @@ public class Shape2DRectangle extends Shape2D {
     }
 
     @Override
-    public boolean contains(float x, float y) {
-        if (!updated) update();
-
+    protected boolean containsPoint(float x, float y) {
         tmp1.set(c4).sub(c1);
         tmp2.set(x,y).sub(c1);
         float projection1 = tmp1.dot(tmp2);

@@ -21,6 +21,10 @@ public abstract class Shape2D {
     public final boolean contains(final MathVector2 point) {
         return contains(point.x, point.y);
     }
+    public final boolean contains(float x, float y) {
+        if (!updated) update();
+        return containsPoint(x, y);
+    }
 
     public final float getArea() {
         if (!areaUpdated) {
@@ -147,7 +151,7 @@ public abstract class Shape2D {
         return scaleY;
     }
 
-    public abstract boolean contains(float x, float y);
+    protected abstract boolean containsPoint(float x, float y);
     protected abstract void updateWorldCoordinates();
     protected abstract float getUnscaledArea();
     protected abstract float getUnscaledBoundingRadius();

@@ -39,8 +39,7 @@ public class Shape2DCircle extends Shape2D {
     }
 
     @Override
-    public boolean contains(float x, float y) {
-        if (!updated) update();
+    protected boolean containsPoint(float x, float y) {
         return (x - worldCenter.x) * (x - worldCenter.x) + (y - worldCenter.y) * (y - worldCenter.y) <= worldRadius * worldRadius;
     }
 

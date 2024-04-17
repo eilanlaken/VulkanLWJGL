@@ -37,11 +37,12 @@ public class Shape2DAABB extends Shape2D {
     }
 
     public MathVector2 getWorldCenter() {
+        if (!updated) update();
         return tmp.set(worldMin).add(worldMax).scl(0.5f);
     }
 
     @Override
-    public boolean contains(float x, float y) {
+    protected boolean containsPoint(float x, float y) {
         return x > worldMin.x && x < worldMax.x && y > worldMin.y && y < worldMax.y;
     }
 

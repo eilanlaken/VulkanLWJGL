@@ -14,9 +14,9 @@ import org.jetbrains.annotations.NotNull;
 // TODO: concave polygons and polygons with holes:
 // TODO: for now, simply support convex polygons, and concave polygons will be represented as compound shapes of convex polygons.
 // TODO: will need to create a great way (API, tools, ...) to intuitively create shapes
-public final class Physics2DWorldCollisionDetection {
+public final class Physics2DCollisionDetection {
 
-    private Physics2DWorldCollisionDetection() {}
+    private Physics2DCollisionDetection() {}
 
     public static boolean broadPhaseCollision(final Shape2D a, final Shape2D b) {
         final float dx = b.x() - a.x();
@@ -25,7 +25,7 @@ public final class Physics2DWorldCollisionDetection {
         return dx * dx + dy * dy < sum * sum;
     }
 
-    public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         // TODO: "sort" if order by expected frequency
         // circle vs **** //
         if (a.shape instanceof Shape2DCircle) {
@@ -47,7 +47,7 @@ public final class Physics2DWorldCollisionDetection {
     }
 
     /** AABB vs ____ **/
-    private static void AABBvsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    private static void AABBvsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         Shape2DAABB aabb1 = (Shape2DAABB) a.shape;
         Shape2DAABB aabb2 = (Shape2DAABB) b.shape;
 
@@ -61,7 +61,7 @@ public final class Physics2DWorldCollisionDetection {
         float x_overlap = MathUtils.intervalsOverlap(a_min.x, a_max.x, b_min.x, b_max.x);
         float y_overlap = MathUtils.intervalsOverlap(a_min.y, a_max.y, b_min.y, b_max.y);
 
-        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
         manifold.depth = Math.min(x_overlap, y_overlap);
         manifold.contactsCount = 2;
         if (x_overlap < y_overlap) {
@@ -82,30 +82,46 @@ public final class Physics2DWorldCollisionDetection {
         manifolds.add(manifold);
     }
 
-    private static void AABBvsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    private static void AABBvsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         circleVsAABB(b, a, manifolds);
     }
 
-    private static boolean AABBvsComplex(Shape2DAABB aabb, Shape2DComposite morphed, Physics2DWorldCollisionManifold manifold) {
+    private static boolean AABBvsComplex(Shape2DAABB aabb, Shape2DComposite morphed, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static void AABBvsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    private static void AABBvsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         Shape2DAABB aabb = (Shape2DAABB) a.shape;
         Shape2DPolygon polygon = (Shape2DPolygon) b.shape;
 
-        // aabb corners
-        MathVector2 aabb_min = aabb.getWorldMin();
-        MathVector2 aabb_max = aabb.getWorldMax();
+        // debug, delete
+        {
+            Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
+            manifolds.add(manifold);
+            manifold.normal = new MathVector2(0, 0);
+            manifold.contactPoint1 = new MathVector2();
 
-        // polygon corners
+            MathVector2 tail0 = polygon.getWorldVertex(0, null);
+            MathVector2 head0 = polygon.getWorldVertex(1, null);
+            MathVector2 axis = new MathVector2(head0).sub(tail0).nor();//rotate90(1);
+            MathVector2 tail_to_min = new MathVector2(aabb.getWorldMin().x - tail0.x, aabb.getWorldMin().y - tail0.y);
+            float dot = MathVector2.dot(axis, tail_to_min);
 
-        // SAT - x axis, y axis
-        float aabb_min_x = aabb_min.x;
-        float aabb_max_x = aabb_max.x;
-        float aabb_min_y = aabb_min.y;
-        float aabb_max_y = aabb_max.y;
+            manifold.contactPoint1.set(tail0.x + dot * axis.x, tail0.y + dot * axis.y);
+
+            if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
+                System.out.println("dot   " + dot);
+                System.out.println("len   " + head0.sub(tail0).len());
+            }
+
+        }
+
+        // SAT - AABB normals (x & y axis)
+        float aabb_min_x = aabb.getWorldMin().x;
+        float aabb_max_x = aabb.getWorldMax().x;
+        float aabb_min_y = aabb.getWorldMin().y;
+        float aabb_max_y = aabb.getWorldMax().y;
         float polygon_min_x = Float.MAX_VALUE;
         float polygon_max_x = -Float.MAX_VALUE;
         float polygon_min_y = Float.MAX_VALUE;
@@ -118,22 +134,50 @@ public final class Physics2DWorldCollisionDetection {
             if (y > polygon_max_y) polygon_max_y = y;
             if (y < polygon_min_y) polygon_min_y = y;
         }
-
         float x_overlap = MathUtils.intervalsOverlap(aabb_min_x, aabb_max_x, polygon_min_x, polygon_max_x);
         if (MathUtils.isZero(x_overlap)) return; // no collision
-
         float y_overlap = MathUtils.intervalsOverlap(aabb_min_y, aabb_max_y, polygon_min_y, polygon_max_y);
         if (MathUtils.isZero(y_overlap)) return; // no collision
 
-        // SAT - polygon normal axis
-        // TODO: continue
+        // SAT - polygon normals
+        // AABB corners
+        MathVector2 aabb_c1 = new MathVector2(aabb_min_x, aabb_max_y);
+        MathVector2 aabb_c2 = new MathVector2(aabb_min_x, aabb_min_y);
+        MathVector2 aabb_c3 = new MathVector2(aabb_max_x, aabb_min_y);
+        MathVector2 aabb_c4 = new MathVector2(aabb_max_x, aabb_max_y);
+        MathVector2 tail = new MathVector2();
+        MathVector2 head = new MathVector2();
+        MathVector2 normal = new MathVector2();
+        for (int i = 0; i < polygon.vertexCount; i++) {
+            polygon.getWorldEdge(i, tail, head);
+            normal.set(head).sub(tail).nor().rotate90(1);
+            // project aabb on the axis
+            float dot_c1 = MathVector2.dot(normal.x, normal.y, aabb_c1.x - tail.x, aabb_c1.y - tail.y);
+            float dot_c2 = MathVector2.dot(normal.x, normal.y, aabb_c2.x - tail.x, aabb_c2.y - tail.y);
+            float dot_c3 = MathVector2.dot(normal.x, normal.y, aabb_c3.x - tail.x, aabb_c3.y - tail.y);
+            float dot_c4 = MathVector2.dot(normal.x, normal.y, aabb_c4.x - tail.x, aabb_c4.y - tail.y);
+            float aabb_axis_min = MathUtils.min(dot_c1, dot_c2, dot_c3, dot_c4);
+            float aabb_axis_max = MathUtils.max(dot_c1, dot_c2, dot_c3, dot_c4);
+            // project polygon on the axis
+            float polygon_axis_min = Float.MAX_VALUE;
+            float polygon_axis_max = -Float.MAX_VALUE;
+            for (int j = 0; j < polygon.vertexCount; j++) {
+                MathVector2 vertex = polygon.getWorldVertex(j, null);
+                float dot = MathVector2.dot(normal.x, normal.y, vertex.x - tail.x, vertex.y - tail.y);
+                if (dot < polygon_axis_min) polygon_axis_min = dot;
+                if (dot > polygon_axis_max) polygon_axis_max = dot;
+            }
+
+            float axis_overlap = MathUtils.intervalsOverlap(aabb_axis_min, aabb_axis_max, polygon_axis_min, polygon_axis_max);
+            if (MathUtils.isZero(axis_overlap)) return;
+        }
 
         System.out.println("ok");
 
     }
 
     // TODO:
-    private static void AABBvsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    private static void AABBvsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         Shape2DAABB aabb = (Shape2DAABB) a.shape;
         Shape2DRectangle rect = (Shape2DRectangle) b.shape;
 
@@ -191,7 +235,7 @@ public final class Physics2DWorldCollisionDetection {
 
         // TODO: see if correct.
         // TODO: fix normal direction.
-        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
         setContactPoints(aabb, rect, manifold);
         float min_overlap = MathUtils.min(x_overlap, y_overlap, axis1_overlap, axis2_overlap);
         if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
@@ -204,7 +248,7 @@ public final class Physics2DWorldCollisionDetection {
 
     // TODO: fix penetration depth and normal direction.
     /** Circle vs ____ **/
-    private static void circleVsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    private static void circleVsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         Shape2DCircle circle = (Shape2DCircle) a.shape;
         Shape2DAABB aabb = (Shape2DAABB) b.shape;
 
@@ -222,7 +266,7 @@ public final class Physics2DWorldCollisionDetection {
 
         if (eX * eX + eY * eY > circleWorldRadius * circleWorldRadius) return;
 
-        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
         manifold.contactsCount = 1;
         manifold.normal = new MathVector2();
         manifold.contactPoint1 = new MathVector2();
@@ -251,7 +295,7 @@ public final class Physics2DWorldCollisionDetection {
         manifolds.add(manifold);
     }
 
-    private static void circleVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    private static void circleVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         Shape2DCircle c1 = (Shape2DCircle) a.shape;
         Shape2DCircle c2 = (Shape2DCircle) b.shape;
         final float dx = c2.x() - c1.x();
@@ -263,7 +307,7 @@ public final class Physics2DWorldCollisionDetection {
 
         final float distance = (float) Math.sqrt(distanceSquared);
 
-        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
         manifold.a = a;
         manifold.b = b;
         manifold.contactsCount = 1;
@@ -281,12 +325,12 @@ public final class Physics2DWorldCollisionDetection {
         manifolds.add(manifold);
     }
 
-    private static boolean circleVsMorphed(Shape2DCircle circle, Shape2DComposite morphed, Physics2DWorldCollisionManifold manifold) {
+    private static boolean circleVsMorphed(Shape2DCircle circle, Shape2DComposite morphed, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static void circleVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    private static void circleVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         Shape2DCircle circle = (Shape2DCircle) a.shape;
         Shape2DPolygon polygon = (Shape2DPolygon) b.shape;
 
@@ -326,7 +370,7 @@ public final class Physics2DWorldCollisionDetection {
         if (!collide) return;
 
         // build manifold
-        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
         MathVector2 projection = projections.get(closestProjectionIndex);
         manifold.contactPoint1 = new MathVector2(projection);
         final float minDstEdge = (float) Math.sqrt(minDistanceSquared);
@@ -340,7 +384,7 @@ public final class Physics2DWorldCollisionDetection {
         manifolds.add(manifold);
     }
 
-    private static void circleVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    private static void circleVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         Shape2DCircle circle = (Shape2DCircle) a.shape;
         Shape2DRectangle rect = (Shape2DRectangle) b.shape;
 
@@ -407,7 +451,7 @@ public final class Physics2DWorldCollisionDetection {
             projection = projection4;
         }
 
-        Physics2DWorldCollisionManifold manifold = new Physics2DWorldCollisionManifold();
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
         manifold.contactPoint1 = new MathVector2(projection);
         final float minDstEdge = (float) Math.sqrt(minDstEdgeSquared);
         if (rectContainsCenter) {
@@ -421,84 +465,84 @@ public final class Physics2DWorldCollisionDetection {
     }
 
     /** Morphed vs ___ **/
-    private static boolean morphedVsAABB(Shape2DComposite morphed, Shape2DAABB aabb, Physics2DWorldCollisionManifold manifold) {
+    private static boolean morphedVsAABB(Shape2DComposite morphed, Shape2DAABB aabb, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean morphedVsCircle(Shape2DComposite morphed, Shape2DCircle circle, Physics2DWorldCollisionManifold manifold) {
+    private static boolean morphedVsCircle(Shape2DComposite morphed, Shape2DCircle circle, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean morphedVsMorphed(Shape2DComposite morphed1, Shape2DComposite morphed2, Physics2DWorldCollisionManifold manifold) {
+    private static boolean morphedVsMorphed(Shape2DComposite morphed1, Shape2DComposite morphed2, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean morphedVsPolygon(Shape2DComposite morphed, Shape2DPolygon polygon, Physics2DWorldCollisionManifold manifold) {
+    private static boolean morphedVsPolygon(Shape2DComposite morphed, Shape2DPolygon polygon, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean morphedVsRectangle(Shape2DComposite morphed, Shape2DRectangle rectangle, Physics2DWorldCollisionManifold manifold) {
+    private static boolean morphedVsRectangle(Shape2DComposite morphed, Shape2DRectangle rectangle, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
     /** Polygon vs ____ **/
-    private static boolean polygonVsAABB(Shape2DPolygon polygon, Shape2DAABB aabb, Physics2DWorldCollisionManifold manifold) {
+    private static boolean polygonVsAABB(Shape2DPolygon polygon, Shape2DAABB aabb, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean polygonVsCircle(Shape2DPolygon polygon, Shape2DCircle circle, Physics2DWorldCollisionManifold manifold) {
+    private static boolean polygonVsCircle(Shape2DPolygon polygon, Shape2DCircle circle, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean polygonVsMorphed(Shape2DPolygon polygon, Shape2DComposite morphed, Physics2DWorldCollisionManifold manifold) {
+    private static boolean polygonVsMorphed(Shape2DPolygon polygon, Shape2DComposite morphed, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean polygonVsPolygon(Shape2DPolygon p1, Shape2DPolygon p2, Physics2DWorldCollisionManifold manifold) {
+    private static boolean polygonVsPolygon(Shape2DPolygon p1, Shape2DPolygon p2, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean polygonVsRectangle(Shape2DPolygon polygon, Shape2DRectangle rectangle, Physics2DWorldCollisionManifold manifold) {
+    private static boolean polygonVsRectangle(Shape2DPolygon polygon, Shape2DRectangle rectangle, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
     /** Rectangle vs ____ **/
-    private static boolean rectangleVsAABB(Shape2DRectangle rectangle, Shape2DAABB aabb, Physics2DWorldCollisionManifold manifold) {
+    private static boolean rectangleVsAABB(Shape2DRectangle rectangle, Shape2DAABB aabb, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static void rectangleVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorldCollisionManifold> manifolds) {
+    private static void rectangleVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         System.out.println("ggg");
     }
 
-    private static boolean rectangleVsMorphed(Shape2DRectangle rectangle, Shape2DComposite morphed, Physics2DWorldCollisionManifold manifold) {
+    private static boolean rectangleVsMorphed(Shape2DRectangle rectangle, Shape2DComposite morphed, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean rectangleVsPolygon(Shape2DRectangle rectangle, Shape2DPolygon polygon, Physics2DWorldCollisionManifold manifold) {
+    private static boolean rectangleVsPolygon(Shape2DRectangle rectangle, Shape2DPolygon polygon, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
-    private static boolean rectangleVsRectangle(Shape2DRectangle r1, Shape2DRectangle r2, Physics2DWorldCollisionManifold manifold) {
+    private static boolean rectangleVsRectangle(Shape2DRectangle r1, Shape2DRectangle r2, Physics2DCollisionManifold manifold) {
 
         return false;
     }
 
     // TODO: continue and fix
-    private static void setContactPoints(Shape2DAABB aabb, Shape2DRectangle rect, Physics2DWorldCollisionManifold manifold) {
+    private static void setContactPoints(Shape2DAABB aabb, Shape2DRectangle rect, Physics2DCollisionManifold manifold) {
         MathVector2 aabb_worldMin = aabb.getWorldMin();
         MathVector2 aabb_worldMax = aabb.getWorldMax();
 
@@ -624,7 +668,7 @@ public final class Physics2DWorldCollisionDetection {
         }
 
         @Override
-        public int compareTo(@NotNull Physics2DWorldCollisionDetection.Projection o) {
+        public int compareTo(@NotNull Physics2DCollisionDetection.Projection o) {
             return Float.compare(this.dst, o.dst);
         }
 

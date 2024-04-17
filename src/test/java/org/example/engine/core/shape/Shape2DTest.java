@@ -15,7 +15,7 @@ class Shape2DTest {
     private void setup() {
         shape = new Shape2D() {
             @Override
-            public boolean contains(float x, float y) {
+            public boolean containsPoint(float x, float y) {
                 return false;
             }
 

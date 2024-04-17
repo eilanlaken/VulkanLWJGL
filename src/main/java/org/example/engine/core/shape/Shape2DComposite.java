@@ -19,9 +19,9 @@ public class Shape2DComposite extends Shape2D {
     }
 
     @Override
-    public boolean contains(float x, float y) {
+    protected boolean containsPoint(float x, float y) {
         for (Shape2D shape : shapes)
-            if (shape.contains(x, y)) return true;
+            if (shape.containsPoint(x, y)) return true;
         return false;
     }
 

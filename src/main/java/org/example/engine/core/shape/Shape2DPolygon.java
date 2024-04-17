@@ -93,8 +93,7 @@ public class Shape2DPolygon extends Shape2D {
     }
 
     @Override
-    public boolean contains(float x, float y) {
-        if (!updated) update();
+    protected boolean containsPoint(float x, float y) {
         boolean inside = false;
         for (int i = 0, j = worldVertices.length - 2; i < worldVertices.length; i += 2) {
             float x1 = worldVertices[i];
