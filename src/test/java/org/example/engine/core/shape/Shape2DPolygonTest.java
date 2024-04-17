@@ -91,28 +91,6 @@ class Shape2DPolygonTest {
     }
 
     @Test
-    void getWorldVertex() {
-        Shape2DPolygon polygon1 = new Shape2DPolygon(new float[] {2,1,1,2,-1,2,-2,1,-2,-1,-1,-2,1,-2,2,-1});
-
-        MathVector2 vertex1 = new MathVector2();
-        polygon1.getWorldVertex(0, vertex1);
-        Assertions.assertEquals(vertex1.x, 2.0f, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(vertex1.y, 1.0f, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(polygon1.getWorldVertex(0,null).x, 2.0f, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(polygon1.getWorldVertex(0,null).y, 1.0f, MathUtils.FLOAT_ROUNDING_ERROR);
-
-        MathVector2 vertex2 = new MathVector2();
-        polygon1.getWorldVertex(-1, vertex2);
-        Assertions.assertEquals(vertex2.x, 2.0f, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(vertex2.y, -1.0f, MathUtils.FLOAT_ROUNDING_ERROR);
-
-        MathVector2 vertex3 = new MathVector2();
-        polygon1.getWorldVertex(9, vertex3);
-        Assertions.assertEquals(vertex3.x, 1.0f, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(vertex3.y, 2.0f, MathUtils.FLOAT_ROUNDING_ERROR);
-    }
-
-    @Test
     void testGetVertexX() {
     }
 

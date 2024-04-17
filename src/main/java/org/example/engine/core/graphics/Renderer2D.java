@@ -1,5 +1,6 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.*;
 import org.example.engine.core.memory.MemoryResourceHolder;
 import org.example.engine.core.shape.*;
@@ -220,11 +221,13 @@ public class Renderer2D implements MemoryResourceHolder {
         polygon.update();
 
         float t = tint == null ? WHITE_TINT : tint.toFloatBits();
-        final float[] worldPoints = polygon.getWorldVertices_flat();
 
-        for (int i = 0; i < worldPoints.length - 1; i += 2) {
-            verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(t).put(0.5f).put(0.5f);
+        final CollectionsArray<MathVector2> worldVertices = polygon.worldVertices();
+
+        for (MathVector2 vertex : worldVertices) {
+            verticesBuffer.put(vertex.x).put(vertex.y).put(t).put(0.5f).put(0.5f);
         }
+
         vertexIndex += polygon.vertexCount * 5;
     }
 
@@ -441,11 +444,12 @@ public class Renderer2D implements MemoryResourceHolder {
         }
         triangleIndex += polygon.indices.length * 2;
 
-        polygon.update();
-        final float[] worldPoints = polygon.getWorldVertices_flat();
-        for (int i = 0; i < worldPoints.length - 1; i += 2) {
-            verticesBuffer.put(worldPoints[i]).put(worldPoints[i+1]).put(tintFloatBits).put(0.5f).put(0.5f);
+        final CollectionsArray<MathVector2> worldVertices = polygon.worldVertices();
+
+        for (MathVector2 vertex : worldVertices) {
+            verticesBuffer.put(vertex.x).put(vertex.y).put(tintFloatBits).put(0.5f).put(0.5f);
         }
+
         vertexIndex += polygon.vertexCount * 5;
     }
 

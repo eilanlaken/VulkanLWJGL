@@ -104,9 +104,9 @@ public final class Physics2DCollisionDetection {
         float polygon_max_x = -Float.MAX_VALUE;
         float polygon_min_y = Float.MAX_VALUE;
         float polygon_max_y = -Float.MAX_VALUE;
-        for (int i = 0; i < polygon.vertexCount; i++) {
-            float x = polygon.getWorldVertexX(i);
-            float y = polygon.getWorldVertexY(i);
+        for (MathVector2 vertex : polygon.worldVertices()) {
+            float x = vertex.x;
+            float y = vertex.y;
             if (x > polygon_max_x) polygon_max_x = x;
             if (x < polygon_min_x) polygon_min_x = x;
             if (y > polygon_max_y) polygon_max_y = y;
@@ -139,8 +139,8 @@ public final class Physics2DCollisionDetection {
             // project polygon on the axis
             float polygon_axis_min = Float.MAX_VALUE;
             float polygon_axis_max = -Float.MAX_VALUE;
-            for (int j = 0; j < polygon.vertexCount; j++) {
-                MathVector2 vertex = polygon.getWorldVertex(j, null);
+            CollectionsArray<MathVector2> worldVertices = polygon.worldVertices();
+            for (MathVector2 vertex : worldVertices) {
                 float dot = MathVector2.dot(normal.x, normal.y, vertex.x - tail.x, vertex.y - tail.y);
                 if (dot < polygon_axis_min) polygon_axis_min = dot;
                 if (dot > polygon_axis_max) polygon_axis_max = dot;

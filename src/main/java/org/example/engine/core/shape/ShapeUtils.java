@@ -240,18 +240,18 @@ public final class ShapeUtils {
         MathVector2 tmp1 = new MathVector2();
         MathVector2 tmp2 = new MathVector2();
 
-        tmp1.set(Shape2DPolygon.getVertexX(0, vertices), Shape2DPolygon.getVertexY(0, vertices))
-                .sub(Shape2DPolygon.getVertexX(-1, vertices), Shape2DPolygon.getVertexY(-1, vertices));
-        tmp2.set(Shape2DPolygon.getVertexX(+1, vertices), Shape2DPolygon.getVertexY(+1, vertices))
-                .sub(Shape2DPolygon.getVertexX(0, vertices), Shape2DPolygon.getVertexY(0, vertices));
+        tmp1.set(getVertexX(0, vertices), getVertexY(0, vertices))
+                .sub(getVertexX(-1, vertices), getVertexY(-1, vertices));
+        tmp2.set(getVertexX(+1, vertices), getVertexY(+1, vertices))
+                .sub(getVertexX(0, vertices), getVertexY(0, vertices));
 
         float crossSign = Math.signum(tmp1.crs(tmp2));
 
         for (int i = 1; i < vertices.length; i++) {
-            tmp1.set(Shape2DPolygon.getVertexX(i, vertices), Shape2DPolygon.getVertexY(i, vertices))
-                    .sub(Shape2DPolygon.getVertexX(i-1, vertices), Shape2DPolygon.getVertexY(i-1, vertices));
-            tmp2.set(Shape2DPolygon.getVertexX(i+1, vertices), Shape2DPolygon.getVertexY(i+1, vertices))
-                    .sub(Shape2DPolygon.getVertexX(i, vertices), Shape2DPolygon.getVertexY(i, vertices));
+            tmp1.set(getVertexX(i, vertices), getVertexY(i, vertices))
+                    .sub(getVertexX(i-1, vertices), getVertexY(i-1, vertices));
+            tmp2.set(getVertexX(i+1, vertices), getVertexY(i+1, vertices))
+                    .sub(getVertexX(i, vertices), getVertexY(i, vertices));
             float crossSignCurrent = Math.signum(tmp1.crs(tmp2));
             if (crossSignCurrent != crossSign) return false;
         }
@@ -911,6 +911,20 @@ public final class ShapeUtils {
             last.next = p;
         }
         return p;
+    }
+
+    private static float getVertexX(int index, float[] vertices) {
+        int n2 = vertices.length / 2;
+        if (index >= n2) return vertices[(index % n2) * 2];
+        else if (index < 0) return vertices[(index % n2 + n2) * 2];
+        return vertices[index * 2];
+    }
+
+    private static float getVertexY(int index, float[] vertices) {
+        int n2 = vertices.length / 2;
+        if (index >= n2) return vertices[(index % n2) * 2 + 1];
+        else if (index < 0) return vertices[(index % n2 + n2) * 2 + 1];
+        return vertices[index * 2 + 1];
     }
 
     private static float signedArea(float[] data, int start, int end, int dim) {
