@@ -48,17 +48,6 @@ public abstract class Shape2D {
         return boundingRadiusSquared;
     }
 
-    protected void forceUpdateArea() {
-        area = getUnscaledArea() * Math.abs(scaleX) * Math.abs(scaleY);
-        areaUpdated = true;
-    }
-
-    protected void forceUpdateBoundingRadius() {
-        boundingRadius = getUnscaledBoundingRadius() * Math.max(Math.abs(scaleX), Math.abs(scaleY));
-        boundingRadiusSquared = boundingRadius * boundingRadius;
-        boundingRadiusUpdated = true;
-    }
-
     public final void update() {
         if (updated) return;
         updateWorldCoordinates();
