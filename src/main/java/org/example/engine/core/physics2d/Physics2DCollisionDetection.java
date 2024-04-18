@@ -552,18 +552,74 @@ public final class Physics2DCollisionDetection {
         MathVector2 rect2_c2 = rect2.c2();
         MathVector2 rect2_c3 = rect2.c3();
 
+
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
+        manifolds.add(manifold);
+        manifold.normal = new MathVector2();
+
+        MathVector2 axis = new MathVector2();
+
         // rect1 axis1: c1-c2 axis
         {
-            float ax = rect1_c2.x - rect1_c1.x;
-            float ay = rect1_c2.y - rect1_c1.y;
+            axis.set(rect2_c2.x - rect2_c1.x, rect2_c2.y - rect2_c1.y).nor();
+            float rect1_c0_axis = MathVector2.dot(axis.x, axis.y, rect1_c0.x - rect2_c1.x, rect1_c0.y - rect2_c1.y);
+            float rect1_c1_axis = MathVector2.dot(axis.x, axis.y, rect1_c1.x - rect2_c1.x, rect1_c1.y - rect2_c1.y);
+            float rect1_c2_axis = MathVector2.dot(axis.x, axis.y, rect1_c2.x - rect2_c1.x, rect1_c2.y - rect2_c1.y);
+            float rect1_c3_axis = MathVector2.dot(axis.x, axis.y, rect1_c3.x - rect2_c1.x, rect1_c3.y - rect2_c1.y);
+            float rect1_min_axis = MathUtils.min(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
+            float rect1_max_axis = MathUtils.max(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
+            float axis_overlap = MathUtils.intervalsOverlap(rect1_min_axis, rect1_max_axis, 0, rect2.unscaledWidth * rect2.scaleX());
+
+            manifold.contactPoint1 = new MathVector2(axis).scl(rect1_min_axis).add(rect2_c1.x, rect2_c1.y);
+            manifold.contactPoint2 = new MathVector2(axis).scl(rect1_max_axis).add(rect2_c1.x, rect2_c1.y);
+
+            if (MathUtils.isZero(axis_overlap)) return; // no collision
+        }
+
+        if (true) return;
+
+        // rect1 axis2: c2-c3 axis
+        {
+            float ax = rect1_c3.x - rect1_c2.x;
+            float ay = rect1_c3.y - rect1_c2.y;
             float aLen = MathVector2.len(ax, ay);
-            float rect2_c0_axis = MathVector2.dot(ax, ay, rect2_c0.x - rect1_c1.x, rect2_c0.y - rect1_c1.y) / aLen;
-            float rect2_c1_axis = MathVector2.dot(ax, ay, rect2_c1.x - rect1_c1.x, rect2_c1.y - rect1_c1.y) / aLen;
-            float rect2_c2_axis = MathVector2.dot(ax, ay, rect2_c2.x - rect1_c1.x, rect2_c2.y - rect1_c1.y) / aLen;
-            float rect2_c3_axis = MathVector2.dot(ax, ay, rect2_c3.x - rect1_c1.x, rect2_c3.y - rect1_c1.y) / aLen;
+            float rect2_c0_axis = MathVector2.dot(ax, ay, rect2_c0.x - rect1_c2.x, rect2_c0.y - rect1_c2.y) / aLen;
+            float rect2_c1_axis = MathVector2.dot(ax, ay, rect2_c1.x - rect1_c2.x, rect2_c1.y - rect1_c2.y) / aLen;
+            float rect2_c2_axis = MathVector2.dot(ax, ay, rect2_c2.x - rect1_c2.x, rect2_c2.y - rect1_c2.y) / aLen;
+            float rect2_c3_axis = MathVector2.dot(ax, ay, rect2_c3.x - rect1_c2.x, rect2_c3.y - rect1_c2.y) / aLen;
             float rect2_min_axis = MathUtils.min(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
             float rect2_max_axis = MathUtils.max(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
-            float axis_overlap = MathUtils.intervalsOverlap(rect2_min_axis, rect2_max_axis, 0, rect1.unscaledWidth * rect1.scaleX());
+            float axis_overlap = MathUtils.intervalsOverlap(rect2_min_axis, rect2_max_axis, 0, rect1.unscaledHeight * rect1.scaleY());
+            if (MathUtils.isZero(axis_overlap)) return; // no collision
+        }
+
+        // rect2 axis1: c1-c2 axis
+        {
+            float ax = rect2_c2.x - rect2_c1.x;
+            float ay = rect2_c2.y - rect2_c1.y;
+            float aLen = MathVector2.len(ax, ay);
+            float rect1_c0_axis = MathVector2.dot(ax, ay, rect1_c0.x - rect2_c1.x, rect1_c0.y - rect2_c2.y) / aLen;
+            float rect1_c1_axis = MathVector2.dot(ax, ay, rect1_c1.x - rect2_c2.x, rect1_c1.y - rect2_c2.y) / aLen;
+            float rect1_c2_axis = MathVector2.dot(ax, ay, rect1_c2.x - rect2_c2.x, rect1_c2.y - rect2_c2.y) / aLen;
+            float rect1_c3_axis = MathVector2.dot(ax, ay, rect1_c3.x - rect2_c2.x, rect1_c3.y - rect2_c2.y) / aLen;
+            float rect1_min_axis = MathUtils.min(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
+            float rect1_max_axis = MathUtils.max(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
+            float axis_overlap = MathUtils.intervalsOverlap(rect1_min_axis, rect1_max_axis, 0, rect2.unscaledWidth * rect2.scaleX());
+            if (MathUtils.isZero(axis_overlap)) return; // no collision
+        }
+
+        // rect2 axis2: c2-c3 axis
+        {
+            float ax = rect2_c3.x - rect2_c2.x;
+            float ay = rect2_c3.y - rect2_c2.y;
+            float aLen = MathVector2.len(ax, ay);
+            float rect1_c0_axis = MathVector2.dot(ax, ay, rect1_c0.x - rect2_c2.x, rect1_c0.y - rect2_c2.y) / aLen;
+            float rect1_c1_axis = MathVector2.dot(ax, ay, rect1_c1.x - rect2_c2.x, rect1_c1.y - rect2_c2.y) / aLen;
+            float rect1_c2_axis = MathVector2.dot(ax, ay, rect1_c2.x - rect2_c2.x, rect1_c2.y - rect2_c2.y) / aLen;
+            float rect1_c3_axis = MathVector2.dot(ax, ay, rect1_c3.x - rect2_c2.x, rect1_c3.y - rect2_c2.y) / aLen;
+            float rect1_min_axis = MathUtils.min(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
+            float rect1_max_axis = MathUtils.max(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
+            float axis_overlap = MathUtils.intervalsOverlap(rect1_min_axis, rect1_max_axis, 0, rect2.unscaledHeight * rect2.scaleY());
             if (MathUtils.isZero(axis_overlap)) return; // no collision
         }
 
