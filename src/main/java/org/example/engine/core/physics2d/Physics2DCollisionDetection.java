@@ -518,11 +518,11 @@ public final class Physics2DCollisionDetection {
 
     /** Rectangle vs ____ **/
     private static void rectangleVsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
-
+        AABBvsRectangle(b, a, manifolds);
     }
 
     private static void rectangleVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
-        System.out.println("ggg");
+        circleVsRectangle(b, a, manifolds);
     }
 
     private static boolean rectangleVsMorphed(Shape2DRectangle rectangle, Shape2DComposite morphed, Physics2DCollisionManifold manifold) {
@@ -535,7 +535,10 @@ public final class Physics2DCollisionDetection {
     }
 
     private static void rectangleVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
+        Shape2DRectangle rect1 = (Shape2DRectangle) a.shape;
+        Shape2DRectangle rect2 = (Shape2DRectangle) b.shape;
 
+        System.out.println("collide");
     }
 
     private static void setContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB, Physics2DCollisionManifold manifold) {
@@ -595,18 +598,10 @@ public final class Physics2DCollisionDetection {
         }
 
         @Override
-        public int compareTo(@NotNull Physics2DCollisionDetection.Projection o) {
-            return Float.compare(this.dst, o.dst);
+        public int compareTo(@NotNull Physics2DCollisionDetection.Projection other) {
+            return Float.compare(this.dst, other.dst);
         }
 
-        // TODO: delete
-        @Override
-        public String toString() {
-            return "Projection{" +
-                    "p=" + p +
-                    ", dst=" + dst +
-                    '}';
-        }
     }
 
 }

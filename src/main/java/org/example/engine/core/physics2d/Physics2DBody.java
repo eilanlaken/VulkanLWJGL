@@ -10,6 +10,8 @@ public final class Physics2DBody {
     public boolean active;
 
     public Type type;
+    // TODO: should be protected, internal data. For example
+    // TODO: concave polygons will be converted to morphed shapes.
     public Shape2D shape;
     public MathVector2 velocity;
     public float angularVelocity;
