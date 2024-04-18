@@ -177,6 +177,7 @@ public final class Physics2DCollisionDetection {
     }
 
     // TODO: revise
+    // reference
     private static void AABBvsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         Shape2DAABB aabb = (Shape2DAABB) a.shape;
         Shape2DRectangle rect = (Shape2DRectangle) b.shape;
@@ -186,50 +187,50 @@ public final class Physics2DCollisionDetection {
         MathVector2 aabb_max = aabb.getWorldMax();
 
         // rect corners
-        MathVector2 c1 = rect.c0();
-        MathVector2 c2 = rect.c1();
-        MathVector2 c3 = rect.c2();
-        MathVector2 c4 = rect.c3();
+        MathVector2 c0 = rect.c0();
+        MathVector2 c1 = rect.c1();
+        MathVector2 c2 = rect.c2();
+        MathVector2 c3 = rect.c3();
 
         // SAT - x axis
         float aabb_min_x = aabb_min.x;
         float aabb_max_x = aabb_max.x;
-        float rect_min_x = MathUtils.min(c1.x, c2.x, c3.x, c4.x);
-        float rect_max_x = MathUtils.max(c1.x, c2.x, c3.x, c4.x);
+        float rect_min_x = MathUtils.min(c0.x, c1.x, c2.x, c3.x);
+        float rect_max_x = MathUtils.max(c0.x, c1.x, c2.x, c3.x);
         float x_overlap = MathUtils.intervalsOverlap(aabb_min_x, aabb_max_x, rect_min_x, rect_max_x);
         if (MathUtils.isZero(x_overlap)) return; // no collision
 
         // SAT - y axis
         float aabb_min_y = aabb_min.y;
         float aabb_max_y = aabb_max.y;
-        float rect_min_y = MathUtils.min(c1.y, c2.y, c3.y, c4.y);
-        float rect_max_y = MathUtils.max(c1.y, c2.y, c3.y, c4.y);
+        float rect_min_y = MathUtils.min(c0.y, c1.y, c2.y, c3.y);
+        float rect_max_y = MathUtils.max(c0.y, c1.y, c2.y, c3.y);
         float y_overlap = MathUtils.intervalsOverlap(aabb_min_y, aabb_max_y, rect_min_y, rect_max_y);
         if (MathUtils.isZero(y_overlap)) return; // no collision
 
         // c1-c2 axis
-        float ax = c3.x - c2.x;
-        float ay = c3.y - c2.y;
+        float ax = c2.x - c1.x;
+        float ay = c2.y - c1.y;
         float aLen = MathVector2.len(ax, ay);
-        float aabb_c1_axis1 = MathVector2.dot(ax, ay, aabb_min.x - c2.x, aabb_max.y - c2.y) / aLen;
-        float aabb_c2_axis1 = MathVector2.dot(ax, ay, aabb_min.x - c2.x, aabb_min.y - c2.y) / aLen;
-        float aabb_c3_axis1 = MathVector2.dot(ax, ay, aabb_max.x - c2.x, aabb_min.y - c2.y) / aLen;
-        float aabb_c4_axis1 = MathVector2.dot(ax, ay, aabb_max.x - c2.x, aabb_max.y - c2.y) / aLen;
-        float aabb_min_axis1 = MathUtils.min(aabb_c1_axis1, aabb_c2_axis1, aabb_c3_axis1, aabb_c4_axis1);
-        float aabb_max_axis1 = MathUtils.max(aabb_c1_axis1, aabb_c2_axis1, aabb_c3_axis1, aabb_c4_axis1);
+        float aabb_c0_axis1 = MathVector2.dot(ax, ay, aabb_min.x - c1.x, aabb_max.y - c1.y) / aLen;
+        float aabb_c1_axis1 = MathVector2.dot(ax, ay, aabb_min.x - c1.x, aabb_min.y - c1.y) / aLen;
+        float aabb_c2_axis1 = MathVector2.dot(ax, ay, aabb_max.x - c1.x, aabb_min.y - c1.y) / aLen;
+        float aabb_c3_axis1 = MathVector2.dot(ax, ay, aabb_max.x - c1.x, aabb_max.y - c1.y) / aLen;
+        float aabb_min_axis1 = MathUtils.min(aabb_c0_axis1, aabb_c1_axis1, aabb_c2_axis1, aabb_c3_axis1);
+        float aabb_max_axis1 = MathUtils.max(aabb_c0_axis1, aabb_c1_axis1, aabb_c2_axis1, aabb_c3_axis1);
         float axis1_overlap = MathUtils.intervalsOverlap(aabb_min_axis1, aabb_max_axis1, 0, rect.unscaledWidth * rect.scaleX());
         if (MathUtils.isZero(axis1_overlap)) return; // no collision
 
         // c2-c3 axis
-        float bx = c4.x - c3.x;
-        float by = c4.y - c3.y;
+        float bx = c3.x - c2.x;
+        float by = c3.y - c2.y;
         float bLen = MathVector2.len(bx, by);
-        float aabb_c1_axis2 = MathVector2.dot(bx, by, aabb_min.x - c3.x, aabb_max.y - c3.y) / bLen;
-        float aabb_c2_axis2 = MathVector2.dot(bx, by, aabb_min.x - c3.x, aabb_min.y - c3.y) / bLen;
-        float aabb_c3_axis2 = MathVector2.dot(bx, by, aabb_max.x - c3.x, aabb_min.y - c3.y) / bLen;
-        float aabb_c4_axis2 = MathVector2.dot(bx, by, aabb_max.x - c3.x, aabb_max.y - c3.y) / bLen;
-        float aabb_min_axis2 = MathUtils.min(aabb_c1_axis2, aabb_c2_axis2, aabb_c3_axis2, aabb_c4_axis2);
-        float aabb_max_axis2 = MathUtils.max(aabb_c1_axis2, aabb_c2_axis2, aabb_c3_axis2, aabb_c4_axis2);
+        float aabb_c0_axis2 = MathVector2.dot(bx, by, aabb_min.x - c2.x, aabb_max.y - c2.y) / bLen;
+        float aabb_c1_axis2 = MathVector2.dot(bx, by, aabb_min.x - c2.x, aabb_min.y - c2.y) / bLen;
+        float aabb_c2_axis2 = MathVector2.dot(bx, by, aabb_max.x - c2.x, aabb_min.y - c2.y) / bLen;
+        float aabb_c3_axis2 = MathVector2.dot(bx, by, aabb_max.x - c2.x, aabb_max.y - c2.y) / bLen;
+        float aabb_min_axis2 = MathUtils.min(aabb_c0_axis2, aabb_c1_axis2, aabb_c2_axis2, aabb_c3_axis2);
+        float aabb_max_axis2 = MathUtils.max(aabb_c0_axis2, aabb_c1_axis2, aabb_c2_axis2, aabb_c3_axis2);
         float axis2_overlap = MathUtils.intervalsOverlap(aabb_min_axis2, aabb_max_axis2, 0, rect.unscaledHeight * rect.scaleY());
         if (MathUtils.isZero(axis2_overlap)) return; // no collision
 
@@ -534,11 +535,41 @@ public final class Physics2DCollisionDetection {
 
     }
 
+    // TODO: implement.
     private static void rectangleVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
         Shape2DRectangle rect1 = (Shape2DRectangle) a.shape;
         Shape2DRectangle rect2 = (Shape2DRectangle) b.shape;
 
-        System.out.println("collide");
+        // rect1 corners
+        MathVector2 rect1_c0 = rect1.c0();
+        MathVector2 rect1_c1 = rect1.c1();
+        MathVector2 rect1_c2 = rect1.c2();
+        MathVector2 rect1_c3 = rect1.c3();
+
+        // rect2 corners
+        MathVector2 rect2_c0 = rect2.c0();
+        MathVector2 rect2_c1 = rect2.c1();
+        MathVector2 rect2_c2 = rect2.c2();
+        MathVector2 rect2_c3 = rect2.c3();
+
+        // rect1 axis1: c1-c2 axis
+        {
+            float ax = rect1_c2.x - rect1_c1.x;
+            float ay = rect1_c2.y - rect1_c1.y;
+            float aLen = MathVector2.len(ax, ay);
+            float rect2_c0_axis = MathVector2.dot(ax, ay, rect2_c0.x - rect1_c1.x, rect2_c0.y - rect1_c1.y) / aLen;
+            float rect2_c1_axis = MathVector2.dot(ax, ay, rect2_c1.x - rect1_c1.x, rect2_c1.y - rect1_c1.y) / aLen;
+            float rect2_c2_axis = MathVector2.dot(ax, ay, rect2_c2.x - rect1_c1.x, rect2_c2.y - rect1_c1.y) / aLen;
+            float rect2_c3_axis = MathVector2.dot(ax, ay, rect2_c3.x - rect1_c1.x, rect2_c3.y - rect1_c1.y) / aLen;
+            float rect2_min_axis = MathUtils.min(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
+            float rect2_max_axis = MathUtils.max(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
+            float axis_overlap = MathUtils.intervalsOverlap(rect2_min_axis, rect2_max_axis, 0, rect1.unscaledWidth * rect1.scaleX());
+            if (MathUtils.isZero(axis_overlap)) return; // no collision
+        }
+
+        System.out.println("ok");
+
+
     }
 
     private static void setContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB, Physics2DCollisionManifold manifold) {

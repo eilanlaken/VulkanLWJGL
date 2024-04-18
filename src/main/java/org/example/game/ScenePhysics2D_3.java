@@ -53,7 +53,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
         body = world.createBody(rectangle, new MathVector2(0,0),0, new MathVector2(0.f, 0));
         //world.createBody(otherCircle, new MathVector2(3,1.5f), 0, new MathVector2(0.f, 0));
         //world.createBody(otherAABB, new MathVector2(0, 0), 0, new MathVector2(0.f, 0));
-        world.createBody(otherRectangle, new MathVector2(0,0.0f), 30, new MathVector2(0.f, 0));
+        world.createBody(otherRectangle, new MathVector2(0,0.0f), 0, new MathVector2(0.f, 0));
         //world.createBody(otherPolygonConvex, new MathVector2(0.0f,0f), 0, new MathVector2(0.f, 0));
 
     }

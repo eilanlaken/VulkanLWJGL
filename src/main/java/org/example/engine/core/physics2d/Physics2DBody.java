@@ -57,7 +57,7 @@ public final class Physics2DBody {
     }
 
     public void setVelocity(float x, float y) {
-
+        velocity.set(x, y);
     }
 
     public void dx_dy_rot(float dx, float dy, float da) {
