@@ -81,9 +81,9 @@ public class Shape2DAABB extends Shape2D {
     @Override
     protected CollectionsArray<MathVector2> getWorldVertices() {
         worldVertices.get(0).set(worldMin.x, worldMax.y);
-        worldVertices.get(0).set(worldMin);
-        worldVertices.get(0).set(worldMax.x, worldMin.y);
-        worldVertices.get(0).set(worldMax);
+        worldVertices.get(1).set(worldMin);
+        worldVertices.get(2).set(worldMax.x, worldMin.y);
+        worldVertices.get(3).set(worldMax);
         return worldVertices;
     }
 
