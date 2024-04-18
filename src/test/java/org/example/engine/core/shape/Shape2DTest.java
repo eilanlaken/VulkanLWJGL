@@ -66,7 +66,7 @@ class Shape2DTest {
     void dy() {
         shape.dy(Float.MAX_VALUE);
         Assertions.assertEquals(0.0,     shape.x(), MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(Float.MAX_VALUE, shape.y(), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(Float.MAX_VALUE,  shape.y(), MathUtils.FLOAT_ROUNDING_ERROR);
         shape.dy(-Float.MAX_VALUE);
         Assertions.assertEquals(0.0f, shape.y(),    MathUtils.FLOAT_ROUNDING_ERROR);
     }

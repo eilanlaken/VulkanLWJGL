@@ -155,15 +155,15 @@ public final class Physics2DCollisionDetection {
 
         // TODO: see if correct.
         // TODO: fix normal direction.
-//        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
-//        setContactPoints(aabb, rect, manifold);
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
+        setContactPoints(aabb.worldVertices(), polygon.worldVertices(), manifold);
 //        float min_overlap = MathUtils.min(x_overlap, y_overlap, axis1_overlap, axis2_overlap);
 //        if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
 //        else if (MathUtils.isEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
 //        else if (MathUtils.isEqual(min_overlap, axis1_overlap)) manifold.normal = new MathVector2(ax, ay).nor();
-//        else manifold.normal = new MathVector2(bx, by).nor();
-//        manifold.depth = min_overlap;
-//        manifolds.add(manifold);
+        manifold.normal = new MathVector2(1, 1).nor();
+        manifold.depth = 1;
+        manifolds.add(manifold);
 
     }
 

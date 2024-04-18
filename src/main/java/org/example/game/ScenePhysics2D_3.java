@@ -38,7 +38,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
     @Override
     public void show() {
-        aabb = new Shape2DAABB(3f,2f);
+        aabb = new Shape2DAABB(1f,0.75f);
         otherCircle = new Shape2DCircle(1.5f,0,0);
         otherAABB = new Shape2DAABB(4, 2);
         otherRectangle = new Shape2DRectangle(4.5f,2.2f);
