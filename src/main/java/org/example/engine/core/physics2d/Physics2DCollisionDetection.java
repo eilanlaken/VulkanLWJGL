@@ -1,7 +1,6 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.*;
 import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.NotNull;
@@ -37,10 +36,19 @@ public final class Physics2DCollisionDetection {
         }
 
         // AABB vs **** //
+        if (a.shape instanceof Shape2DRectangle) {
+            if      (b.shape instanceof Shape2DCircle)    rectangleVsCircle(a,    b, manifolds);
+            else if (b.shape instanceof Shape2DRectangle) rectangleVsRectangle(a, b, manifolds);
+            else if (b.shape instanceof Shape2DAABB)      rectangleVsAABB(a,      b, manifolds);
+            else if (b.shape instanceof Shape2DPolygon)   rectangleVsPolygon(a,   b, manifolds);
+            return;
+        }
+
+        // AABB vs **** //
         if (a.shape instanceof Shape2DAABB) {
-            if      (b.shape instanceof Shape2DCircle)    AABBvsCircle(a,      b, manifolds);
-            else if (b.shape instanceof Shape2DAABB)      AABBvsAABB(a,        b, manifolds);
-            else if (b.shape instanceof Shape2DRectangle) AABBvsRectangle(a,   b, manifolds);
+            if      (b.shape instanceof Shape2DCircle)    AABBvsCircle(a,    b, manifolds);
+            else if (b.shape instanceof Shape2DAABB)      AABBvsAABB(a,      b, manifolds);
+            else if (b.shape instanceof Shape2DRectangle) AABBvsRectangle(a, b, manifolds);
             else if (b.shape instanceof Shape2DPolygon)   AABBvsPolygon(a,   b, manifolds);
             return;
         }
@@ -127,6 +135,8 @@ public final class Physics2DCollisionDetection {
         MathVector2 tail = new MathVector2();
         MathVector2 head = new MathVector2();
         MathVector2 normal = new MathVector2();
+        float minOverlapPolygon = Float.MAX_VALUE;
+        MathVector2 minOverlapPolygonAxis = new MathVector2();
         for (int i = 0; i < polygon.vertexCount; i++) {
             polygon.getWorldEdge(i, tail, head);
             normal.set(head).sub(tail).nor().rotate90(1);
@@ -149,22 +159,21 @@ public final class Physics2DCollisionDetection {
 
             float axis_overlap = MathUtils.intervalsOverlap(aabb_axis_min, aabb_axis_max, polygon_axis_min, polygon_axis_max);
             if (MathUtils.isZero(axis_overlap)) return;
+
+            if (minOverlapPolygon > axis_overlap) {
+                minOverlapPolygon = axis_overlap;
+                minOverlapPolygonAxis.set(normal);
+            }
         }
 
-        System.out.println("ok");
-
-        // TODO: see if correct.
-        // TODO: fix normal direction.
         Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
         setContactPoints(aabb.worldVertices(), polygon.worldVertices(), manifold);
-//        float min_overlap = MathUtils.min(x_overlap, y_overlap, axis1_overlap, axis2_overlap);
-//        if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
-//        else if (MathUtils.isEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
-//        else if (MathUtils.isEqual(min_overlap, axis1_overlap)) manifold.normal = new MathVector2(ax, ay).nor();
-        manifold.normal = new MathVector2(1, 1).nor();
-        manifold.depth = 1;
+        float min_overlap = MathUtils.min(x_overlap, y_overlap, minOverlapPolygon);
+        if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
+        else if (MathUtils.isEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
+        else manifold.normal = new MathVector2(minOverlapPolygonAxis);
+        manifold.depth = min_overlap;
         manifolds.add(manifold);
-
     }
 
     // TODO: revise
@@ -172,17 +181,15 @@ public final class Physics2DCollisionDetection {
         Shape2DAABB aabb = (Shape2DAABB) a.shape;
         Shape2DRectangle rect = (Shape2DRectangle) b.shape;
 
-        // TODO: use worldVertices()
         // aabb corners
         MathVector2 aabb_min = aabb.getWorldMin();
         MathVector2 aabb_max = aabb.getWorldMax();
 
-        // TODO: use worldVertices()
         // rect corners
-        MathVector2 c1 = rect.c1();
-        MathVector2 c2 = rect.c2();
-        MathVector2 c3 = rect.c3();
-        MathVector2 c4 = rect.c4();
+        MathVector2 c1 = rect.c0();
+        MathVector2 c2 = rect.c1();
+        MathVector2 c3 = rect.c2();
+        MathVector2 c4 = rect.c3();
 
         // SAT - x axis
         float aabb_min_x = aabb_min.x;
@@ -382,10 +389,10 @@ public final class Physics2DCollisionDetection {
         Shape2DRectangle rect = (Shape2DRectangle) b.shape;
 
         MathVector2 circleWorldCenter = circle.getWorldCenter();
-        MathVector2 c1 = rect.c1();
-        MathVector2 c2 = rect.c2();
-        MathVector2 c3 = rect.c3();
-        MathVector2 c4 = rect.c4();
+        MathVector2 c1 = rect.c0();
+        MathVector2 c2 = rect.c1();
+        MathVector2 c3 = rect.c2();
+        MathVector2 c4 = rect.c3();
 
         float dx1 = c2.x - c1.x;
         float dy1 = c2.y - c1.y;
@@ -510,9 +517,8 @@ public final class Physics2DCollisionDetection {
     }
 
     /** Rectangle vs ____ **/
-    private static boolean rectangleVsAABB(Shape2DRectangle rectangle, Shape2DAABB aabb, Physics2DCollisionManifold manifold) {
+    private static void rectangleVsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
 
-        return false;
     }
 
     private static void rectangleVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
@@ -524,14 +530,12 @@ public final class Physics2DCollisionDetection {
         return false;
     }
 
-    private static boolean rectangleVsPolygon(Shape2DRectangle rectangle, Shape2DPolygon polygon, Physics2DCollisionManifold manifold) {
+    private static void rectangleVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
 
-        return false;
     }
 
-    private static boolean rectangleVsRectangle(Shape2DRectangle r1, Shape2DRectangle r2, Physics2DCollisionManifold manifold) {
+    private static void rectangleVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
 
-        return false;
     }
 
     private static void setContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB, Physics2DCollisionManifold manifold) {

@@ -320,10 +320,10 @@ public class Renderer2D implements MemoryResourceHolder {
         triangleIndex += 10;
 
         rectangle.update();
-        float x1 = rectangle.c1().x, y1 = rectangle.c1().y;
-        float x2 = rectangle.c2().x, y2 = rectangle.c2().y;
-        float x3 = rectangle.c3().x, y3 = rectangle.c3().y;
-        float x4 = rectangle.c4().x, y4 = rectangle.c4().y;
+        float x1 = rectangle.c0().x, y1 = rectangle.c0().y;
+        float x2 = rectangle.c1().x, y2 = rectangle.c1().y;
+        float x3 = rectangle.c2().x, y3 = rectangle.c2().y;
+        float x4 = rectangle.c3().x, y4 = rectangle.c3().y;
         verticesBuffer
                 .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // V1
                 .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // V2
