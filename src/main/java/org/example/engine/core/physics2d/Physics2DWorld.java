@@ -25,7 +25,7 @@ public class Physics2DWorld {
 
     // [i, i+1] are collision candidates.
     public final CollectionsArray<Physics2DBody> collisionCandidates                  = new CollectionsArray<>(false, 400);
-    public final CollectionsArray<Physics2DCollisionManifold> collisionManifolds = new CollectionsArray<>(false, 200);
+    public final CollectionsArray<Physics2DWorldCollision.CollisionManifold> collisionManifolds = new CollectionsArray<>(false, 200);
 
     public Physics2DWorld() {
 
@@ -72,7 +72,7 @@ public class Physics2DWorld {
                 for (int j = i + 1; j < allBodies.size; j++) {
                     Physics2DBody a = allBodies.get(i);
                     Physics2DBody b = allBodies.get(j);
-                    Physics2DCollisionDetection.narrowPhaseCollision(a, b, collisionManifolds);
+                    Physics2DWorldCollision.narrowPhaseCollision(a, b, collisionManifolds);
                 }
             }
 //            for (int i = 0; i < collisionCandidates.size - 1; i += 2) {

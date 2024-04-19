@@ -6,7 +6,7 @@ import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.*;
 import org.example.engine.core.physics2d.Physics2DBody;
 import org.example.engine.core.physics2d.Physics2DWorld;
-import org.example.engine.core.physics2d.Physics2DCollisionManifold;
+import org.example.engine.core.physics2d.Physics2DWorldCollision;
 import org.example.engine.core.shape.*;
 import org.lwjgl.opengl.GL11;
 
@@ -82,13 +82,13 @@ public class ScenePhysics2D_2 extends WindowScreen {
 
         // render physics 2d debug:
         renderer2D.begin(camera);
-        for (Physics2DCollisionManifold manifold : world.collisionManifolds)
+        for (Physics2DWorldCollision.CollisionManifold manifold : world.collisionManifolds)
             renderManifold(manifold);
         renderer2D.end();
     }
 
     // TODO: refactor out into the physics debug renderer. For now, use to implement correct narrow phase.
-    private void renderManifold(Physics2DCollisionManifold manifold) {
+    private void renderManifold(Physics2DWorldCollision.CollisionManifold manifold) {
         MathVector2 penetration = new MathVector2(manifold.normal).scl(manifold.depth);
 
         // calculate points scale

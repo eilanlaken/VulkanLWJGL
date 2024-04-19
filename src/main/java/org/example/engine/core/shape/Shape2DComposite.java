@@ -3,12 +3,25 @@ package org.example.engine.core.shape;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathVector2;
 
+// TODO: write unit tests.
 public class Shape2DComposite extends Shape2D {
 
+    public final CollectionsArray<Shape2D> shapes;
     private float unscaledArea;
     private float unscaledBoundingRadius;
-    public final CollectionsArray<Shape2D> shapes;
 
+    public Shape2DComposite(Shape2D ...shapes) {
+        for (Shape2D shape : shapes) {
+            if (shape instanceof Shape2DComposite) throw new IllegalArgumentException("Trying to construct a " + Shape2DComposite.class.getSimpleName() + " using 1 or more compound shapes is not allowed.");
+            if (!Shape2D.isTransformIdentity(shape)) throw new IllegalStateException("Transform of input island shape to a " + Shape2DComposite.class.getSimpleName() + " constructor must be identity (x = 0, y = 0, angle = 0, scaleX = 1, scaleY = 1). Got: x = " + shape.x + ", y = " + shape.y + ", angle = " + shape.angle + ", scaleX = " + shape.scaleX + ", scaleY = " + shape.scaleY);
+        }
+        this.shapes = new CollectionsArray<>(true, shapes.length);
+        this.shapes.addAll(shapes);
+        this.unscaledArea = calculateCurrentUnscaledArea();
+        this.unscaledBoundingRadius = calculateCurrentUnscaledBoundingRadius();
+    }
+
+    @Deprecated
     public Shape2DComposite(final CollectionsArray<Shape2D> shapes) {
         for (Shape2D shape : shapes) {
             if (shape instanceof Shape2DComposite) throw new IllegalArgumentException("Trying to construct a " + Shape2DComposite.class.getSimpleName() + " using 1 or more compound shapes is not allowed.");

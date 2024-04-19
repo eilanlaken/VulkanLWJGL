@@ -8,7 +8,7 @@ import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.math.MathVector3;
 import org.example.engine.core.physics2d.Physics2DBody;
 import org.example.engine.core.physics2d.Physics2DWorld;
-import org.example.engine.core.physics2d.Physics2DCollisionManifold;
+import org.example.engine.core.physics2d.Physics2DWorldCollision;
 import org.example.engine.core.shape.*;
 import org.lwjgl.opengl.GL11;
 
@@ -20,7 +20,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
     private Color staleTint = new Color(1,0,0,1);
     private Camera camera;
 
-    private Shape2D polygon;
+    private Shape2D composite;
     private Shape2D otherCircle;
     private Shape2D otherAABB;
     private Shape2D otherRectangle;
@@ -37,7 +37,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
     @Override
     public void show() {
-        polygon = new Shape2DPolygon(new float[] {1,0.5f,0.5f,1,-0.5f,1,-1,0.5f,-1,-0.5f,-0.5f,-1,0.5f,-1,1,-0.5f});
+        composite = new Shape2DComposite(new Shape2DCircle(1.5f,-1,0), new Shape2DCircle(1.5f,1,0));
         otherCircle = new Shape2DCircle(1.5f,0,0);
         otherAABB = new Shape2DAABB(4, 2);
         otherRectangle = new Shape2DRectangle(4.5f,2.2f);
@@ -49,7 +49,7 @@ public class ScenePhysics2D_3 extends WindowScreen {
         camera = new Camera(640f/64,480f/64, 1);
         camera.update();
 
-        body = world.createBody(polygon, new MathVector2(0,0),0, new MathVector2(0.f, 0));
+        body = world.createBody(composite, new MathVector2(0,0),0, new MathVector2(0.f, 0));
         //world.createBody(otherCircle, new MathVector2(3,1.5f), 0, new MathVector2(0.f, 0));
         //world.createBody(otherAABB, new MathVector2(0, 0), 0, new MathVector2(0.f, 0));
         //world.createBody(otherRectangle, new MathVector2(0,0.0f), 30, new MathVector2(0.f, 0));
@@ -65,11 +65,11 @@ public class ScenePhysics2D_3 extends WindowScreen {
         GL11.glClearColor(0,0,0,1);
         renderer2D.begin(camera);
 
-        renderer2D.pushDebugShape(polygon, null);
+        renderer2D.pushDebugShape(composite, null);
         //renderer2D.pushDebugShape(otherCircle, staleTint);
-        //renderer2D.pushDebugShape(otherAABB, staleTint);
+        renderer2D.pushDebugShape(otherAABB, staleTint);
         //renderer2D.pushDebugShape(otherRectangle, staleTint);
-        renderer2D.pushDebugShape(otherPolygon, staleTint);
+        //renderer2D.pushDebugShape(otherPolygon, staleTint);
 
         renderer2D.end();
 
@@ -82,17 +82,17 @@ public class ScenePhysics2D_3 extends WindowScreen {
 
         // render physics 2d debug:
         renderer2D.begin(camera);
-        for (Physics2DCollisionManifold manifold : world.collisionManifolds)
+        for (Physics2DWorldCollision.CollisionManifold manifold : world.collisionManifolds)
             renderManifold(manifold);
         renderer2D.end();
 
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
-            polygon.rot(-1);
+            composite.rot(-1);
         }
     }
 
     // TODO: refactor out into the physics debug renderer. For now, use to implement correct narrow phase.
-    private void renderManifold(Physics2DCollisionManifold manifold) {
+    private void renderManifold(Physics2DWorldCollision.CollisionManifold manifold) {
         MathVector2 penetration = new MathVector2(manifold.normal).scl(manifold.depth);
 
         // calculate points scale
