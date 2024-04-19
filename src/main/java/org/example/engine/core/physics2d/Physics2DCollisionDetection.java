@@ -35,7 +35,7 @@ public final class Physics2DCollisionDetection {
             return;
         }
 
-        // AABB vs **** //
+        // rectangle vs **** //
         if (a.shape instanceof Shape2DRectangle) {
             if      (b.shape instanceof Shape2DCircle)    rectangleVsCircle(a,    b, manifolds);
             else if (b.shape instanceof Shape2DRectangle) rectangleVsRectangle(a, b, manifolds);
@@ -532,7 +532,12 @@ public final class Physics2DCollisionDetection {
     }
 
     private static void rectangleVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
+        Shape2DRectangle rect = (Shape2DRectangle) a.shape;
+        Shape2DPolygon polygon =  (Shape2DPolygon) b.shape;
 
+
+
+        System.out.println("rrr");
     }
 
     // TODO: implement.

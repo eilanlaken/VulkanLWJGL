@@ -24,9 +24,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
     private Shape2D otherCircle;
     private Shape2D otherAABB;
     private Shape2D otherRectangle;
-    private Shape2D otherPolygonConvex;
-    private Shape2D otherPolygonConcave;
-    private Shape2D otherPolygonWithHoles;
+    private Shape2D otherPolygon;
+    private Shape2D otherMorphed;
 
     Physics2DWorld world = new Physics2DWorld();
     Physics2DBody body;
@@ -42,9 +41,9 @@ public class ScenePhysics2D_3 extends WindowScreen {
         otherCircle = new Shape2DCircle(1.5f,0,0);
         otherAABB = new Shape2DAABB(4, 2);
         otherRectangle = new Shape2DRectangle(4.5f,2.2f);
-        otherPolygonConvex = new Shape2DPolygon(new float[] {2,1,1,2,-1,2,-2,1,-2,-1,-1,-2,1,-2,2,-1});
-        otherPolygonConcave = new Shape2DPolygon(new float[] {-2,0, 0,4, 2,2, 3,-3, 0,1});
-        otherPolygonWithHoles = new Shape2DPolygon(new float[] { 0, 0, 5, 0, 5, 5, 0, 5, 1, 1, 4, 1, 4, 4, 1, 4 }, new int[] { 4 });
+        otherPolygon = new Shape2DPolygon(new float[] {2,1,1,2,-1,2,-2,1,-2,-1,-1,-2,1,-2,2,-1});
+        //otherPolygonConcave = new Shape2DPolygon(new float[] {-2,0, 0,4, 2,2, 3,-3, 0,1});
+        //otherPolygonWithHoles = new Shape2DPolygon(new float[] { 0, 0, 5, 0, 5, 5, 0, 5, 1, 1, 4, 1, 4, 4, 1, 4 }, new int[] { 4 });
 
 
         camera = new Camera(640f/64,480f/64, 1);
@@ -53,8 +52,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
         body = world.createBody(rectangle, new MathVector2(0,0),0, new MathVector2(0.f, 0));
         //world.createBody(otherCircle, new MathVector2(3,1.5f), 0, new MathVector2(0.f, 0));
         //world.createBody(otherAABB, new MathVector2(0, 0), 0, new MathVector2(0.f, 0));
-        world.createBody(otherRectangle, new MathVector2(0,0.0f), 30, new MathVector2(0.f, 0));
-        //world.createBody(otherPolygonConvex, new MathVector2(0.0f,0f), 0, new MathVector2(0.f, 0));
+        //world.createBody(otherRectangle, new MathVector2(0,0.0f), 30, new MathVector2(0.f, 0));
+        world.createBody(otherPolygon, new MathVector2(0.0f,0f), 0, new MathVector2(0.f, 0));
 
     }
 
@@ -69,8 +68,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
         renderer2D.pushDebugShape(rectangle, null);
         //renderer2D.pushDebugShape(otherCircle, staleTint);
         //renderer2D.pushDebugShape(otherAABB, staleTint);
-        renderer2D.pushDebugShape(otherRectangle, staleTint);
-        //renderer2D.pushDebugShape(otherPolygonConvex, staleTint);
+        //renderer2D.pushDebugShape(otherRectangle, staleTint);
+        renderer2D.pushDebugShape(otherPolygon, staleTint);
 
         renderer2D.end();
 
