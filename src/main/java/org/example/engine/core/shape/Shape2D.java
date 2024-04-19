@@ -164,10 +164,4 @@ public abstract class Shape2D {
     protected abstract float getUnscaledArea();
     protected abstract float getUnscaledBoundingRadius();
 
-    protected static boolean isTransformIdentity(final Shape2D shape) {
-        return MathUtils.isZero(shape.x) && MathUtils.isZero(shape.y)
-                && MathUtils.isZero(shape.angle % 360)
-                && MathUtils.isEqual(shape.scaleX, 1.0f) && MathUtils.isEqual(shape.scaleY, 1.0f);
-    }
-
 }

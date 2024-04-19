@@ -11,6 +11,7 @@ public class Shape2DCircle extends Shape2D {
     private MathVector2 worldCenter;
     private float worldRadius;
 
+    // TODO: see how this can be refactored out, without sacrificing performance.
     private final float unscaledArea;
     private final float unscaledBoundingRadius;
 
