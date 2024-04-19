@@ -12,7 +12,7 @@ import org.example.engine.core.math.MathVector3;
  *  (this, but in 3D)
  *
  */
-// TODO: redo entire Shape2D
+// TODO: redo entire Shape3D
 public class Shape3DFrustum implements Shape3D_old {
 
     // for the purpose of intermediate computations
@@ -53,13 +53,6 @@ public class Shape3DFrustum implements Shape3D_old {
             if (diff < 0) return false;
         }
         return true;
-    }
-
-    public boolean intersectsAABB(final Shape3DAABB aabb) {
-        for (int i = 0; i < 8; i++) {
-            if (contains(aabb.computeCorner(i, vector))) return true;
-        }
-        return false;
     }
 
     @Override
