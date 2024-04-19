@@ -42,8 +42,8 @@ public class ScenePhysics2D_3 extends WindowScreen {
         otherAABB = new Shape2DAABB(4, 2);
         otherRectangle = new Shape2DRectangle(4.5f,2.2f);
         otherPolygon = new Shape2DPolygon(new float[] {2,1,1,2,-1,2,-2,1,-2,-1,-1,-2,1,-2,2,-1});
-        //otherPolygonConcave = new Shape2DPolygon(new float[] {-2,0, 0,4, 2,2, 3,-3, 0,1});
-        //otherPolygonWithHoles = new Shape2DPolygon(new float[] { 0, 0, 5, 0, 5, 5, 0, 5, 1, 1, 4, 1, 4, 4, 1, 4 }, new int[] { 4 });
+        //otherPolygon = new Shape2DPolygon(new float[] {-2,0, 0,4, 2,2, 3,-3, 0,1});
+        //otherPolygon = new Shape2DPolygon(new float[] { 0, 0, 5, 0, 5, 5, 0, 5, 1, 1, 4, 1, 4, 4, 1, 4 }, new int[] { 4 });
 
 
         camera = new Camera(640f/64,480f/64, 1);

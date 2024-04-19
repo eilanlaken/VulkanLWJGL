@@ -535,7 +535,87 @@ public final class Physics2DCollisionDetection {
         Shape2DRectangle rect = (Shape2DRectangle) a.shape;
         Shape2DPolygon polygon =  (Shape2DPolygon) b.shape;
 
+        // rect corners
+        CollectionsArray<MathVector2> rect_v = rect.worldVertices();
+        MathVector2 rect_c0 = rect_v.get(0);
+        MathVector2 rect_c1 = rect_v.get(1);
+        MathVector2 rect_c2 = rect_v.get(2);
+        MathVector2 rect_c3 = rect_v.get(3);
 
+        // polygon corners
+        CollectionsArray<MathVector2> polygon_v = polygon.worldVertices();
+
+        MathVector2 axis = new MathVector2();
+        float min_overlap;
+        float min_overlap_axis_x;
+        float min_overlap_axis_y;
+
+        // rect axis1: c1-c2 axis
+        {
+            axis.set(rect_c2.x - rect_c1.x, rect_c2.y - rect_c1.y).nor();
+            float min_axis_overlap = Float.MAX_VALUE;
+            float max_axis_overlap = -Float.MAX_VALUE;
+            for (MathVector2 p_vertex : polygon_v) {
+                float projection = MathVector2.dot(axis.x, axis.y, p_vertex.x - rect_c1.x, p_vertex.y - rect_c1.y);
+                if (projection < min_axis_overlap) min_axis_overlap = projection;
+                if (projection > max_axis_overlap) max_axis_overlap = projection;
+            }
+            float axis_overlap = MathUtils.intervalsOverlap(min_axis_overlap, max_axis_overlap, 0, rect.unscaledWidth * rect.scaleX());
+            if (MathUtils.isZero(axis_overlap)) return; // no collision
+            min_axis_overlap = axis_overlap;
+            min_overlap_axis_x = axis.x;
+            min_overlap_axis_y = axis.y;
+        }
+
+        // rect axis2: c2-c3 axis
+        {
+            axis.set(rect_c3.x - rect_c2.x, rect_c3.y - rect_c2.y).nor();
+            float min_axis_overlap = Float.MAX_VALUE;
+            float max_axis_overlap = -Float.MAX_VALUE;
+            for (MathVector2 p_vertex : polygon_v) {
+                float projection = MathVector2.dot(axis.x, axis.y, p_vertex.x - rect_c2.x, p_vertex.y - rect_c2.y);
+                if (projection < min_axis_overlap) min_axis_overlap = projection;
+                if (projection > max_axis_overlap) max_axis_overlap = projection;
+            }
+            float axis_overlap = MathUtils.intervalsOverlap(min_axis_overlap, max_axis_overlap, 0, rect.unscaledHeight * rect.scaleY());
+            if (MathUtils.isZero(axis_overlap)) return; // no collision
+            // TODO: revise
+            min_axis_overlap = axis_overlap;
+            min_overlap_axis_x = axis.x;
+            min_overlap_axis_y = axis.y;
+        }
+
+        // polygon axis
+        {
+            MathVector2 tail = new MathVector2();
+            MathVector2 head = new MathVector2();
+            float min_axis_overlap = Float.MAX_VALUE;
+            float max_axis_overlap = -Float.MAX_VALUE;
+            for (int i = 0; i < polygon.vertexCount; i++) {
+                polygon.getWorldEdge(i, tail, head);
+                axis.set(head).sub(tail).nor().rotate90(1);
+
+                // project rectangle on the axis
+                float prj_rect_c0 = MathVector2.dot(axis.x, axis.y, rect_c0.x - tail.x, rect_c0.y - tail.y);
+                float prj_rect_c1 = MathVector2.dot(axis.x, axis.y, rect_c1.x - tail.x, rect_c1.y - tail.y);
+                float prj_rect_c2 = MathVector2.dot(axis.x, axis.y, rect_c2.x - tail.x, rect_c2.y - tail.y);
+                float prj_rect_c3 = MathVector2.dot(axis.x, axis.y, rect_c3.x - tail.x, rect_c3.y - tail.y);
+                float min_prj_rect = MathUtils.min(prj_rect_c0, prj_rect_c1, prj_rect_c2, prj_rect_c3);
+                float max_prj_rect = MathUtils.max(prj_rect_c0, prj_rect_c1, prj_rect_c2, prj_rect_c3);
+
+                // project polygon on the axis
+                float min_prj_vertex = Float.MAX_VALUE;
+                float max_prj_vertex = -Float.MAX_VALUE;
+                for (MathVector2 vertex : polygon_v) {
+                    float prj_vertex = MathVector2.dot(axis.x, axis.y, vertex.x - tail.x, vertex.y - tail.y);
+                    if (prj_vertex < min_prj_vertex) min_prj_vertex = prj_vertex;
+                    if (prj_vertex > max_prj_vertex) max_prj_vertex = prj_vertex;
+                }
+
+                float axis_overlap = MathUtils.intervalsOverlap(min_prj_rect, max_prj_rect, min_prj_vertex, max_prj_vertex);
+                if (MathUtils.isZero(axis_overlap)) return;
+            }
+        }
 
         System.out.println("rrr");
     }
