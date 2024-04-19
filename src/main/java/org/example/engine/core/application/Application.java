@@ -5,9 +5,6 @@ import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.async.AsyncUtils;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.graphics.Window;
-import org.example.engine.core.graphics.WindowAttributes;
-import org.example.engine.core.graphics.WindowScreen;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
 import org.lwjgl.glfw.GLFW;
@@ -18,17 +15,17 @@ public class Application {
 
     private static boolean initialized = false;
     private static boolean debugMode;
-    private static Window window;
+    private static ApplicationWindow window;
     private static CollectionsArray<Runnable> tasks = new CollectionsArray<>();
     private static boolean running = false;
     private static GLFWErrorCallback errorCallback;
 
-    public static void createSingleWindowApplication(final WindowAttributes attributes) {
+    public static void createSingleWindowApplication(final ApplicationWindowAttributes attributes) {
         // init GLFW
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         GLFWErrorCallback.createPrint(System.err).set();
         if (!GLFW.glfwInit()) throw new RuntimeException("Unable to initialize GLFW.");
-        window = new Window(attributes);
+        window = new ApplicationWindow(attributes);
         GL.createCapabilities();
         GraphicsUtils.init(window);
         AssetUtils.init(window);
@@ -38,7 +35,7 @@ public class Application {
         initialized = true;
     }
 
-    public static void launch(WindowScreen screen) {
+    public static void launch(ApplicationScreen screen) {
         if (!initialized) throw new IllegalStateException("Must call createSingleWindowApplication before launch().");
         window.setScreen(screen);
         running = true;
@@ -46,7 +43,7 @@ public class Application {
         clean();
     }
 
-    public static void switchScreen(WindowScreen screen) {
+    public static void switchScreen(ApplicationScreen screen) {
         window.setScreen(screen);
     }
 

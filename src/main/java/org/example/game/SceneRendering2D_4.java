@@ -1,9 +1,9 @@
 package org.example.game;
 
+import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.core.shape.*;
 import org.lwjgl.opengl.GL11;
@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SceneRendering2D_4 extends WindowScreen {
+public class SceneRendering2D_4 extends ApplicationScreen {
 
     private Renderer2D renderer2D;
     private Camera camera;

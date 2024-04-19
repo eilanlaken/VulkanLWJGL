@@ -1,7 +1,7 @@
-package org.example.engine.core.graphics;
+package org.example.engine.core.application;
 
-import org.example.engine.core.application.Application;
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
@@ -15,7 +15,7 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class Window implements MemoryResource {
+public class ApplicationWindow implements MemoryResource {
 
     // compute and auxiliary buffers
     private final IntBuffer tmpBuffer = BufferUtils.createIntBuffer(1);
@@ -25,7 +25,7 @@ public class Window implements MemoryResource {
 
     // window attributes
     private long handle;
-    protected WindowAttributes attributes;
+    public ApplicationWindowAttributes attributes;
 
     private boolean focused = false;
     private CollectionsArray<String> filesDraggedAndDropped = new CollectionsArray<>();
@@ -38,7 +38,7 @@ public class Window implements MemoryResource {
     // state management
     private CollectionsArray<Runnable> tasks = new CollectionsArray<>();
     private boolean requestRendering = false;
-    private WindowScreen screen;
+    private ApplicationScreen screen;
 
     GLFWFramebufferSizeCallback resizeCallback = new GLFWFramebufferSizeCallback() {
         private volatile boolean requested;
@@ -58,8 +58,8 @@ public class Window implements MemoryResource {
                     }
                 });
             }
-            Window.this.attributes.width = width;
-            Window.this.attributes.height = height;
+            ApplicationWindow.this.attributes.width = width;
+            ApplicationWindow.this.attributes.height = height;
         }
     };
 
@@ -69,7 +69,7 @@ public class Window implements MemoryResource {
             tasks.add(new Runnable() {
                 @Override
                 public void run() {
-                    Window.this.focused = focused;
+                    ApplicationWindow.this.focused = focused;
                 }
             });
         }
@@ -81,7 +81,7 @@ public class Window implements MemoryResource {
             tasks.add(new Runnable() {
                 @Override
                 public void run() {
-                    Window.this.attributes.minimized = minimized;
+                    ApplicationWindow.this.attributes.minimized = minimized;
                 }
             });
         }
@@ -93,7 +93,7 @@ public class Window implements MemoryResource {
             tasks.add(new Runnable() {
                 @Override
                 public void run() {
-                    Window.this.attributes.maximized = maximized;
+                    ApplicationWindow.this.attributes.maximized = maximized;
                 }
             });
         }
@@ -128,7 +128,7 @@ public class Window implements MemoryResource {
     };
 
     // TODO: set icon
-    public Window(WindowAttributes attributes) {
+    public ApplicationWindow(ApplicationWindowAttributes attributes) {
         GLFW.glfwDefaultWindowHints();
         GLFW.glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         GLFW.glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -259,7 +259,7 @@ public class Window implements MemoryResource {
         }
     }
 
-    protected void setVSync(boolean enabled) {
+    public void setVSync(boolean enabled) {
         GLFW.glfwSwapInterval(enabled ? 1 : 0);
         attributes.vSyncEnabled = enabled;
     }
@@ -306,7 +306,7 @@ public class Window implements MemoryResource {
         return latestFilesDraggedAndDroppedCount;
     }
 
-    public void setScreen(WindowScreen screen) {
+    public void setScreen(ApplicationScreen screen) {
         if (this.screen != null) {
             this.screen.hide();
             this.screen.window = null;
@@ -352,7 +352,7 @@ public class Window implements MemoryResource {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        Window other = (Window)obj;
+        ApplicationWindow other = (ApplicationWindow)obj;
         return handle == other.handle;
     }
 

@@ -1,5 +1,6 @@
 package org.example.game;
 
+import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
@@ -14,7 +15,7 @@ import org.lwjgl.opengl.GL11;
 
 // contact points polygon vs polygon:
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
-public class ScenePhysics2D_3 extends WindowScreen {
+public class ScenePhysics2D_3 extends ApplicationScreen {
 
     private Renderer2D renderer2D;
     private Color staleTint = new Color(1,0,0,1);

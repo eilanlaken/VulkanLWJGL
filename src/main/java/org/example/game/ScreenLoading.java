@@ -2,15 +2,15 @@ package org.example.game;
 
 import org.example.engine.core.application.Application;
 import org.example.engine.core.assets.AssetStore;
-import org.example.engine.core.graphics.WindowScreen;
+import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Map;
 
-public class ScreenLoading extends WindowScreen {
+public class ScreenLoading extends ApplicationScreen {
 
-    private WindowScreen screen = new ScenePhysics2D_3();
+    private ApplicationScreen screen = new ScenePhysics2D_3();
     //private WindowScreen screen = new SceneRendering2D_8();
 
     @Override

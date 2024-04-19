@@ -1,5 +1,6 @@
 package org.example.game;
 
+import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.ecs.Component;
 import org.example.engine.ecs.ComponentTransform;
 import org.example.engine.core.assets.AssetStore;
@@ -13,7 +14,7 @@ import org.lwjgl.opengl.GL11;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SceneRendering3D_1 extends WindowScreen {
+public class SceneRendering3D_1 extends ApplicationScreen {
 
     private Renderer3D renderer3DOld;
     private Model model;

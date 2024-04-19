@@ -1,11 +1,11 @@
 package org.example.engine.core.input;
 
-import org.example.engine.core.graphics.Window;
+import org.example.engine.core.application.ApplicationWindow;
 import org.lwjgl.glfw.*;
 
 public class InputMouse {
 
-    private static Window window;
+    private static ApplicationWindow window;
     private static boolean initialized = false;
     private static float sensitivity = 1f; // goes from 0 to infinity. Default is 1.
     private static int prevCursorX;
@@ -24,7 +24,7 @@ public class InputMouse {
     private InputMouse() {}
 
     // TODO: change window to application context.
-    public static void init(Window window) {
+    public static void init(ApplicationWindow window) {
         if (initialized) throw new IllegalStateException("Device input " + InputMouse.class.getSimpleName() + " already initialized.");
         InputMouse.window = window;
 

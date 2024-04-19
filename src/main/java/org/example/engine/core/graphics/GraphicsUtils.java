@@ -1,5 +1,6 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.application.ApplicationWindow;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -10,7 +11,7 @@ import java.nio.IntBuffer;
 public final class GraphicsUtils {
 
     private static boolean initialized = false;
-    private static Window window;
+    private static ApplicationWindow window;
 
     private static volatile boolean isContinuous = true;
     private static long lastFrameTime = -1;
@@ -27,7 +28,7 @@ public final class GraphicsUtils {
 
     private GraphicsUtils() {}
 
-    public static void init(final Window window) {
+    public static void init(final ApplicationWindow window) {
         if (initialized) throw new IllegalStateException(GraphicsUtils.class.getSimpleName() + " instance already initialized.");
         GraphicsUtils.window = window;
         maxTextureSize = GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);

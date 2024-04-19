@@ -1,4 +1,4 @@
-package org.example.engine.core.graphics;
+package org.example.engine.core.application;
 
 import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.core.memory.MemoryResourceHolder;
@@ -6,9 +6,9 @@ import org.example.engine.core.memory.MemoryResourceHolder;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class WindowScreen implements MemoryResourceHolder {
+public abstract class ApplicationScreen implements MemoryResourceHolder {
 
-    protected Window window;
+    protected ApplicationWindow window;
 
     protected abstract void show();
 

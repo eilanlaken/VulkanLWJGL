@@ -1,7 +1,7 @@
 package org.example.engine.core.input;
 
 import org.example.engine.core.collections.CollectionsArrayInt;
-import org.example.engine.core.graphics.Window;
+import org.example.engine.core.application.ApplicationWindow;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
@@ -18,7 +18,7 @@ public class InputKeyboard {
     private InputKeyboard() {}
 
     // TODO: change window to application context.
-    public static void init(Window window) {
+    public static void init(ApplicationWindow window) {
         if (initialized)
             throw new IllegalStateException("Device input " + InputKeyboard.class.getSimpleName() + " already initialized.");
 

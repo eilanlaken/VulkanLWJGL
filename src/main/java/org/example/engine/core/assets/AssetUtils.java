@@ -2,7 +2,7 @@ package org.example.engine.core.assets;
 
 import com.google.gson.Gson;
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.graphics.Window;
+import org.example.engine.core.application.ApplicationWindow;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.Property;
@@ -22,7 +22,7 @@ import java.util.Set;
 public final class AssetUtils {
 
     private static boolean initialized = false;
-    private static Window window;
+    private static ApplicationWindow window;
     public static final Yaml yaml;
     public static final Gson gson;
     static {
@@ -41,7 +41,7 @@ public final class AssetUtils {
 
     private AssetUtils() {}
 
-    public static void init(final Window window) {
+    public static void init(final ApplicationWindow window) {
         if (initialized) throw new IllegalStateException(AssetUtils.class.getSimpleName() + " instance already initialized.");
         AssetUtils.window = window;
         initialized = true;

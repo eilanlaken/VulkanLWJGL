@@ -1,5 +1,6 @@
 package org.example.game;
 
+import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputMouse;
@@ -10,7 +11,7 @@ import org.example.engine.core.physics2d.Physics2DWorldCollision;
 import org.example.engine.core.shape.*;
 import org.lwjgl.opengl.GL11;
 
-public class ScenePhysics2D_2 extends WindowScreen {
+public class ScenePhysics2D_2 extends ApplicationScreen {
 
     private Renderer2D renderer2D;
     private Color staleTint = new Color(1,0,0,1);

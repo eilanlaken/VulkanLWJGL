@@ -1,7 +1,7 @@
-package org.example.engine.core.graphics;
+package org.example.engine.core.application;
 
 // TODO: revise.
-public class WindowAttributes {
+public class ApplicationWindowAttributes {
 
     public int posX = -1;
     public int posY = -1;

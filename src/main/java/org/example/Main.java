@@ -1,7 +1,7 @@
 package org.example;
 
 import org.example.engine.core.application.Application;
-import org.example.engine.core.graphics.WindowAttributes;
+import org.example.engine.core.application.ApplicationWindowAttributes;
 
 import org.example.game.ScreenLoading;
 
@@ -24,7 +24,7 @@ public class Main {
 
         //if (true) return;
 
-        WindowAttributes config = new WindowAttributes();
+        ApplicationWindowAttributes config = new ApplicationWindowAttributes();
         Application.createSingleWindowApplication(config);
         Application.launch(new ScreenLoading());
 

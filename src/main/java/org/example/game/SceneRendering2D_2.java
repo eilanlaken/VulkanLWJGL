@@ -1,5 +1,6 @@
 package org.example.game;
 
+import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.shape.*;
 import org.example.engine.ecs.ComponentGraphics2DShape;
 import org.example.engine.core.assets.AssetStore;
@@ -10,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SceneRendering2D_2 extends WindowScreen {
+public class SceneRendering2D_2 extends ApplicationScreen {
 
     private Renderer2D renderer2D;
     private Camera camera;
