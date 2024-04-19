@@ -12,12 +12,16 @@ public abstract class Shape2D {
     protected float scaleX = 1;
     protected float scaleY = 1;
 
-    private float     area                  = 0;
-    private float     boundingRadius        = 0;
-    private float     boundingRadiusSquared = 0;
-    protected boolean updated               = false;
-    private boolean   areaUpdated           = false;
-    private boolean   boundingRadiusUpdated = false;
+    private float     area                       = 0;
+    private float     boundingRadius             = 0;
+    private float     boundingRadiusSquared      = 0;
+    private float     unscaledArea               = 0;
+    private float     unscaledBoundingRadius     = 0;
+    private boolean   calcUnscaledArea           = false;
+    private boolean   calcUnscaledBoundingRadius = false;
+    protected boolean updated                    = false;
+    private boolean   areaUpdated                = false;
+    private boolean   boundingRadiusUpdated      = false;
 
     public final boolean contains(final MathVector2 point) {
         return contains(point.x, point.y);
@@ -142,6 +146,22 @@ public abstract class Shape2D {
         updated = false;
     }
 
+    protected final float getUnscaledArea() {
+        if (!calcUnscaledArea) {
+            unscaledArea = calculateUnscaledArea();
+            calcUnscaledArea = true;
+        }
+        return unscaledArea;
+    }
+
+    protected final float getUnscaledBoundingRadius() {
+        if (!calcUnscaledBoundingRadius) {
+            unscaledBoundingRadius = calculateUnscaledBoundingRadius();
+            calcUnscaledBoundingRadius = true;
+        }
+        return unscaledBoundingRadius;
+    }
+
     public final float x() {
         return x;
     }
@@ -161,7 +181,7 @@ public abstract class Shape2D {
     protected abstract boolean containsPoint(float x, float y);
     protected abstract void updateWorldCoordinates();
     protected abstract CollectionsArray<MathVector2> getWorldVertices();
-    protected abstract float getUnscaledArea();
-    protected abstract float getUnscaledBoundingRadius();
+    protected abstract float calculateUnscaledBoundingRadius();
+    protected abstract float calculateUnscaledArea();
 
 }

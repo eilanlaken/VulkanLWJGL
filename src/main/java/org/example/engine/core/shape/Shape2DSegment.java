@@ -6,13 +6,12 @@ import org.example.engine.core.math.MathVector2;
 
 public class Shape2DSegment extends Shape2D {
 
-    private final float unscaledBoundingRadius;
-
     private final MathVector2 localA;
     private final MathVector2 localB;
 
     private final MathVector2 worldA;
     private final MathVector2 worldB;
+
     private final CollectionsArray<MathVector2> worldVertices;
 
     public Shape2DSegment(float x1, float y1, float x2, float y2) {
@@ -22,19 +21,19 @@ public class Shape2DSegment extends Shape2D {
         this.worldB = new MathVector2(localB);
         this.worldVertices = new CollectionsArray<>(true, 2);
         this.worldVertices.addAll(worldA, worldB);
+
+    }
+
+    @Override
+    protected float calculateUnscaledBoundingRadius() {
         float centerX = (localA.x + localB.x) * 0.5f;
         float centerY = (localA.y + localB.y) * 0.5f;
         float halfDiagonal = MathVector2.dst(localA, localB) * 0.5f;
-        unscaledBoundingRadius = MathVector2.len(centerX, centerY) + halfDiagonal;
+        return MathVector2.len(centerX, centerY) + halfDiagonal;
     }
 
     @Override
-    protected float getUnscaledBoundingRadius() {
-        return unscaledBoundingRadius;
-    }
-
-    @Override
-    protected float getUnscaledArea() {
+    protected float calculateUnscaledArea() {
         return 0;
     }
 

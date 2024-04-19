@@ -11,19 +11,12 @@ public class Shape2DCircle extends Shape2D {
     private MathVector2 worldCenter;
     private float worldRadius;
 
-    // TODO: see how this can be refactored out, without sacrificing performance.
-    private final float unscaledArea;
-    private final float unscaledBoundingRadius;
-
     public Shape2DCircle(float r, float x, float y) {
         if (r < 0) throw new IllegalArgumentException("Radius must be positive. Got: " + r);
         this.localCenter = new MathVector2(x, y);
         this.localRadius = r;
         this.worldCenter = new MathVector2(localCenter);
         this.worldRadius = r;
-
-        this.unscaledArea = MathUtils.PI * localRadius * localRadius;
-        this.unscaledBoundingRadius = localCenter.len() + r;
     }
 
     public Shape2DCircle(float r) {
@@ -46,13 +39,13 @@ public class Shape2DCircle extends Shape2D {
     }
 
     @Override
-    protected float getUnscaledBoundingRadius() {
-        return unscaledBoundingRadius;
+    protected float calculateUnscaledBoundingRadius() {
+        return localCenter.len() + localRadius;
     }
 
     @Override
-    protected float getUnscaledArea() {
-        return unscaledArea;
+    protected float calculateUnscaledArea() {
+        return MathUtils.PI * localRadius * localRadius;
     }
 
     public MathVector2 getWorldCenter() {

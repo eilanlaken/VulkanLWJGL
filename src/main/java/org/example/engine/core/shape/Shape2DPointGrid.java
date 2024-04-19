@@ -18,9 +18,6 @@ public class Shape2DPointGrid extends Shape2D {
     public final int[] indices;
     private final CollectionsArray<MathVector2> worldVertices;
 
-    private final float unscaledArea;
-    private final float unscaledBoundingRadius;
-
     protected Shape2DPointGrid(float[] vertices) {
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
@@ -32,13 +29,6 @@ public class Shape2DPointGrid extends Shape2D {
         }
         this.indices = null; // calculate triangles.
         // TODO: fix the area calculations.
-        this.unscaledArea = Math.abs(ShapeUtils.incorrect_calculatePolygonSignedArea(this.vertices));
-        this.unscaledBoundingRadius = ShapeUtils.calculatePolygonBoundingRadius(this.vertices);
-    }
-
-    @Override
-    protected float getUnscaledBoundingRadius() {
-        return unscaledBoundingRadius;
     }
 
     @Override
@@ -67,9 +57,16 @@ public class Shape2DPointGrid extends Shape2D {
         return false;
     }
 
+    // TODO: implement
     @Override
-    protected float getUnscaledArea() {
-        return unscaledArea;
+    protected float calculateUnscaledBoundingRadius() {
+        return 0;
+    }
+
+    // TODO: implement
+    @Override
+    protected float calculateUnscaledArea() {
+        return 0;
     }
 
     public void getWorldEdge(int index, @NotNull MathVector2 tail, @NotNull MathVector2 head) {

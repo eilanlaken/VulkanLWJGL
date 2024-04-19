@@ -7,9 +7,6 @@ import org.example.engine.core.math.MathVector2;
 // AABB = axis aligned bonding box
 public class Shape2DAABB extends Shape2D {
 
-    private final float unscaledArea;
-    private final float unscaledBoundingRadius;
-
     private final MathVector2 localMin;
     private final MathVector2 localMax;
     private final MathVector2 worldMin;
@@ -31,8 +28,6 @@ public class Shape2DAABB extends Shape2D {
         float centerX = (localMin.x + localMax.x) * 0.5f;
         float centerY = (localMin.y + localMax.y) * 0.5f;
         float halfDiagonal = MathVector2.dst(localMin, localMax) * 0.5f;
-        this.unscaledArea = Math.abs(x2 - x1) * Math.abs(y2 - y1);
-        this.unscaledBoundingRadius = MathVector2.len(centerX, centerY) + halfDiagonal;
     }
 
     public Shape2DAABB(float width, float height) {
@@ -45,13 +40,16 @@ public class Shape2DAABB extends Shape2D {
     }
 
     @Override
-    protected float getUnscaledBoundingRadius() {
-        return unscaledBoundingRadius;
+    protected float calculateUnscaledBoundingRadius() {
+        float centerX = (localMin.x + localMax.x) * 0.5f;
+        float centerY = (localMin.y + localMax.y) * 0.5f;
+        float halfDiagonal = MathVector2.dst(localMin, localMax) * 0.5f;
+        return MathVector2.len(centerX, centerY) + halfDiagonal;
     }
 
     @Override
-    protected float getUnscaledArea() {
-        return unscaledArea;
+    protected float calculateUnscaledArea() {
+        return (localMax.x - localMin.x) * (localMax.y - localMax.y);
     }
 
     @Override

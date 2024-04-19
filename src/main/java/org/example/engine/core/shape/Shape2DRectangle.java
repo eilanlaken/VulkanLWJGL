@@ -6,8 +6,6 @@ import org.example.engine.core.math.MathVector2;
 
 public class Shape2DRectangle extends Shape2D {
 
-    public final float unscaledArea;
-    public final float unscaledBoundingRadius;
     public final float unscaledWidth;
     public final float unscaledHeight;
 
@@ -42,8 +40,6 @@ public class Shape2DRectangle extends Shape2D {
         this.c3Local = new MathVector2(+widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
         this.worldVertices = new CollectionsArray<>(true, 4);
         this.worldVertices.addAll(c0, c1, c2, c3);
-        this.unscaledArea = width * height;
-        this.unscaledBoundingRadius = (float) Math.sqrt(MathUtils.max(c0Local.len2(), c1Local.len2(), c2Local.len2(), c3Local.len2()));
     }
 
     public Shape2DRectangle(float width, float height) {
@@ -57,8 +53,6 @@ public class Shape2DRectangle extends Shape2D {
         this.c3Local = new MathVector2(+widthHalf, +heightHalf);
         this.worldVertices = new CollectionsArray<>(true, 4);
         this.worldVertices.addAll(c0, c1, c2, c3);
-        this.unscaledArea = width * height;
-        this.unscaledBoundingRadius = (float) Math.sqrt(MathUtils.max(c0Local.len2(), c1Local.len2(), c2Local.len2(), c3Local.len2()));
     }
 
     @Override
@@ -88,13 +82,13 @@ public class Shape2DRectangle extends Shape2D {
     }
 
     @Override
-    protected float getUnscaledBoundingRadius() {
-        return unscaledBoundingRadius;
+    protected float calculateUnscaledBoundingRadius() {
+        return (float) Math.sqrt(MathUtils.max(c0Local.len2(), c1Local.len2(), c2Local.len2(), c3Local.len2()));
     }
 
     @Override
-    protected float getUnscaledArea() {
-        return unscaledArea;
+    protected float calculateUnscaledArea() {
+        return unscaledWidth * unscaledHeight;
     }
 
     @Override

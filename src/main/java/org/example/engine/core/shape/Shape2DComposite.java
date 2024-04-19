@@ -7,8 +7,6 @@ import org.example.engine.core.math.MathVector2;
 public class Shape2DComposite extends Shape2D {
 
     public final CollectionsArray<Shape2D> shapes;
-    private float unscaledArea;
-    private float unscaledBoundingRadius;
 
     public Shape2DComposite(Shape2D ...shapes) {
         for (Shape2D shape : shapes) {
@@ -16,8 +14,6 @@ public class Shape2DComposite extends Shape2D {
         }
         this.shapes = new CollectionsArray<>(true, shapes.length);
         this.shapes.addAll(shapes);
-        this.unscaledArea = calculateCurrentUnscaledArea();
-        this.unscaledBoundingRadius = calculateCurrentUnscaledBoundingRadius();
     }
 
     @Deprecated
@@ -26,8 +22,6 @@ public class Shape2DComposite extends Shape2D {
             if (shape instanceof Shape2DComposite) throw new IllegalArgumentException("Trying to construct a " + Shape2DComposite.class.getSimpleName() + " using 1 or more compound shapes is not allowed.");
         }
         this.shapes = shapes;
-        this.unscaledArea = calculateCurrentUnscaledArea();
-        this.unscaledBoundingRadius = calculateCurrentUnscaledBoundingRadius();
     }
 
     @Override
@@ -37,7 +31,8 @@ public class Shape2DComposite extends Shape2D {
         return false;
     }
 
-    private float calculateCurrentUnscaledBoundingRadius() {
+    @Override
+    protected float calculateUnscaledBoundingRadius() {
         float max = -1.0f;
         for (Shape2D shape : shapes) {
             float r = shape.getUnscaledBoundingRadius();
@@ -46,20 +41,11 @@ public class Shape2DComposite extends Shape2D {
         return max;
     }
 
-    private float calculateCurrentUnscaledArea() {
+    @Override
+    protected float calculateUnscaledArea() {
         float area = 0;
         for (Shape2D shape : shapes) area += shape.getUnscaledArea();
         return area;
-    }
-
-    @Override
-    protected float getUnscaledBoundingRadius() {
-        return unscaledBoundingRadius;
-    }
-
-    @Override
-    protected float getUnscaledArea() {
-        return unscaledArea;
     }
 
     @Override

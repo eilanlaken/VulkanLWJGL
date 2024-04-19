@@ -20,9 +20,6 @@ public class Shape2DPolygon extends Shape2D {
     public final boolean hasHoles;
     private final CollectionsArray<CollectionsTuple2<Integer, Integer>> loops;
 
-    private final float unscaledArea;
-    private final float unscaledBoundingRadius;
-
     protected Shape2DPolygon(int[] indices, float[] vertices) {
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
@@ -34,9 +31,6 @@ public class Shape2DPolygon extends Shape2D {
         }
         this.indices = indices;
         this.isConvex = ShapeUtils.isPolygonConvex(vertices);
-        // TODO: fix the area calculations.
-        this.unscaledArea = Math.abs(ShapeUtils.incorrect_calculatePolygonSignedArea(this.vertices));
-        this.unscaledBoundingRadius = ShapeUtils.calculatePolygonBoundingRadius(this.vertices);
         this.holes = null;
         this.loops = ShapeUtils.getLoops(null, vertexCount);
         this.hasHoles = false;
@@ -65,14 +59,17 @@ public class Shape2DPolygon extends Shape2D {
         this.loops = ShapeUtils.getLoops(holes, vertexCount);
         this.hasHoles = holes != null && holes.length != 0;
         this.isConvex = !hasHoles && ShapeUtils.isPolygonConvex(vertices);
-        // TODO: fix this one and write unit tests.
-        this.unscaledArea = Math.abs(ShapeUtils.incorrect_calculatePolygonSignedArea(this.vertices));
-        this.unscaledBoundingRadius = ShapeUtils.calculatePolygonBoundingRadius(this.vertices);
     }
 
     @Override
-    protected float getUnscaledBoundingRadius() {
-        return unscaledBoundingRadius;
+    protected float calculateUnscaledBoundingRadius() {
+        return ShapeUtils.calculatePolygonBoundingRadius(this.vertices);
+    }
+
+    @Override
+    protected float calculateUnscaledArea() {
+        // TODO: fix and write unit tests.
+        return Math.abs(ShapeUtils.incorrect_calculatePolygonSignedArea(this.vertices));
     }
 
     @Override
@@ -110,11 +107,6 @@ public class Shape2DPolygon extends Shape2D {
                 if (x < (x2 - x1) * (y - y1) / (y2 - y1) + x1) inside = !inside;
         }
         return inside;
-    }
-
-    @Override
-    protected float getUnscaledArea() {
-        return unscaledArea;
     }
 
     public void getWorldEdge(int index, @NotNull MathVector2 tail, @NotNull MathVector2 head) {
