@@ -27,12 +27,12 @@ class Shape2DTest {
             }
 
             @Override
-            protected float getUnscaledArea() {
+            protected float calculateUnscaledBoundingRadius() {
                 return 0;
             }
 
             @Override
-            protected float getUnscaledBoundingRadius() {
+            protected float calculateUnscaledArea() {
                 return 0;
             }
 
