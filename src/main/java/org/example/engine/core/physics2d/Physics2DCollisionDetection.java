@@ -546,25 +546,25 @@ public final class Physics2DCollisionDetection {
         CollectionsArray<MathVector2> polygon_v = polygon.worldVertices();
 
         MathVector2 axis = new MathVector2();
-        float min_overlap;
-        float min_overlap_axis_x;
-        float min_overlap_axis_y;
+        float depth;
+        float normal_x;
+        float normal_y;
 
         // rect axis1: c1-c2 axis
         {
             axis.set(rect_c2.x - rect_c1.x, rect_c2.y - rect_c1.y).nor();
-            float min_axis_overlap = Float.MAX_VALUE;
-            float max_axis_overlap = -Float.MAX_VALUE;
+            float min_polygon_overlap = Float.MAX_VALUE;
+            float max_polygon_overlap = -Float.MAX_VALUE;
             for (MathVector2 p_vertex : polygon_v) {
                 float projection = MathVector2.dot(axis.x, axis.y, p_vertex.x - rect_c1.x, p_vertex.y - rect_c1.y);
-                if (projection < min_axis_overlap) min_axis_overlap = projection;
-                if (projection > max_axis_overlap) max_axis_overlap = projection;
+                if (projection < min_polygon_overlap) min_polygon_overlap = projection;
+                if (projection > max_polygon_overlap) max_polygon_overlap = projection;
             }
-            float axis_overlap = MathUtils.intervalsOverlap(min_axis_overlap, max_axis_overlap, 0, rect.unscaledWidth * rect.scaleX());
+            float axis_overlap = MathUtils.intervalsOverlap(min_polygon_overlap, max_polygon_overlap, 0, rect.unscaledWidth * rect.scaleX());
             if (MathUtils.isZero(axis_overlap)) return; // no collision
-            min_axis_overlap = axis_overlap;
-            min_overlap_axis_x = axis.x;
-            min_overlap_axis_y = axis.y;
+            depth = axis_overlap;
+            normal_x = axis.x;
+            normal_y = axis.y;
         }
 
         // rect axis2: c2-c3 axis
@@ -579,18 +579,17 @@ public final class Physics2DCollisionDetection {
             }
             float axis_overlap = MathUtils.intervalsOverlap(min_axis_overlap, max_axis_overlap, 0, rect.unscaledHeight * rect.scaleY());
             if (MathUtils.isZero(axis_overlap)) return; // no collision
-            // TODO: revise
-            min_axis_overlap = axis_overlap;
-            min_overlap_axis_x = axis.x;
-            min_overlap_axis_y = axis.y;
+            if (axis_overlap < depth) {
+                depth = axis_overlap;
+                normal_x = axis.x;
+                normal_y = axis.y;
+            }
         }
 
         // polygon axis
         {
             MathVector2 tail = new MathVector2();
             MathVector2 head = new MathVector2();
-            float min_axis_overlap = Float.MAX_VALUE;
-            float max_axis_overlap = -Float.MAX_VALUE;
             for (int i = 0; i < polygon.vertexCount; i++) {
                 polygon.getWorldEdge(i, tail, head);
                 axis.set(head).sub(tail).nor().rotate90(1);
@@ -614,10 +613,20 @@ public final class Physics2DCollisionDetection {
 
                 float axis_overlap = MathUtils.intervalsOverlap(min_prj_rect, max_prj_rect, min_prj_vertex, max_prj_vertex);
                 if (MathUtils.isZero(axis_overlap)) return;
+
+                if (axis_overlap < depth) {
+                    depth = axis_overlap;
+                    normal_x = axis.x;
+                    normal_y = axis.y;
+                }
             }
         }
 
-        System.out.println("rrr");
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
+        setContactPoints(rect_v, polygon_v, manifold);
+        manifold.normal = new MathVector2(normal_x, normal_y).nor();
+        manifold.depth = depth;
+        manifolds.add(manifold);
     }
 
     // TODO: implement.
@@ -715,7 +724,7 @@ public final class Physics2DCollisionDetection {
 
         Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
         setContactPoints(vertices_1, vertices_2, manifold);
-        manifold.normal = new MathVector2(min_overlap_axis_x, min_overlap_axis_y);
+        manifold.normal = new MathVector2(min_overlap_axis_x, min_overlap_axis_y).nor();
         manifold.depth = min_axis_overlap;
         manifolds.add(manifold);
     }
