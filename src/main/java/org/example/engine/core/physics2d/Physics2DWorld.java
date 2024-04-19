@@ -25,7 +25,7 @@ public class Physics2DWorld {
 
     // [i, i+1] are collision candidates.
     public final CollectionsArray<Physics2DBody> collisionCandidates                  = new CollectionsArray<>(false, 400);
-    public final CollectionsArray<Physics2DWorldCollision.CollisionManifold> collisionManifolds = new CollectionsArray<>(false, 200);
+    public final CollectionsArray<Physics2DWorldCollision.Manifold> collisionManifolds = new CollectionsArray<>(false, 200);
 
     public Physics2DWorld() {
 

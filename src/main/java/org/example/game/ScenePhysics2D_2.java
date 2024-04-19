@@ -82,13 +82,13 @@ public class ScenePhysics2D_2 extends WindowScreen {
 
         // render physics 2d debug:
         renderer2D.begin(camera);
-        for (Physics2DWorldCollision.CollisionManifold manifold : world.collisionManifolds)
+        for (Physics2DWorldCollision.Manifold manifold : world.collisionManifolds)
             renderManifold(manifold);
         renderer2D.end();
     }
 
     // TODO: refactor out into the physics debug renderer. For now, use to implement correct narrow phase.
-    private void renderManifold(Physics2DWorldCollision.CollisionManifold manifold) {
+    private void renderManifold(Physics2DWorldCollision.Manifold manifold) {
         MathVector2 penetration = new MathVector2(manifold.normal).scl(manifold.depth);
 
         // calculate points scale
