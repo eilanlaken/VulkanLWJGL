@@ -519,7 +519,83 @@ public final class Physics2DCollisionDetection {
         Shape2DPolygon p1 = (Shape2DPolygon) a.shape;
         Shape2DPolygon p2 = (Shape2DPolygon) b.shape;
 
-        System.out.println(" testing");
+        CollectionsArray<MathVector2> p1_vertices = p1.worldVertices();
+        CollectionsArray<MathVector2> p2_vertices = p2.worldVertices();
+
+        MathVector2 axis = new MathVector2();
+        float depth = Float.MAX_VALUE;
+        float normal_x = 0;
+        float normal_y = 0;
+
+        MathVector2 tail = new MathVector2();
+        MathVector2 head = new MathVector2();
+        // p1 edges normals as axis
+        for (int i = 0; i < p1.vertexCount; i++) {
+            p1.getWorldEdge(i, tail, head);
+            axis.set(head).sub(tail).nor();
+            // project p1 on the axis
+            float min_p1_axis = Float.MAX_VALUE;
+            float max_p1_axis = -Float.MAX_VALUE;
+            for (MathVector2 vertex : p1_vertices) {
+                float projection = MathVector2.dot(axis.x, axis.y, vertex.x - tail.x, vertex.y - tail.y);
+                if (projection < min_p1_axis) min_p1_axis = projection;
+                if (projection > max_p1_axis) max_p1_axis = projection;
+            }
+            // project p2 on the axis
+            float min_p2_axis = Float.MAX_VALUE;
+            float max_p2_axis = -Float.MAX_VALUE;
+            for (MathVector2 vertex : p2_vertices) {
+                float projection = MathVector2.dot(axis.x, axis.y, vertex.x - tail.x, vertex.y - tail.y);
+                if (projection < min_p2_axis) min_p2_axis = projection;
+                if (projection > max_p2_axis) max_p2_axis = projection;
+            }
+
+            float axis_overlap = MathUtils.intervalsOverlap(min_p1_axis, max_p1_axis, min_p2_axis, max_p2_axis);
+            if (MathUtils.isZero(axis_overlap)) return;
+
+            if (axis_overlap < depth) {
+                depth = axis_overlap;
+                normal_x = axis.x;
+                normal_y = axis.y;
+            }
+        }
+
+        // p1 edges normals as axis
+        for (int i = 0; i < p2.vertexCount; i++) {
+            p2.getWorldEdge(i, tail, head);
+            axis.set(head).sub(tail).nor();
+            // project p1 on the axis
+            float min_p1_axis = Float.MAX_VALUE;
+            float max_p1_axis = -Float.MAX_VALUE;
+            for (MathVector2 vertex : p1_vertices) {
+                float projection = MathVector2.dot(axis.x, axis.y, vertex.x - tail.x, vertex.y - tail.y);
+                if (projection < min_p1_axis) min_p1_axis = projection;
+                if (projection > max_p1_axis) max_p1_axis = projection;
+            }
+            // project p2 on the axis
+            float min_p2_axis = Float.MAX_VALUE;
+            float max_p2_axis = -Float.MAX_VALUE;
+            for (MathVector2 vertex : p2_vertices) {
+                float projection = MathVector2.dot(axis.x, axis.y, vertex.x - tail.x, vertex.y - tail.y);
+                if (projection < min_p2_axis) min_p2_axis = projection;
+                if (projection > max_p2_axis) max_p2_axis = projection;
+            }
+
+            float axis_overlap = MathUtils.intervalsOverlap(min_p1_axis, max_p1_axis, min_p2_axis, max_p2_axis);
+            if (MathUtils.isZero(axis_overlap)) return;
+
+            if (axis_overlap < depth) {
+                depth = axis_overlap;
+                normal_x = axis.x;
+                normal_y = axis.y;
+            }
+        }
+
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
+        setContactPoints(p1_vertices, p2_vertices, manifold);
+        manifold.normal = new MathVector2(normal_x, normal_y);
+        manifold.depth = depth;
+        manifolds.add(manifold);
     }
 
     private static void polygonVsRectangle(Physics2DBody polygon, Physics2DBody rectangle, CollectionsArray<Physics2DCollisionManifold> manifolds) {
@@ -634,7 +710,7 @@ public final class Physics2DCollisionDetection {
 
         Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
         setContactPoints(rect_v, polygon_v, manifold);
-        manifold.normal = new MathVector2(normal_x, normal_y).nor();
+        manifold.normal = new MathVector2(normal_x, normal_y);
         manifold.depth = depth;
         manifolds.add(manifold);
     }
