@@ -52,6 +52,15 @@ public final class Physics2DCollisionDetection {
             else if (b.shape instanceof Shape2DPolygon)   AABBvsPolygon(a,   b, manifolds);
             return;
         }
+
+        // rectangle vs **** //
+        if (a.shape instanceof Shape2DPolygon) {
+            if      (b.shape instanceof Shape2DCircle)    polygonVsCircle(a,    b, manifolds);
+            else if (b.shape instanceof Shape2DRectangle) polygonVsRectangle(a, b, manifolds);
+            else if (b.shape instanceof Shape2DAABB)      polygonVsAABB(a,      b, manifolds);
+            else if (b.shape instanceof Shape2DPolygon)   polygonVsPolygon(a,   b, manifolds);
+            return;
+        }
     }
 
     /** AABB vs ____ **/
@@ -492,14 +501,12 @@ public final class Physics2DCollisionDetection {
     }
 
     /** Polygon vs ____ **/
-    private static boolean polygonVsAABB(Shape2DPolygon polygon, Shape2DAABB aabb, Physics2DCollisionManifold manifold) {
-
-        return false;
+    private static void polygonVsAABB(Physics2DBody polygon, Physics2DBody aabb, CollectionsArray<Physics2DCollisionManifold> manifolds) {
+        AABBvsPolygon(aabb, polygon, manifolds);
     }
 
-    private static boolean polygonVsCircle(Shape2DPolygon polygon, Shape2DCircle circle, Physics2DCollisionManifold manifold) {
-
-        return false;
+    private static void polygonVsCircle(Physics2DBody polygon, Physics2DBody circle, CollectionsArray<Physics2DCollisionManifold> manifolds) {
+        circleVsPolygon(circle, polygon, manifolds);
     }
 
     private static boolean polygonVsMorphed(Shape2DPolygon polygon, Shape2DComposite morphed, Physics2DCollisionManifold manifold) {
@@ -507,14 +514,16 @@ public final class Physics2DCollisionDetection {
         return false;
     }
 
-    private static boolean polygonVsPolygon(Shape2DPolygon p1, Shape2DPolygon p2, Physics2DCollisionManifold manifold) {
+    // TODO: now
+    private static void polygonVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DCollisionManifold> manifolds) {
+        Shape2DPolygon p1 = (Shape2DPolygon) a.shape;
+        Shape2DPolygon p2 = (Shape2DPolygon) b.shape;
 
-        return false;
+        System.out.println(" testing");
     }
 
-    private static boolean polygonVsRectangle(Shape2DPolygon polygon, Shape2DRectangle rectangle, Physics2DCollisionManifold manifold) {
-
-        return false;
+    private static void polygonVsRectangle(Physics2DBody polygon, Physics2DBody rectangle, CollectionsArray<Physics2DCollisionManifold> manifolds) {
+        rectangleVsPolygon(rectangle, polygon, manifolds);
     }
 
     /** Rectangle vs ____ **/
@@ -562,6 +571,7 @@ public final class Physics2DCollisionDetection {
             }
             float axis_overlap = MathUtils.intervalsOverlap(min_polygon_overlap, max_polygon_overlap, 0, rect.unscaledWidth * rect.scaleX());
             if (MathUtils.isZero(axis_overlap)) return; // no collision
+
             depth = axis_overlap;
             normal_x = axis.x;
             normal_y = axis.y;
@@ -579,6 +589,7 @@ public final class Physics2DCollisionDetection {
             }
             float axis_overlap = MathUtils.intervalsOverlap(min_axis_overlap, max_axis_overlap, 0, rect.unscaledHeight * rect.scaleY());
             if (MathUtils.isZero(axis_overlap)) return; // no collision
+
             if (axis_overlap < depth) {
                 depth = axis_overlap;
                 normal_x = axis.x;
@@ -610,7 +621,6 @@ public final class Physics2DCollisionDetection {
                     if (prj_vertex < min_prj_vertex) min_prj_vertex = prj_vertex;
                     if (prj_vertex > max_prj_vertex) max_prj_vertex = prj_vertex;
                 }
-
                 float axis_overlap = MathUtils.intervalsOverlap(min_prj_rect, max_prj_rect, min_prj_vertex, max_prj_vertex);
                 if (MathUtils.isZero(axis_overlap)) return;
 
