@@ -541,24 +541,23 @@ public final class Physics2DCollisionDetection {
         Shape2DRectangle rect2 = (Shape2DRectangle) b.shape;
 
         // rect1 corners
-        MathVector2 rect1_c0 = rect1.c0();
-        MathVector2 rect1_c1 = rect1.c1();
-        MathVector2 rect1_c2 = rect1.c2();
-        MathVector2 rect1_c3 = rect1.c3();
+        CollectionsArray<MathVector2> vertices_1 = rect1.worldVertices();
+        MathVector2 rect1_c0 = vertices_1.get(0);
+        MathVector2 rect1_c1 = vertices_1.get(1);
+        MathVector2 rect1_c2 = vertices_1.get(2);
+        MathVector2 rect1_c3 = vertices_1.get(3);
 
         // rect2 corners
-        MathVector2 rect2_c0 = rect2.c0();
-        MathVector2 rect2_c1 = rect2.c1();
-        MathVector2 rect2_c2 = rect2.c2();
-        MathVector2 rect2_c3 = rect2.c3();
-
-
-        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
-        manifolds.add(manifold);
-        manifold.normal = new MathVector2();
+        CollectionsArray<MathVector2> vertices_2 = rect2.worldVertices();
+        MathVector2 rect2_c0 = vertices_2.get(0);
+        MathVector2 rect2_c1 = vertices_2.get(1);
+        MathVector2 rect2_c2 = vertices_2.get(2);
+        MathVector2 rect2_c3 = vertices_2.get(3);
 
         MathVector2 axis = new MathVector2();
-
+        float min_axis_overlap;
+        float min_overlap_axis_x;
+        float min_overlap_axis_y;
         // rect1 axis1: c1-c2 axis
         {
             axis.set(rect2_c2.x - rect2_c1.x, rect2_c2.y - rect2_c1.y).nor();
@@ -569,13 +568,11 @@ public final class Physics2DCollisionDetection {
             float rect1_min_axis = MathUtils.min(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
             float rect1_max_axis = MathUtils.max(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
             float axis_overlap = MathUtils.intervalsOverlap(rect1_min_axis, rect1_max_axis, 0, rect2.unscaledWidth * rect2.scaleX());
-
-            manifold.contactPoint1 = new MathVector2(axis).scl(rect1_min_axis).add(rect2_c1.x, rect2_c1.y);
-            manifold.contactPoint2 = new MathVector2(axis).scl(rect1_max_axis).add(rect2_c1.x, rect2_c1.y);
-
             if (MathUtils.isZero(axis_overlap)) return; // no collision
+            min_axis_overlap = axis_overlap;
+            min_overlap_axis_x = axis.x;
+            min_overlap_axis_y = axis.y;
         }
-
 
         // rect1 axis2: c2-c3 axis
         {
@@ -587,13 +584,13 @@ public final class Physics2DCollisionDetection {
             float rect1_min_axis = MathUtils.min(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
             float rect1_max_axis = MathUtils.max(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
             float axis_overlap = MathUtils.intervalsOverlap(rect1_min_axis, rect1_max_axis, 0, rect2.unscaledHeight * rect2.scaleY());
-
-            manifold.contactPoint1 = new MathVector2(axis).scl(rect1_min_axis).add(rect2_c2.x, rect2_c2.y);
-            manifold.contactPoint2 = new MathVector2(axis).scl(rect1_max_axis).add(rect2_c2.x, rect2_c2.y);
-
             if (MathUtils.isZero(axis_overlap)) return; // no collision
+            if (axis_overlap < min_axis_overlap) {
+                min_axis_overlap = axis_overlap;
+                min_overlap_axis_x = axis.x;
+                min_overlap_axis_y = axis.y;
+            }
         }
-
 
         // rect2 axis1: c1-c2 axis
         {
@@ -605,17 +602,16 @@ public final class Physics2DCollisionDetection {
             float rect2_min_axis = MathUtils.min(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
             float rect2_max_axis = MathUtils.max(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
             float axis_overlap = MathUtils.intervalsOverlap(rect2_min_axis, rect2_max_axis, 0, rect1.unscaledWidth * rect1.scaleX());
-
-            manifold.contactPoint1 = new MathVector2(axis).scl(rect2_min_axis).add(rect1_c1.x, rect1_c1.y);
-            manifold.contactPoint2 = new MathVector2(axis).scl(rect2_max_axis).add(rect1_c1.x, rect1_c1.y);
-
             if (MathUtils.isZero(axis_overlap)) return; // no collision
+            if (axis_overlap < min_axis_overlap) {
+                min_axis_overlap = axis_overlap;
+                min_overlap_axis_x = axis.x;
+                min_overlap_axis_y = axis.y;
+            }
         }
-
 
         // rect2 axis2: c2-c3 axis
         {
-
             axis.set(rect1_c3.x - rect1_c2.x, rect1_c3.y - rect1_c2.y).nor();
             float rect2_c0_axis = MathVector2.dot(axis.x, axis.y, rect2_c0.x - rect1_c2.x, rect2_c0.y - rect1_c2.y);
             float rect2_c1_axis = MathVector2.dot(axis.x, axis.y, rect2_c1.x - rect1_c2.x, rect2_c1.y - rect1_c2.y);
@@ -624,16 +620,19 @@ public final class Physics2DCollisionDetection {
             float rect2_min_axis = MathUtils.min(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
             float rect2_max_axis = MathUtils.max(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
             float axis_overlap = MathUtils.intervalsOverlap(rect2_min_axis, rect2_max_axis, 0, rect1.unscaledHeight * rect1.scaleY());
-
-            manifold.contactPoint1 = new MathVector2(axis).scl(rect2_min_axis).add(rect1_c2.x, rect1_c2.y);
-            manifold.contactPoint2 = new MathVector2(axis).scl(rect2_max_axis).add(rect1_c2.x, rect1_c2.y);
-
             if (MathUtils.isZero(axis_overlap)) return; // no collision
-
+            if (axis_overlap < min_axis_overlap) {
+                min_axis_overlap = axis_overlap;
+                min_overlap_axis_x = axis.x;
+                min_overlap_axis_y = axis.y;
+            }
         }
 
-        System.out.println("collision");
-
+        Physics2DCollisionManifold manifold = new Physics2DCollisionManifold();
+        setContactPoints(vertices_1, vertices_2, manifold);
+        manifold.normal = new MathVector2(min_overlap_axis_x, min_overlap_axis_y);
+        manifold.depth = min_axis_overlap;
+        manifolds.add(manifold);
     }
 
     private static void setContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB, Physics2DCollisionManifold manifold) {
