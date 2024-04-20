@@ -14,8 +14,8 @@ import org.jetbrains.annotations.NotNull;
 // TODO: Simply support convex polygons, and concave polygons will be represented as compound shapes of convex polygons.
 // TODO: will need to create a great way (API, tools, ...) to intuitively create shapes
 
-// this handles: collision detection braod phase, collision detection narrow phase, collision resolution.
-public final class Physics2DWorldCollision {
+// this handles: collision detection broad phase, collision detection narrow phase, collision resolution.
+@Deprecated public final class Physics2DWorldCollision {
 
     private Physics2DWorldCollision() {}
 
@@ -492,7 +492,14 @@ public final class Physics2DWorldCollision {
         Shape2DComposite composite = (Shape2DComposite) a.shape;
         Shape2DAABB aabb = (Shape2DAABB) b.shape;
 
+        CollectionsArray<Manifold> individualShapeManifolds = new CollectionsArray<>(true, composite.shapes.size);
+        for (Shape2D shape : composite.shapes) {
 
+        }
+
+        if (individualShapeManifolds.size == 0) return; // no collision
+
+        // select the best manifold
 
         System.out.println("omadam");
     }
