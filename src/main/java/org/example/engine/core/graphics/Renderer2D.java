@@ -17,34 +17,40 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+// TODO: to make it a standalone, make it initialize the opengl context itself, in case it is not initialized.
 public class Renderer2D implements MemoryResourceHolder {
 
-    private static final int BATCH_SIZE = 4000;
-    private static final int VERTEX_SIZE = 5;
-    private static final int BATCH_TRIANGLES_CAPACITY = BATCH_SIZE * 2;
+    // constants
+    private static final int BATCH_SIZE         = 4000;
+    private static final int VERTEX_SIZE        = 5;
+    private static final int TRIANGLES_CAPACITY = BATCH_SIZE * 2;
 
-    private final ShaderProgram defaultShader = createDefaultShaderProgram();
-    private final Texture whiteSinglePixelTexture = createWhiteSinglePixelTexture();
+    // defaults
+    private final ShaderProgram defaultShader           =    createDefaultShaderProgram();
+    private final Texture       whiteSinglePixelTexture = createWhiteSinglePixelTexture();
+
+    // cached colors
     private final float WHITE_TINT = new Color(1,1,1,1).toFloatBits();
-    private final float RED_TINT = new Color(1,0,0,1).toFloatBits();
+    private final float RED_TINT   = new Color(1,0,0,1).toFloatBits();
     private final float GREEN_TINT = new Color(0,1,0,1).toFloatBits();
-    private final float BLUE_TINT = new Color(0,0,1,1).toFloatBits();
+    private final float BLUE_TINT  = new Color(0,0,1,1).toFloatBits();
 
-    private Camera camera;
-    private ShaderProgram currentShader;
-    private Texture lastTexture;
-    private boolean drawing = false;
-    private int vertexIndex = 0;
-    private int triangleIndex = 0;
-    private int mode = GL11.GL_TRIANGLES;
+    // state
+    private Camera        currentCamera = null;
+    private ShaderProgram currentShader = null;
+    private Texture       lastTexture   = null;
+    private boolean       drawing       = false;
+    private int           vertexIndex   = 0;
+    private int           triangleIndex = 0;
+    private int           mode          = GL11.GL_TRIANGLES;
+    private int           drawCalls     = 0;
 
+    // buffers
     private final int vao;
-    private final int vbo, ebo;
+    private final int vbo;
+    private final int ebo;
     private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * 4 * VERTEX_SIZE);
-    private final IntBuffer indicesBuffer = BufferUtils.createIntBuffer(BATCH_TRIANGLES_CAPACITY * 3);
-
-    // profiling
-    private int drawCalls = 0;
+    private final IntBuffer   indicesBuffer  =         BufferUtils.createIntBuffer(TRIANGLES_CAPACITY * 3);
 
     public Renderer2D() {
         this.vao = GL30.glGenVertexArrays();
@@ -74,7 +80,7 @@ public class Renderer2D implements MemoryResourceHolder {
         GL11.glEnable(GL11.GL_BLEND); // TODO: make camera attributes, get as additional parameter to begin()
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); // TODO: make camera attributes, get as additional parameter to begin()
         this.drawCalls = 0;
-        this.camera = camera;
+        this.currentCamera = camera;
         this.currentShader = null;
         drawing = true;
     }
@@ -465,7 +471,7 @@ public class Renderer2D implements MemoryResourceHolder {
         if (currentShader != shader) {
             flush();
             ShaderProgramBinder.bind(shader);
-            shader.bindUniform("u_camera_combined", camera.lens.combined);
+            shader.bindUniform("u_camera_combined", currentCamera.lens.combined);
         }
         currentShader = shader;
     }

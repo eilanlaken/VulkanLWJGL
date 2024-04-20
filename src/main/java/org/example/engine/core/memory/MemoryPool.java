@@ -4,6 +4,7 @@ import org.example.engine.core.collections.CollectionsArray;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 
 public class MemoryPool<T> {
 
@@ -18,6 +19,8 @@ public class MemoryPool<T> {
 
     public MemoryPool(Class<T> type, int initialCapacity) {
         if (initialCapacity <= 0) throw new IllegalArgumentException("Memory pool initial capacity must be greater than 0. Got: " + initialCapacity);
+        if (Modifier.isAbstract(type.getModifiers()))  throw new IllegalArgumentException("Cannot create " + MemoryPool.class.getSimpleName() + " of an abstract class.");
+        if (Modifier.isInterface(type.getModifiers())) throw new IllegalArgumentException("Cannot create " + MemoryPool.class.getSimpleName() + " of an interface.");
         this.initialCapacity = initialCapacity;
         this.freeObjects = new CollectionsArray<>(initialCapacity);
         try {
@@ -26,7 +29,6 @@ public class MemoryPool<T> {
                 freeObjects.add(constructor.newInstance());
             }
         } catch (NoSuchMethodException | SecurityException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
             throw new RuntimeException("Classes managed by a " + MemoryPool.class.getSimpleName() + " MUST declare a no-args constructor.");
         }
     }
@@ -46,7 +48,7 @@ public class MemoryPool<T> {
     }
 
     public synchronized void letGo(T obj) {
-        if (obj == null) throw new IllegalArgumentException("object cannot be null.");
+        if (obj == null) return;
         this.freeObjects.add(obj);
     }
 

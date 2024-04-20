@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 // TODO: will need to create a great way (API, tools, ...) to intuitively create shapes
 
 // this handles: collision detection broad phase, collision detection narrow phase, collision resolution.
-@Deprecated public final class Physics2DWorldCollision {
+public final class Physics2DWorldCollision {
 
     private Physics2DWorldCollision() {}
 
