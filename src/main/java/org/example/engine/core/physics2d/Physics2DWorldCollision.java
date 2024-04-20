@@ -63,6 +63,16 @@ public final class Physics2DWorldCollision {
             else if (b.shape instanceof Shape2DPolygon)   polygonVsPolygon(a,   b, manifolds);
             return;
         }
+
+        // composite vs **** //
+        if (a.shape instanceof Shape2DComposite) {
+            if      (b.shape instanceof Shape2DCircle)    compositeVsCircle(a,    b, manifolds);
+            else if (b.shape instanceof Shape2DRectangle) compositeVsRectangle(a, b, manifolds);
+            else if (b.shape instanceof Shape2DAABB)      compositeVsAABB(a,      b, manifolds);
+            else if (b.shape instanceof Shape2DPolygon)   compositeVsPolygon(a,   b, manifolds);
+            else if (b.shape instanceof Shape2DComposite) compositeVsComposite(a, b, manifolds);
+            return;
+        }
     }
 
     /** AABB vs ____ **/
@@ -478,26 +488,28 @@ public final class Physics2DWorldCollision {
 
     // TODO:
     /** Composite vs ___ **/
-    private static void CompositeVsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
+    private static void compositeVsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
         Shape2DComposite composite = (Shape2DComposite) a.shape;
         Shape2DAABB aabb = (Shape2DAABB) b.shape;
+
+
 
         System.out.println("omadam");
     }
 
-    private static void CompositeVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
+    private static void compositeVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
 
     }
 
-    private static void CompositeVsComposite(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
+    private static void compositeVsComposite(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
 
     }
 
-    private static void CompositeVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
+    private static void compositeVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
 
     }
 
-    private static void CompositeVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
+    private static void compositeVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
 
     }
 
@@ -515,7 +527,6 @@ public final class Physics2DWorldCollision {
         return false;
     }
 
-    // TODO: now
     private static void polygonVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
         Shape2DPolygon p1 = (Shape2DPolygon) a.shape;
         Shape2DPolygon p2 = (Shape2DPolygon) b.shape;

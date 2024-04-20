@@ -9,19 +9,11 @@ public class Shape2DComposite extends Shape2D {
     public final CollectionsArray<Shape2D> shapes;
 
     public Shape2DComposite(Shape2D ...shapes) {
-        for (Shape2D shape : shapes) {
-            if (shape instanceof Shape2DComposite) throw new IllegalArgumentException("Trying to construct a " + Shape2DComposite.class.getSimpleName() + " using 1 or more compound shapes is not allowed.");
-        }
         this.shapes = new CollectionsArray<>(true, shapes.length);
-        this.shapes.addAll(shapes);
-    }
-
-    @Deprecated
-    public Shape2DComposite(final CollectionsArray<Shape2D> shapes) {
         for (Shape2D shape : shapes) {
-            if (shape instanceof Shape2DComposite) throw new IllegalArgumentException("Trying to construct a " + Shape2DComposite.class.getSimpleName() + " using 1 or more compound shapes is not allowed.");
+            if (shape instanceof Shape2DComposite) this.shapes.addAll(((Shape2DComposite) shape).shapes);
+            else this.shapes.add(shape);
         }
-        this.shapes = shapes;
     }
 
     @Override
@@ -33,7 +25,7 @@ public class Shape2DComposite extends Shape2D {
 
     @Override
     protected float calculateUnscaledBoundingRadius() {
-        float max = -1.0f;
+        float max = 0.0f;
         for (Shape2D shape : shapes) {
             float r = shape.getUnscaledBoundingRadius();
             max = Math.max(max, r);
@@ -43,8 +35,10 @@ public class Shape2DComposite extends Shape2D {
 
     @Override
     protected float calculateUnscaledArea() {
-        float area = 0;
-        for (Shape2D shape : shapes) area += shape.getUnscaledArea();
+        float area = 0.0f;
+        for (Shape2D shape : shapes) {
+            area += shape.getUnscaledArea();
+        }
         return area;
     }
 

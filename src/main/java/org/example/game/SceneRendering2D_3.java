@@ -76,8 +76,6 @@ public class SceneRendering2D_3 extends ApplicationScreen {
         islands.add(circle1);
         islands.add(polygon);
 
-        compound = new Shape2DComposite(islands);
-        //compound.update();
         bounds = new Shape2DCircle(compound.getBoundingRadius(), compound.x(), compound.y());
 
         camera = new Camera(640*2,480*2, 1);

@@ -72,6 +72,7 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
         //renderer2D.pushDebugShape(otherRectangle, staleTint);
         //renderer2D.pushDebugShape(otherPolygon, staleTint);
 
+        //renderBounds(composite);
         renderer2D.end();
 
 
@@ -115,8 +116,7 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
     }
 
     private void renderBounds(Shape2D shape2D) {
-        float r = shape2D.getBoundingRadius();
-        Shape2DCircle bounds = new Shape2DCircle(r, shape2D.x(), shape2D.y());
+        Shape2DCircle bounds = new Shape2DCircle(shape2D.getBoundingRadius(), shape2D.x(), shape2D.y());
         renderer2D.pushDebugShape(bounds,new Color(1,1,0,1));
     }
 

@@ -71,7 +71,6 @@ public class SceneRendering2D_5 extends ApplicationScreen {
         islands.add(circle);
         islands.add(polygon);
 
-        compound = new Shape2DComposite(islands);
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -90,7 +89,6 @@ public class SceneRendering2D_5 extends ApplicationScreen {
         //renderer2D.pushDebugShape(circle, null);
         //renderer2D.pushDebugShape(rectangle, null);
         //renderer2D.pushDebugShape(aabb, null);
-        renderer2D.pushDebugShape(compound, null);
         //renderer2D.pushDebugShape(polygon, null);
 
         renderBounds(compound);
