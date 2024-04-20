@@ -6,7 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
-public class MemoryPool<T> {
+public class MemoryPool<T extends MemoryPool.Reset> {
 
     private final CollectionsArray<T> freeObjects;
     private final Constructor<T> constructor;
@@ -49,7 +49,14 @@ public class MemoryPool<T> {
 
     public synchronized void letGo(T obj) {
         if (obj == null) return;
+        obj.reset();
         this.freeObjects.add(obj);
+    }
+
+    public interface Reset {
+
+        void reset();
+
     }
 
 }

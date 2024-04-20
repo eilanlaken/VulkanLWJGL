@@ -11,12 +11,10 @@ class MemoryPoolTest {
     @Test
     void createPools() {
         Assertions.assertThrows(RuntimeException.class, () -> new MemoryPool<>(PooledClassC.class,  20));
-        Assertions.assertThrows(RuntimeException.class, () -> new MemoryPool<>(Shape2DCircle.class, 20));
-        Assertions.assertThrows(IllegalArgumentException.class,       () -> new MemoryPool<>(Shape2D.class, 20));
-        Assertions.assertThrows(IllegalArgumentException.class,  () -> new MemoryPool<>(PooledClassB.class, -1));
-        Assertions.assertThrows(IllegalArgumentException.class,  () -> new MemoryPool<>(PooledClassB.class,  0));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new MemoryPool<>(SomeInterface.class, 20));
-        Assertions.assertDoesNotThrow(() -> new MemoryPool<>(MathVector2.class,  20));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new MemoryPool<>(SomeAbstractClass.class, 20));
+        Assertions.assertThrows(IllegalArgumentException.class,      () -> new MemoryPool<>(PooledClassB.class, -1));
+        Assertions.assertThrows(IllegalArgumentException.class,      () -> new MemoryPool<>(PooledClassB.class,  0));
+        Assertions.assertThrows(IllegalArgumentException.class,     () -> new MemoryPool<>(SomeInterface.class, 20));
         Assertions.assertDoesNotThrow(() -> new MemoryPool<>(PooledClassB.class, 20));
     }
 
@@ -33,7 +31,7 @@ class MemoryPoolTest {
         MemoryPool<PooledClassB> bMemoryPool = new MemoryPool<>(PooledClassB.class, 10);
         PooledClassB b = bMemoryPool.grabOne();
         Assertions.assertEquals(0, b.x);
-        Assertions.assertEquals(null, b.obj);
+        Assertions.assertNull(b.obj);
     }
 
     @Test
@@ -43,28 +41,37 @@ class MemoryPoolTest {
         a.x = 10;
         aMemoryPool.letGo(a);
         PooledClassA aa = aMemoryPool.grabOne();
-        // pooled objects DO NOT RESET when letGo(). They retain their attribute values.
-        Assertions.assertEquals(aa.x, a.x);
+        Assertions.assertEquals(0, aa.x);
         aa = null;
         aMemoryPool.letGo(aa);
         PooledClassA aaa = aMemoryPool.grabOne();
         Assertions.assertEquals(0, aaa.x);
     }
 
-    public static class PooledClassA {
+    public static class PooledClassA implements MemoryPool.Reset {
 
         public int x;
 
+        @Override
+        public void reset() {
+            this.x = 0;
+        }
+
     }
 
-    public static class PooledClassB {
+    public static class PooledClassB implements MemoryPool.Reset {
 
         public int x;
         public Object obj;
 
+        @Override
+        public void reset() {
+            this.x = 0;
+            this.obj = null;
+        }
     }
 
-    public static class PooledClassC {
+    public static class PooledClassC implements MemoryPool.Reset {
 
         public int x, y;
 
@@ -73,10 +80,21 @@ class MemoryPoolTest {
             this.y = y;
         }
 
+        @Override
+        public void reset() {
+            this.x = 0;
+            this.y = 0;
+        }
     }
 
-    public interface SomeInterface {
+    public interface SomeInterface extends MemoryPool.Reset {
         void function();
+        @Override
+        default void reset() {};
+    }
+
+    public abstract class SomeAbstractClass implements MemoryPool.Reset {
+
     }
 
 }
