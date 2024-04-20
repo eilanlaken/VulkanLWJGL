@@ -1,8 +1,9 @@
-package org.example.engine.core.physics2d;
+package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.shape.Shape2D;
 import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.physics2d_new.Physics2DBody;
+import org.example.engine.core.shape.Shape2D;
 
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
@@ -24,8 +25,8 @@ public class Physics2DWorld {
     public short phase;
 
     // [0, 1], [2, 3], [4, 5], ... are collision candidates.
-    public final CollectionsArray<Physics2DBody> collisionCandidates                  = new CollectionsArray<>(false, 400);
-    public final CollectionsArray<Physics2DWorldCollision.Manifold> collisionManifolds = new CollectionsArray<>(false, 200);
+    public final CollectionsArray<Physics2DBody>                    collisionCandidates = new CollectionsArray<>(false, 400);
+    public final CollectionsArray<Physics2DWorldCollision.Manifold> collisionManifolds  = new CollectionsArray<>(false, 200);
 
     public Physics2DWorld() {
 
@@ -71,7 +72,6 @@ public class Physics2DWorld {
                 for (int j = i + 1; j < allBodies.size; j++) {
                     Physics2DBody a = allBodies.get(i);
                     Physics2DBody b = allBodies.get(j);
-                    Physics2DWorldCollision.narrowPhaseCollision(a, b, collisionManifolds);
                 }
             }
         }
