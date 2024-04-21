@@ -11,9 +11,9 @@ class MemoryPoolTest {
     void createPools() {
         Assertions.assertThrows(RuntimeException.class, () -> new MemoryPool<>(ClassC.class,  20));
         Assertions.assertThrows(IllegalArgumentException.class, () -> new MemoryPool<>(ClassAbstract.class, 20));
-        Assertions.assertThrows(IllegalArgumentException.class,      () -> new MemoryPool<>(ClassB.class, -1));
-        Assertions.assertThrows(IllegalArgumentException.class,      () -> new MemoryPool<>(ClassB.class,  0));
-        Assertions.assertThrows(IllegalArgumentException.class,     () -> new MemoryPool<>(InterfaceA.class, 20));
+        Assertions.assertThrows(IllegalArgumentException.class,        () -> new MemoryPool<>(ClassB.class, -1));
+        Assertions.assertThrows(IllegalArgumentException.class,        () -> new MemoryPool<>(ClassB.class,  0));
+        Assertions.assertThrows(IllegalArgumentException.class,    () -> new MemoryPool<>(InterfaceA.class, 20));
         Assertions.assertDoesNotThrow(() -> new MemoryPool<>(ClassB.class, 20));
     }
 
