@@ -2,6 +2,7 @@ package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.physics2d_new.Physics2DBody;
 import org.example.engine.core.shape.Shape2D;
 
@@ -12,12 +13,14 @@ import org.example.engine.core.shape.Shape2D;
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
 public class Physics2DWorld {
 
-    // todo: change everything to private or protected
     private static final short PHASE_PREPARATION = 0;
     private static final short PHASE_INTEGRATION = 1;
     private static final short PHASE_BROAD       = 2;
     private static final short PHASE_NARROW      = 3;
     private static final short PHASE_RESOLUTION  = 4;
+
+    private MemoryPool<Physics2DBody> bodyMemoryPool = new MemoryPool<>(Physics2DBody.class, 10);
+    private MemoryPool<Physics2DWorldCollision.Manifold> manifoldMemoryPool = new MemoryPool<>(Physics2DWorldCollision.Manifold.class, 10);
 
     public CollectionsArray<Physics2DBody> allBodies      = new CollectionsArray<>(false, 500);
     public CollectionsArray<Physics2DBody> bodiesToAdd    = new CollectionsArray<>(false, 100);
@@ -91,8 +94,9 @@ public class Physics2DWorld {
         return body;
     }
 
-    public void destroyBody(int handle) {
-
+    public void destroyBody(final Physics2DBody body) {
+        this.bodiesToRemove.add(body);
+        // TODO: destroy joints as well.
     }
 
     public void createJoint() {

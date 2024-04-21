@@ -2,10 +2,11 @@ package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.physics2d.Physics2DUtils;
 import org.example.engine.core.shape.Shape2D;
 
-public final class Physics2DBody {
+public final class Physics2DBody implements MemoryPool.Reset {
 
     public Object owner;
     public boolean active;
@@ -71,4 +72,20 @@ public final class Physics2DBody {
         DYNAMIC
     }
 
+    @Override
+    public void reset() {
+        this.owner = null;
+        this.active = false;
+        this.type = null;
+        this.shape = null;
+        this.velocity.set(0, 0);
+        this.angularVelocity = 0;
+        this.forces.clear();
+        this.massInv = 0;
+        this.density = 0;
+        this.friction = 0;
+        this.restitution = 0;
+        this.ghost = false;
+        this.bitmask = 0;
+    }
 }

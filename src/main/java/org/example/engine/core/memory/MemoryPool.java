@@ -33,7 +33,7 @@ public class MemoryPool<T extends MemoryPool.Reset> {
         }
     }
 
-    public synchronized T grabOne() throws RuntimeException {
+    public synchronized T allocate() throws RuntimeException {
         try {
             if (this.freeObjects.size == 0) {
                 for (int i = 0; i < initialCapacity; i++) {
@@ -47,10 +47,16 @@ public class MemoryPool<T extends MemoryPool.Reset> {
         }
     }
 
-    public synchronized void letGo(T obj) {
+    public synchronized void free(T obj) {
         if (obj == null) return;
         obj.reset();
         this.freeObjects.add(obj);
+    }
+
+    public synchronized void freeAll(Iterable<T> iterable) {
+        for (T obj : iterable) {
+            free(obj);
+        }
     }
 
     public interface Reset {

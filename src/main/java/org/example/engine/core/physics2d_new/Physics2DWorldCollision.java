@@ -783,7 +783,7 @@ public final class Physics2DWorldCollision {
 
         // free projections
         for (Projection projection : projections) {
-            projectionsPool.letGo(projection);
+            projectionsPool.free(projection);
         }
     }
 
@@ -808,7 +808,7 @@ public final class Physics2DWorldCollision {
             }
         }
 
-        Projection p = projectionsPool.grabOne();
+        Projection p = projectionsPool.allocate();
         p.px = px;
         p.py = py;
         p.dst = (float) Math.sqrt(minDst2);
