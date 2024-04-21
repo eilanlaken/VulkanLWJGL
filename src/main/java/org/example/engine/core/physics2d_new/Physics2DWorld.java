@@ -38,48 +38,24 @@ public class Physics2DWorld {
     public void update(final float delta) {
         this.phase = PHASE_PREPARATION;
         {
-            allBodies.removeAll(bodiesToRemove, true);
-            allBodies.addAll(bodiesToAdd);
-            bodiesToAdd.clear();
-            bodiesToRemove.clear();
-            collisionCandidates.clear();
-            collisionManifolds.clear();
+
         }
 
         this.phase = PHASE_INTEGRATION;
         {
-            for (Physics2DBody body : allBodies) {
-                if (!body.active) continue;
-                if (body.type == Physics2DBody.Type.STATIC) continue;
-                CollectionsArray<MathVector2> forces = body.forces;
-                for (MathVector2 force : forces) {
-                    body.velocity.add(body.massInv * delta * force.x, body.massInv * delta * force.y);
-                }
-                body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.angularVelocity);
-                body.shape.update();
 
-                // TODO: update broad phase cells.
-            }
         }
 
         this.phase = PHASE_BROAD;
         {
-            // for now.
-            collisionCandidates.addAll(allBodies);
+
         }
 
         this.phase = PHASE_NARROW;
         {
-            // TODO: use enhanced loop below. (delete this).
-            for (int i = 0; i < allBodies.size - 1; i++) {
-                for (int j = i + 1; j < allBodies.size; j++) {
-                    Physics2DBody a = allBodies.get(i);
-                    Physics2DBody b = allBodies.get(j);
-                }
-            }
+
         }
 
-        // resolution
         this.phase = PHASE_RESOLUTION;
         {
 
@@ -87,16 +63,13 @@ public class Physics2DWorld {
 
     }
 
-    // TODO: change to create using shapes.
     public Physics2DBody createBody(Shape2D shape, MathVector2 position, float angle, MathVector2 velocity) {
-        Physics2DBody body = new Physics2DBody(shape, position, angle, velocity);
-        this.bodiesToAdd.add(body);
-        return body;
+
+        return null;
     }
 
     public void destroyBody(final Physics2DBody body) {
-        this.bodiesToRemove.add(body);
-        // TODO: destroy joints as well.
+
     }
 
     public void createJoint() {
@@ -107,7 +80,6 @@ public class Physics2DWorld {
 
     }
 
-    // TODO
     public void castRay() {
 
     }
