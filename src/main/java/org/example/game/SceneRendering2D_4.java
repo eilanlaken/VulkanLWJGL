@@ -21,7 +21,7 @@ public class SceneRendering2D_4 extends ApplicationScreen {
     private Shape2DAABB aabb;
     private Shape2DSegment segment;
     private Shape2DPolygon polygon;
-    private Shape2DComposite compound;
+    private Shape2DUnion compound;
 
     private Texture texture0;
     private TextureRegion region;

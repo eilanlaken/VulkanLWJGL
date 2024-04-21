@@ -4,14 +4,14 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathVector2;
 
 // TODO: write unit tests.
-public class Shape2DComposite extends Shape2D {
+public class Shape2DUnion extends Shape2D {
 
     public final CollectionsArray<Shape2D> shapes;
 
-    public Shape2DComposite(Shape2D ...shapes) {
+    public Shape2DUnion(Shape2D ...shapes) {
         this.shapes = new CollectionsArray<>(true, shapes.length);
         for (Shape2D shape : shapes) {
-            if (shape instanceof Shape2DComposite) this.shapes.addAll(((Shape2DComposite) shape).shapes);
+            if (shape instanceof Shape2DUnion) this.shapes.addAll(((Shape2DUnion) shape).shapes);
             else this.shapes.add(shape);
         }
     }
@@ -44,7 +44,7 @@ public class Shape2DComposite extends Shape2D {
 
     @Override
     protected CollectionsArray<MathVector2> getWorldVertices() {
-        throw new UnsupportedOperationException("Cannot get a world vertices list for " + Shape2DComposite.class.getSimpleName() + ": operation not strictly defined.");
+        throw new UnsupportedOperationException("Cannot get a world vertices list for " + Shape2DUnion.class.getSimpleName() + ": operation not strictly defined.");
     }
 
     @Override

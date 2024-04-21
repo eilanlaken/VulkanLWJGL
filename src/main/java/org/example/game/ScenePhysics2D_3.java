@@ -38,7 +38,7 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
 
     @Override
     public void show() {
-        composite = new Shape2DComposite(new Shape2DCircle(1.5f,-1,0), new Shape2DCircle(1.5f,1,0));
+        composite = new Shape2DUnion(new Shape2DCircle(1.5f,-1,0), new Shape2DCircle(1.5f,1,0));
         otherCircle = new Shape2DCircle(1.5f,0,0);
         otherAABB = new Shape2DAABB(4, 2);
         otherRectangle = new Shape2DRectangle(4.5f,2.2f);

@@ -4,40 +4,24 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
-import org.example.engine.core.physics2d.Physics2DBody;
 import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.NotNull;
 
-// TODO: SOLVED: contact points explained:
-// https://www.youtube.com/watch?v=5gDC1GU3Ivg
-// https://oercommons.s3.amazonaws.com/media/courseware/relatedresource/file/imth-6-1-9-6-1-coordinate_plane_plotter/index.html
-
-
-// TODO: concave polygons and polygons with holes:
-// TODO: Simply support convex polygons, and concave polygons will be represented as compound shapes of convex polygons.
-// TODO: will need to create a great way (API, tools, ...) to intuitively create shapes
-
-// this handles: collision detection broad phase, collision detection narrow phase, collision resolution.
-public final class Physics2DWorldCollision {
+public final class Physics2DWorldPhaseDNarrow implements Physics2DWorldPhase {
 
     private static final MemoryPool<Projection> projectionsPool = new MemoryPool<>(Projection.class, 200);
-    private static final MemoryPool<Manifold>   manifoldsPool   =   new MemoryPool<>(Manifold.class, 200);
 
-    private Physics2DWorldCollision() {}
+    @Override
+    public void update(Physics2DWorld world, float delta) {
 
-    public static boolean broadPhaseCollision(final Shape2D a, final Shape2D b) {
-        final float dx = b.x() - a.x();
-        final float dy = b.y() - a.y();
-        final float sum = a.getBoundingRadius() + b.getBoundingRadius();
-        return dx * dx + dy * dy < sum * sum;
     }
 
-    public static void narrowPhaseCollision(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
+    public static void narrowPhaseCollision(org.example.engine.core.physics2d.Physics2DBody a, org.example.engine.core.physics2d.Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
 
     }
 
     /** AABB vs ____ **/
-    private static void AABBvsAABB(Shape2DAABB aabb1, Shape2DAABB aabb2, CollectionsArray<Manifold> manifolds) {
+    private void AABBvsAABB(Shape2DAABB aabb1, Shape2DAABB aabb2, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         MathVector2 a_min = aabb1.getWorldMin();
         MathVector2 a_max = aabb1.getWorldMax();
         MathVector2 b_min = aabb2.getWorldMin();
@@ -48,7 +32,7 @@ public final class Physics2DWorldCollision {
         float x_overlap = MathUtils.intervalsOverlap(a_min.x, a_max.x, b_min.x, b_max.x);
         float y_overlap = MathUtils.intervalsOverlap(a_min.y, a_max.y, b_min.y, b_max.y);
 
-        Manifold manifold = new Manifold();
+        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         manifold.depth = Math.min(x_overlap, y_overlap);
         manifold.contactsCount = 2;
         if (x_overlap < y_overlap) {
@@ -69,16 +53,16 @@ public final class Physics2DWorldCollision {
         manifolds.add(manifold);
     }
 
-    private static void AABBvsCircle(Shape2DAABB aabb, Shape2DCircle circle, CollectionsArray<Manifold> manifolds) {
+    private void AABBvsCircle(Shape2DAABB aabb, Shape2DCircle circle, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         circleVsAABB(circle, aabb, manifolds);
     }
 
-    private static boolean AABBvsComplex(Shape2DAABB aabb, Shape2DComposite morphed, Manifold manifold) {
+    private boolean AABBvsComplex(Shape2DAABB aabb, Shape2DUnion union, Physics2DWorld.CollisionManifold manifold) {
 
         return false;
     }
 
-    private static void AABBvsPolygon(Shape2DAABB aabb, Shape2DPolygon polygon, CollectionsArray<Manifold> manifolds) {
+    private void AABBvsPolygon(Shape2DAABB aabb, Shape2DPolygon polygon, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         // SAT - AABB normals (x & y axis)
         float aabb_min_x = aabb.getWorldMin().x;
         float aabb_max_x = aabb.getWorldMax().x;
@@ -142,7 +126,7 @@ public final class Physics2DWorldCollision {
             }
         }
 
-        Manifold manifold = new Manifold();
+        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(aabb.worldVertices(), polygon.worldVertices(), manifold);
         float min_overlap = MathUtils.min(x_overlap, y_overlap, minOverlapPolygon);
         if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
@@ -152,9 +136,7 @@ public final class Physics2DWorldCollision {
         manifolds.add(manifold);
     }
 
-    // TODO: revise
-    // reference
-    private static void AABBvsRectangle(Shape2DAABB aabb, Shape2DRectangle rect, CollectionsArray<Manifold> manifolds) {
+    private void AABBvsRectangle(Shape2DAABB aabb, Shape2DRectangle rect, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         // aabb corners
         MathVector2 aabb_min = aabb.getWorldMin();
         MathVector2 aabb_max = aabb.getWorldMax();
@@ -209,7 +191,7 @@ public final class Physics2DWorldCollision {
 
         // TODO: see if correct.
         // TODO: fix normal direction.
-        Manifold manifold = new Manifold();
+        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(aabb.worldVertices(), rect.worldVertices(), manifold);
         float min_overlap = MathUtils.min(x_overlap, y_overlap, axis1_overlap, axis2_overlap);
         if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
@@ -220,9 +202,8 @@ public final class Physics2DWorldCollision {
         manifolds.add(manifold);
     }
 
-    // TODO: fix penetration depth and normal direction.
     /** Circle vs ____ **/
-    private static void circleVsAABB(Shape2DCircle circle, Shape2DAABB aabb, CollectionsArray<Manifold> manifolds) {
+    private void circleVsAABB(Shape2DCircle circle, Shape2DAABB aabb, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         MathVector2 circleWorldCenter = circle.getWorldCenter();
         float circleWorldRadius = circle.getWorldRadius();
 
@@ -237,7 +218,7 @@ public final class Physics2DWorldCollision {
 
         if (eX * eX + eY * eY > circleWorldRadius * circleWorldRadius) return;
 
-        Manifold manifold = new Manifold();
+        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         manifold.contactsCount = 1;
         manifold.normal = new MathVector2();
         manifold.contactPoint1 = new MathVector2();
@@ -266,7 +247,7 @@ public final class Physics2DWorldCollision {
         manifolds.add(manifold);
     }
 
-    private static void circleVsCircle(Shape2DCircle c1, Shape2DCircle c2, CollectionsArray<Manifold> manifolds) {
+    private void circleVsCircle(Shape2DCircle c1, Shape2DCircle c2, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         final float dx = c2.x() - c1.x();
         final float dy = c2.y() - c1.y();
         final float radiusSum = c1.getWorldRadius() + c2.getWorldRadius();
@@ -276,7 +257,7 @@ public final class Physics2DWorldCollision {
 
         final float distance = (float) Math.sqrt(distanceSquared);
 
-        Manifold manifold = new Manifold();
+        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         manifold.contactsCount = 1;
         manifold.normal = new MathVector2();
         if (distance != 0) {
@@ -292,12 +273,12 @@ public final class Physics2DWorldCollision {
         manifolds.add(manifold);
     }
 
-    private static boolean circleVsMorphed(Shape2DCircle circle, Shape2DComposite morphed, Manifold manifold) {
+    private boolean circleVsUnion(Shape2DCircle circle, Shape2DUnion union, Physics2DWorld.CollisionManifold manifold) {
 
         return false;
     }
 
-    private static void circleVsPolygon(Shape2DCircle circle, Shape2DPolygon polygon, CollectionsArray<Manifold> manifolds) {
+    private void circleVsPolygon(Shape2DCircle circle, Shape2DPolygon polygon, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         MathVector2 circleWorldCenter = circle.getWorldCenter();
         CollectionsArray<MathVector2> projections = new CollectionsArray<>(false, polygon.vertexCount);
         int closestProjectionIndex = 0;
@@ -334,7 +315,7 @@ public final class Physics2DWorldCollision {
         if (!collide) return;
 
         // build manifold
-        Manifold manifold = new Manifold();
+        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         MathVector2 projection = projections.get(closestProjectionIndex);
         manifold.contactPoint1 = new MathVector2(projection);
         final float minDstEdge = (float) Math.sqrt(minDistanceSquared);
@@ -348,7 +329,7 @@ public final class Physics2DWorldCollision {
         manifolds.add(manifold);
     }
 
-    private static void circleVsRectangle(Shape2DCircle circle, Shape2DRectangle rect, CollectionsArray<Manifold> manifolds) {
+    private void circleVsRectangle(Shape2DCircle circle, Shape2DRectangle rect, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         MathVector2 circleWorldCenter = circle.getWorldCenter();
         MathVector2 c1 = rect.c0();
         MathVector2 c2 = rect.c1();
@@ -412,7 +393,7 @@ public final class Physics2DWorldCollision {
             projection = projection4;
         }
 
-        Manifold manifold = new Manifold();
+        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         manifold.contactPoint1 = new MathVector2(projection);
         final float minDstEdge = (float) Math.sqrt(minDstEdgeSquared);
         if (rectContainsCenter) {
@@ -426,10 +407,10 @@ public final class Physics2DWorldCollision {
     }
 
     // TODO:
-    /** Composite vs ___ **/
-    private static void compositeVsAABB(Shape2DComposite composite, Shape2DAABB aabb, CollectionsArray<Manifold> manifolds) {
-        CollectionsArray<Manifold> individualShapeManifolds = new CollectionsArray<>(true, composite.shapes.size);
-        for (Shape2D shape : composite.shapes) {
+    /** Union vs ___ **/
+    private void unionVsAABB(Shape2DUnion union, Shape2DAABB aabb, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+        CollectionsArray<Physics2DWorld.CollisionManifold> individualShapeManifolds = new CollectionsArray<>(true, union.shapes.size);
+        for (Shape2D shape : union.shapes) {
 
         }
 
@@ -440,37 +421,37 @@ public final class Physics2DWorldCollision {
         System.out.println("omadam");
     }
 
-    private static void compositeVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
+    private void unionVsCircle(org.example.engine.core.physics2d.Physics2DBody a, org.example.engine.core.physics2d.Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
 
     }
 
-    private static void compositeVsComposite(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
+    private void unionVsUnion(org.example.engine.core.physics2d.Physics2DBody a, org.example.engine.core.physics2d.Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
 
     }
 
-    private static void compositeVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
+    private void unionVsPolygon(org.example.engine.core.physics2d.Physics2DBody a, org.example.engine.core.physics2d.Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
 
     }
 
-    private static void compositeVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
+    private void unionVsRectangle(org.example.engine.core.physics2d.Physics2DBody a, org.example.engine.core.physics2d.Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
 
     }
 
     /** Polygon vs ____ **/
-    private static void polygonVsAABB(Shape2DPolygon polygon, Shape2DAABB aabb, CollectionsArray<Manifold> manifolds) {
+    private void polygonVsAABB(Shape2DPolygon polygon, Shape2DAABB aabb, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         AABBvsPolygon(aabb, polygon, manifolds);
     }
 
-    private static void polygonVsCircle(Shape2DPolygon polygon, Shape2DCircle circle, CollectionsArray<Manifold> manifolds) {
+    private void polygonVsCircle(Shape2DPolygon polygon, Shape2DCircle circle, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         circleVsPolygon(circle, polygon, manifolds);
     }
 
-    private static boolean polygonVsMorphed(Shape2DPolygon polygon, Shape2DComposite morphed, Manifold manifold) {
+    private boolean polygonVsUnion(Shape2DPolygon polygon, Shape2DUnion union, Physics2DWorld.CollisionManifold manifold) {
 
         return false;
     }
 
-    private static void polygonVsPolygon(Shape2DPolygon p1, Shape2DPolygon p2, CollectionsArray<Manifold> manifolds) {
+    private void polygonVsPolygon(Shape2DPolygon p1, Shape2DPolygon p2, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         CollectionsArray<MathVector2> p1_vertices = p1.worldVertices();
         CollectionsArray<MathVector2> p2_vertices = p2.worldVertices();
 
@@ -543,32 +524,32 @@ public final class Physics2DWorldCollision {
             }
         }
 
-        Manifold manifold = new Manifold();
+        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(p1_vertices, p2_vertices, manifold);
         manifold.normal = new MathVector2(normal_x, normal_y);
         manifold.depth = depth;
         manifolds.add(manifold);
     }
 
-    private static void polygonVsRectangle(Shape2DPolygon polygon, Shape2DRectangle rect, CollectionsArray<Manifold> manifolds) {
+    private void polygonVsRectangle(Shape2DPolygon polygon, Shape2DRectangle rect, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         rectangleVsPolygon(rect, polygon, manifolds);
     }
 
     /** Rectangle vs ____ **/
-    private static void rectangleVsAABB(Shape2DRectangle rect, Shape2DAABB aabb, CollectionsArray<Manifold> manifolds) {
+    private void rectangleVsAABB(Shape2DRectangle rect, Shape2DAABB aabb, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         AABBvsRectangle(aabb, rect, manifolds);
     }
 
-    private static void rectangleVsCircle(Shape2DRectangle rect, Shape2DCircle circle, CollectionsArray<Manifold> manifolds) {
+    private void rectangleVsCircle(Shape2DRectangle rect, Shape2DCircle circle, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         circleVsRectangle(circle, rect, manifolds);
     }
 
-    private static boolean rectangleVsMorphed(Shape2DRectangle rectangle, Shape2DComposite morphed, Manifold manifold) {
+    private boolean rectangleVsUnion(Shape2DRectangle rectangle, Shape2DUnion union, Physics2DWorld.CollisionManifold manifold) {
 
         return false;
     }
 
-    private static void rectangleVsPolygon(Shape2DRectangle rect, Shape2DPolygon polygon, CollectionsArray<Manifold> manifolds) {
+    private void rectangleVsPolygon(Shape2DRectangle rect, Shape2DPolygon polygon, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         // rect corners
         CollectionsArray<MathVector2> rect_v = rect.worldVertices();
         MathVector2 rect_c0 = rect_v.get(0);
@@ -657,14 +638,14 @@ public final class Physics2DWorldCollision {
             }
         }
 
-        Manifold manifold = new Manifold();
+        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(rect_v, polygon_v, manifold);
         manifold.normal = new MathVector2(normal_x, normal_y);
         manifold.depth = depth;
         manifolds.add(manifold);
     }
 
-    private static void rectangleVsRectangle(Shape2DRectangle rect1, Shape2DRectangle rect2, CollectionsArray<Manifold> manifolds) {
+    private void rectangleVsRectangle(Shape2DRectangle rect1, Shape2DRectangle rect2, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         // rect1 corners
         CollectionsArray<MathVector2> vertices_1 = rect1.worldVertices();
         MathVector2 rect1_c0 = vertices_1.get(0);
@@ -753,14 +734,14 @@ public final class Physics2DWorldCollision {
             }
         }
 
-        Manifold manifold = new Manifold();
+        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(vertices_1, vertices_2, manifold);
         manifold.normal = new MathVector2(min_overlap_axis_x, min_overlap_axis_y).nor();
         manifold.depth = min_axis_overlap;
         manifolds.add(manifold);
     }
 
-    private static void setContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB, Manifold manifold) {
+    private void setContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB, Physics2DWorld.CollisionManifold manifold) {
         CollectionsArray<Projection> projections = new CollectionsArray<>();
 
         // first polygon vs second
@@ -787,7 +768,7 @@ public final class Physics2DWorldCollision {
         }
     }
 
-    private static Projection getClosestProjection(MathVector2 point, CollectionsArray<MathVector2> vertices) {
+    private Projection getClosestProjection(MathVector2 point, CollectionsArray<MathVector2> vertices) {
         float minDst2 = Float.MAX_VALUE;
         float px = Float.NaN;
         float py = Float.NaN;
@@ -828,7 +809,7 @@ public final class Physics2DWorldCollision {
         }
 
         @Override
-        public int compareTo(@NotNull Physics2DWorldCollision.Projection other) {
+        public int compareTo(@NotNull Projection other) {
             return Float.compare(this.dst, other.dst);
         }
 
@@ -839,27 +820,5 @@ public final class Physics2DWorldCollision {
 
     }
 
-    public static final class Manifold implements MemoryPool.Reset {
 
-        public Physics2DBody a;
-        public Physics2DBody b;
-
-        public float depth;
-        public MathVector2 normal;
-
-        public int contactsCount;
-        public MathVector2 contactPoint1;
-        public MathVector2 contactPoint2;
-
-        public float mixedRestitution;
-        public float mixedDynamicFriction;
-        public float mixedStaticFriction;
-
-        @Override
-        public void reset() {
-            this.a = null;
-            this.b = null;
-            this.contactsCount = 0;
-        }
-    }
 }

@@ -65,12 +65,12 @@ public final class Physics2DWorldCollision {
         }
 
         // composite vs **** //
-        if (a.shape instanceof Shape2DComposite) {
+        if (a.shape instanceof Shape2DUnion) {
             if      (b.shape instanceof Shape2DCircle)    compositeVsCircle(a,    b, manifolds);
             else if (b.shape instanceof Shape2DRectangle) compositeVsRectangle(a, b, manifolds);
             else if (b.shape instanceof Shape2DAABB)      compositeVsAABB(a,      b, manifolds);
             else if (b.shape instanceof Shape2DPolygon)   compositeVsPolygon(a,   b, manifolds);
-            else if (b.shape instanceof Shape2DComposite) compositeVsComposite(a, b, manifolds);
+            else if (b.shape instanceof Shape2DUnion) compositeVsComposite(a, b, manifolds);
             return;
         }
     }
@@ -115,7 +115,7 @@ public final class Physics2DWorldCollision {
         circleVsAABB(b, a, manifolds);
     }
 
-    private static boolean AABBvsComplex(Shape2DAABB aabb, Shape2DComposite morphed, Manifold manifold) {
+    private static boolean AABBvsComplex(Shape2DAABB aabb, Shape2DUnion morphed, Manifold manifold) {
 
         return false;
     }
@@ -347,7 +347,7 @@ public final class Physics2DWorldCollision {
         manifolds.add(manifold);
     }
 
-    private static boolean circleVsMorphed(Shape2DCircle circle, Shape2DComposite morphed, Manifold manifold) {
+    private static boolean circleVsMorphed(Shape2DCircle circle, Shape2DUnion morphed, Manifold manifold) {
 
         return false;
     }
@@ -489,7 +489,7 @@ public final class Physics2DWorldCollision {
     // TODO:
     /** Composite vs ___ **/
     private static void compositeVsAABB(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {
-        Shape2DComposite composite = (Shape2DComposite) a.shape;
+        Shape2DUnion composite = (Shape2DUnion) a.shape;
         Shape2DAABB aabb = (Shape2DAABB) b.shape;
 
         CollectionsArray<Manifold> individualShapeManifolds = new CollectionsArray<>(true, composite.shapes.size);
@@ -529,7 +529,7 @@ public final class Physics2DWorldCollision {
         circleVsPolygon(circle, polygon, manifolds);
     }
 
-    private static boolean polygonVsMorphed(Shape2DPolygon polygon, Shape2DComposite morphed, Manifold manifold) {
+    private static boolean polygonVsMorphed(Shape2DPolygon polygon, Shape2DUnion morphed, Manifold manifold) {
 
         return false;
     }
@@ -630,7 +630,7 @@ public final class Physics2DWorldCollision {
         circleVsRectangle(b, a, manifolds);
     }
 
-    private static boolean rectangleVsMorphed(Shape2DRectangle rectangle, Shape2DComposite morphed, Manifold manifold) {
+    private static boolean rectangleVsMorphed(Shape2DRectangle rectangle, Shape2DUnion morphed, Manifold manifold) {
 
         return false;
     }
