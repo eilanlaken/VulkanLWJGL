@@ -15,6 +15,11 @@ import org.example.engine.core.math.MathVector3;
 // TODO: redo entire Shape3D
 public class Shape3DFrustum implements Shape3D_old {
 
+    public static final MathVector3[] canonicalCubeCorners = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
+            new MathVector3(-1, -1, -1), new MathVector3(1, -1, -1), new MathVector3(1, 1, -1), new MathVector3(-1, 1, -1), // near clipping plane corners
+            new MathVector3(-1, -1, 1), new MathVector3(1, -1, 1), new MathVector3(1, 1, 1), new MathVector3(-1, 1, 1), // far clipping plane corners
+    };
+
     // for the purpose of intermediate computations
     private final MathVector3 vector = new MathVector3();
     public Shape3DPlane[] planes; // the 6 clipping planes: near, far, left, right, top, bottom
@@ -32,7 +37,7 @@ public class Shape3DFrustum implements Shape3D_old {
 
     @Override
     public void update(final MathMatrix4 invPrjView) {
-        for (int i = 0; i < 8; i++) frustumCorners[i].set(MathUtils.canonicalCubeCorners[i]).prj(invPrjView);
+        for (int i = 0; i < 8; i++) frustumCorners[i].set(canonicalCubeCorners[i]).prj(invPrjView);
         planes[0].set(frustumCorners[1], frustumCorners[0], frustumCorners[2]); // near
         planes[1].set(frustumCorners[4], frustumCorners[5], frustumCorners[7]); // far
         planes[2].set(frustumCorners[0], frustumCorners[4], frustumCorners[3]); // left

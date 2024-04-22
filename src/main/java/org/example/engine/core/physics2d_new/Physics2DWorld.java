@@ -12,40 +12,39 @@ import org.example.engine.core.shape.Shape2D;
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
 public class Physics2DWorld {
 
-    private static final short PHASE_PREPARATION = 0;
-    private static final short PHASE_INTEGRATION = 1;
-    private static final short PHASE_BROAD       = 2;
-    private static final short PHASE_NARROW      = 3;
-    private static final short PHASE_RESOLUTION  = 4;
+    private static final short PHASE_A_PREPARATION = 0;
+    private static final short PHASE_B_INTEGRATION = 1;
+    private static final short PHASE_C_BROAD       = 2;
+    private static final short PHASE_D_NARROW      = 3;
+    private static final short PHASE_E_RESOLUTION  = 4;
 
-    public MemoryPool<Physics2DBody>     bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
-    public MemoryPool<CollisionManifold> manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
-
-    public CollectionsArray<Physics2DBody> allBodies      = new CollectionsArray<>(false, 500);
-    public CollectionsArray<Physics2DBody> bodiesToAdd    = new CollectionsArray<>(false, 100);
-    public CollectionsArray<Physics2DBody> bodiesToRemove = new CollectionsArray<>(false, 500);
+    public MemoryPool<Physics2DBody>       bodyMemoryPool      = new MemoryPool<>(Physics2DBody.class,     10);
+    public MemoryPool<CollisionManifold>   manifoldMemoryPool  = new MemoryPool<>(CollisionManifold.class, 10);
+    public CollectionsArray<Physics2DBody> allBodies           = new CollectionsArray<>(false, 500);
+    public CollectionsArray<Physics2DBody> bodiesToAdd         = new CollectionsArray<>(false, 100);
+    public CollectionsArray<Physics2DBody> bodiesToRemove      = new CollectionsArray<>(false, 500);
 
     // [0, 1], [2, 3], [4, 5], ... are collision candidates.
     public final CollectionsArray<Physics2DBody>     collisionCandidates = new CollectionsArray<>(false, 400);
     public final CollectionsArray<CollisionManifold> collisionManifolds  = new CollectionsArray<>(false, 200);
 
     // phases
-    private Physics2DWorldPhase[] phases = new Physics2DWorldPhase[5];
+    private final Physics2DWorldPhase[] phases = new Physics2DWorldPhase[5];
 
     public Physics2DWorld() {
-        this.phases[PHASE_PREPARATION] = new Physics2DWorldPhaseAPreparation();
-        this.phases[PHASE_INTEGRATION] = new Physics2DWorldPhaseBIntegration();
-        this.phases[PHASE_BROAD]       = new Physics2DWorldPhaseCBroad();
-        this.phases[PHASE_NARROW]      = new Physics2DWorldPhaseDNarrow();
-        this.phases[PHASE_RESOLUTION]  = new Physics2DWorldPhaseEResolution();
+        this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseAPreparation();
+        this.phases[PHASE_B_INTEGRATION] = new Physics2DWorldPhaseBIntegration();
+        this.phases[PHASE_C_BROAD]       = new Physics2DWorldPhaseCBroad();
+        this.phases[PHASE_D_NARROW]      = new Physics2DWorldPhaseDNarrow();
+        this.phases[PHASE_E_RESOLUTION]  = new Physics2DWorldPhaseEResolution();
     }
 
     public void update(final float delta) {
-        this.phases[PHASE_PREPARATION].update(this, delta);
-        this.phases[PHASE_INTEGRATION].update(this, delta);
-        this.phases[PHASE_BROAD].update(this, delta);
-        this.phases[PHASE_NARROW].update(this, delta);
-        this.phases[PHASE_RESOLUTION].update(this, delta);
+        this.phases[PHASE_A_PREPARATION].update(this, delta);
+        this.phases[PHASE_B_INTEGRATION].update(this, delta);
+        this.phases[PHASE_C_BROAD]      .update(this, delta);
+        this.phases[PHASE_D_NARROW]     .update(this, delta);
+        this.phases[PHASE_E_RESOLUTION] .update(this, delta);
     }
 
     public Physics2DBody createBody(Shape2D shape, MathVector2 position, float angle, MathVector2 velocity) {
@@ -71,8 +70,8 @@ public class Physics2DWorld {
 
     public static final class CollisionManifold implements MemoryPool.Reset {
 
-        public org.example.engine.core.physics2d.Physics2DBody a;
-        public org.example.engine.core.physics2d.Physics2DBody b;
+        public Physics2DBody a;
+        public Physics2DBody b;
 
         public float depth;
         public MathVector2 normal;

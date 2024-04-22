@@ -30,10 +30,8 @@ public class Renderer2D implements MemoryResourceHolder {
     private final Texture       whiteSinglePixelTexture = createWhiteSinglePixelTexture();
 
     // cached colors
-    private final float WHITE_TINT = new Color(1,1,1,1).toFloatBits();
-    private final float RED_TINT   = new Color(1,0,0,1).toFloatBits();
-    private final float GREEN_TINT = new Color(0,1,0,1).toFloatBits();
-    private final float BLUE_TINT  = new Color(0,0,1,1).toFloatBits();
+    private final float TINT_WHITE = new Color(1,1,1,1).toFloatBits();
+    private final float TINT_SHAPE = new Color(0,0,1,1).toFloatBits();
 
     // state
     private Camera        currentCamera = null;
@@ -71,6 +69,14 @@ public class Renderer2D implements MemoryResourceHolder {
             GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.capacity(), GL15.GL_DYNAMIC_DRAW);
         }
         GL30.glBindVertexArray(0);
+    }
+
+    public Camera getCurrentCamera() {
+        return currentCamera;
+    }
+
+    public boolean isDrawing() {
+        return drawing;
     }
 
     public void begin(Camera camera) {
@@ -193,7 +199,7 @@ public class Renderer2D implements MemoryResourceHolder {
         x4 += x;
         y4 += y;
 
-        float t = tint == null ? WHITE_TINT : tint.toFloatBits();
+        float t = tint == null ? TINT_WHITE : tint.toFloatBits();
         verticesBuffer
                 .put(x1).put(y1).put(t).put(ui).put(vi) // V1
                 .put(x2).put(y2).put(t).put(ui).put(vf) // V2
@@ -226,7 +232,7 @@ public class Renderer2D implements MemoryResourceHolder {
         polygon.setTransform(x, y, angleZ, scaleX, scaleY);
         polygon.update();
 
-        float t = tint == null ? WHITE_TINT : tint.toFloatBits();
+        float t = tint == null ? TINT_WHITE : tint.toFloatBits();
 
         final CollectionsArray<MathVector2> worldVertices = polygon.worldVertices();
 
@@ -242,7 +248,7 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     public void pushDebugShape(Shape2D shape, final Color tint) {
-        final float tintFloatBits = tint == null ? BLUE_TINT : tint.toFloatBits();
+        final float tintFloatBits = tint == null ? TINT_SHAPE : tint.toFloatBits();
         pushDebugShape(shape, tintFloatBits);
     }
 
@@ -414,8 +420,8 @@ public class Renderer2D implements MemoryResourceHolder {
         ;
         triangleIndex += 2;
 
-        MathVector2 worldA = segment.getWorldA();
-        MathVector2 worldB = segment.getWorldB();
+        MathVector2 worldA = segment.worldA();
+        MathVector2 worldB = segment.worldB();
         float x1 = worldA.x, y1 = worldA.y;
         float x2 = worldB.x, y2 = worldB.y;
         verticesBuffer

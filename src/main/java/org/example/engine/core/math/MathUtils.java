@@ -5,26 +5,22 @@ import java.util.Random;
 // TODO: implement init() block that will take care of configuration.
 public final class MathUtils {
 
-    public static final float NANO_TO_SEC = 1 / 1000000000f;
-    public static final float FLOAT_ROUNDING_ERROR = 0.000001f; // 32 bits
-    public static final float PI = (float)Math.PI;
-    public static final float PI2 = PI * 2;
-    public static final float HALF_PI = PI / 2;
-    public static final float E = (float) Math.E;
-    public static final float radiansToDegrees = 180f / PI;
-    public static final float degreesToRadians = PI / 180;
-    private static final int SIN_BITS = 14; // 16KB. Adjust for accuracy.
-    private static final int SIN_MASK = ~(-1 << SIN_BITS);
-    private static final int SIN_COUNT = SIN_MASK + 1;
-    private static final float RADIANS_FULL = PI2;
-    private static final float DEGREES_FULL = 360.0f;
-    private static final float RADIANS_TO_INDEX = SIN_COUNT / RADIANS_FULL;
-    private static final float DEGREES_TO_INDEX = SIN_COUNT / DEGREES_FULL;
-    private static final Random random = new Random();
-    public static final MathVector3[] canonicalCubeCorners = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
-            new MathVector3(-1, -1, -1), new MathVector3(1, -1, -1), new MathVector3(1, 1, -1), new MathVector3(-1, 1, -1), // near clipping plane corners
-            new MathVector3(-1, -1, 1), new MathVector3(1, -1, 1), new MathVector3(1, 1, 1), new MathVector3(-1, 1, 1), // far clipping plane corners
-    };
+    public static final float   NANO_TO_SEC          = 1.0f / 1000000000f;
+    public static final float   FLOAT_ROUNDING_ERROR = 0.000001f; // 32 bits
+    public static final float   PI                   = (float) Math.PI;
+    public static final float   PI2                  = PI * 2;
+    public static final float   HALF_PI              = PI / 2;
+    public static final float   E                    = (float) Math.E;
+    public static final float   radiansToDegrees     = 180f / PI;
+    public static final float   degreesToRadians     = PI / 180;
+    private static final int    SIN_BITS             = 14; // 16KB. Adjust for accuracy.
+    private static final int    SIN_MASK             = ~(-1 << SIN_BITS);
+    private static final int    SIN_COUNT            = SIN_MASK + 1;
+    private static final float  RADIANS_FULL         = PI2;
+    private static final float  DEGREES_FULL         = 360.0f;
+    private static final float  RADIANS_TO_INDEX     = SIN_COUNT / RADIANS_FULL;
+    private static final float  DEGREES_TO_INDEX     = SIN_COUNT / DEGREES_FULL;
+    private static final Random random               = new Random();
 
     private MathUtils() {}
 

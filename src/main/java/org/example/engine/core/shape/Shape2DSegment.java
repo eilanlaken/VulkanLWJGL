@@ -56,12 +56,30 @@ public class Shape2DSegment extends Shape2D {
         worldB.add(x,y);
     }
 
-    public MathVector2 getWorldA() {
+    public void localA(float x, float y) {
+        this.localA.set(x, y);
+        updated = false;
+    }
+
+    public void localB(float x, float y) {
+        this.localB.set(x, y);
+        updated = false;
+    }
+
+    public MathVector2 localA() {
+        return localA;
+    }
+
+    public MathVector2 localB() {
+        return localB;
+    }
+
+    public MathVector2 worldA() {
         if (!updated) update();
         return worldA;
     }
 
-    public MathVector2 getWorldB() {
+    public MathVector2 worldB() {
         if (!updated) update();
         return worldB;
     }
