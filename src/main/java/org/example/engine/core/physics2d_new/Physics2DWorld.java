@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
@@ -12,12 +13,14 @@ import org.example.engine.core.shape.Shape2D;
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
 public class Physics2DWorld {
 
+    // constants
     private static final short PHASE_A_PREPARATION = 0;
     private static final short PHASE_B_INTEGRATION = 1;
     private static final short PHASE_C_BROAD       = 2;
     private static final short PHASE_D_NARROW      = 3;
     private static final short PHASE_E_RESOLUTION  = 4;
 
+    // bodies, joints, constraints and manifolds
     public MemoryPool<Physics2DBody>       bodyMemoryPool      = new MemoryPool<>(Physics2DBody.class,     10);
     public MemoryPool<CollisionManifold>   manifoldMemoryPool  = new MemoryPool<>(CollisionManifold.class, 10);
     public CollectionsArray<Physics2DBody> allBodies           = new CollectionsArray<>(false, 500);
@@ -28,8 +31,8 @@ public class Physics2DWorld {
     public final CollectionsArray<Physics2DBody>     collisionCandidates = new CollectionsArray<>(false, 400);
     public final CollectionsArray<CollisionManifold> collisionManifolds  = new CollectionsArray<>(false, 200);
 
-    // phases
-    private final Physics2DWorldPhase[] phases = new Physics2DWorldPhase[5];
+    private final Physics2DWorldPhase[]  phases        = new Physics2DWorldPhase[5];
+    private final Physics2DWorldRenderer debugRenderer = new Physics2DWorldRenderer(this);
 
     public Physics2DWorld() {
         this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseAPreparation();
@@ -66,6 +69,10 @@ public class Physics2DWorld {
 
     public void castRay() {
 
+    }
+
+    public void render(Renderer2D renderer) {
+        debugRenderer.render(renderer);
     }
 
     public static final class CollisionManifold implements MemoryPool.Reset {

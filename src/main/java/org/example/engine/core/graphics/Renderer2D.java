@@ -25,13 +25,15 @@ import java.util.stream.Collectors;
 public class Renderer2D implements MemoryResourceHolder {
 
     // constants
-    private static final int BATCH_SIZE         = 4000;
     private static final int VERTEX_SIZE        = 5;
+    private static final int BATCH_SIZE         = 4000;
     private static final int TRIANGLES_CAPACITY = BATCH_SIZE * 2;
 
     // defaults
-    private final ShaderProgram defaultShader           =    createDefaultShaderProgram();
+    private final ShaderProgram defaultShader           = createDefaultShaderProgram();
     private final Texture       whiteSinglePixelTexture = createWhiteSinglePixelTexture();
+    // TODO: test
+    private final Camera        defaultCamera           = createDefaultCamera();
 
     // cached colors
     private final float TINT_WHITE = new Color(1,1,1,1).toFloatBits();
@@ -39,8 +41,8 @@ public class Renderer2D implements MemoryResourceHolder {
 
     // state
     private Camera        currentCamera = null;
-    private ShaderProgram currentShader = null;
     private Texture       lastTexture   = null;
+    private ShaderProgram currentShader = null;
     private boolean       drawing       = false;
     private int           vertexIndex   = 0;
     private int           triangleIndex = 0;
@@ -51,8 +53,8 @@ public class Renderer2D implements MemoryResourceHolder {
     private final int vao;
     private final int vbo;
     private final int ebo;
+    private final IntBuffer   indicesBuffer  = BufferUtils.createIntBuffer(TRIANGLES_CAPACITY * 3);
     private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * 4 * VERTEX_SIZE);
-    private final IntBuffer   indicesBuffer  =         BufferUtils.createIntBuffer(TRIANGLES_CAPACITY * 3);
 
     public Renderer2D() {
         this.vao = GL30.glGenVertexArrays();
@@ -83,6 +85,11 @@ public class Renderer2D implements MemoryResourceHolder {
         return drawing;
     }
 
+    // TODO: test
+    public void begin() {
+        begin(null);
+    }
+
     public void begin(Camera camera) {
         if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
@@ -90,7 +97,7 @@ public class Renderer2D implements MemoryResourceHolder {
         GL11.glEnable(GL11.GL_BLEND); // TODO: make camera attributes, get as additional parameter to begin()
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); // TODO: make camera attributes, get as additional parameter to begin()
         this.drawCalls = 0;
-        this.currentCamera = camera;
+        this.currentCamera = camera != null ? camera : defaultCamera.update(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight());
         this.currentShader = null;
         drawing = true;
     }
@@ -544,6 +551,8 @@ public class Renderer2D implements MemoryResourceHolder {
         flush();
         GL20.glDepthMask(true);
         GL11.glEnable(GL11.GL_CULL_FACE);
+        currentCamera = null;
+        currentShader = null;
         drawing = false;
     }
 
@@ -636,6 +645,10 @@ public class Renderer2D implements MemoryResourceHolder {
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, 1, 1, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
             return texture;
         }
+    }
+
+    private static Camera createDefaultCamera() {
+        return new Camera(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight(), 1);
     }
 
 }

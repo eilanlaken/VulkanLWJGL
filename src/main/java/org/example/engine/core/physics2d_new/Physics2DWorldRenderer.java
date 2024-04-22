@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.graphics.Camera;
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Renderer2D;
@@ -8,6 +9,7 @@ import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.shape.Shape2DPolygon;
 import org.example.engine.core.shape.Shape2DSegment;
 import org.example.engine.core.shape.ShapeUtils;
+import org.jetbrains.annotations.NotNull;
 
 public final class Physics2DWorldRenderer {
 
@@ -15,12 +17,16 @@ public final class Physics2DWorldRenderer {
     private static final Color TINT_DYNAMIC   = new Color(1,0,1,1);
     private static final Color TINT_KINEMATIC = new Color(0,1,1,1);
 
-    private static Shape2DSegment segment          = new Shape2DSegment(0,0,0,0);
-    private static Shape2DPolygon contactIndicator = ShapeUtils.createPolygonCircleFilled(1, 10);
+    private Shape2DSegment segment          = new Shape2DSegment(0,0,0,0);
+    private Shape2DPolygon contactIndicator = ShapeUtils.createPolygonCircleFilled(1, 10);
 
-    private Physics2DWorldRenderer() {}
+    private final Physics2DWorld world;
 
-    public static void render(Physics2DWorld world, Renderer2D renderer) {
+    Physics2DWorldRenderer(final Physics2DWorld world) {
+        this.world = world;
+    }
+
+    public void render(Renderer2D renderer) {
         // render bodies
         CollectionsArray<Physics2DBody> bodies = world.allBodies;
         for (Physics2DBody body : bodies) {

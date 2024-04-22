@@ -36,8 +36,10 @@ public class CameraLens {
     }
 
     public void update(MathVector3 position, MathVector3 direction, MathVector3 up) {
-        if (mode == Mode.ORTHOGRAPHIC) projection.setToOrthographicProjection(zoom * -viewportWidth / 2.0f, zoom * (viewportWidth / 2.0f), zoom * -(viewportHeight / 2.0f), zoom * viewportHeight / 2.0f, 0, far);
-        else if (mode == Mode.PERSPECTIVE) this.projection.setToPerspectiveProjection(Math.abs(near), Math.abs(far), fov, viewportWidth / viewportHeight);
+        switch (mode) {
+            case ORTHOGRAPHIC -> projection.setToOrthographicProjection(zoom * -viewportWidth / 2.0f, zoom * (viewportWidth / 2.0f), zoom * -(viewportHeight / 2.0f), zoom * viewportHeight / 2.0f, 0, far);
+            case PERSPECTIVE  -> this.projection.setToPerspectiveProjection(Math.abs(near), Math.abs(far), fov, viewportWidth / viewportHeight);
+        }
         view.setToLookAt(position, tmp.set(position).add(direction), up);
         combined.set(projection);
         MathMatrix4.mul(combined.val, view.val);

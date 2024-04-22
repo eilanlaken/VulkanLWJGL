@@ -30,9 +30,16 @@ public class Camera {
         this.lens = new CameraLens(CameraLens.Mode.ORTHOGRAPHIC, viewportWidth, viewportHeight, zoom, 0.1f, 100, 70);
     }
 
-    public void update() {
+    public Camera update() {
         left.set(up).crs(direction);
         lens.update(position, direction, up);
+        return this;
+    }
+
+    public Camera update(float viewportWidth, float viewportHeight) {
+        lens.viewportWidth  = viewportWidth;
+        lens.viewportHeight = viewportHeight;
+        return update();
     }
 
     public void switchToOrthographicMode() {
