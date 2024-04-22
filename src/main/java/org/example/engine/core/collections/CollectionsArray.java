@@ -22,6 +22,7 @@ public class CollectionsArray<T> implements Iterable<T> {
     }
 
     public CollectionsArray(boolean ordered, int capacity) {
+        if (capacity <= 0) throw new IllegalArgumentException(CollectionsArray.class.getSimpleName() + " must have a positive capacity. Got: " + capacity);
         this.ordered = ordered;
         items = (T[])new Object[capacity];
     }

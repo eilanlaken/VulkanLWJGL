@@ -80,10 +80,9 @@ public class Physics2DWorld {
         public Physics2DBody a;
         public Physics2DBody b;
 
-        public float depth;
+        public float       depth;
         public MathVector2 normal;
-
-        public int contactsCount;
+        public int         contactsCount;
         public MathVector2 contactPoint1;
         public MathVector2 contactPoint2;
 

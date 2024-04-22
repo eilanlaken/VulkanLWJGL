@@ -138,6 +138,13 @@ public class Shape2DRectangle extends Shape2D {
         return c3;
     }
 
+    public boolean isAxisAligned() {
+        if (!updated) update();
+        if (MathUtils.isEqual(c0.x, c1.x) && MathUtils.isEqual(c1.y, c2.y)) return true;
+        if (MathUtils.isEqual(c0.y, c1.y) && MathUtils.isEqual(c1.x, c2.x)) return true;
+        return false;
+    }
+
     @Override
     protected CollectionsArray<MathVector2> getWorldVertices() {
         return worldVertices;

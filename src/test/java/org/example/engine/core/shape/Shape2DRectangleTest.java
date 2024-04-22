@@ -52,6 +52,15 @@ class Shape2DRectangleTest {
     }
 
     @Test
+    void isAxisAligned() {
+        Assertions.assertTrue(rectangle1.isAxisAligned());
+        Assertions.assertTrue(rectangle2.isAxisAligned());
+        Assertions.assertTrue(rectangle3.isAxisAligned());
+        Assertions.assertTrue(rectangle4.isAxisAligned());
+        Assertions.assertFalse(rectangle5.isAxisAligned());
+    }
+
+    @Test
     void updateWorldCoordinates() {
     }
 
