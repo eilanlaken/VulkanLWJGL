@@ -1,15 +1,11 @@
 package org.example.engine.core.memory;
 
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.lwjgl.system.MemoryStack;
 
-import java.lang.instrument.Instrumentation;
 import java.nio.ByteBuffer;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryUtilsTest {
 

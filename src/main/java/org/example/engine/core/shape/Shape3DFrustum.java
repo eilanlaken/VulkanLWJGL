@@ -1,6 +1,5 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathMatrix4;
 import org.example.engine.core.math.MathVector3;
 

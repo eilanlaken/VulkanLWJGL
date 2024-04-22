@@ -5,7 +5,6 @@ import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.math.MathVector2;
-import org.example.engine.core.physics2d_new.Physics2DWorld;
 import org.example.engine.core.shape.Shape2DPolygon;
 import org.example.engine.core.shape.Shape2DSegment;
 import org.example.engine.core.shape.ShapeUtils;

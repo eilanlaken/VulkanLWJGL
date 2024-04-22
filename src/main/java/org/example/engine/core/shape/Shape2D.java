@@ -178,10 +178,10 @@ public abstract class Shape2D {
         return scaleY;
     }
 
-    protected abstract boolean containsPoint(float x, float y);
-    protected abstract void updateWorldCoordinates();
+    protected abstract boolean                       containsPoint(float x, float y);
+    protected abstract void                          updateWorldCoordinates();
     protected abstract CollectionsArray<MathVector2> getWorldVertices();
-    protected abstract float calculateUnscaledBoundingRadius();
-    protected abstract float calculateUnscaledArea();
+    protected abstract float                         calculateUnscaledBoundingRadius();
+    protected abstract float                         calculateUnscaledArea();
 
 }

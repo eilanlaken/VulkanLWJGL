@@ -1,8 +1,5 @@
 package org.example.engine.ecs;
 
-import org.example.engine.ecs.Entity;
-import org.example.engine.ecs.EntityContainer;
-
 public abstract class System {
 
     public final EntityContainer container;

@@ -1,6 +1,8 @@
 package org.example.engine.core.shape;
 
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.math.MathVector3;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,7 @@ class Shape3DTest {
     private void setup() {
         shape = new Shape3D() {
             @Override
-            public boolean contains(float x, float y, float z) {
+            protected boolean containsPoint(float x, float y, float z) {
                 return false;
             }
 
@@ -24,7 +26,17 @@ class Shape3DTest {
             }
 
             @Override
-            protected float getUnscaledBoundingRadius() {
+            protected CollectionsArray<MathVector3> getWorldVertices() {
+                return null;
+            }
+
+            @Override
+            protected float calculateUnscaledBoundingRadius() {
+                return 0;
+            }
+
+            @Override
+            protected float calculateUnscaledVolume() {
                 return 0;
             }
         };

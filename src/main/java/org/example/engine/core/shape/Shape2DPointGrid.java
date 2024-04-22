@@ -1,13 +1,9 @@
 package org.example.engine.core.shape;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.collections.CollectionsTuple2;
-import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
 
 // will be used in rigged 2d meshes.
 // TODO: implement

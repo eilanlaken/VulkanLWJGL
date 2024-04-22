@@ -29,7 +29,7 @@ public class MemoryPool<T extends MemoryPool.Reset> {
                 freeObjects.add(constructor.newInstance());
             }
         } catch (NoSuchMethodException | SecurityException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-            throw new RuntimeException("Classes managed by a " + MemoryPool.class.getSimpleName() + " MUST declare a no-args constructor.");
+            throw new RuntimeException("Classes managed by a " + MemoryPool.class.getSimpleName() + " MUST declare a public no-args constructor.");
         }
     }
 

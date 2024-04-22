@@ -1,8 +1,8 @@
 package org.example.game;
 
 import org.example.engine.core.application.Application;
-import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.application.ApplicationScreen;
+import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 

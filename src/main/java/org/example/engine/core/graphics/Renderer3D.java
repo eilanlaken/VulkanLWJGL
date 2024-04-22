@@ -1,8 +1,8 @@
 package org.example.engine.core.graphics;
 
-import org.example.engine.ecs.ComponentTransform;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
+import org.example.engine.ecs.ComponentTransform;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;

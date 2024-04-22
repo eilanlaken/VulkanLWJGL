@@ -26,6 +26,8 @@ public final class Physics2DBody implements MemoryPool.Reset {
     public boolean ghost;
     public int bitmask;
 
+    public Physics2DBody() {}
+
     // todo: change to protected.
     public Physics2DBody(Object owner, boolean active, Type type, Shape2D shape, MathVector2 position, float angle, MathVector2 velocity, float angularVelocity, float density, float friction, float restitution, boolean ghost, int bitmask) {
         this.owner = owner;

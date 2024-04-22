@@ -1,7 +1,6 @@
 package org.example.engine.core.shape;
 
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.shape.Shape2DRectangle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

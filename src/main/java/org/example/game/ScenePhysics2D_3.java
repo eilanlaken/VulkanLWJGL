@@ -2,7 +2,10 @@ package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.graphics.*;
+import org.example.engine.core.graphics.Camera;
+import org.example.engine.core.graphics.Color;
+import org.example.engine.core.graphics.GraphicsUtils;
+import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.MathVector2;

@@ -25,9 +25,6 @@ public class Shape2DAABB extends Shape2D {
         this.worldMax = new MathVector2(localMax);
         this.worldVertices = new CollectionsArray<>(true, 4);
         this.worldVertices.addAll(new MathVector2(), new MathVector2(), new MathVector2(), new MathVector2());
-        float centerX = (localMin.x + localMax.x) * 0.5f;
-        float centerY = (localMin.y + localMax.y) * 0.5f;
-        float halfDiagonal = MathVector2.dst(localMin, localMax) * 0.5f;
     }
 
     public Shape2DAABB(float width, float height) {

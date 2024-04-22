@@ -2,7 +2,6 @@ package org.example;
 
 import org.example.engine.core.application.Application;
 import org.example.engine.core.application.ApplicationWindowAttributes;
-
 import org.example.game.ScreenLoading;
 
 public class Main {

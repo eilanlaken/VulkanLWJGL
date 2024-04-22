@@ -1,7 +1,7 @@
 package org.example.engine.core.input;
 
-import org.example.engine.core.collections.CollectionsArrayInt;
 import org.example.engine.core.application.ApplicationWindow;
+import org.example.engine.core.collections.CollectionsArrayInt;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
 

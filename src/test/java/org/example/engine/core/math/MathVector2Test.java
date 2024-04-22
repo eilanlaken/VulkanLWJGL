@@ -3,8 +3,6 @@ package org.example.engine.core.math;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class MathVector2Test {
 
     @Test

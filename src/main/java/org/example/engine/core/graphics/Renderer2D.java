@@ -1,11 +1,15 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.math.*;
+import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryResourceHolder;
 import org.example.engine.core.shape.*;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

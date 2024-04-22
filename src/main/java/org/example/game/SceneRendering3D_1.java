@@ -1,14 +1,14 @@
 package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
-import org.example.engine.ecs.Component;
-import org.example.engine.ecs.ComponentTransform;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.MathMatrix4;
 import org.example.engine.core.memory.MemoryResource;
+import org.example.engine.ecs.Component;
+import org.example.engine.ecs.ComponentTransform;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;

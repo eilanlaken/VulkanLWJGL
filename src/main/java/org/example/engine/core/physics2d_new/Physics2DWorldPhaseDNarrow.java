@@ -796,17 +796,13 @@ public final class Physics2DWorldPhaseDNarrow implements Physics2DWorldPhase {
         return p;
     }
 
-    private static final class Projection implements Comparable<Projection>, MemoryPool.Reset {
+    public static final class Projection implements Comparable<Projection>, MemoryPool.Reset {
 
         public float px;
         public float py;
         public float dst;
 
-        public Projection(float px, float py, float dst) {
-            this.px = px;
-            this.py = py;
-            this.dst = dst;
-        }
+        public Projection() {}
 
         @Override
         public int compareTo(@NotNull Projection other) {

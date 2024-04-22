@@ -1,11 +1,11 @@
 package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
-import org.example.engine.core.shape.*;
-import org.example.engine.ecs.ComponentGraphics2DShape;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.memory.MemoryResource;
+import org.example.engine.core.shape.*;
+import org.example.engine.ecs.ComponentGraphics2DShape;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;

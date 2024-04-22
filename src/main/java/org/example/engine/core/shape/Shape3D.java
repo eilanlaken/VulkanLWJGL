@@ -1,5 +1,6 @@
 package org.example.engine.core.shape;
 
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.math.MathVector3;
@@ -16,13 +17,37 @@ public abstract class Shape3D {
     protected float scaleY = 1;
     protected float scaleZ = 1;
 
-    private float boundingRadius;
-    private float boundingRadiusSquared;
-    protected boolean updated             = false;
-    private boolean boundingRadiusUpdated = false;
+    private float     volume                     = 0;
+    private float     boundingRadius             = 0;
+    private float     boundingRadiusSquared      = 0;
+    private float     unscaledVolume             = 0;
+    private float     unscaledBoundingRadius     = 0;
+    private boolean   calcUnscaledVolume         = false;
+    private boolean   calcUnscaledBoundingRadius = false;
+    protected boolean updated                    = false;
+    private boolean   areaUpdated                = false;
+    private boolean   boundingRadiusUpdated      = false;
 
     public final boolean contains(final MathVector3 point) {
         return contains(point.x, point.y, point.z);
+    }
+
+    public final boolean contains(float x, float y, float z) {
+        if (!updated) update();
+        return containsPoint(x, y, z);
+    }
+
+    public final CollectionsArray<MathVector3> worldVertices() {
+        if (!updated) update();
+        return getWorldVertices();
+    }
+
+    public final float getVolume() {
+        if (!areaUpdated) {
+            volume = getUnscaledVolume() * Math.abs(scaleX) * Math.abs(scaleY) * Math.abs(scaleZ);
+            areaUpdated = true;
+        }
+        return volume;
     }
 
     public final float getBoundingRadius() {
@@ -41,12 +66,6 @@ public abstract class Shape3D {
             boundingRadiusUpdated = true;
         }
         return boundingRadiusSquared;
-    }
-
-    protected void forceUpdateBoundingRadius() {
-        boundingRadius = getUnscaledBoundingRadius() * MathUtils.max(Math.abs(scaleX), Math.abs(scaleY), Math.abs(scaleZ));
-        boundingRadiusSquared = boundingRadius * boundingRadius;
-        boundingRadiusUpdated = true;
     }
 
     public final void update() {
@@ -78,25 +97,17 @@ public abstract class Shape3D {
     }
 
     public final void rotX(float da_x) {
-        angleX += da_x;
-        angleX %= 360.0f;
-        if (angleX < 0) angleX += 360.0f;
+        angleX = MathUtils.normalizeAngleDeg(angleX + da_x);
         updated = false;
     }
-
 
     public final void rotY(float da_y) {
-        angleY += da_y;
-        angleY %= 360.0f;
-        if (angleY < 0) angleY += 360.0f;
+        angleY = MathUtils.normalizeAngleDeg(angleY + da_y);
         updated = false;
     }
 
-
     public final void rotZ(float da_z) {
-        angleZ += da_z;
-        angleZ %= 360.0f;
-        if (angleZ < 0) angleZ += 360.0f;
+        angleZ = MathUtils.normalizeAngleDeg(angleZ + da_z);
         updated = false;
     }
 
@@ -140,18 +151,21 @@ public abstract class Shape3D {
     public final void scaleX(float scaleX) {
         this.scaleX = scaleX;
         boundingRadiusUpdated = false;
+        areaUpdated = false;
         updated = false;
     }
 
     public final void scaleY(float scaleY) {
         this.scaleY = scaleY;
         boundingRadiusUpdated = false;
+        areaUpdated = false;
         updated = false;
     }
 
     public final void scaleZ(float scaleZ) {
         this.scaleZ = scaleZ;
         boundingRadiusUpdated = false;
+        areaUpdated = false;
         updated = false;
     }
 
@@ -160,12 +174,11 @@ public abstract class Shape3D {
         this.scaleY = scaleY;
         this.scaleZ = scaleZ;
         boundingRadiusUpdated = false;
+        areaUpdated = false;
         updated = false;
     }
 
-    public final void transform(float x, float y, float z,
-                                float angleX, float angleY, float angleZ,
-                                float scaleX, float scaleY, float scaleZ) {
+    public final void setTransform(float x, float y, float z, float angleX, float angleY, float angleZ, float scaleX, float scaleY, float scaleZ) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -176,7 +189,24 @@ public abstract class Shape3D {
         this.scaleY = scaleY;
         this.scaleZ = scaleZ;
         boundingRadiusUpdated = false;
+        areaUpdated = false;
         updated = false;
+    }
+
+    protected final float getUnscaledVolume() {
+        if (!calcUnscaledVolume) {
+            unscaledVolume = calculateUnscaledVolume();
+            calcUnscaledVolume = true;
+        }
+        return unscaledVolume;
+    }
+
+    protected final float getUnscaledBoundingRadius() {
+        if (!calcUnscaledBoundingRadius) {
+            unscaledBoundingRadius = calculateUnscaledBoundingRadius();
+            calcUnscaledBoundingRadius = true;
+        }
+        return unscaledBoundingRadius;
     }
 
     public final float x() {
@@ -189,34 +219,20 @@ public abstract class Shape3D {
     public final float angleX() {
         return angleX;
     }
-    public final float angleY() {
-        return angleY;
+    public final float angleY() { return angleY; }
+    public final float angleZ() { return angleZ; }
+    public final float scaleX() {
+        return scaleX;
     }
-    public final float angleZ() {
-        return angleZ;
+    public final float scaleY() {
+        return scaleY;
     }
-    public float scaleX() { return scaleX; }
-    public float scaleY() { return scaleY; }
-    public float scaleZ() {
-        return scaleZ;
-    }
+    public final float scaleZ() { return scaleZ; }
 
-    public abstract boolean contains(float x, float y, float z);
-    protected abstract void updateWorldCoordinates();
-    protected abstract float getUnscaledBoundingRadius();
-
-    protected static boolean isTransformIdentity(final Shape3D shape) {
-        return  MathUtils.isZero(shape.x)
-                && MathUtils.isZero(shape.y)
-                && MathUtils.isZero(shape.z)
-
-                && MathUtils.isZero(shape.angleX % 360)
-                && MathUtils.isZero(shape.angleY % 360)
-                && MathUtils.isZero(shape.angleZ % 360)
-
-                && MathUtils.isEqual(shape.scaleX, 1.0f)
-                && MathUtils.isEqual(shape.scaleY, 1.0f)
-                && MathUtils.isEqual(shape.scaleZ, 1.0f);
-    }
+    protected abstract boolean                       containsPoint(float x, float y, float z);
+    protected abstract void                          updateWorldCoordinates();
+    protected abstract CollectionsArray<MathVector3> getWorldVertices();
+    protected abstract float                         calculateUnscaledBoundingRadius();
+    protected abstract float                         calculateUnscaledVolume();
 
 }

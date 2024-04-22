@@ -1,11 +1,14 @@
 package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
-import org.example.engine.core.graphics.*;
+import org.example.engine.core.graphics.Camera;
+import org.example.engine.core.graphics.Color;
+import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.Texture;
 import org.example.engine.core.input.InputKeyboard;
+import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.core.shape.Shape2D;
 import org.example.engine.core.shape.Shape2DCircle;
-import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;

@@ -1,7 +1,9 @@
 package org.example.engine.core.assets;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.graphics.*;
+import org.example.engine.core.graphics.GraphicsUtils;
+import org.example.engine.core.graphics.Texture;
+import org.example.engine.core.graphics.TextureBinder;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.stb.STBImage;
