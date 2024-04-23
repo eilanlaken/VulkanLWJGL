@@ -35,7 +35,7 @@ public class ScenePhysics2D_5 extends ApplicationScreen {
         world.update(GraphicsUtils.getDeltaTime());
         if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.R)) {
 
-            world.createBodyCircle(null, Physics2DBody.MotionType.FIXED,
+            world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
                     0,0,0,
                     0,0,0,
                     1, 1, 1, false, 1,
