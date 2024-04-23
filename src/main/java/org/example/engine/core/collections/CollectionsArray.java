@@ -357,7 +357,7 @@ public class CollectionsArray<T> implements Iterable<T> {
     }
 
     /** Returns the items as an array. Note the array is typed, so the {@link #CollectionsArray()}} constructor must have been used.
-     * Otherwise use {@link #toArray(Class)} to specify the array type. */
+     * Otherwise, use {@link #toArray(Class)} to specify the array type. */
     public T[] toArray () {
         return (T[])toArray(items.getClass().getComponentType());
     }
