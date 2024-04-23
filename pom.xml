@@ -154,7 +154,7 @@
                 <artifactId>lwjgl-bom</artifactId>
                 <version>${lwjgl.version}</version>
                 <scope>import</scope>
-                <type>pom</type>
+                <motionType>pom</motionType>
             </dependency>
         </dependencies>
     </dependencyManagement>

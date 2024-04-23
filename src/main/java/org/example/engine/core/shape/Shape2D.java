@@ -135,10 +135,17 @@ public abstract class Shape2D {
         updated = false;
     }
 
-    public final void setTransform(float x, float y, float angle, float scaleX, float scaleY) {
+    public final void setTransform(float x, float y, float angleDeg) {
         this.x = x;
         this.y = y;
-        this.angle = MathUtils.normalizeAngleDeg(angle);
+        this.angle = MathUtils.normalizeAngleDeg(angleDeg);
+        updated = false;
+    }
+
+    public final void setTransform(float x, float y, float angleDeg, float scaleX, float scaleY) {
+        this.x = x;
+        this.y = y;
+        this.angle = MathUtils.normalizeAngleDeg(angleDeg);
         this.scaleX = scaleX;
         this.scaleY = scaleY;
         boundingRadiusUpdated = false;

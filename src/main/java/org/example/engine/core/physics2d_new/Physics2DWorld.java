@@ -4,7 +4,6 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
-import org.example.engine.core.shape.Shape2D;
 
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
@@ -33,13 +32,14 @@ public class Physics2DWorld {
 
     private final Physics2DWorldPhase[]  phases        = new Physics2DWorldPhase[5];
     private final Physics2DWorldRenderer debugRenderer = new Physics2DWorldRenderer(this);
+    private final Physics2DBodyFactory   bodyFactory   = new Physics2DBodyFactory(this);
 
     public Physics2DWorld() {
-        this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseAPreparation();
-        this.phases[PHASE_B_INTEGRATION] = new Physics2DWorldPhaseBIntegration();
-        this.phases[PHASE_C_BROAD]       = new Physics2DWorldPhaseCBroad();
-        this.phases[PHASE_D_NARROW]      = new Physics2DWorldPhaseDNarrow();
-        this.phases[PHASE_E_RESOLUTION]  = new Physics2DWorldPhaseEResolution();
+        this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseAPreparation(this);
+        this.phases[PHASE_B_INTEGRATION] = new Physics2DWorldPhaseBIntegration(this);
+        this.phases[PHASE_C_BROAD]       = new Physics2DWorldPhaseCBroad      (this);
+        this.phases[PHASE_D_NARROW]      = new Physics2DWorldPhaseDNarrow     (this);
+        this.phases[PHASE_E_RESOLUTION]  = new Physics2DWorldPhaseEResolution (this);
     }
 
     public void update(final float delta) {
@@ -50,9 +50,16 @@ public class Physics2DWorld {
         this.phases[PHASE_E_RESOLUTION] .update(this, delta);
     }
 
-    public Physics2DBody createBody(Shape2D shape, MathVector2 position, float angle, MathVector2 velocity) {
-
-        return null;
+    public Physics2DBody createBodyCircle(Object owner, Physics2DBody.MotionType motionType,
+                                          float x, float y, float angleDeg,
+                                          float velX, float velY, float velAngleDeg,
+                                          float density, float friction, float restitution,
+                                          boolean ghost, int bitmask,
+                                          float r) {
+        Physics2DBody body = bodyFactory.createBodyCircle(owner, motionType, density, friction, restitution, ghost, bitmask, r);
+        body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
+        return body;
     }
 
     public void destroyBody(final Physics2DBody body) {

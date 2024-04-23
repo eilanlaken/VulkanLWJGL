@@ -5,10 +5,10 @@ import org.example.engine.core.shape.Shape2D;
 
 public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
 
+    private final Physics2DWorld world;
 
-
-    protected Physics2DWorldPhaseCBroad() {
-
+    Physics2DWorldPhaseCBroad(final Physics2DWorld world) {
+        this.world = world;
     }
 
     @Override

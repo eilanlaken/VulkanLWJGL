@@ -18,22 +18,16 @@ public final class Physics2DBodyFactory {
 
     @Contract(pure = true)
     @NotNull Physics2DBody createBodyCircle(Object owner,
-                                                 boolean sleeping, Physics2DBody.Type type,
-                                                 float x, float y, float angle,
-                                                 float velocityX, float velocityY, float angularVelocity,
+                                                 Physics2DBody.MotionType motionType,
                                                  float density, float friction, float restitution,
                                                  boolean ghost, int bitmask,
                                                  float radius) {
         Physics2DBody body = bodyMemoryPool.allocate();
         body.owner = owner;
-        body.sleeping = sleeping;
-        body.type = type;
-        body.angularVelocityDeg = angularVelocity;
+        body.off = false;
+        body.motionType = motionType;
         body.density = density;
         body.shape = new Shape2DCircle(radius);
-        body.setPosition(x, y);
-        body.setAngle(angle);
-        body.setVelocity(velocityX, velocityY);
         body.massInv = 1.0f / (body.shape.getArea() * density);
         body.friction = friction;
         body.restitution = restitution;
@@ -45,15 +39,15 @@ public final class Physics2DBodyFactory {
     // TODO
     @Contract(pure = true)
     @NotNull Physics2DBody createBodyRectangle(Object owner,
-                                      boolean sleeping, Physics2DBody.Type type,
+                                      boolean sleeping, Physics2DBody.MotionType motionType,
                                       MathVector2 velocity, float angularVelocity,
                                       float massInv, float density, float friction, float restitution,
                                       boolean ghost, int bitmask,
                                       float width, float height, float angle) {
         Physics2DBody body = bodyMemoryPool.allocate();
         body.owner = owner;
-        body.sleeping = sleeping;
-        body.type = type;
+        body.off = sleeping;
+        body.motionType = motionType;
 
         return body;
     }
@@ -61,15 +55,15 @@ public final class Physics2DBodyFactory {
     // TODO
     @Contract(pure = true)
     @NotNull Physics2DBody createBodyPolygon(Object owner,
-                                               boolean sleeping, Physics2DBody.Type type,
+                                               boolean sleeping, Physics2DBody.MotionType motionType,
                                                MathVector2 velocity, float angularVelocity,
                                                float massInv, float density, float friction, float restitution,
                                                boolean ghost, int bitmask,
                                                float[] vertices, int[] holes) {
         Physics2DBody body = bodyMemoryPool.allocate();
         body.owner = owner;
-        body.sleeping = sleeping;
-        body.type = type;
+        body.off = sleeping;
+        body.motionType = motionType;
 
         return body;
     }
@@ -77,15 +71,15 @@ public final class Physics2DBodyFactory {
     // TODO
     @Contract(pure = true)
     @NotNull Physics2DBody createBodyUnion(Object owner,
-                                             boolean sleeping, Physics2DBody.Type type,
+                                             boolean sleeping, Physics2DBody.MotionType motionType,
                                              MathVector2 velocity, float angularVelocity,
                                              float massInv, float density, float friction, float restitution,
                                              boolean ghost, int bitmask,
                                              Shape2D ...shapes) {
         Physics2DBody body = bodyMemoryPool.allocate();
         body.owner = owner;
-        body.sleeping = sleeping;
-        body.type = type;
+        body.off = sleeping;
+        body.motionType = motionType;
 
         return body;
     }
