@@ -9,7 +9,6 @@ class Shape2DUnionTest {
     private static Shape2DUnion shape_1;
     private static Shape2DUnion shape_2;
     private static Shape2DUnion shape_3;
-    private static Shape2DUnion shape_invalid;
 
     @BeforeEach
     public void setup() {
