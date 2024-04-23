@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.physics2d.Physics2DUtils;
@@ -14,7 +15,7 @@ public class Physics2DBody implements MemoryPool.Reset {
     public    Type        type;
     public    Shape2D     shape;
     public    MathVector2 velocity;
-    public    float       angularVelocity;
+    public    float       angularVelocityDeg;
 
     public CollectionsArray<MathVector2>         forces      = new CollectionsArray<>(false, 2);
     public CollectionsArray<Physics2DConstraint> constraints = new CollectionsArray<>(false, 1);
@@ -33,7 +34,7 @@ public class Physics2DBody implements MemoryPool.Reset {
     // TODO: make protected.
     public Physics2DBody(Object owner,
                          boolean sleeping, Type type, Shape2D shape,
-                         MathVector2 velocity, float angularVelocity,
+                         MathVector2 velocity, float angularVelocityDeg,
                          float massInv, float density, float friction, float restitution,
                          boolean ghost, int bitmask) {
         this.owner = owner;
@@ -42,7 +43,7 @@ public class Physics2DBody implements MemoryPool.Reset {
         this.type = type;
         this.shape = shape;
         this.velocity = velocity;
-        this.angularVelocity = angularVelocity;
+        this.angularVelocityDeg = MathUtils.normalizeAngleDeg(angularVelocityDeg);
         this.massInv = massInv;
         this.density = density;
         this.friction = friction;
@@ -52,7 +53,7 @@ public class Physics2DBody implements MemoryPool.Reset {
     }
 
     // todo: remove.
-    public Physics2DBody(Object owner, boolean sleeping, Type type, Shape2D shape, MathVector2 position, float angle, MathVector2 velocity, float angularVelocity, float density, float friction, float restitution, boolean ghost, int bitmask) {
+    public Physics2DBody(Object owner, boolean sleeping, Type type, Shape2D shape, MathVector2 position, float angle, MathVector2 velocity, float angularVelocityDeg, float density, float friction, float restitution, boolean ghost, int bitmask) {
         this.owner = owner;
         this.created = false;
         this.sleeping = sleeping;
@@ -60,7 +61,7 @@ public class Physics2DBody implements MemoryPool.Reset {
         this.shape = shape;
         shape.setTransform(position.x, position.y, angle, 1,1);
         this.velocity = new MathVector2(velocity);
-        this.angularVelocity = angularVelocity;
+        this.angularVelocityDeg = angularVelocityDeg;
         this.forces = new CollectionsArray<>(false, 2);
         this.massInv = 1f / Physics2DUtils.calculateMass(shape, density);
         this.density = density;
@@ -74,8 +75,16 @@ public class Physics2DBody implements MemoryPool.Reset {
         shape.xy(x, y);
     }
 
+    public void setAngle(float angle) {
+        shape.angle(angle);
+    }
+
     public void setVelocity(float x, float y) {
         velocity.set(x, y);
+    }
+
+    public void setAngularVelocityDeg(float angularVelocityDeg) {
+        this.angularVelocityDeg = MathUtils.normalizeAngleDeg(angularVelocityDeg);
     }
 
     public enum Type {
@@ -92,7 +101,7 @@ public class Physics2DBody implements MemoryPool.Reset {
         this.type = null;
         this.shape = null;
         this.velocity.set(0, 0);
-        this.angularVelocity = 0;
+        this.angularVelocityDeg = 0;
         this.forces.clear();
         this.constraints.clear();
         this.joints.clear();

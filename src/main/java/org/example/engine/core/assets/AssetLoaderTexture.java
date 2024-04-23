@@ -38,6 +38,7 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
         }
     }
 
+    // TODO: use Texture Builder
     @Override
     public Texture create() {
         int glHandle = GL11.glGenTextures();

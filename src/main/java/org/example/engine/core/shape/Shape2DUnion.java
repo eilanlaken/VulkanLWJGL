@@ -9,10 +9,11 @@ public class Shape2DUnion extends Shape2D {
     public final CollectionsArray<Shape2D> shapes;
 
     public Shape2DUnion(Shape2D ...shapes) {
+        if (shapes == null || shapes.length == 0) throw new IllegalArgumentException("Union must have at least one shape.");
         this.shapes = new CollectionsArray<>(true, shapes.length);
         for (Shape2D shape : shapes) {
             if (shape instanceof Shape2DUnion) this.shapes.addAll(((Shape2DUnion) shape).shapes);
-            else this.shapes.add(shape);
+            else if (shape != null) this.shapes.add(shape);
         }
     }
 
