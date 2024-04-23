@@ -11,7 +11,7 @@ public class Physics2DBody implements MemoryPool.Reset {
     public    Object      owner;
     protected boolean     created;
     public    boolean     off;
-    public MotionType motionType;
+    public    MotionType  motionType;
     public    Shape2D     shape;
     public    MathVector2 velocity;
     public    float       angularVelocityDeg;
@@ -27,7 +27,9 @@ public class Physics2DBody implements MemoryPool.Reset {
     public boolean ghost;
     public int     bitmask;
 
-    public Physics2DBody() {}
+    public Physics2DBody() {
+        this.velocity = new MathVector2();
+    }
 
     // TODO: use only this all args constructor from the world.
     // TODO: make protected.

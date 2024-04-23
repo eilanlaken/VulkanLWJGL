@@ -35,11 +35,11 @@ public class Physics2DWorld {
     private final Physics2DBodyFactory   bodyFactory   = new Physics2DBodyFactory(this);
 
     public Physics2DWorld() {
-        this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseAPreparation(this);
-        this.phases[PHASE_B_INTEGRATION] = new Physics2DWorldPhaseBIntegration(this);
-        this.phases[PHASE_C_BROAD]       = new Physics2DWorldPhaseCBroad      (this);
-        this.phases[PHASE_D_NARROW]      = new Physics2DWorldPhaseDNarrow     (this);
-        this.phases[PHASE_E_RESOLUTION]  = new Physics2DWorldPhaseEResolution (this);
+        this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseAPreparation();
+        this.phases[PHASE_B_INTEGRATION] = new Physics2DWorldPhaseBIntegration();
+        this.phases[PHASE_C_BROAD]       = new Physics2DWorldPhaseCBroad      ();
+        this.phases[PHASE_D_NARROW]      = new Physics2DWorldPhaseDNarrow     ();
+        this.phases[PHASE_E_RESOLUTION]  = new Physics2DWorldPhaseEResolution ();
     }
 
     public void update(final float delta) {

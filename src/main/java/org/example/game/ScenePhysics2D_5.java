@@ -5,6 +5,8 @@ import org.example.engine.core.graphics.Camera;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.input.InputKeyboard;
+import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.physics2d_new.Physics2DBody;
 import org.example.engine.core.physics2d_new.Physics2DWorld;
 import org.example.engine.core.physics2d_new.Physics2DWorldRenderer;
 import org.lwjgl.opengl.GL11;
@@ -31,12 +33,18 @@ public class ScenePhysics2D_5 extends ApplicationScreen {
     @Override
     protected void refresh() {
         world.update(GraphicsUtils.getDeltaTime());
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
+        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.R)) {
 
+            world.createBodyCircle(null, Physics2DBody.MotionType.FIXED,
+                    0,0,0,
+                    0,0,0,
+                    1, 1, 1, false, 1,
+                    1);
         }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,1);
+
         renderer2D.begin(camera);
         world.render(renderer2D);
         renderer2D.end();

@@ -11,9 +11,9 @@ import org.example.engine.core.shape.ShapeUtils;
 
 public final class Physics2DWorldRenderer {
 
-    private static final Color TINT_STATIC    = new Color(1,1,0,1);
-    private static final Color TINT_DYNAMIC   = new Color(1,0,1,1);
-    private static final Color TINT_KINEMATIC = new Color(0,1,1,1);
+    private static final Color TINT_FIXED     = new Color(1,1,0,1);
+    private static final Color TINT_LOGICAL   = new Color(1,0,1,1);
+    private static final Color TINT_NEWTONIAN = new Color(0,1,1,1);
 
     private Shape2DSegment segment          = new Shape2DSegment(0,0,0,0);
     private Shape2DPolygon contactIndicator = ShapeUtils.createPolygonCircleFilled(1, 10);
@@ -28,9 +28,10 @@ public final class Physics2DWorldRenderer {
         // render bodies
         CollectionsArray<Physics2DBody> bodies = world.allBodies;
         for (Physics2DBody body : bodies) {
-            if (body.motionType == Physics2DBody.MotionType.FIXED)    renderer.pushDebugShape(body.shape,    TINT_STATIC);
-            if (body.motionType == Physics2DBody.MotionType.NEWTONIAN)   renderer.pushDebugShape(body.shape,   TINT_DYNAMIC);
-            if (body.motionType == Physics2DBody.MotionType.LOGICAL) renderer.pushDebugShape(body.shape, TINT_KINEMATIC);
+            System.out.println(body.motionType);
+            if (body.motionType == Physics2DBody.MotionType.FIXED)       renderer.pushDebugShape(body.shape, TINT_FIXED);
+            if (body.motionType == Physics2DBody.MotionType.LOGICAL)     renderer.pushDebugShape(body.shape, TINT_LOGICAL);
+            if (body.motionType == Physics2DBody.MotionType.NEWTONIAN)   renderer.pushDebugShape(body.shape, TINT_NEWTONIAN);
         }
 
         // TODO: render constraints
