@@ -15,6 +15,7 @@ public class Shape2DUnion extends Shape2D {
             if (shape instanceof Shape2DUnion) this.shapes.addAll(((Shape2DUnion) shape).shapes);
             else if (shape != null) this.shapes.add(shape);
         }
+        this.shapes.pack();
     }
 
     @Override
