@@ -6,10 +6,10 @@ import java.util.*;
 
 public class CollectionsArray<T> implements Iterable<T> {
 
-    public T[] items;
-    public int size;
-    public boolean ordered;
-    private ArrayIterable iterable;
+    public  int              size;
+    public  T[]              items;
+    public  boolean          ordered;
+    private ArrayIterable<T> iterable;
 
     /** Creates an ordered array with a capacity of 16. */
     public CollectionsArray() {
@@ -412,15 +412,12 @@ public class CollectionsArray<T> implements Iterable<T> {
         return buffer.toString();
     }
 
-    static public class ArrayIterator<T> implements Iterator<T>, Iterable<T> {
-        private final CollectionsArray<T> array;
-        private final boolean allowRemove;
-        int index;
-        boolean valid = true;
+    public static class ArrayIterator<T> implements Iterator<T>, Iterable<T> {
 
-        public ArrayIterator (CollectionsArray<T> array) {
-            this(array, true);
-        }
+        private final CollectionsArray<T> array;
+        private final boolean             allowRemove;
+        private       int                 index;
+        private       boolean             valid = true;
 
         public ArrayIterator (CollectionsArray<T> array, boolean allowRemove) {
             this.array = array;
@@ -451,16 +448,18 @@ public class CollectionsArray<T> implements Iterable<T> {
         public void reset () {
             index = 0;
         }
-
         public ArrayIterator<T> iterator () {
             return this;
         }
+
     }
 
-    static public class ArrayIterable<T> implements Iterable<T> {
+    public static class ArrayIterable<T> implements Iterable<T> {
+
         private final CollectionsArray<T> array;
-        private final boolean allowRemove;
-        private ArrayIterator iterator1, iterator2;
+        private final boolean             allowRemove;
+        private       ArrayIterator<T>    iterator1;
+        private       ArrayIterator<T>    iterator2;
 
         public ArrayIterable (CollectionsArray<T> array) {
             this(array, true);
@@ -473,8 +472,8 @@ public class CollectionsArray<T> implements Iterable<T> {
 
         public ArrayIterator<T> iterator () {
             if (iterator1 == null) {
-                iterator1 = new ArrayIterator(array, allowRemove);
-                iterator2 = new ArrayIterator(array, allowRemove);
+                iterator1 = new ArrayIterator<>(array, allowRemove);
+                iterator2 = new ArrayIterator<>(array, allowRemove);
             }
             if (!iterator1.valid) {
                 iterator1.index = 0;
@@ -506,7 +505,7 @@ public class CollectionsArray<T> implements Iterable<T> {
     @Override
     public CollectionsArray.ArrayIterator<T> iterator() {
         if (this.iterable == null) {
-            this.iterable = new CollectionsArray.ArrayIterable(this);
+            this.iterable = new CollectionsArray.ArrayIterable<>(this);
         }
         return this.iterable.iterator();
     }
