@@ -12,6 +12,7 @@ public final class Physics2DWorldPhaseAPreparation implements Physics2DWorldPhas
             world.allBodies.removeValue(body, true);
             world.bodyMemoryPool.free(body);
         }
+
         for (Physics2DBody body : world.bodiesToAdd) {
             world.allBodies.add(body);
             body.created = true;

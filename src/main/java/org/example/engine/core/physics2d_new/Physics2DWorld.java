@@ -87,15 +87,15 @@ public class Physics2DWorld {
         public Physics2DBody a;
         public Physics2DBody b;
 
-        public float       depth;
-        public MathVector2 normal;
-        public int         contactsCount;
-        public MathVector2 contactPoint1;
-        public MathVector2 contactPoint2;
+        public float         depth;
+        public MathVector2   normal;
+        public int           contactsCount;
+        public MathVector2   contactPoint1;
+        public MathVector2   contactPoint2;
 
-        public float mixedRestitution;
-        public float mixedDynamicFriction;
-        public float mixedStaticFriction;
+        public float         mixedRestitution;
+        public float         mixedStaticFriction;
+        public float         mixedDynamicFriction;
 
         @Override
         public void reset() {
@@ -103,6 +103,7 @@ public class Physics2DWorld {
             this.b = null;
             this.contactsCount = 0;
         }
+
     }
 
 }
