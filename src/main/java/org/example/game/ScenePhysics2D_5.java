@@ -33,10 +33,10 @@ public class ScenePhysics2D_5 extends ApplicationScreen {
     @Override
     protected void refresh() {
         world.update(GraphicsUtils.getDeltaTime());
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.R)) {
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
 
             world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
-                    0,0,0,
+                    MathUtils.random() * 10 - 5,MathUtils.random() * 10 - 5,MathUtils.random() * 360,
                     0,0,0,
                     1, 1, 1, false, 1,
                     1);
