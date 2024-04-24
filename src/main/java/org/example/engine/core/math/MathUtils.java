@@ -109,9 +109,7 @@ public final class MathUtils {
         return x + y; // returns 0 for 0,0 or NaN if either y or x is NaN
     }
 
-    public static float areaTriangle(MathVector2 a, MathVector2 b, MathVector2 c) { return 0.5f * Math.abs((a.x - c.x) * (b.y - a.y) - (a.x - b.x) * (c.y - a.y)); }
-
-    public static float areaTriangle(float x1, float y1, float x2, float y2, float x3, float y3) { return 0.5f * Math.abs((x1 - x3) * (y2 - y2) - (x1 - x2) * (y3 - y1)); }
+    public static float areaTriangle(float x1, float y1, float x2, float y2, float x3, float y3) { return 0.5f * Math.abs(x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2)); }
 
     public static float max(float a, float b, float c) {
         return Math.max(a, Math.max(b, c));
@@ -153,11 +151,11 @@ public final class MathUtils {
         }
     }
 
-    public static float sin(float radians) {
+    public static float sinRad(float radians) {
         return Sin.lookup[(int)(radians * RADIANS_TO_INDEX) & SIN_MASK];
     }
 
-    public static float cos(float radians) {
+    public static float cosRad(float radians) {
         return Sin.lookup[(int)((radians + HALF_PI) * RADIANS_TO_INDEX) & SIN_MASK];
     }
 
@@ -167,7 +165,7 @@ public final class MathUtils {
 
     public static float cosDeg(float degrees) { return Sin.lookup[(int)((degrees + 90) * DEGREES_TO_INDEX) & SIN_MASK]; }
 
-    public static float tan(float radians) {
+    public static float tanRad(float radians) {
         radians /= PI;
         radians += 0.5f;
         radians -= Math.floor(radians);
@@ -261,11 +259,11 @@ public final class MathUtils {
         return Math.abs(value) <= tolerance;
     }
 
-    public static boolean isEqual(float a, float b) {
+    public static boolean floatsEqual(float a, float b) {
         return Math.abs(a - b) <= FLOAT_ROUNDING_ERROR;
     }
 
-    public static boolean isEqual(float a, float b, float tolerance) {
+    public static boolean floatsEqual(float a, float b, float tolerance) {
         return Math.abs(a - b) <= tolerance;
     }
 

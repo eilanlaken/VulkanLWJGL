@@ -129,8 +129,8 @@ public final class Physics2DWorldPhaseDNarrow implements Physics2DWorldPhase {
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(aabb.worldVertices(), polygon.worldVertices(), manifold);
         float min_overlap = MathUtils.min(x_overlap, y_overlap, minOverlapPolygon);
-        if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
-        else if (MathUtils.isEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
+        if (MathUtils.floatsEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
+        else if (MathUtils.floatsEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
         else manifold.normal = new MathVector2(minOverlapPolygonAxis);
         manifold.depth = min_overlap;
         manifolds.add(manifold);
@@ -194,9 +194,9 @@ public final class Physics2DWorldPhaseDNarrow implements Physics2DWorldPhase {
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(aabb.worldVertices(), rect.worldVertices(), manifold);
         float min_overlap = MathUtils.min(x_overlap, y_overlap, axis1_overlap, axis2_overlap);
-        if (MathUtils.isEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
-        else if (MathUtils.isEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
-        else if (MathUtils.isEqual(min_overlap, axis1_overlap)) manifold.normal = new MathVector2(ax, ay).nor();
+        if (MathUtils.floatsEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
+        else if (MathUtils.floatsEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
+        else if (MathUtils.floatsEqual(min_overlap, axis1_overlap)) manifold.normal = new MathVector2(ax, ay).nor();
         else manifold.normal = new MathVector2(bx, by).nor();
         manifold.depth = min_overlap;
         manifolds.add(manifold);
@@ -230,10 +230,10 @@ public final class Physics2DWorldPhaseDNarrow implements Physics2DWorldPhase {
             float dstDSquared = MathVector2.dst2(circleWorldCenter.x, circleWorldCenter.y, circleWorldCenter.x, worldMin.y);
             float minDstSquared = MathUtils.min(dstASquared, dstBSquared, dstCSquared, dstDSquared);
             MathVector2 closest = new MathVector2();
-            if (MathUtils.isEqual(minDstSquared, dstASquared)) closest.set(worldMin.x, circleWorldCenter.y);
-            else if (MathUtils.isEqual(minDstSquared, dstBSquared)) closest.set(circleWorldCenter.x, worldMax.y);
-            else if (MathUtils.isEqual(minDstSquared, dstCSquared)) closest.set(worldMax.x, circleWorldCenter.y);
-            else if (MathUtils.isEqual(minDstSquared, dstDSquared)) closest.set(circleWorldCenter.x, worldMin.y);
+            if (MathUtils.floatsEqual(minDstSquared, dstASquared)) closest.set(worldMin.x, circleWorldCenter.y);
+            else if (MathUtils.floatsEqual(minDstSquared, dstBSquared)) closest.set(circleWorldCenter.x, worldMax.y);
+            else if (MathUtils.floatsEqual(minDstSquared, dstCSquared)) closest.set(worldMax.x, circleWorldCenter.y);
+            else if (MathUtils.floatsEqual(minDstSquared, dstDSquared)) closest.set(circleWorldCenter.x, worldMin.y);
             manifold.contactPoint1.set(closest);
             manifold.normal.set(closest).sub(circleWorldCenter).nor();
             manifold.depth = circleWorldRadius + MathVector2.dst(circleWorldCenter, manifold.contactPoint1);
@@ -383,11 +383,11 @@ public final class Physics2DWorldPhaseDNarrow implements Physics2DWorldPhase {
         final float minDstEdgeSquared = MathUtils.min(dstEdge1Squared, dstEdge2Squared, dstEdge3Squared, dstEdge4Squared);
 
         MathVector2 projection;
-        if (MathUtils.isEqual(minDstEdgeSquared, dstEdge1Squared)) {
+        if (MathUtils.floatsEqual(minDstEdgeSquared, dstEdge1Squared)) {
             projection = projection1;
-        } else if (MathUtils.isEqual(minDstEdgeSquared, dstEdge2Squared)) {
+        } else if (MathUtils.floatsEqual(minDstEdgeSquared, dstEdge2Squared)) {
             projection = projection2;
-        } else if (MathUtils.isEqual(minDstEdgeSquared, dstEdge3Squared)) {
+        } else if (MathUtils.floatsEqual(minDstEdgeSquared, dstEdge3Squared)) {
             projection = projection3;
         } else {
             projection = projection4;
@@ -760,7 +760,7 @@ public final class Physics2DWorldPhaseDNarrow implements Physics2DWorldPhase {
         Projection p0 = projections.get(0);
         Projection p1 = projections.get(1);
         if (p0 != null) manifold.contactPoint1.set(p0.px, p0.py);
-        if (p0 != null && p1 != null && MathUtils.isEqual(p0.dst, p1.dst)) manifold.contactPoint2.set(p1.px, p1.py);
+        if (p0 != null && p1 != null && MathUtils.floatsEqual(p0.dst, p1.dst)) manifold.contactPoint2.set(p1.px, p1.py);
 
         // free projections
         for (Projection projection : projections) {

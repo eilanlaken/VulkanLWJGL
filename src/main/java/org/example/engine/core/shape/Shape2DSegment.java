@@ -39,7 +39,7 @@ public class Shape2DSegment extends Shape2D {
 
     @Override
     protected boolean containsPoint(float x, float y) {
-        return MathUtils.isEqual(MathVector2.dst(worldA.x, worldA.y, x, y) + MathVector2.dst(x, y, worldB.x, worldB.y), MathVector2.dst(worldA, worldB));
+        return MathUtils.floatsEqual(MathVector2.dst(worldA.x, worldA.y, x, y) + MathVector2.dst(x, y, worldB.x, worldB.y), MathVector2.dst(worldA, worldB));
     }
 
     @Override

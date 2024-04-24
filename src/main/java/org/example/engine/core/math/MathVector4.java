@@ -393,27 +393,27 @@ public class MathVector4 {
             case 8:
                 return true;
             case 3:
-                return MathUtils.isEqual(dx, dy, epsilon);
+                return MathUtils.floatsEqual(dx, dy, epsilon);
             case 5:
-                return MathUtils.isEqual(dx, dz, epsilon);
+                return MathUtils.floatsEqual(dx, dz, epsilon);
             case 9:
-                return MathUtils.isEqual(dx, dw, epsilon);
+                return MathUtils.floatsEqual(dx, dw, epsilon);
             case 6:
-                return MathUtils.isEqual(dy, dz, epsilon);
+                return MathUtils.floatsEqual(dy, dz, epsilon);
             case 10:
-                return MathUtils.isEqual(dy, dw, epsilon);
+                return MathUtils.floatsEqual(dy, dw, epsilon);
             case 12:
-                return MathUtils.isEqual(dz, dw, epsilon);
+                return MathUtils.floatsEqual(dz, dw, epsilon);
             case 7:
-                return MathUtils.isEqual(dx, dy, epsilon) && MathUtils.isEqual(dx, dz, epsilon);
+                return MathUtils.floatsEqual(dx, dy, epsilon) && MathUtils.floatsEqual(dx, dz, epsilon);
             case 11:
-                return MathUtils.isEqual(dx, dy, epsilon) && MathUtils.isEqual(dx, dw, epsilon);
+                return MathUtils.floatsEqual(dx, dy, epsilon) && MathUtils.floatsEqual(dx, dw, epsilon);
             case 13:
-                return MathUtils.isEqual(dx, dz, epsilon) && MathUtils.isEqual(dx, dw, epsilon);
+                return MathUtils.floatsEqual(dx, dz, epsilon) && MathUtils.floatsEqual(dx, dw, epsilon);
             case 14:
-                return MathUtils.isEqual(dy, dz, epsilon) && MathUtils.isEqual(dy, dw, epsilon);
+                return MathUtils.floatsEqual(dy, dz, epsilon) && MathUtils.floatsEqual(dy, dw, epsilon);
             default: // this is essentially case 15:
-                return MathUtils.isEqual(dx, dy, epsilon) && MathUtils.isEqual(dx, dz, epsilon) && MathUtils.isEqual(dx, dw, epsilon);
+                return MathUtils.floatsEqual(dx, dy, epsilon) && MathUtils.floatsEqual(dx, dz, epsilon) && MathUtils.floatsEqual(dx, dw, epsilon);
         }
     }
 
@@ -552,10 +552,10 @@ public class MathVector4 {
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
         MathVector4 other = (MathVector4)obj;
-        if (!MathUtils.isEqual(x, other.x)) return false;
-        if (!MathUtils.isEqual(y, other.y)) return false;
-        if (!MathUtils.isEqual(z, other.z)) return false;
-        if (!MathUtils.isEqual(w, other.w)) return false;
+        if (!MathUtils.floatsEqual(x, other.x)) return false;
+        if (!MathUtils.floatsEqual(y, other.y)) return false;
+        if (!MathUtils.floatsEqual(z, other.z)) return false;
+        if (!MathUtils.floatsEqual(w, other.w)) return false;
         return true;
     }
 

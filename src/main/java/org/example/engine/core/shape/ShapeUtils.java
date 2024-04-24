@@ -84,8 +84,8 @@ public final class ShapeUtils {
 
     public static Shape2DPolygon createPolygonCircleFilled(float r, int refinement, float degStart, float degEnd) {
         degStart = MathUtils.normalizeAngleDeg(degStart);
-        float range = degEnd > degStart && MathUtils.isEqual(MathUtils.normalizeAngleDeg(degEnd), degStart) ? 360.0f : Math.abs(MathUtils.normalizeAngleDeg(degEnd) - degStart);
-        boolean fullRange = MathUtils.isEqual(360.0f, range);
+        float range = degEnd > degStart && MathUtils.floatsEqual(MathUtils.normalizeAngleDeg(degEnd), degStart) ? 360.0f : Math.abs(MathUtils.normalizeAngleDeg(degEnd) - degStart);
+        boolean fullRange = MathUtils.floatsEqual(360.0f, range);
         if (fullRange) return createPolygonCircleFilled(r, refinement);
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
         final CollectionsTuple4<Float, Integer, Float, Float> tuple4 = new CollectionsTuple4<>(r, refinement, degStart, degEnd);
@@ -143,9 +143,9 @@ public final class ShapeUtils {
 
     public static Shape2DPolygon createPolygonCircleHollow(float r, int refinement, float stroke, float degStart, float degEnd) {
         degStart = MathUtils.normalizeAngleDeg(degStart);
-        float range = degEnd > degStart && MathUtils.isEqual(MathUtils.normalizeAngleDeg(degEnd), degStart) ? 360.0f : Math.abs(MathUtils.normalizeAngleDeg(degEnd) - degStart);
+        float range = degEnd > degStart && MathUtils.floatsEqual(MathUtils.normalizeAngleDeg(degEnd), degStart) ? 360.0f : Math.abs(MathUtils.normalizeAngleDeg(degEnd) - degStart);
 
-        boolean fullRange = MathUtils.isEqual(360.0f, range);
+        boolean fullRange = MathUtils.floatsEqual(360.0f, range);
         if (fullRange) return createPolygonCircleHollow(r, refinement, stroke);
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
         stroke = Math.abs(stroke);

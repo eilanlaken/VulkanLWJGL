@@ -98,7 +98,7 @@ public class Shape2DRectangle extends Shape2D {
         c2.set(c2Local);
         c3.set(c3Local);
         // scale
-        if (!MathUtils.isEqual(scaleX,1.0f) || !MathUtils.isEqual(scaleY,1.0f)) {
+        if (!MathUtils.floatsEqual(scaleX,1.0f) || !MathUtils.floatsEqual(scaleY,1.0f)) {
             c0.scl(scaleX, scaleY);
             c1.scl(scaleX, scaleY);
             c2.scl(scaleX, scaleY);
@@ -140,8 +140,8 @@ public class Shape2DRectangle extends Shape2D {
 
     public boolean isAxisAligned() {
         if (!updated) update();
-        if (MathUtils.isEqual(c0.x, c1.x) && MathUtils.isEqual(c1.y, c2.y)) return true;
-        if (MathUtils.isEqual(c0.y, c1.y) && MathUtils.isEqual(c1.x, c2.x)) return true;
+        if (MathUtils.floatsEqual(c0.x, c1.x) && MathUtils.floatsEqual(c1.y, c2.y)) return true;
+        if (MathUtils.floatsEqual(c0.y, c1.y) && MathUtils.floatsEqual(c1.x, c2.x)) return true;
         return false;
     }
 
