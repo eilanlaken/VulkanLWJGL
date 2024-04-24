@@ -1,9 +1,6 @@
 package org.example.engine.core.physics2d_new;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.math.MathVector2;
-import org.example.engine.core.physics2d_new.Physics2DBody;
-
+// TODO: continue. consider torque, constraints, joints.
 public final class Physics2DWorldPhaseBIntegration implements Physics2DWorldPhase {
 
     @Override
