@@ -35,13 +35,15 @@ public class ScenePhysics2D_5_PhaseB extends ApplicationScreen {
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.Q)) {
             world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
                     MathUtils.random() * 10 - 5,MathUtils.random() * 10 - 5,MathUtils.random() * 360,
-                    0.8f,0.3f,30,
+                    0f,0f,0,
                     1, 1, 1, false, 1,
                     0.1f);
         }
 
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.E)) {
-            world.destroyBody(world.allBodies.getCircular(0));
+            for (Physics2DBody body : world.allBodies) {
+                body.applyForce(0.1f, 0.1f);
+            }
         }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);

@@ -48,6 +48,10 @@ public class Physics2DBody implements MemoryPool.Reset {
         this.angularVelocityDeg = angularVelocityDeg;
     }
 
+    public void applyForce(float fx, float fy) {
+        netForce.add(fx, fy);
+    }
+
     public void setMotionState(float x, float y, float angleDeg, float velX, float velY, float velAngleDeg) {
         this.shape.setTransform(x, y, angleDeg);
         this.velocity.set(velX, velY);
