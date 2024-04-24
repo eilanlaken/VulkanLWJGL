@@ -15,6 +15,10 @@ public abstract class Shape2D {
     private float     area                       = 0;
     private float     boundingRadius             = 0;
     private float     boundingRadiusSquared      = 0;
+    private float     minExtentX                 = 0;
+    private float     maxExtentX                 = 0;
+    private float     minExtentY                 = 0;
+    private float     maxExtentY                 = 0;
     private float     unscaledArea               = 0;
     private float     unscaledBoundingRadius     = 0;
     private boolean   calcUnscaledArea           = false;
@@ -46,27 +50,50 @@ public abstract class Shape2D {
     }
 
     public final float getBoundingRadius() {
-        if (!boundingRadiusUpdated) {
-            boundingRadius = getUnscaledBoundingRadius() * Math.max(Math.abs(scaleX), Math.abs(scaleY));
-            boundingRadiusSquared = boundingRadius * boundingRadius;
-            boundingRadiusUpdated = true;
-        }
+        updateBoundingRadius();
         return boundingRadius;
     }
 
     public final float getBoundingRadiusSquared() {
-        if (!boundingRadiusUpdated) {
-            boundingRadius = getUnscaledBoundingRadius() * Math.max(Math.abs(scaleX), Math.abs(scaleY));
-            boundingRadiusSquared = boundingRadius * boundingRadius;
-            boundingRadiusUpdated = true;
-        }
+        updateBoundingRadius();
         return boundingRadiusSquared;
+    }
+
+    public final float getMinExtentX() {
+        updateBoundingRadius();
+        return minExtentX;
+    }
+
+    public final float getMaxExtentX() {
+        updateBoundingRadius();
+        return maxExtentX;
+    }
+
+    public final float getMinExtentY() {
+        updateBoundingRadius();
+        return minExtentY;
+    }
+
+    public final float getMaxExtentY() {
+        updateBoundingRadius();
+        return maxExtentY;
     }
 
     public final void update() {
         if (updated) return;
         updateWorldCoordinates();
         updated = true;
+    }
+
+    public final void updateBoundingRadius() {
+        if (boundingRadiusUpdated) return;
+        boundingRadius = getUnscaledBoundingRadius() * Math.max(Math.abs(scaleX), Math.abs(scaleY));
+        boundingRadiusSquared = boundingRadius * boundingRadius;
+        minExtentX = x - boundingRadius;
+        maxExtentX = x + boundingRadius;
+        minExtentY = y - boundingRadius;
+        maxExtentY = y + boundingRadius;
+        boundingRadiusUpdated = true;
     }
 
     public final void dx(float dx) {

@@ -2,6 +2,7 @@ package org.example.engine.core.async;
 
 import java.util.*;
 
+// TODO: test
 public class AsyncTaskRunner {
 
     public static void runAsync(AsyncTask...tasks) {
@@ -35,12 +36,13 @@ public class AsyncTaskRunner {
             }
         }
 
-        Thread taskThread = new Thread(task::task);
+        Thread taskThread = new Thread(task::run);
         taskThread.setDaemon(true);
         taskThread.start();
         return taskThread;
     }
 
+    // TODO: test. probably sucks.
     public static void runSync(AsyncTask...tasks) {
         TaskPriority[] taskPriorities = new TaskPriority[tasks.length];
         for (int i = 0; i < taskPriorities.length; i++) {
@@ -49,7 +51,7 @@ public class AsyncTaskRunner {
             taskPriorities[i].priority = countPrerequisites(tasks[i]);
         }
         Arrays.sort(taskPriorities, Comparator.comparingInt(p -> p.priority));
-        for (TaskPriority taskPriority : taskPriorities) taskPriority.task.task();
+        for (TaskPriority taskPriority : taskPriorities) taskPriority.task.run();
     }
 
 

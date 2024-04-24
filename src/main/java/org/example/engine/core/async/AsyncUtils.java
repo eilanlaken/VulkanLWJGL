@@ -4,11 +4,11 @@ import org.lwjgl.glfw.GLFW;
 
 public final class AsyncUtils {
 
-    private static final long NANOS_IN_SECOND = 1000L * 1000L * 1000L;
-    private static long nextFrame = 0;
-    private static boolean initialised = false;
-    private static final RunningAvg sleepDurations = new RunningAvg(10);
-    private static final RunningAvg yieldDurations = new RunningAvg(10);
+    private static final long       NANOS_IN_SECOND = 1000L * 1000L * 1000L;
+    private static long             nextFrame       = 0;
+    private static boolean          initialised     = false;
+    private static final RunningAvg sleepDurations  = new RunningAvg(10);
+    private static final RunningAvg yieldDurations  = new RunningAvg(10);
 
     public static void sync(int fps) {
         if (fps <= 0) return;
@@ -57,6 +57,10 @@ public final class AsyncUtils {
 
     private static long getTime() {
         return (long)(GLFW.glfwGetTime() * NANOS_IN_SECOND);
+    }
+
+    public static int getAvailableProcessors() {
+        return Runtime.getRuntime().availableProcessors();
     }
 
     private static class RunningAvg {

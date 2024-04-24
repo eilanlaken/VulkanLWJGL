@@ -15,7 +15,7 @@ public class AssetStoreLoadingTask extends AsyncTask {
     }
 
     @Override
-    public void run() {
+    public void task() {
         loader.asyncLoad(descriptor.path);
         this.dependencies = loader.getDependencies();
     }
@@ -27,7 +27,7 @@ public class AssetStoreLoadingTask extends AsyncTask {
     }
 
     protected boolean ready() {
-        if (!isRunComplete()) return false;
+        if (!isComplete()) return false;
         if (dependencies == null || dependencies.size == 0) return true;
         return AssetStore.areLoaded(dependencies);
     }
