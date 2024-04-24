@@ -70,7 +70,6 @@ public class TexturePacker {
             rects.position(0);
             int result = STBRectPack.stbrp_pack_rects(context, rects);
             if (result != 0) {
-                System.out.println("packed!");
                 //BufferedImage bufferedImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
                 IndexedBufferedImage bufferedImage = new IndexedBufferedImage(currentImageIndex, size, size);
                 CollectionsArray<PackedRegionData> regionsData = new CollectionsArray<>();

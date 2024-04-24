@@ -2,7 +2,6 @@ package org.example.engine.core.shape;
 
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.math.MathVector3;
 
 public abstract class Shape3D {

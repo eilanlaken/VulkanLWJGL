@@ -114,7 +114,6 @@ public class SceneRendering2D_3 extends ApplicationScreen {
 
     @Override
     public void deleteAll() {
-        System.out.println("free");
         renderer2D.deleteAll();
     }
 

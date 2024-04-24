@@ -28,7 +28,6 @@ public final class Physics2DWorldRenderer {
         // render bodies
         CollectionsArray<Physics2DBody> bodies = world.allBodies;
         for (Physics2DBody body : bodies) {
-            System.out.println(body.motionType);
             if (body.motionType == Physics2DBody.MotionType.FIXED)       renderer.pushDebugShape(body.shape, TINT_FIXED);
             if (body.motionType == Physics2DBody.MotionType.LOGICAL)     renderer.pushDebugShape(body.shape, TINT_LOGICAL);
             if (body.motionType == Physics2DBody.MotionType.NEWTONIAN)   renderer.pushDebugShape(body.shape, TINT_NEWTONIAN);

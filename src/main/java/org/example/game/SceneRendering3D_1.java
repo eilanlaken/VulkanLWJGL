@@ -60,7 +60,6 @@ public class SceneRendering3D_1 extends ApplicationScreen {
 
     @Override
     protected void refresh() {
-        System.out.println("refresh");
         float delta = GraphicsUtils.getDeltaTime();
         float angularSpeed = 200; // degrees per second
 
@@ -101,28 +100,14 @@ public class SceneRendering3D_1 extends ApplicationScreen {
             transform.y -= 0.1f;
         }
 
-        System.out.println("refresh2");
-
-
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,1);
-        System.out.println("refresh3");
-
         renderer3DOld.begin(shader);
-        System.out.println("refresh4");
-
         renderer3DOld.setCamera(camera);
-        System.out.println("refresh5");
-
         renderer3DOld.setEnvironment(lights);
-        System.out.println("refresh6");
-
         renderer3DOld.draw(model.parts[0], transform);
-        System.out.println("refresh7");
-
         //renderer3DOld.draw(model.parts[1], transform3D.matrix4);
-
         renderer3DOld.end();
     }
 

@@ -21,8 +21,6 @@ public class ApplicationProperties {
             // Get a property
             String physThreads = properties.getProperty("physics2d.threads");
 
-            // Print the properties
-            System.out.println("physics threads: " + physThreads);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

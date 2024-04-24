@@ -501,8 +501,6 @@ public final class Physics2DWorldCollision {
         if (individualShapeManifolds.size == 0) return; // no collision
 
         // select the best manifold
-
-        System.out.println("omadam");
     }
 
     private static void compositeVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Manifold> manifolds) {

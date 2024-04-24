@@ -70,7 +70,6 @@ public class SceneRendering2D_2 extends ApplicationScreen {
         polygon.angle(30);
 
         bounds = new Shape2DCircle(polygon.getBoundingRadius(), polygon.x(), polygon.y());
-        System.out.println(bounds);
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
