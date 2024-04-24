@@ -108,6 +108,7 @@ public class CollectionsArray<T> implements Iterable<T> {
     }
 
     public T getCircular(int index) {
+        if (size == 0) throw new IllegalStateException(CollectionsArray.class.getSimpleName() + " is empty.");
         if (index >= size) return items[index % size];
         else if (index < 0) return items[index % size + size];
         return items[index];

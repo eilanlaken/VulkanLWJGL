@@ -63,7 +63,7 @@ public class Physics2DWorld {
     }
 
     public void destroyBody(final Physics2DBody body) {
-
+        bodiesToRemove.add(body);
     }
 
     public void createJoint() {
