@@ -2,10 +2,9 @@ package org.example.engine.core.async;
 
 import java.util.*;
 
-// TODO: test
 public class AsyncTaskRunner {
 
-    public static void runAsync(AsyncTask...tasks) {
+    public static void runAsync(Iterable<AsyncTask> tasks) {
         for (AsyncTask task : tasks) runAsync(task);
     }
 
@@ -42,36 +41,15 @@ public class AsyncTaskRunner {
         return taskThread;
     }
 
-    // TODO: test. probably sucks.
-    public static void runSync(AsyncTask...tasks) {
-        TaskPriority[] taskPriorities = new TaskPriority[tasks.length];
-        for (int i = 0; i < taskPriorities.length; i++) {
-            taskPriorities[i] = new TaskPriority();
-            taskPriorities[i].task = tasks[i];
-            taskPriorities[i].priority = countPrerequisites(tasks[i]);
+    public static void runSync(Iterable<AsyncTask> tasks) {
+        for (AsyncTask task : tasks) runSync(task);
+    }
+
+    public static void runSync(AsyncTask task) {
+        for (AsyncTask preRequisite : task.prerequisites) {
+            runSync(preRequisite);
         }
-        Arrays.sort(taskPriorities, Comparator.comparingInt(p -> p.priority));
-        for (TaskPriority taskPriority : taskPriorities) taskPriority.task.run();
-    }
-
-
-    private static int countPrerequisites(AsyncTask task) {
-        Set<AsyncTask> allDistinctPrerequisites = new HashSet<>();
-        collectDistinctPrerequisites(task, allDistinctPrerequisites);
-        return allDistinctPrerequisites.size();
-    }
-
-    private static void collectDistinctPrerequisites(AsyncTask task, Set<AsyncTask> allDistinctPrerequisites) {
-        if (task == null) return;
-        for (AsyncTask prerequisite : task.prerequisites) {
-            allDistinctPrerequisites.add(prerequisite);
-            collectDistinctPrerequisites(prerequisite, allDistinctPrerequisites);
-        }
-    }
-
-    private static class TaskPriority {
-        public AsyncTask task;
-        public int priority;
+        task.run();
     }
     
 }

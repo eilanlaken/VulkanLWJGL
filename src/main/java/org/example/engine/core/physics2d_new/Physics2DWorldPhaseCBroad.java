@@ -61,9 +61,9 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
             int min_j_index  = (int) Math.floor((min_body_x - minX) / cellWidth);
             int max_j_index  = (int) Math.floor((max_body_x - minX) / cellWidth);
             int i = min_i_index;
-            while (i <= max_i_index) {
+            while (i < max_i_index) {
                 int j = min_j_index;
-                while (j <= max_j_index) {
+                while (j < max_j_index) {
                     Cell cell = partition[i * PARTITION_SIDE + j];
                     cell.bodies.add(body);
                     activeCells.add(cell);
