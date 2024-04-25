@@ -32,20 +32,22 @@ public abstract class AsyncTask {
         return found;
     }
 
-    protected final void run() {
-        synchronized (this) { if (complete) return; inProgress = true; }
+    protected synchronized final void run() {
+        if (complete) return;
+        inProgress = true;
         onStart();
         task();
         onComplete();
-        synchronized (this) { inProgress = false; complete = true; }
+        inProgress = false;
+        complete = true;
     }
 
     public void onStart() {}
     public abstract void task();
     public void onComplete() {}
 
-    public boolean isComplete() {
+    public final boolean isComplete() {
         return complete;
     }
-    public boolean isInProgress() { return inProgress; }
+    public final boolean isInProgress() { return inProgress; }
 }

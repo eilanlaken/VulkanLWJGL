@@ -1,59 +1,48 @@
 package org.example.engine.core.async;
 
+import org.example.engine.core.collections.CollectionsArray;
+
 import java.util.*;
 
 public class AsyncTaskRunner {
 
-    // TODO: implement.
-    public static Thread runAsync_new(AsyncTask task) {
-
-        return null;
+    public static Thread[] runAsync(AsyncTask ...tasks) {
+        CollectionsArray<Thread> tThreads = new CollectionsArray<>();
+        for (AsyncTask task : tasks) {
+            tThreads.add(runAsync(task));
+        }
+        return tThreads.toArray(Thread.class);
     }
 
-    /** TODO: maybe remove **/
-    public static void runAsync(AsyncTask ...tasks) {
-        for (AsyncTask task : tasks) runAsync(task);
+    public static Thread[] runAsync(Iterable<AsyncTask> tasks) {
+        CollectionsArray<Thread> tThreads = new CollectionsArray<>();
+        for (AsyncTask task : tasks) {
+            tThreads.add(runAsync(task));
+        }
+        return tThreads.toArray(Thread.class);
     }
 
-    /** TODO: maybe remove **/
-    public static void runAsync(Iterable<AsyncTask> tasks) {
-        for (AsyncTask task : tasks) runAsync(task);
-    }
-
-    /** TODO: maybe remove **/
     public static Thread runAsync(AsyncTask task) {
-        Thread spawningThread = new Thread(() -> {
-            try {
-                AsyncTaskRunner.start(task);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (task.prerequisites != null && !task.prerequisites.isEmpty()) {
+            List<Thread> pThreads = new ArrayList<>();
+            for (AsyncTask prerequisite : task.prerequisites) {
+                Thread pThread = runAsync(prerequisite);
+                pThreads.add(pThread);
             }
-        });
-        spawningThread.setDaemon(true);
-        spawningThread.start();
-        return spawningThread;
-    }
 
-    /** TODO: maybe remove **/
-    private static Thread start(AsyncTask task) {
-        List<Thread> preRequisiteThreads = new ArrayList<>();
-        for (AsyncTask prerequisite : task.prerequisites) {
-            Thread prerequisiteThread = start(prerequisite);
-            preRequisiteThreads.add(prerequisiteThread);
-        }
-
-        for (Thread prerequisiteThread : preRequisiteThreads) {
-            try {
-                prerequisiteThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            for (Thread pThread : pThreads) {
+                try {
+                    pThread.join();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
-        Thread taskThread = new Thread(task::run);
-        taskThread.setDaemon(true);
-        taskThread.start();
-        return taskThread;
+        Thread tThread = new Thread(task::run);
+        tThread.setDaemon(true);
+        tThread.start();
+        return tThread;
     }
 
     public static void runSync(AsyncTask ...tasks) {

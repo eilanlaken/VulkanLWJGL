@@ -26,8 +26,6 @@ public class SceneRendering2D_3 extends ApplicationScreen {
     private Shape2DSegment segment;
     private Shape2DPolygon polygon;
 
-    private Shape2DUnion compound;
-
     private Texture texture0;
     private TextureRegion region;
 
@@ -76,7 +74,6 @@ public class SceneRendering2D_3 extends ApplicationScreen {
         islands.add(circle1);
         islands.add(polygon);
 
-        bounds = new Shape2DCircle(compound.getBoundingRadius(), compound.x(), compound.y());
 
         camera = new Camera(640*2,480*2, 1);
         camera.update();
@@ -98,7 +95,6 @@ public class SceneRendering2D_3 extends ApplicationScreen {
         ////renderer2D.pushDebugShape(segment, null);
         //renderer2D.pushDebugShape(polygon, null);
         renderer2D.pushDebugShape(bounds, null);
-        renderer2D.pushDebugShape(compound, null);
 
         renderer2D.end();
         time++;

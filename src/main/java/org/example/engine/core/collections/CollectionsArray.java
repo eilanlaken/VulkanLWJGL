@@ -274,9 +274,8 @@ public class CollectionsArray<T> implements Iterable<T> {
         size = 0;
     }
 
-    public T[] pack() {
+    public void pack() {
         if (items.length != size) resize(size);
-        return items;
     }
 
     public T[] ensureCapacity(int additionalCapacity) {
@@ -355,12 +354,6 @@ public class CollectionsArray<T> implements Iterable<T> {
     public T random() {
         if (size == 0) return null;
         return items[MathUtils.random(0, size - 1)];
-    }
-
-    /** Returns the items as an array. Note the array is typed, so the {@link #CollectionsArray()}} constructor must have been used.
-     * Otherwise, use {@link #toArray(Class)} to specify the array type. */
-    public T[] toArray () {
-        return (T[])toArray(items.getClass().getComponentType());
     }
 
     public <V> V[] toArray (Class<V> type) {

@@ -18,15 +18,16 @@ import java.util.Set;
 
 public final class AssetStore {
 
-    private final static HashMap<Class<? extends MemoryResource>, Class<? extends AssetLoader<? extends MemoryResource>>> loaders = getLoadersMap();
-    private static final CollectionsQueue<AssetDescriptor> loadQueue = new CollectionsQueue<>();
-    private static final HashMap<String, Asset> store = new HashMap<>();
-    private static final Set<AssetStoreLoadingTask> completedAsyncTasks = new HashSet<>();
-    private static final Set<AssetStoreLoadingTask> asyncTasks = new HashSet<>();
-    private static final Set<AssetStoreLoadingTask> completedCreateTasks = new HashSet<>();
-    private static final Set<AssetStoreLoadingTask> createTasks = new HashSet<>();
+    private static final HashMap<Class<? extends MemoryResource>, Class<? extends AssetLoader<? extends MemoryResource>>> loaders = getLoadersMap();
 
-    // loading state
+    private static final HashMap<String, Asset>            store                = new HashMap<>();
+    private static final CollectionsQueue<AssetDescriptor> loadQueue            = new CollectionsQueue<>();
+    private static final Set<AssetStoreLoadingTask>        completedAsyncTasks  = new HashSet<>();
+    private static final Set<AssetStoreLoadingTask>        asyncTasks           = new HashSet<>();
+    private static final Set<AssetStoreLoadingTask>        completedCreateTasks = new HashSet<>();
+    private static final Set<AssetStoreLoadingTask>        createTasks          = new HashSet<>();
+
+    // TODO: loading state
 
     public static synchronized void update() {
         for (AssetStoreLoadingTask task : asyncTasks) {

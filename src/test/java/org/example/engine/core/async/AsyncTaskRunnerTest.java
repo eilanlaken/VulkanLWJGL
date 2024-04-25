@@ -259,7 +259,6 @@ class AsyncTaskRunnerTest {
                 for (int i = 0; i < arrayFloat2.size; i++) {
                     arrayFloat2.set(i, arrayFloat2.get(i) * 2);
                 }
-                System.out.println("a1: " + arrayFloat2);
             }
         };
 
@@ -269,7 +268,6 @@ class AsyncTaskRunnerTest {
                 for (int i = 0; i < arrayFloat2.size; i++) {
                     arrayFloat2.set(i, arrayFloat2.get(i) + 2);
                 }
-                System.out.println("a2: " + arrayFloat2);
             }
         };
 
@@ -279,7 +277,6 @@ class AsyncTaskRunnerTest {
                 for (int i = 0; i < arrayFloat2.size; i++) {
                     arrayFloat2.set(i, arrayFloat2.get(i) + 2);
                 }
-                System.out.println("a3: " + arrayFloat2);
             }
         };
 
@@ -446,8 +443,12 @@ class AsyncTaskRunnerTest {
         AsyncTask t1 = new AsyncTask() {
             @Override
             public void task() {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 arrayFloat3.add(1);
-                System.out.println("1: " + arrayFloat3);
             }
         };
 
@@ -455,12 +456,6 @@ class AsyncTaskRunnerTest {
             @Override
             public void task() {
                 arrayFloat3.add(2);
-                System.out.println("2: " + arrayFloat3);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
             }
         };
 
@@ -469,8 +464,104 @@ class AsyncTaskRunnerTest {
 
         thread1.join();
         thread2.join();
-        System.out.println("after join");
+
         Assertions.assertEquals(2, arrayFloat3.size);
+    }
+
+    @Test
+    void test_runAsync_single_2() throws InterruptedException {
+        AsyncTask t1 = new AsyncTask() {
+            @Override
+            public void task() {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                arrayFloat3.add(1);
+            }
+        };
+
+        AsyncTask t2 = new AsyncTask(t1) {
+            @Override
+            public void task() {
+                arrayFloat3.add(2);
+            }
+        };
+
+        Thread thread = AsyncTaskRunner.runAsync(t2);
+        thread.join();
+        Assertions.assertEquals(2, arrayFloat3.size);
+    }
+
+    @Test
+    void test_runAsync_many_1() throws InterruptedException {
+        AsyncTask t1 = new AsyncTask() {
+            @Override
+            public void task() {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                arrayFloat3.add(1);
+            }
+        };
+
+        AsyncTask t2 = new AsyncTask() {
+            @Override
+            public void task() {
+                arrayFloat3.add(2);
+            }
+        };
+
+        AsyncTask t3 = new AsyncTask() {
+            @Override
+            public void task() {
+                arrayFloat3.add(3);
+            }
+        };
+
+        Thread[] threads = AsyncTaskRunner.runAsync(t1, t2, t3);
+        for (Thread thread : threads) {
+            thread.join();
+        }
+        Assertions.assertEquals(3, arrayFloat3.size);
+    }
+
+    @Test
+    void test_runAsync_many_2() throws InterruptedException {
+        AsyncTask t1 = new AsyncTask() {
+            @Override
+            public void task() {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                arrayFloat3.add(1);
+            }
+        };
+
+        AsyncTask t2 = new AsyncTask() {
+            @Override
+            public void task() {
+                arrayFloat3.add(2);
+            }
+        };
+
+        AsyncTask t3 = new AsyncTask(t1, t2) {
+            @Override
+            public void task() {
+                arrayFloat3.add(3);
+            }
+        };
+
+        Thread[] threads = AsyncTaskRunner.runAsync(t3, t1, t2);
+        for (Thread thread : threads) {
+            thread.join();
+        }
+        Assertions.assertEquals(3, arrayFloat3.size);
     }
 
 }
