@@ -27,6 +27,7 @@ public class Application {
         if (!GLFW.glfwInit()) throw new RuntimeException("Unable to initialize GLFW.");
         window = new ApplicationWindow(attributes);
         GL.createCapabilities();
+        AsyncUtils.init();
         GraphicsUtils.init(window);
         AssetUtils.init(window);
         InputMouse.init(window);

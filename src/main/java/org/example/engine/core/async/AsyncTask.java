@@ -16,8 +16,8 @@ public abstract class AsyncTask {
 
     public final void addPrerequisite(AsyncTask task) {
         if (task == null) return;
-        if (inProgress) throw new IllegalStateException("Cannot add prerequisite tasks to " + this.getClass().getSimpleName() + " while in progress.");
-        if (complete)   throw new IllegalStateException("Cannot add prerequisite tasks to " + this.getClass().getSimpleName() + " after completed.");
+        if (inProgress)   throw new IllegalStateException("Cannot add prerequisite tasks to " + this.getClass().getSimpleName() + " while in progress.");
+        if (complete)     throw new IllegalStateException("Cannot add prerequisite tasks to " + this.getClass().getSimpleName() + " after completed.");
         if (task == this) throw new IllegalArgumentException("A " + AsyncTask.class.getSimpleName() + " cannot be its own prerequisite.");
         if (task.isPrerequisite(this)) throw new IllegalArgumentException("Cyclic dependency: this " + this.getClass().getSimpleName() + " is a prerequisite of task: " + task + ". Cannot set task: " + task + " to be a prerequisite of " + this + ".");
         this.prerequisites.add(task);

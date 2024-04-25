@@ -4,22 +4,37 @@ import java.util.*;
 
 public class AsyncTaskRunner {
 
+    // TODO: implement.
+    public static Thread runAsync_new(AsyncTask task) {
+
+        return null;
+    }
+
+    /** TODO: maybe remove **/
+    public static void runAsync(AsyncTask ...tasks) {
+        for (AsyncTask task : tasks) runAsync(task);
+    }
+
+    /** TODO: maybe remove **/
     public static void runAsync(Iterable<AsyncTask> tasks) {
         for (AsyncTask task : tasks) runAsync(task);
     }
 
-    public static void runAsync(AsyncTask task) {
+    /** TODO: maybe remove **/
+    public static Thread runAsync(AsyncTask task) {
         Thread spawningThread = new Thread(() -> {
             try {
-                start(task);
+                AsyncTaskRunner.start(task);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
         spawningThread.setDaemon(true);
         spawningThread.start();
+        return spawningThread;
     }
 
+    /** TODO: maybe remove **/
     private static Thread start(AsyncTask task) {
         List<Thread> preRequisiteThreads = new ArrayList<>();
         for (AsyncTask prerequisite : task.prerequisites) {
@@ -39,6 +54,10 @@ public class AsyncTaskRunner {
         taskThread.setDaemon(true);
         taskThread.start();
         return taskThread;
+    }
+
+    public static void runSync(AsyncTask ...tasks) {
+        for (AsyncTask task : tasks) runSync(task);
     }
 
     public static void runSync(Iterable<AsyncTask> tasks) {
