@@ -37,7 +37,7 @@ public class ScenePhysics2D_5_PhaseB extends ApplicationScreen {
                     MathUtils.random() * 10 - 5,MathUtils.random() * 10 - 5,MathUtils.random() * 360,
                     0f,0f,0,
                     1, 1, 1, false, 1,
-                    0.1f);
+                    0.3f);
         }
 
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.E)) {

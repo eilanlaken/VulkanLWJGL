@@ -2,6 +2,7 @@ package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.async.AsyncUtils;
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.CollectionsArrayConcurrent;
 import org.example.engine.core.shape.Shape2D;
 
 import java.util.HashSet;
@@ -17,6 +18,11 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
     private final Set<Cell>  activeCells = new HashSet<>();
     private final int        processors  = AsyncUtils.getAvailableProcessors();
 
+    protected float worldWidth  = 0;
+    protected float worldHeight = 0;
+    protected float cellWidth   = 0;
+    protected float cellHeight  = 0;
+
     Physics2DWorldPhaseCBroad() {
         for (int i = 0; i < partition.length; i++) {
             this.partition[i] = new Cell();
@@ -27,7 +33,7 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
     public void update(Physics2DWorld world, float delta) {
         for (Cell cell : activeCells) {
             cell.bodies.clear();
-            cell.collisionCandidates.clear();
+            cell.candidates.clear();
         }
         activeCells.clear();
         // calculate world x and y extents
@@ -46,10 +52,10 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
             maxY = Math.max(maxY, max_body_y);
         }
         // calculate the cell size of the grid partition
-        final float world_width  = Math.abs(maxX - minX);
-        final float world_height = Math.abs(maxY - minY);
-        final float cellWidth    = world_width  / PARTITION_SIDE;
-        final float cellHeight   = world_height / PARTITION_SIDE;
+        worldWidth  = Math.abs(maxX - minX);
+        worldHeight = Math.abs(maxY - minY);
+        cellWidth   = worldWidth  / PARTITION_SIDE;
+        cellHeight  = worldHeight / PARTITION_SIDE;
         // build partition
         for (Physics2DBody body : world.allBodies) {
             float min_body_x = body.shape.getMinExtentX();
@@ -79,18 +85,17 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
 
     }
 
-    // TODO: yank the code only.
-    public static boolean broadPhaseCollision(final Shape2D a, final Shape2D b) {
-        final float dx = b.x() - a.x();
-        final float dy = b.y() - a.y();
-        final float sum = a.getBoundingRadius() + b.getBoundingRadius();
-        return dx * dx + dy * dy < sum * sum;
-    }
+    protected static final class Cell {
 
-    private static final class Cell {
+        private CollectionsArrayConcurrent<Physics2DBody> bodies     = new CollectionsArrayConcurrent<>(false, 2);
+        private CollectionsArrayConcurrent<Physics2DBody> candidates = new CollectionsArrayConcurrent<>(false, 2);
 
-        private CollectionsArray<Physics2DBody> bodies = new CollectionsArray<>(false, 2);
-        private CollectionsArray<Physics2DBody> collisionCandidates = new CollectionsArray<>(false, 2);
+        private boolean areBoundingCirclesCollide(final Shape2D a, final Shape2D b) {
+            final float dx  = b.x() - a.x();
+            final float dy  = b.y() - a.y();
+            final float sum = a.getBoundingRadius() + b.getBoundingRadius();
+            return dx * dx + dy * dy < sum * sum;
+        }
 
     }
 

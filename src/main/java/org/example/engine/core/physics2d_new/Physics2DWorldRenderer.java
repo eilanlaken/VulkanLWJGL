@@ -14,9 +14,11 @@ public final class Physics2DWorldRenderer {
     private static final Color TINT_FIXED     = new Color(1,1,0,1);
     private static final Color TINT_LOGICAL   = new Color(1,0,1,1);
     private static final Color TINT_NEWTONIAN = new Color(0,1,1,1);
+    private static final Color TINT_CELL   = new Color(1,0.5f, 0.5f, 0.5f);
 
     private Shape2DSegment segment          = new Shape2DSegment(0,0,0,0);
     private Shape2DPolygon contactIndicator = ShapeUtils.createPolygonCircleFilled(1, 10);
+    private Shape2DPolygon broadPhaseCell   = ShapeUtils.createPolygonRectangleFilled(1, 1);
 
     private final Physics2DWorld world;
 
@@ -25,6 +27,12 @@ public final class Physics2DWorldRenderer {
     }
 
     public void render(Renderer2D renderer) {
+        // render broad phase
+        final Physics2DWorldPhaseCBroad broad = (Physics2DWorldPhaseCBroad) world.phases[Physics2DWorld.PHASE_C_BROAD];
+        float cellWidth = broad.cellWidth;
+        float cellHeight = broad.cellHeight;
+        renderer.pushPolygon(broadPhaseCell, TINT_CELL, 0,0,0,0,0,cellWidth,cellHeight,null,null);
+
         // render bodies
         CollectionsArray<Physics2DBody> bodies = world.allBodies;
         for (Physics2DBody body : bodies) {

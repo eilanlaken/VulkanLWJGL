@@ -13,11 +13,11 @@ import org.example.engine.core.memory.MemoryPool;
 public class Physics2DWorld {
 
     // constants
-    private static final short PHASE_A_PREPARATION = 0;
-    private static final short PHASE_B_INTEGRATION = 1;
-    private static final short PHASE_C_BROAD       = 2;
-    private static final short PHASE_D_NARROW      = 3;
-    private static final short PHASE_E_RESOLUTION  = 4;
+    public static final short PHASE_A_PREPARATION = 0;
+    public static final short PHASE_B_INTEGRATION = 1;
+    public static final short PHASE_C_BROAD       = 2;
+    public static final short PHASE_D_NARROW      = 3;
+    public static final short PHASE_E_RESOLUTION  = 4;
 
     // bodies, joints, constraints and manifolds
     public MemoryPool<Physics2DBody>       bodyMemoryPool      = new MemoryPool<>(Physics2DBody.class,     10);
@@ -27,12 +27,12 @@ public class Physics2DWorld {
     public CollectionsArray<Physics2DBody> bodiesToRemove      = new CollectionsArray<>(false, 500);
 
     // [0, 1], [2, 3], [4, 5], ... are collision candidates.
-    public final CollectionsArray<Physics2DBody>     collisionCandidates = new CollectionsArray<>(false, 400);
-    public final CollectionsArray<CollisionManifold> collisionManifolds  = new CollectionsArray<>(false, 200);
+    protected final CollectionsArray<Physics2DBody>     collisionCandidates = new CollectionsArray<>(false, 400);
+    protected final CollectionsArray<CollisionManifold> collisionManifolds  = new CollectionsArray<>(false, 200);
 
-    private final Physics2DWorldPhase[]  phases        = new Physics2DWorldPhase[5];
-    private final Physics2DWorldRenderer debugRenderer = new Physics2DWorldRenderer(this);
-    private final Physics2DBodyFactory   bodyFactory   = new Physics2DBodyFactory(this);
+    protected final Physics2DWorldPhase[]  phases        = new Physics2DWorldPhase[5];
+    protected final Physics2DWorldRenderer debugRenderer = new Physics2DWorldRenderer(this);
+    protected final Physics2DBodyFactory   bodyFactory   = new Physics2DBodyFactory(this);
 
     public Physics2DWorld() {
         this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseAPreparation();
