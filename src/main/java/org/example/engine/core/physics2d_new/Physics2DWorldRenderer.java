@@ -14,7 +14,7 @@ public final class Physics2DWorldRenderer {
     private static final Color TINT_FIXED     = new Color(1,1,0,1);
     private static final Color TINT_LOGICAL   = new Color(1,0,1,1);
     private static final Color TINT_NEWTONIAN = new Color(0,1,1,1);
-    private static final Color TINT_CELL   = new Color(1,0.5f, 0.5f, 0.5f);
+    private static final Color TINT_CELL      = new Color(1,0.5f, 0.5f, 0.5f);
 
     private Shape2DSegment segment          = new Shape2DSegment(0,0,0,0);
     private Shape2DPolygon contactIndicator = ShapeUtils.createPolygonCircleFilled(1, 10);
