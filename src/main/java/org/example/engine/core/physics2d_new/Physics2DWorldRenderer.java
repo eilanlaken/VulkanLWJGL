@@ -16,9 +16,9 @@ public final class Physics2DWorldRenderer {
     private static final Color TINT_NEWTONIAN = new Color(0,1,1,1);
     private static final Color TINT_CELL      = new Color(1,0.5f, 0.5f, 0.5f);
 
-    private final Shape2DSegment polySegment = new Shape2DSegment(0,0,0,0);
-    private final Shape2DPolygon polyCircle  = ShapeUtils.createPolygonCircleFilled(1, 10);
-    private final Shape2DPolygon polyRect    = ShapeUtils.createPolygonRectangleFilled(1, 1);
+    private final Shape2DSegment segment    = new Shape2DSegment(0,0,0,0);
+    private final Shape2DPolygon polyCircle = ShapeUtils.createPolygonCircleFilled(1, 10);
+    private final Shape2DPolygon polyRect   = ShapeUtils.createPolygonRectangleFilled(1, 1);
 
     private final Physics2DWorld world;
 
@@ -57,16 +57,16 @@ public final class Physics2DWorldRenderer {
 
             // render first contact point.
             renderer.pushPolygon(polyCircle, new Color(1,0,0,1), manifold.contactPoint1.x, manifold.contactPoint1.y, 0,0,0,scaleX,scaleY,null,null);
-            polySegment.localA(manifold.contactPoint1.x, manifold.contactPoint1.y);
-            polySegment.localB(manifold.contactPoint1.x + penetration.x, manifold.contactPoint1.y + penetration.y);
-            renderer.pushDebugShape(polySegment, new Color(1,0,1,1));
+            segment.localA(manifold.contactPoint1.x, manifold.contactPoint1.y);
+            segment.localB(manifold.contactPoint1.x + penetration.x, manifold.contactPoint1.y + penetration.y);
+            renderer.pushDebugShape(segment, new Color(1,0,1,1));
 
             // render second contact point
             if (manifold.contactsCount == 1) continue;
             renderer.pushPolygon(polyCircle, new Color(1,0,0,1), manifold.contactPoint2.x, manifold.contactPoint2.y, 0,0,0,scaleX,scaleY,null,null);
-            polySegment.localA(manifold.contactPoint2.x, manifold.contactPoint2.y);
-            polySegment.localB(manifold.contactPoint2.x + penetration.x, manifold.contactPoint2.y + penetration.y);
-            renderer.pushDebugShape(polySegment, new Color(1,0,1,1));
+            segment.localA(manifold.contactPoint2.x, manifold.contactPoint2.y);
+            segment.localB(manifold.contactPoint2.x + penetration.x, manifold.contactPoint2.y + penetration.y);
+            renderer.pushDebugShape(segment, new Color(1,0,1,1));
         }
     }
 
