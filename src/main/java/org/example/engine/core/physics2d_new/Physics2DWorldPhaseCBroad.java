@@ -3,6 +3,7 @@ package org.example.engine.core.physics2d_new;
 import org.example.engine.core.async.AsyncUtils;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.collections.CollectionsArrayConcurrent;
+import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 
 import java.util.HashSet;
@@ -85,10 +86,11 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
 
     }
 
-    protected static final class Cell {
+    protected static final class Cell implements MemoryPool.Reset {
 
-        private CollectionsArrayConcurrent<Physics2DBody> bodies     = new CollectionsArrayConcurrent<>(false, 2);
-        private CollectionsArrayConcurrent<Physics2DBody> candidates = new CollectionsArrayConcurrent<>(false, 2);
+        private int index = -1;
+        private final CollectionsArrayConcurrent<Physics2DBody> bodies     = new CollectionsArrayConcurrent<>(false, 2);
+        private final CollectionsArrayConcurrent<Physics2DBody> candidates = new CollectionsArrayConcurrent<>(false, 2);
 
         private boolean areBoundingCirclesCollide(final Shape2D a, final Shape2D b) {
             final float dx  = b.x() - a.x();
@@ -97,6 +99,12 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
             return dx * dx + dy * dy < sum * sum;
         }
 
+        @Override
+        public void reset() {
+            bodies.clear();
+            candidates.clear();
+            index = -1;
+        }
     }
 
 }
