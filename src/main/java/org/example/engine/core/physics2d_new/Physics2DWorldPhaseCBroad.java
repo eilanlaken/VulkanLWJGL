@@ -17,7 +17,7 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
 
     private final Cell[]     partition   = new Cell[PARTITION_SIZE]; // 1024
     private final Set<Cell>  activeCells = new HashSet<>();
-    private final int        processors  = AsyncUtils.getAvailableProcessors();
+    private final int        processors  = AsyncUtils.getAvailableProcessorsNum();
 
     protected float worldWidth  = 0;
     protected float worldHeight = 0;
