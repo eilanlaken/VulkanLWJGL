@@ -40,23 +40,32 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
         final int cols = world.cols;
         final int cellCount = rows * cols;
         for (int i = 0; i < cellCount; i++) {
-            Cell cell = cellMemoryPool.allocate();
-            cell.x = minX + (i % rows + 0.5f) * cellWidth;
-            cell.y = maxY - (i + 0.5f) * cellHeight;
             world.spacePartition.add(cellMemoryPool.allocate());
         }
 
         // FIXME: populate cells
         for (Physics2DBody body : world.allBodies) {
-            float min_body_x = body.shape.getMinExtentX();
-            float max_body_x = body.shape.getMaxExtentX();
-            float min_body_y = body.shape.getMinExtentY();
-            float max_body_y = body.shape.getMaxExtentY();
 
-            int min_i_index  = (int) Math.floor((min_body_y - minY) / cellHeight);
-            int max_i_index  = (int) Math.floor((max_body_y - minY) / cellHeight);
-            int min_j_index  = (int) Math.floor((min_body_x - minX) / cellWidth);
-            int max_j_index  = (int) Math.floor((max_body_x - minX) / cellWidth);
+            int startCol = (int) ((body.shape.getMinExtentX() - minX) / cellWidth);
+            int endCol = (int) ((body.shape.getMaxExtentX() - minX) / cellWidth);
+            int startRow = (int) ((body.shape.getMinExtentY() - minY) / cellHeight);
+            int endRow = (int) ((body.shape.getMaxExtentY() - minY) / cellHeight);
+
+            startCol = Math.max(startCol, 0);
+            endCol = Math.min(endCol, cols - 1);
+            startRow = Math.max(startRow, 0);
+            endRow = Math.min(endRow, rows - 1);
+
+            for (int row = startRow; row <= endRow; row++) {
+                for (int col = startCol; col <= endCol; col++) {
+                    int cellIndex = row * cols + col; // Convert 2D cell coordinates to 1D index
+                    Cell cell = world.spacePartition.get(cellIndex);
+                    cell.x = minX + (col + 0.5f) * cellWidth;  // X coordinate of the cell's lower-left corner
+                    cell.y = minY + (row + 0.5f) * cellHeight;
+                    cell.bodies.add(body);
+                    world.activeCells.add(cell);
+                }
+            }
 
         }
 
