@@ -6,6 +6,9 @@ import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.physics2d.Physics2DUtils;
 import org.example.engine.core.shape.Shape2D;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Physics2DBody implements MemoryPool.Reset {
 
     public    Object      owner;
@@ -19,6 +22,7 @@ public class Physics2DBody implements MemoryPool.Reset {
 
     public CollectionsArray<Physics2DConstraint> constraints = new CollectionsArray<>(false, 1);
     public CollectionsArray<Physics2DJoint>      joints      = new CollectionsArray<>(false, 1);
+    public Set<Physics2DBody>                    collision   = new HashSet<>();
 
     public float   massInv;
     public float   density;

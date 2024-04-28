@@ -58,6 +58,9 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
                 for (int j = i + 1; j < cell.bodies.size; j++) {
                     Physics2DBody a = cell.bodies.get(i);
                     Physics2DBody b = cell.bodies.get(j);
+                    if (a.off) continue;
+                    if (b.off) continue;
+                    if (a.motionType == Physics2DBody.MotionType.FIXED && b.motionType == Physics2DBody.MotionType.FIXED) continue;
                     if (cell.boundingCirclesCollide(a.shape, b.shape)) cell.candidates.add(a, b);
                 }
             }
