@@ -20,7 +20,7 @@ public final class Physics2DWorldPhaseBIntegration implements Physics2DWorldPhas
             body.shape.update();
             body.netForce.set(0, 0);
 
-            // prepare further heuristics for the broad phase
+            // prepare heuristics for the broad phase
             world.worldMinX = Math.min(world.worldMinX, body.shape.getMinExtentX());
             world.worldMaxX = Math.max(world.worldMaxX, body.shape.getMaxExtentX());
             world.worldMinY = Math.min(world.worldMinY, body.shape.getMinExtentY());
@@ -28,13 +28,12 @@ public final class Physics2DWorldPhaseBIntegration implements Physics2DWorldPhas
             world.worldMaxR = Math.max(world.worldMaxR, body.shape.getBoundingRadius());
         }
 
+        final float maxDiameter = 2 * world.worldMaxR;
         world.worldWidth  = Math.abs(world.worldMaxX - world.worldMinX);
         world.worldHeight = Math.abs(world.worldMaxY - world.worldMinY);
-
-        final float maxDiameter = 2 * world.worldMaxR;
         world.rows = Math.min((int) Math.ceil(world.worldHeight  / maxDiameter), 32);
-        world.cols = Math.min((int) Math.ceil(world.worldWidth / maxDiameter), 32);
-        world.cellWidth = world.worldWidth / world.cols;
+        world.cols = Math.min((int) Math.ceil(world.worldWidth   / maxDiameter), 32);
+        world.cellWidth  = world.worldWidth  / world.cols;
         world.cellHeight = world.worldHeight / world.rows;
     }
 

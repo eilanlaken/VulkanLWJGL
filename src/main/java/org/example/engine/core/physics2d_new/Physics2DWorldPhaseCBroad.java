@@ -13,12 +13,8 @@ import java.util.Set;
 // this should be multithreaded
 public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
 
-    protected final MemoryPool<Cell>       cellMemoryPool = new MemoryPool<>(Cell.class, 1024);
-    protected final int                    processors     = AsyncUtils.getAvailableProcessorsNum();
-
-    Physics2DWorldPhaseCBroad() {
-
-    }
+    private final MemoryPool<Cell> cellMemoryPool = new MemoryPool<>(Cell.class, 1024);
+    private final int              processors     = AsyncUtils.getAvailableProcessorsNum();
 
     @Override
     public void update(Physics2DWorld world, float delta) {
@@ -29,13 +25,9 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
 
         // data from previous phase
         final float minX = world.worldMinX;
-        final float maxX = world.worldMaxX;
         final float minY = world.worldMinY;
-        final float maxY = world.worldMaxY;
-
         final float cellWidth  = world.cellWidth;
         final float cellHeight = world.cellHeight;
-
         final int rows = world.rows;
         final int cols = world.cols;
 
@@ -48,33 +40,24 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
             }
         }
 
-        // FIXME: populate cells
         for (Physics2DBody body : world.allBodies) {
+            int startCol = Math.max(0, (int) ((body.shape.getMinExtentX() - minX) / cellWidth));
+            int endCol   = Math.min(cols - 1, (int) ((body.shape.getMaxExtentX() - minX) / cellWidth));
+            int startRow = Math.max(0, (int) ((body.shape.getMinExtentY() - minY) / cellHeight));
+            int endRow   = Math.min(rows - 1, (int) ((body.shape.getMaxExtentY() - minY) / cellHeight));
 
-            int startCol = (int) ((body.shape.getMinExtentX() - minX) / cellWidth);
-            int endCol = (int) ((body.shape.getMaxExtentX() - minX) / cellWidth);
-            int startRow = (int) ((body.shape.getMinExtentY() - minY) / cellHeight);
-            int endRow = (int) ((body.shape.getMaxExtentY() - minY) / cellHeight);
-
-            startCol = Math.max(startCol, 0);
-            endCol = Math.min(endCol, cols - 1);
-            startRow = Math.max(startRow, 0);
-            endRow = Math.min(endRow, rows - 1);
-
-            //if (true) return;
             for (int row = startRow; row <= endRow; row++) {
                 for (int col = startCol; col <= endCol; col++) {
-                    int cellIndex = row * cols + col; // Convert 2D cell coordinates to 1D index
+                    int cellIndex = row * cols + col;
                     Cell cell = world.spacePartition.get(cellIndex);
                     cell.bodies.add(body);
                     world.activeCells.add(cell);
                 }
             }
-
         }
 
-
         // run broad phase. Use async tasks.
+        // TODO
 
         // merge all collision candidates.
         CollectionsArray<Physics2DBody> collisionCandidates = world.collisionCandidates;
@@ -86,8 +69,8 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
         private final CollectionsArrayConcurrent<Physics2DBody> bodies     = new CollectionsArrayConcurrent<>(false, 2);
         private final CollectionsArrayConcurrent<Physics2DBody> candidates = new CollectionsArrayConcurrent<>(false, 2);
 
-        protected float x;
-        protected float y;
+        float x;
+        float y;
 
         public Cell() {}
 
