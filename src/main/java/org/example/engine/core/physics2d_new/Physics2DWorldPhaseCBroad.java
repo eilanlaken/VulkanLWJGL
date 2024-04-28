@@ -3,12 +3,8 @@ package org.example.engine.core.physics2d_new;
 import org.example.engine.core.async.AsyncUtils;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.collections.CollectionsArrayConcurrent;
-import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
-
-import java.util.HashSet;
-import java.util.Set;
 
 // this should be multithreaded
 public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
@@ -56,12 +52,25 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
             }
         }
 
-        // run broad phase. Use async tasks.
-        // TODO
+        // TODO: run broad phase. Use async tasks for multithreading
+        for (Cell cell : world.activeCells) {
+            for (int i = 0; i < cell.bodies.size - 1; i++) {
+                for (int j = i + 1; j < cell.bodies.size; j++) {
+                    Physics2DBody a = cell.bodies.get(i);
+                    Physics2DBody b = cell.bodies.get(j);
+                    if (cell.boundingCirclesCollide(a.shape, b.shape)) cell.candidates.add(a, b);
+                }
+            }
+        }
 
         // merge all collision candidates.
-        CollectionsArray<Physics2DBody> collisionCandidates = world.collisionCandidates;
+        for (Cell cell : world.activeCells) {
+            for (Physics2DBody body : cell.candidates) {
+                world.collisionCandidates.add(body);
+            }
+        }
 
+        System.out.println(world.collisionCandidates.size);
     }
 
     public static final class Cell implements MemoryPool.Reset {
@@ -74,7 +83,7 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
 
         public Cell() {}
 
-        private boolean areBoundingCirclesCollide(final Shape2D a, final Shape2D b) {
+        private boolean boundingCirclesCollide(final Shape2D a, final Shape2D b) {
             final float dx  = b.x() - a.x();
             final float dy  = b.y() - a.y();
             final float sum = a.getBoundingRadius() + b.getBoundingRadius();
@@ -90,56 +99,3 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
     }
 
 }
-
-
-//TODO: remove
-/*
-int min_i_index  = (int) Math.floor((max_body_y - maxY) / cellHeight);
-            int max_i_index  = (int) Math.ceil((min_body_y - maxY) / cellHeight);
-            int min_j_index  = (int) Math.floor((min_body_x - minX) / cellWidth);
-            int max_j_index  = (int) Math.ceil((max_body_x - minX) / cellWidth);
-            int i = min_i_index;
-            while (i < max_i_index) {
-                int j = min_j_index;
-                while (j < max_j_index) {
-                    Cell cell = spacePartition.get(i * cols + j);
-                    cell.bodies.add(body);
-                    cell.x = minX + j * cellWidth;
-                    cell.y = maxY - i * cellHeight;
-                    world.activeCells.add(cell);
-                    j += cellWidth;
-                }
-                i += cellHeight;
-            }
-
-
- */
-
-// TODO: remove
-/**
- *
- // build partition
- for (Physics2DBody body : world.allBodies) {
- float min_body_x = body.shape.getMinExtentX();
- float max_body_x = body.shape.getMaxExtentX();
- float min_body_y = body.shape.getMinExtentY();
- float max_body_y = body.shape.getMaxExtentY();
- int min_i_index  = (int) Math.floor((min_body_y - minY) / cellHeight);
- int max_i_index  = (int) Math.floor((max_body_y - minY) / cellHeight);
- int min_j_index  = (int) Math.floor((min_body_x - minX) / cellWidth);
- int max_j_index  = (int) Math.floor((max_body_x - minX) / cellWidth);
- int i = min_i_index;
- while (i < max_i_index) {
- int j = min_j_index;
- while (j < max_j_index) {
- //Cell cell = partition[i * cellCount + j];
- //cell.bodies.add(body);
- //activeCells.add(cell);
- j++;
- }
- i++;
- }
- }
-
-
- */
