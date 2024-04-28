@@ -36,6 +36,7 @@ public class Physics2DWorld {
     protected float worldMaxX   = 0;
     protected float worldMinY   = 0;
     protected float worldMaxY   = 0;
+    protected float worldMaxR   = 0;
     protected float worldHeight = 0;
     protected int   rows        = 0;
     protected int   cols        = 0;

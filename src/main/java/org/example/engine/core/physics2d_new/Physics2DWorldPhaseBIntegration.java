@@ -9,7 +9,7 @@ public final class Physics2DWorldPhaseBIntegration implements Physics2DWorldPhas
         world.worldMaxX = -Float.MAX_VALUE;
         world.worldMinY =  Float.MAX_VALUE;
         world.worldMaxY = -Float.MAX_VALUE;
-        float maxR      = -Float.MAX_VALUE;
+        world.worldMaxR = -Float.MAX_VALUE;
 
         for (Physics2DBody body : world.allBodies) {
             if (body.off) continue;
@@ -21,23 +21,17 @@ public final class Physics2DWorldPhaseBIntegration implements Physics2DWorldPhas
             body.netForce.set(0, 0);
 
             // prepare further heuristics for the broad phase
-            float min_body_x = body.shape.getMinExtentX();
-            float max_body_x = body.shape.getMaxExtentX();
-            float min_body_y = body.shape.getMinExtentY();
-            float max_body_y = body.shape.getMaxExtentY();
-            world.worldMinX = Math.min(world.worldMinX, min_body_x);
-            world.worldMaxX = Math.max(world.worldMaxX, max_body_x);
-            world.worldMinY = Math.min(world.worldMinY, min_body_y);
-            world.worldMaxY = Math.max(world.worldMaxY, max_body_y);
-
-            float bounding_r = body.shape.getBoundingRadius();
-            maxR = Math.max(maxR, bounding_r);
+            world.worldMinX = Math.min(world.worldMinX, body.shape.getMinExtentX());
+            world.worldMaxX = Math.max(world.worldMaxX, body.shape.getMaxExtentX());
+            world.worldMinY = Math.min(world.worldMinY, body.shape.getMinExtentY());
+            world.worldMaxY = Math.max(world.worldMaxY, body.shape.getMaxExtentY());
+            world.worldMaxR = Math.max(world.worldMaxR, body.shape.getBoundingRadius());
         }
 
         world.worldWidth  = Math.abs(world.worldMaxX - world.worldMinX);
         world.worldHeight = Math.abs(world.worldMaxY - world.worldMinY);
 
-        final float maxDiameter = 2 * maxR;
+        final float maxDiameter = 2 * world.worldMaxR;
         world.rows = Math.min((int) Math.ceil(world.worldHeight  / maxDiameter), 32);
         world.cols = Math.min((int) Math.ceil(world.worldWidth / maxDiameter), 32);
         world.cellWidth = world.worldWidth / world.cols;

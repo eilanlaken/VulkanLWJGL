@@ -36,11 +36,6 @@ public final class Physics2DWorldRenderer {
         float cellWidth = world.cellWidth;
         float cellHeight = world.cellHeight;
 
-        renderer.pushPolygon(polyCircle, new Color(1,0,0,1), world.worldMinX, world.worldMinY, 0,0,0, scaleX, scaleY,null,null);
-        renderer.pushPolygon(polyCircle, new Color(1,0,0,1), world.worldMaxX, world.worldMinY, 0,0,0, scaleX, scaleY,null,null);
-        renderer.pushPolygon(polyCircle, new Color(1,0,0,1), world.worldMinX, world.worldMaxY, 0,0,0, scaleX, scaleY,null,null);
-        renderer.pushPolygon(polyCircle, new Color(1,0,0,1), world.worldMaxX, world.worldMaxY, 0,0,0, scaleX, scaleY,null,null);
-
         for (Physics2DWorldPhaseCBroad.Cell cell : world.spacePartition) {
             renderer.pushPolygon(polyRect, TINT_CELL_OFF, cell.x, cell.y,0,0,0, cellWidth, cellHeight,null,null);
         }
@@ -48,7 +43,6 @@ public final class Physics2DWorldRenderer {
         for (Physics2DWorldPhaseCBroad.Cell cell : world.activeCells) {
             renderer.pushPolygon(polyRect, TINT_CELL_ON, cell.x, cell.y,0,0,0, cellWidth, cellHeight,null,null);
         }
-
 
         // render bodies
         CollectionsArray<Physics2DBody> bodies = world.allBodies;
