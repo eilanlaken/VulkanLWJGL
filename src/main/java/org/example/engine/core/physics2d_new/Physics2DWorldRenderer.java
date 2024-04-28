@@ -4,6 +4,7 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.shape.Shape2DPolygon;
 import org.example.engine.core.shape.Shape2DSegment;
@@ -27,9 +28,25 @@ public final class Physics2DWorldRenderer {
     }
 
     public void render(Renderer2D renderer) {
+        final float pointPixelRadius = 6;
+        float scaleX = renderer.getCurrentCamera().lens.getViewportWidth() * pointPixelRadius / GraphicsUtils.getWindowWidth();
+        float scaleY = renderer.getCurrentCamera().lens.getViewportHeight() * pointPixelRadius / GraphicsUtils.getWindowHeight();
+
         // render broad phase
         float cellWidth = world.cellWidth;
         float cellHeight = world.cellHeight;
+
+        renderer.pushPolygon(polyCircle, new Color(1,0,0,1), world.worldMinX, world.worldMinY, 0,0,0, scaleX, scaleY,null,null);
+        renderer.pushPolygon(polyCircle, new Color(1,0,0,1), world.worldMaxX, world.worldMinY, 0,0,0, scaleX, scaleY,null,null);
+        renderer.pushPolygon(polyCircle, new Color(1,0,0,1), world.worldMinX, world.worldMaxY, 0,0,0, scaleX, scaleY,null,null);
+        renderer.pushPolygon(polyCircle, new Color(1,0,0,1), world.worldMaxX, world.worldMaxY, 0,0,0, scaleX, scaleY,null,null);
+
+        // when rows == cols, we get this bug.
+        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.G)) {
+            System.out.println("rows: " + world.rows);
+            System.out.println("cols: " + world.cols);
+        }
+
         for (Physics2DWorldPhaseCBroad.Cell cell : world.spacePartition) {
             renderer.pushPolygon(polyRect, TINT_CELL, cell.x, cell.y,0,0,0, cellWidth, cellHeight,null,null);
         }
@@ -53,9 +70,6 @@ public final class Physics2DWorldRenderer {
             if (manifold.contactsCount == 0) continue;
 
             MathVector2 penetration = new MathVector2(manifold.normal).scl(manifold.depth);
-            final float pointPixelRadius = 6;
-            float scaleX = renderer.getCurrentCamera().lens.getViewportWidth() * pointPixelRadius / GraphicsUtils.getWindowWidth();
-            float scaleY = renderer.getCurrentCamera().lens.getViewportHeight() * pointPixelRadius / GraphicsUtils.getWindowHeight();
 
             // render first contact point.
             renderer.pushPolygon(polyCircle, new Color(1,0,0,1), manifold.contactPoint1.x, manifold.contactPoint1.y, 0,0,0,scaleX,scaleY,null,null);

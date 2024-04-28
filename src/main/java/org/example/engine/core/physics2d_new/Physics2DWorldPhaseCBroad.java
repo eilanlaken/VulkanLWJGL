@@ -33,14 +33,19 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
         final float minY = world.worldMinY;
         final float maxY = world.worldMaxY;
 
-        final float cellWidth   = world.cellWidth;
-        final float cellHeight  = world.cellHeight;
+        final float cellWidth  = world.cellWidth;
+        final float cellHeight = world.cellHeight;
 
         final int rows = world.rows;
         final int cols = world.cols;
-        final int cellCount = rows * cols;
-        for (int i = 0; i < cellCount; i++) {
-            world.spacePartition.add(cellMemoryPool.allocate());
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Cell cell = cellMemoryPool.allocate();
+                cell.x = minX + (j + 0.5f) * cellWidth;
+                cell.y = minY + (i + 0.5f) * cellHeight;
+                world.spacePartition.add(cell);
+            }
         }
 
         // FIXME: populate cells
@@ -56,11 +61,12 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
             startRow = Math.max(startRow, 0);
             endRow = Math.min(endRow, rows - 1);
 
+            if (true) return;
             for (int row = startRow; row <= endRow; row++) {
                 for (int col = startCol; col <= endCol; col++) {
                     int cellIndex = row * cols + col; // Convert 2D cell coordinates to 1D index
                     Cell cell = world.spacePartition.get(cellIndex);
-                    cell.x = minX + (col + 0.5f) * cellWidth;  // X coordinate of the cell's lower-left corner
+                    cell.x = minX + (col + 0.5f) * cellWidth;
                     cell.y = minY + (row + 0.5f) * cellHeight;
                     cell.bodies.add(body);
                     world.activeCells.add(cell);

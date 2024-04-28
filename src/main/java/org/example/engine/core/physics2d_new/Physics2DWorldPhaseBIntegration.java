@@ -5,11 +5,11 @@ public final class Physics2DWorldPhaseBIntegration implements Physics2DWorldPhas
 
     @Override
     public void update(Physics2DWorld world, float delta) {
-        float minX =  Float.MAX_VALUE;
-        float maxX = -Float.MAX_VALUE;
-        float minY =  Float.MAX_VALUE;
-        float maxY = -Float.MAX_VALUE;
-        float maxR = -Float.MAX_VALUE;
+        world.worldMinX =  Float.MAX_VALUE;
+        world.worldMaxX = -Float.MAX_VALUE;
+        world.worldMinY =  Float.MAX_VALUE;
+        world.worldMaxY = -Float.MAX_VALUE;
+        float maxR      = -Float.MAX_VALUE;
 
         for (Physics2DBody body : world.allBodies) {
             if (body.off) continue;
@@ -25,23 +25,17 @@ public final class Physics2DWorldPhaseBIntegration implements Physics2DWorldPhas
             float max_body_x = body.shape.getMaxExtentX();
             float min_body_y = body.shape.getMinExtentY();
             float max_body_y = body.shape.getMaxExtentY();
-            minX = Math.min(minX, min_body_x);
-            maxX = Math.max(maxX, max_body_x);
-            minY = Math.min(minY, min_body_y);
-            maxY = Math.max(maxY, max_body_y);
+            world.worldMinX = Math.min(world.worldMinX, min_body_x);
+            world.worldMaxX = Math.max(world.worldMaxX, max_body_x);
+            world.worldMinY = Math.min(world.worldMinY, min_body_y);
+            world.worldMaxY = Math.max(world.worldMaxY, max_body_y);
 
             float bounding_r = body.shape.getBoundingRadius();
             maxR = Math.max(maxR, bounding_r);
         }
 
-        // calculate the cell size of the grid partition
-        world.worldMinX = minX;
-        world.worldMaxX = maxX;
-        world.worldMinY = minY;
-        world.worldMaxY = maxY;
-
-        world.worldWidth  = Math.abs(maxX - minX);
-        world.worldHeight = Math.abs(maxY - minY);
+        world.worldWidth  = Math.abs(world.worldMaxX - world.worldMinX);
+        world.worldHeight = Math.abs(world.worldMaxY - world.worldMinY);
 
         final float maxDiameter = 2 * maxR;
         world.rows = Math.min((int) Math.ceil(world.worldHeight  / maxDiameter), 32);
