@@ -29,7 +29,6 @@ public final class Physics2DBodyFactory {
         body.density = density;
         body.shape = new Shape2DCircle(radius);
         body.massInv = 1.0f / (body.shape.getArea() * density);
-        System.out.println(body.massInv);
         body.friction = friction;
         body.restitution = restitution;
         body.ghost = ghost;

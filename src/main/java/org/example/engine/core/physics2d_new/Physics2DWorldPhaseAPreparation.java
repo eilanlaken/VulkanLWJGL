@@ -6,6 +6,7 @@ public final class Physics2DWorldPhaseAPreparation implements Physics2DWorldPhas
     @Override
     public void update(Physics2DWorld world, float delta) {
         world.collisionCandidates.clear();
+        world.activeCells.clear();
         world.manifoldMemoryPool.freeAll(world.collisionManifolds);
         world.collisionManifolds.clear();
         for (Physics2DBody body : world.bodiesToRemove) {

@@ -28,10 +28,12 @@ public final class Physics2DWorldRenderer {
 
     public void render(Renderer2D renderer) {
         // render broad phase
-        final Physics2DWorldPhaseCBroad broad = (Physics2DWorldPhaseCBroad) world.phases[Physics2DWorld.PHASE_C_BROAD];
-        float cellWidth = broad.cellWidth;
-        float cellHeight = broad.cellHeight;
-        renderer.pushPolygon(polyRect, TINT_CELL, 0,0,0,0,0,cellWidth,cellHeight,null,null);
+        float cellWidth = world.cellWidth;
+        float cellHeight = world.cellHeight;
+        for (Physics2DWorldPhaseCBroad.Cell cell : world.spacePartition) {
+            renderer.pushPolygon(polyRect, TINT_CELL, cell.x,cell.y,0,0,0,cellWidth,cellHeight,null,null);
+        }
+
 
         // render bodies
         CollectionsArray<Physics2DBody> bodies = world.allBodies;

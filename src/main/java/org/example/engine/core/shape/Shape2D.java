@@ -61,22 +61,22 @@ public abstract class Shape2D {
 
     public final float getMinExtentX() {
         updateBoundingRadius();
-        return minExtentX;
+        return x - boundingRadius;
     }
 
     public final float getMaxExtentX() {
         updateBoundingRadius();
-        return maxExtentX;
+        return x + boundingRadius;
     }
 
     public final float getMinExtentY() {
         updateBoundingRadius();
-        return minExtentY;
+        return y - boundingRadius;
     }
 
     public final float getMaxExtentY() {
         updateBoundingRadius();
-        return maxExtentY;
+        return y + boundingRadius;
     }
 
     public final void update() {
@@ -89,10 +89,6 @@ public abstract class Shape2D {
         if (boundingRadiusUpdated) return;
         boundingRadius = getUnscaledBoundingRadius() * Math.max(Math.abs(scaleX), Math.abs(scaleY));
         boundingRadiusSquared = boundingRadius * boundingRadius;
-        minExtentX = x - boundingRadius;
-        maxExtentX = x + boundingRadius;
-        minExtentY = y - boundingRadius;
-        maxExtentY = y + boundingRadius;
         boundingRadiusUpdated = true;
     }
 

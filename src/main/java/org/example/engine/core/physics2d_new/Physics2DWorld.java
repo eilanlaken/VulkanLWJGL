@@ -5,6 +5,9 @@ import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
 
+import java.util.HashSet;
+import java.util.Set;
+
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-core-engine--gamedev-7493t
@@ -25,6 +28,19 @@ public class Physics2DWorld {
     public CollectionsArray<Physics2DBody> allBodies           = new CollectionsArray<>(false, 500);
     public CollectionsArray<Physics2DBody> bodiesToAdd         = new CollectionsArray<>(false, 100);
     public CollectionsArray<Physics2DBody> bodiesToRemove      = new CollectionsArray<>(false, 500);
+
+    protected final CollectionsArray<Physics2DWorldPhaseCBroad.Cell> spacePartition = new CollectionsArray<>(false, 1024);
+    protected final Set<Physics2DWorldPhaseCBroad.Cell>              activeCells    = new HashSet<>();
+    protected float worldWidth  = 0;
+    protected float worldMinX   = 0;
+    protected float worldMaxX   = 0;
+    protected float worldMinY   = 0;
+    protected float worldMaxY   = 0;
+    protected float worldHeight = 0;
+    protected int   rows        = 0;
+    protected int   cols        = 0;
+    protected float cellWidth   = 0;
+    protected float cellHeight  = 0;
 
     // [0, 1], [2, 3], [4, 5], ... are collision candidates.
     protected final CollectionsArray<Physics2DBody>     collisionCandidates = new CollectionsArray<>(false, 400);
