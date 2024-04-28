@@ -61,13 +61,11 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
             startRow = Math.max(startRow, 0);
             endRow = Math.min(endRow, rows - 1);
 
-            if (true) return;
+            //if (true) return;
             for (int row = startRow; row <= endRow; row++) {
                 for (int col = startCol; col <= endCol; col++) {
                     int cellIndex = row * cols + col; // Convert 2D cell coordinates to 1D index
                     Cell cell = world.spacePartition.get(cellIndex);
-                    cell.x = minX + (col + 0.5f) * cellWidth;
-                    cell.y = minY + (row + 0.5f) * cellHeight;
                     cell.bodies.add(body);
                     world.activeCells.add(cell);
                 }

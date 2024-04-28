@@ -4,7 +4,6 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Renderer2D;
-import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.shape.Shape2DPolygon;
 import org.example.engine.core.shape.Shape2DSegment;
@@ -15,7 +14,8 @@ public final class Physics2DWorldRenderer {
     private static final Color TINT_FIXED     = new Color(1,1,0,1);
     private static final Color TINT_LOGICAL   = new Color(1,0,1,1);
     private static final Color TINT_NEWTONIAN = new Color(0,1,1,1);
-    private static final Color TINT_CELL      = new Color(1,0.5f, 0.5f, 0.5f);
+    private static final Color TINT_CELL_OFF  = new Color(1,0.5f, 0.5f, 0.5f);
+    private static final Color TINT_CELL_ON   = new Color(0,0.5f, 1f, 0.5f);
 
     private final Shape2DSegment segment    = new Shape2DSegment(0,0,0,0);
     private final Shape2DPolygon polyCircle = ShapeUtils.createPolygonCircleFilled(1, 10);
@@ -41,14 +41,12 @@ public final class Physics2DWorldRenderer {
         renderer.pushPolygon(polyCircle, new Color(1,0,0,1), world.worldMinX, world.worldMaxY, 0,0,0, scaleX, scaleY,null,null);
         renderer.pushPolygon(polyCircle, new Color(1,0,0,1), world.worldMaxX, world.worldMaxY, 0,0,0, scaleX, scaleY,null,null);
 
-        // when rows == cols, we get this bug.
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.G)) {
-            System.out.println("rows: " + world.rows);
-            System.out.println("cols: " + world.cols);
+        for (Physics2DWorldPhaseCBroad.Cell cell : world.spacePartition) {
+            renderer.pushPolygon(polyRect, TINT_CELL_OFF, cell.x, cell.y,0,0,0, cellWidth, cellHeight,null,null);
         }
 
-        for (Physics2DWorldPhaseCBroad.Cell cell : world.spacePartition) {
-            renderer.pushPolygon(polyRect, TINT_CELL, cell.x, cell.y,0,0,0, cellWidth, cellHeight,null,null);
+        for (Physics2DWorldPhaseCBroad.Cell cell : world.activeCells) {
+            renderer.pushPolygon(polyRect, TINT_CELL_ON, cell.x, cell.y,0,0,0, cellWidth, cellHeight,null,null);
         }
 
 
