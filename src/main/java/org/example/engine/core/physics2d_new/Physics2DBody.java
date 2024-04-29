@@ -3,7 +3,6 @@ package org.example.engine.core.physics2d_new;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
-import org.example.engine.core.physics2d.Physics2DUtils;
 import org.example.engine.core.shape.Shape2D;
 
 import java.util.HashSet;
@@ -71,9 +70,10 @@ public class Physics2DBody implements MemoryPool.Reset {
     }
 
     public enum MotionType {
-        FIXED,
-        LOGICAL,
-        NEWTONIAN
+        STATIC,
+        KINEMATIC,
+        NEWTONIAN,
+        RELATIVISTIC, // for now, just an idea.
     }
 
     @Override

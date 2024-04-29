@@ -31,7 +31,7 @@ public class ScenePhysics2D_5_PhaseB extends ApplicationScreen {
         camera = new GraphicsCamera(640f/64,480f/64, 1);
         camera.update();
 
-        this.body = world.createBodyCircle(null, Physics2DBody.MotionType.LOGICAL,
+        this.body = world.createBodyCircle(null, Physics2DBody.MotionType.KINEMATIC,
                 MathUtils.random() * 10 - 5,MathUtils.random() * 10 - 5,MathUtils.random() * 360,
                 0f,0f,0,
                 1, 1, 1, false, 1,

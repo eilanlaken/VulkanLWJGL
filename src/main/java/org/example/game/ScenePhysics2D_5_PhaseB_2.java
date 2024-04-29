@@ -31,7 +31,7 @@ public class ScenePhysics2D_5_PhaseB_2 extends ApplicationScreen {
         camera = new GraphicsCamera(640f/64,480f/64, 1);
         camera.update();
 
-        this.body = world.createBodyCircle(null, Physics2DBody.MotionType.LOGICAL,
+        this.body = world.createBodyCircle(null, Physics2DBody.MotionType.KINEMATIC,
                 MathUtils.random() * 10 - 5,MathUtils.random() * 10 - 5,MathUtils.random() * 360,
                 0f,0f,0,
                 1, 1, 1, false, 1,
@@ -49,7 +49,7 @@ public class ScenePhysics2D_5_PhaseB_2 extends ApplicationScreen {
         if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.E)) {
             screen.set(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
             camera.lens.unproject(screen);
-            world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
+            world.createBodyCircle(null, Physics2DBody.MotionType.STATIC,
                     screen.x,screen.y,0,
                     0f,0f,0,
                     1, 1, 1, false, 1,

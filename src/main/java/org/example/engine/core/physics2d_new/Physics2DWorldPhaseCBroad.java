@@ -1,7 +1,6 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.async.AsyncUtils;
-import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.collections.CollectionsArrayConcurrent;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
@@ -60,7 +59,7 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
                     Physics2DBody b = cell.bodies.get(j);
                     if (a.off) continue;
                     if (b.off) continue;
-                    if (a.motionType == Physics2DBody.MotionType.FIXED && b.motionType == Physics2DBody.MotionType.FIXED) continue;
+                    if (a.motionType == Physics2DBody.MotionType.STATIC && b.motionType == Physics2DBody.MotionType.STATIC) continue;
                     if (cell.boundingCirclesCollide(a.shape, b.shape)) cell.candidates.add(a, b);
                 }
             }
