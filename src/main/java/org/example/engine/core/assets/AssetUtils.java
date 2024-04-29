@@ -21,11 +21,17 @@ import java.util.Set;
 
 public final class AssetUtils {
 
-    private static boolean initialized = false;
-    private static ApplicationWindow window;
-    public static final Yaml yaml;
-    public static final Gson gson;
-    static {
+    private static boolean           initialized = false;
+    private static ApplicationWindow window      = null;
+    public  static Yaml              yaml        = null;
+    public  static Gson              gson        = null;
+
+    private AssetUtils() {}
+
+    public static void init(final ApplicationWindow window) {
+        if (initialized) return;
+        AssetUtils.window = window;
+
         DumperOptions dumperOptions = new DumperOptions();
         dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         Representer representer = new Representer(dumperOptions) {
@@ -37,13 +43,7 @@ public final class AssetUtils {
         };
         yaml = new Yaml(representer);
         gson = new Gson();
-    }
 
-    private AssetUtils() {}
-
-    public static void init(final ApplicationWindow window) {
-        if (initialized) throw new IllegalStateException(AssetUtils.class.getSimpleName() + " instance already initialized.");
-        AssetUtils.window = window;
         initialized = true;
     }
 
