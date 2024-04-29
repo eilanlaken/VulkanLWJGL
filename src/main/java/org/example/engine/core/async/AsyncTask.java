@@ -1,8 +1,9 @@
 package org.example.engine.core.async;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.memory.MemoryPool;
 
-public abstract class AsyncTask {
+public abstract class AsyncTask implements MemoryPool.Reset {
 
     protected CollectionsArray<AsyncTask> prerequisites = new CollectionsArray<>();
     private volatile boolean              inProgress    = false;
@@ -50,4 +51,12 @@ public abstract class AsyncTask {
         return complete;
     }
     public final boolean isInProgress() { return inProgress; }
+
+    @Override
+    public void reset() {
+        prerequisites.clear();
+        inProgress = false;
+        complete = false;
+    }
+
 }

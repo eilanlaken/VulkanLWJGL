@@ -28,7 +28,7 @@ public class ScenePhysics2D_5_PhaseB_2 extends ApplicationScreen {
 
     @Override
     public void show() {
-        camera = new GraphicsCamera(640f/64,480f/64, 1);
+        camera = new GraphicsCamera(640f/32,480f/32, 1);
         camera.update();
 
         this.body = world.createBodyCircle(null, Physics2DBody.MotionType.KINEMATIC,

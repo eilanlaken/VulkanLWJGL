@@ -30,7 +30,7 @@ public class Physics2DWorld {
     public CollectionsArray<Physics2DBody> bodiesToRemove      = new CollectionsArray<>(false, 500);
 
     protected final CollectionsArray<Physics2DWorldPhaseCBroad.Cell> spacePartition = new CollectionsArray<>(false, 1024);
-    protected final Set<Physics2DWorldPhaseCBroad.Cell>              activeCells    = new HashSet<>();
+    protected final CollectionsArray<Physics2DWorldPhaseCBroad.Cell> activeCells    = new CollectionsArray<>();
     protected float worldWidth  = 0;
     protected float worldMinX   = 0;
     protected float worldMaxX   = 0;

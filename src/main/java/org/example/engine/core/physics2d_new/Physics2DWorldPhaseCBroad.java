@@ -1,6 +1,8 @@
 package org.example.engine.core.physics2d_new;
 
+import org.example.engine.core.async.AsyncTask;
 import org.example.engine.core.async.AsyncUtils;
+import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.collections.CollectionsArrayConcurrent;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
@@ -46,7 +48,10 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
                     int cellIndex = row * cols + col;
                     Cell cell = world.spacePartition.get(cellIndex);
                     cell.bodies.add(body);
-                    world.activeCells.add(cell);
+                    if (!cell.active) {
+                        world.activeCells.add(cell);
+                        cell.active = true;
+                    }
                 }
             }
         }
@@ -75,10 +80,33 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
         System.out.println(world.collisionCandidates.size);
     }
 
+    public static final class BroadPhaseAsyncTask extends AsyncTask {
+
+        private CollectionsArray<Cell> cellsToProcess = new CollectionsArray<>();
+
+        @Override
+        public void task() {
+            for (Cell cell : cellsToProcess) {
+                for (int i = 0; i < cell.bodies.size - 1; i++) {
+                    for (int j = i + 1; j < cell.bodies.size; j++) {
+                        Physics2DBody a = cell.bodies.get(i);
+                        Physics2DBody b = cell.bodies.get(j);
+                        if (a.off) continue;
+                        if (b.off) continue;
+                        if (a.motionType == Physics2DBody.MotionType.STATIC && b.motionType == Physics2DBody.MotionType.STATIC) continue;
+                        if (cell.boundingCirclesCollide(a.shape, b.shape)) cell.candidates.add(a, b);
+                    }
+                }
+            }
+        }
+
+    }
+
     public static final class Cell implements MemoryPool.Reset {
 
-        private final CollectionsArrayConcurrent<Physics2DBody> bodies     = new CollectionsArrayConcurrent<>(false, 2);
-        private final CollectionsArrayConcurrent<Physics2DBody> candidates = new CollectionsArrayConcurrent<>(false, 2);
+        private final CollectionsArray<Physics2DBody> bodies     = new CollectionsArray<>(false, 2);
+        private final CollectionsArray<Physics2DBody> candidates = new CollectionsArray<>(false, 2);
+        private       boolean                         active     = false;
 
         float x;
         float y;
@@ -96,6 +124,7 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
         public void reset() {
             bodies.clear();
             candidates.clear();
+            active = false;
         }
 
     }
