@@ -14,8 +14,8 @@ import java.util.Map;
 
 public class SceneRendering2D_5 extends ApplicationScreen {
 
-    private Renderer2D renderer2D;
-    private Camera camera;
+    private GraphicsRenderer2D renderer2D;
+    private GraphicsCamera camera;
 
     private Shape2DCircle circle;
     private Shape2DRectangle rectangle;
@@ -24,23 +24,23 @@ public class SceneRendering2D_5 extends ApplicationScreen {
     private Shape2DPolygon polygon;
     private Shape2DUnion compound;
 
-    private Texture texture0;
-    private TextureRegion region;
+    private GraphicsTexture texture0;
+    private GraphicsTextureRegion region;
 
-    private ShaderProgram custom = new ShaderProgram(
+    private GraphicsShaderProgram custom = new GraphicsShaderProgram(
             AssetUtils.getFileContent("assets/shaders/black-silhouette.vert"),
             AssetUtils.getFileContent("assets/shaders/black-silhouette.frag"));
 
 
     public SceneRendering2D_5() {
-        renderer2D = new Renderer2D();
+        renderer2D = new GraphicsRenderer2D();
     }
 
     @Override
     public Map<String, Class<? extends MemoryResource>> getRequiredAssets() {
         Map<String, Class<? extends MemoryResource>> requiredAssets = new HashMap<>();
 
-        requiredAssets.put("assets/atlases/pack2_0.png", Texture.class);
+        requiredAssets.put("assets/atlases/pack2_0.png", GraphicsTexture.class);
 
         return requiredAssets;
     }
@@ -48,7 +48,7 @@ public class SceneRendering2D_5 extends ApplicationScreen {
     @Override
     public void show() {
         texture0 = AssetStore.get("assets/atlases/pack2_0.png");
-        region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
+        region = new GraphicsTextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
         circle = new Shape2DCircle(150, 100,100);
         //circle.update();
@@ -72,7 +72,7 @@ public class SceneRendering2D_5 extends ApplicationScreen {
         islands.add(polygon);
 
 
-        camera = new Camera(640*2,480*2, 1);
+        camera = new GraphicsCamera(640*2,480*2, 1);
         camera.update();
     }
 
@@ -83,7 +83,7 @@ public class SceneRendering2D_5 extends ApplicationScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,1);
         renderer2D.begin(camera);
-        renderer2D.pushTextureRegion(region, new Color(1,1,1,1),0,0,0,0,0,1f,1f,custom,null);
+        renderer2D.pushTextureRegion(region, new GraphicsColor(1,1,1,1),0,0,0,0,0,1f,1f,custom,null);
 
         //polygon.setRotation(time);
         //renderer2D.pushDebugShape(circle, null);
@@ -102,7 +102,7 @@ public class SceneRendering2D_5 extends ApplicationScreen {
     private void renderBounds(Shape2D shape2D) {
         float r = shape2D.getBoundingRadius();
         Shape2DCircle bounds = new Shape2DCircle(r, shape2D.x(), shape2D.y());
-        renderer2D.pushDebugShape(bounds,new Color(1,1,0,1));
+        renderer2D.pushDebugShape(bounds,new GraphicsColor(1,1,0,1));
     }
 
     @Override

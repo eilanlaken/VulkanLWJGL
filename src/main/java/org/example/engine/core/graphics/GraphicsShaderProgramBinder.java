@@ -2,11 +2,11 @@ package org.example.engine.core.graphics;
 
 import org.lwjgl.opengl.GL20;
 
-public class ShaderProgramBinder {
+public class GraphicsShaderProgramBinder {
 
     private static int boundProgram = -1;
 
-    public static boolean bind(final ShaderProgram shaderProgram) {
+    public static boolean bind(final GraphicsShaderProgram shaderProgram) {
         if (boundProgram == shaderProgram.program) return false;
         GL20.glUseProgram(shaderProgram.program);
         boundProgram = shaderProgram.program;

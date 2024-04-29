@@ -4,7 +4,7 @@ import org.example.engine.core.math.MathMatrix4;
 import org.example.engine.core.math.MathVector3;
 import org.example.engine.core.shape.Shape3DFrustum;
 
-public class CameraLens {
+public class GraphicsCameraLens {
 
     private final MathVector3 tmp = new MathVector3();
     protected Mode mode;
@@ -20,7 +20,7 @@ public class CameraLens {
     protected float viewportHeight;
     protected final Shape3DFrustum frustum;
 
-    public CameraLens(Mode mode, float viewportWidth, float viewportHeight, float zoom, float near, float far, float fov) {
+    public GraphicsCameraLens(Mode mode, float viewportWidth, float viewportHeight, float zoom, float near, float far, float fov) {
         this.mode = mode;
         this.viewportWidth = viewportWidth;
         this.viewportHeight = viewportHeight;

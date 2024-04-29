@@ -1,8 +1,8 @@
 package org.example.engine.core.assets;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.graphics.Texture;
-import org.example.engine.core.graphics.TexturePack;
+import org.example.engine.core.graphics.GraphicsTexture;
+import org.example.engine.core.graphics.GraphicsTexturePack;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 // TODO: implement. Finalize AssetStore.
-public class AssetLoaderTexturePack implements AssetLoader<TexturePack> {
+public class AssetLoaderTexturePack implements AssetLoader<GraphicsTexturePack> {
 
 
     private CollectionsArray<AssetDescriptor> dependencies;
@@ -29,7 +29,7 @@ public class AssetLoaderTexturePack implements AssetLoader<TexturePack> {
             dependencies = new CollectionsArray<>(textures.size());
             for (Map<String, Object> texture : textures) {
                 String file = (String) texture.get("file");
-                dependencies.add(new AssetDescriptor(Texture.class, file));
+                dependencies.add(new AssetDescriptor(GraphicsTexture.class, file));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -37,7 +37,7 @@ public class AssetLoaderTexturePack implements AssetLoader<TexturePack> {
     }
 
     @Override
-    public TexturePack create() {
+    public GraphicsTexturePack create() {
         return null;
     }
 

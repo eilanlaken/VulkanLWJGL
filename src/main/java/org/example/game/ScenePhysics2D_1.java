@@ -1,9 +1,9 @@
 package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
-import org.example.engine.core.graphics.Camera;
-import org.example.engine.core.graphics.Color;
-import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.GraphicsCamera;
+import org.example.engine.core.graphics.GraphicsColor;
+import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.core.shape.Shape2D;
@@ -15,15 +15,15 @@ import java.util.Map;
 
 public class ScenePhysics2D_1 extends ApplicationScreen {
 
-    private Renderer2D renderer2D;
-    private Camera camera;
+    private GraphicsRenderer2D renderer2D;
+    private GraphicsCamera camera;
 
     private Shape2D moving;
     private Shape2D[] stale;
-    private Color staleTint = new Color(1,0,0,1);
+    private GraphicsColor staleTint = new GraphicsColor(1,0,0,1);
 
     public ScenePhysics2D_1() {
-        renderer2D = new Renderer2D();
+        renderer2D = new GraphicsRenderer2D();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ScenePhysics2D_1 extends ApplicationScreen {
             stale[i] = new Shape2DCircle(150 + 80 * (float) Math.random(), -4096 + 8281 * (float) Math.random(), -4096 + 8281 * (float) Math.random());
         }
 
-        camera = new Camera(640*2,480*2, 1);
+        camera = new GraphicsCamera(640*2,480*2, 1);
         camera.update();
     }
 
@@ -88,7 +88,7 @@ public class ScenePhysics2D_1 extends ApplicationScreen {
     private void renderBounds(Shape2D shape2D) {
         float r = shape2D.getBoundingRadius();
         Shape2DCircle bounds = new Shape2DCircle(r, shape2D.x(), shape2D.y());
-        renderer2D.pushDebugShape(bounds,new Color(1,1,0,1));
+        renderer2D.pushDebugShape(bounds,new GraphicsColor(1,1,0,1));
     }
 
     @Override

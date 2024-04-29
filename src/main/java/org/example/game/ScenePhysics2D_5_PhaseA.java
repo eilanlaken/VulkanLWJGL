@@ -1,9 +1,9 @@
 package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
-import org.example.engine.core.graphics.Camera;
+import org.example.engine.core.graphics.GraphicsCamera;
 import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.physics2d_new.Physics2DBody;
@@ -14,17 +14,17 @@ import org.lwjgl.opengl.GL11;
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
 public class ScenePhysics2D_5_PhaseA extends ApplicationScreen {
 
-    private Renderer2D renderer2D;
-    private Camera camera;
+    private GraphicsRenderer2D renderer2D;
+    private GraphicsCamera camera;
     private Physics2DWorld world = new Physics2DWorld();
 
     public ScenePhysics2D_5_PhaseA() {
-        renderer2D = new Renderer2D();
+        renderer2D = new GraphicsRenderer2D();
     }
 
     @Override
     public void show() {
-        camera = new Camera(640f/64,480f/64, 1);
+        camera = new GraphicsCamera(640f/64,480f/64, 1);
         camera.update();
     }
 

@@ -2,7 +2,7 @@ package org.example.engine.core.graphics;
 
 import org.lwjgl.opengl.GL11;
 
-public enum ModelVertexAttribute {
+public enum GraphicsModelVertexAttribute {
 
     POSITION("a_position", 3, GL11.GL_FLOAT, false),
     COLOR("a_color", 4, GL11.GL_UNSIGNED_BYTE, true),
@@ -26,7 +26,7 @@ public enum ModelVertexAttribute {
     public final short bitmask;
     public final int slot;
 
-    ModelVertexAttribute(final String glslVariableName, final int length, int type, boolean normalized) {
+    GraphicsModelVertexAttribute(final String glslVariableName, final int length, int type, boolean normalized) {
         this.glslVariableName = glslVariableName;
         this.type = type;
         this.normalized = normalized;

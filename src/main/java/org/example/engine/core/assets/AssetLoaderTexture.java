@@ -2,8 +2,8 @@ package org.example.engine.core.assets;
 
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.graphics.Texture;
-import org.example.engine.core.graphics.TextureBinder;
+import org.example.engine.core.graphics.GraphicsTexture;
+import org.example.engine.core.graphics.GraphicsTextureBinder;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.stb.STBImage;
@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 // TODO: use TextureBuilder instead
-public class AssetLoaderTexture implements AssetLoader<Texture> {
+public class AssetLoaderTexture implements AssetLoader<GraphicsTexture> {
 
     public static final int maxTextureSize = GraphicsUtils.getMaxTextureSize();
 
@@ -40,14 +40,14 @@ public class AssetLoaderTexture implements AssetLoader<Texture> {
 
     // TODO: use Texture Builder
     @Override
-    public Texture create() {
+    public GraphicsTexture create() {
         int glHandle = GL11.glGenTextures();
-        Texture texture = new Texture(glHandle,
+        GraphicsTexture texture = new GraphicsTexture(glHandle,
                 width, height,
-                Texture.Filter.MIP_MAP_NEAREST_NEAREST, Texture.Filter.MIP_MAP_NEAREST_NEAREST,
-                Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE
+                GraphicsTexture.Filter.MIP_MAP_NEAREST_NEAREST, GraphicsTexture.Filter.MIP_MAP_NEAREST_NEAREST,
+                GraphicsTexture.Wrap.CLAMP_TO_EDGE, GraphicsTexture.Wrap.CLAMP_TO_EDGE
         );
-        TextureBinder.bind(texture);
+        GraphicsTextureBinder.bind(texture);
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
         // TODO: here we need to see if we want to: generate mipmaps, use anisotropic filtering, what level of anisotropy etc
         // TODO: For a raw Texture with no TextureMap, use defaults.

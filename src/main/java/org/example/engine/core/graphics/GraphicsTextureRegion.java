@@ -1,8 +1,8 @@
 package org.example.engine.core.graphics;
 
-public class TextureRegion {
+public class GraphicsTextureRegion {
 
-    public final Texture texture;
+    public final GraphicsTexture texture;
     public final float x;
     public final float y;
     public final float offsetX;
@@ -20,14 +20,14 @@ public class TextureRegion {
     public final float u2;
     public final float v2;
 
-    public TextureRegion(Texture texture) {
+    public GraphicsTextureRegion(GraphicsTexture texture) {
         this(texture,0,0,0,0, texture.width, texture.height, texture.width, texture.height);
     }
 
     // TODO: change back to protected.
-    public TextureRegion(Texture texture,
-                            int x, int y, int offsetX, int offsetY,
-                            int packedWidth, int packedHeight, int originalWidth, int originalHeight) {
+    public GraphicsTextureRegion(GraphicsTexture texture,
+                                 int x, int y, int offsetX, int offsetY,
+                                 int packedWidth, int packedHeight, int originalWidth, int originalHeight) {
         this.texture = texture;
         this.x = x;
         this.y = y;

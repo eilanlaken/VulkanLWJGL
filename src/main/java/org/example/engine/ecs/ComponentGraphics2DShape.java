@@ -1,7 +1,7 @@
 package org.example.engine.ecs;
 
-import org.example.engine.core.graphics.Color;
-import org.example.engine.core.graphics.ShaderProgram;
+import org.example.engine.core.graphics.GraphicsColor;
+import org.example.engine.core.graphics.GraphicsShaderProgram;
 import org.example.engine.core.shape.Shape2DPolygon;
 
 import java.util.HashMap;
@@ -17,12 +17,12 @@ public class ComponentGraphics2DShape extends Component {
     public static final int CURVE     = 4; // TODO: implement.
 
     public final int shape;
-    public Color tint;
+    public GraphicsColor tint;
     public final Shape2DPolygon polygon;
-    public ShaderProgram customShader;
+    public GraphicsShaderProgram customShader;
     public HashMap<String, Object> customAttributes;
 
-    protected ComponentGraphics2DShape(int shape, Color tint, Shape2DPolygon polygon, ShaderProgram customShader, HashMap<String, Object> customAttributes) {
+    protected ComponentGraphics2DShape(int shape, GraphicsColor tint, Shape2DPolygon polygon, GraphicsShaderProgram customShader, HashMap<String, Object> customAttributes) {
         super(category);
         this.shape = shape;
         this.tint = tint;

@@ -14,8 +14,8 @@ import java.util.Map;
 
 public class SceneRendering2D_3 extends ApplicationScreen {
 
-    private Renderer2D renderer2D;
-    private Camera camera;
+    private GraphicsRenderer2D renderer2D;
+    private GraphicsCamera camera;
     private ComponentGraphics2DShape shape;
 
     private Shape2DCircle circle1;
@@ -26,20 +26,20 @@ public class SceneRendering2D_3 extends ApplicationScreen {
     private Shape2DSegment segment;
     private Shape2DPolygon polygon;
 
-    private Texture texture0;
-    private TextureRegion region;
+    private GraphicsTexture texture0;
+    private GraphicsTextureRegion region;
 
     private Shape2DCircle bounds;
 
     public SceneRendering2D_3() {
-        renderer2D = new Renderer2D();
+        renderer2D = new GraphicsRenderer2D();
     }
 
     @Override
     public Map<String, Class<? extends MemoryResource>> getRequiredAssets() {
         Map<String, Class<? extends MemoryResource>> requiredAssets = new HashMap<>();
 
-        requiredAssets.put("assets/atlases/pack2_0.png", Texture.class);
+        requiredAssets.put("assets/atlases/pack2_0.png", GraphicsTexture.class);
 
         return requiredAssets;
     }
@@ -47,7 +47,7 @@ public class SceneRendering2D_3 extends ApplicationScreen {
     @Override
     public void show() {
         texture0 = AssetStore.get("assets/atlases/pack2_0.png");
-        region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
+        region = new GraphicsTextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
         circle1 = new Shape2DCircle(150, 0,0);
         circle1.angle(30);
@@ -75,7 +75,7 @@ public class SceneRendering2D_3 extends ApplicationScreen {
         islands.add(polygon);
 
 
-        camera = new Camera(640*2,480*2, 1);
+        camera = new GraphicsCamera(640*2,480*2, 1);
         camera.update();
     }
 
@@ -86,7 +86,7 @@ public class SceneRendering2D_3 extends ApplicationScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,1);
         renderer2D.begin(camera);
-        renderer2D.pushTextureRegion(region, new Color(1,1,1,1),-350 + 10,10,0,0,0,0.2f,0.2f,null,null);
+        renderer2D.pushTextureRegion(region, new GraphicsColor(1,1,1,1),-350 + 10,10,0,0,0,0.2f,0.2f,null,null);
 
         //polygon.setRotation(time);
         //renderer2D.pushDebugShape(circle, null);

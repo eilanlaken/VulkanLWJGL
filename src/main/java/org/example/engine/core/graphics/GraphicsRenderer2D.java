@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 
 // TODO: to make it a standalone, make it initialize the opengl context itself, in case it is not initialized.
-public class Renderer2D implements MemoryResourceHolder {
+public class GraphicsRenderer2D implements MemoryResourceHolder {
 
     // constants
     private static final int VERTEX_SIZE        = 5;
@@ -30,19 +30,19 @@ public class Renderer2D implements MemoryResourceHolder {
     private static final int TRIANGLES_CAPACITY = BATCH_SIZE * 2;
 
     // defaults
-    private final ShaderProgram defaultShader           = createDefaultShaderProgram();
-    private final Texture       whiteSinglePixelTexture = createWhiteSinglePixelTexture();
+    private final GraphicsShaderProgram defaultShader           = createDefaultShaderProgram();
+    private final GraphicsTexture whiteSinglePixelTexture = createWhiteSinglePixelTexture();
     // TODO: test
-    private final Camera        defaultCamera           = createDefaultCamera();
+    private final GraphicsCamera defaultCamera           = createDefaultCamera();
 
     // cached colors
-    private final float TINT_WHITE = new Color(1,1,1,1).toFloatBits();
-    private final float TINT_SHAPE = new Color(0,0,1,1).toFloatBits();
+    private final float TINT_WHITE = new GraphicsColor(1,1,1,1).toFloatBits();
+    private final float TINT_SHAPE = new GraphicsColor(0,0,1,1).toFloatBits();
 
     // state
-    private Camera        currentCamera = null;
-    private Texture       lastTexture   = null;
-    private ShaderProgram currentShader = null;
+    private GraphicsCamera currentCamera = null;
+    private GraphicsTexture lastTexture   = null;
+    private GraphicsShaderProgram currentShader = null;
     private boolean       drawing       = false;
     private int           vertexIndex   = 0;
     private int           triangleIndex = 0;
@@ -56,7 +56,7 @@ public class Renderer2D implements MemoryResourceHolder {
     private final IntBuffer   indicesBuffer  = BufferUtils.createIntBuffer(TRIANGLES_CAPACITY * 3);
     private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * 4 * VERTEX_SIZE);
 
-    public Renderer2D() {
+    public GraphicsRenderer2D() {
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
         {
@@ -77,7 +77,7 @@ public class Renderer2D implements MemoryResourceHolder {
         GL30.glBindVertexArray(0);
     }
 
-    public Camera getCurrentCamera() {
+    public GraphicsCamera getCurrentCamera() {
         return currentCamera;
     }
 
@@ -90,8 +90,8 @@ public class Renderer2D implements MemoryResourceHolder {
         begin(null);
     }
 
-    public void begin(Camera camera) {
-        if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + Renderer2D.class.getSimpleName() + ".end() before calling begin().");
+    public void begin(GraphicsCamera camera) {
+        if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + GraphicsRenderer2D.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND); // TODO: make camera attributes, get as additional parameter to begin()
@@ -103,13 +103,13 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     /** Push primitives: TextureRegion, Shape, Light **/
-    public void pushTextureRegion(TextureRegion region, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+    public void pushTextureRegion(GraphicsTextureRegion region, GraphicsColor tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, GraphicsShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
             flush();
         }
 
-        final Texture texture = region.texture;
+        final GraphicsTexture texture = region.texture;
         final float ui = region.u;
         final float vi = region.v;
         final float uf = region.u2;
@@ -220,7 +220,7 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += 20;
     }
 
-    public void pushPolygon(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+    public void pushPolygon(final Shape2DPolygon polygon, GraphicsColor tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, GraphicsShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + polygon.indices.length > indicesBuffer.limit() || vertexIndex + polygon.vertices.length > BATCH_SIZE * 4) {
             flush();
@@ -258,7 +258,7 @@ public class Renderer2D implements MemoryResourceHolder {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    public void pushDebugShape(Shape2D shape, final Color tint) {
+    public void pushDebugShape(Shape2D shape, final GraphicsColor tint) {
         final float tintFloatBits = tint == null ? TINT_SHAPE : tint.toFloatBits();
         pushDebugShape(shape, tintFloatBits);
     }
@@ -483,17 +483,17 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     /** Swap Operations **/
-    private void useShader(ShaderProgram shader) {
+    private void useShader(GraphicsShaderProgram shader) {
         if (shader == null) shader = defaultShader;
         if (currentShader != shader) {
             flush();
-            ShaderProgramBinder.bind(shader);
+            GraphicsShaderProgramBinder.bind(shader);
             shader.bindUniform("u_camera_combined", currentCamera.lens.combined);
         }
         currentShader = shader;
     }
 
-    private void useTexture(Texture texture) {
+    private void useTexture(GraphicsTexture texture) {
         if (lastTexture != texture) {
             flush();
         }
@@ -547,7 +547,7 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     public void end() {
-        if (!drawing) throw new IllegalStateException("Called " + Renderer2D.class.getSimpleName() + ".end() without calling " + Renderer2D.class.getSimpleName() + ".begin() first.");
+        if (!drawing) throw new IllegalStateException("Called " + GraphicsRenderer2D.class.getSimpleName() + ".end() without calling " + GraphicsRenderer2D.class.getSimpleName() + ".begin() first.");
         flush();
         GL20.glDepthMask(true);
         GL11.glEnable(GL11.GL_CULL_FACE);
@@ -569,15 +569,15 @@ public class Renderer2D implements MemoryResourceHolder {
         whiteSinglePixelTexture.delete();
     }
 
-    private static ShaderProgram createDefaultShaderProgram() {
-        try (InputStream vertexShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
+    private static GraphicsShaderProgram createDefaultShaderProgram() {
+        try (InputStream vertexShaderInputStream = GraphicsRenderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
              BufferedReader vertexShaderBufferedReader = new BufferedReader(new InputStreamReader(vertexShaderInputStream, StandardCharsets.UTF_8));
-             InputStream fragmentShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
+             InputStream fragmentShaderInputStream = GraphicsRenderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
              BufferedReader fragmentShaderBufferedReader = new BufferedReader(new InputStreamReader(fragmentShaderInputStream, StandardCharsets.UTF_8))) {
 
             String vertexShader = vertexShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
             String fragmentShader = fragmentShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
-            return new ShaderProgram(vertexShader, fragmentShader);
+            return new GraphicsShaderProgram(vertexShader, fragmentShader);
         } catch (Exception e) {
             System.err.println("Could not create shader program from resources: ");
             e.printStackTrace();
@@ -617,13 +617,13 @@ public class Renderer2D implements MemoryResourceHolder {
                     "    out_color = color * texture(u_texture, uv);\n" +
                     "}";
 
-            return new ShaderProgram(vertexShader, fragmentShader);
+            return new GraphicsShaderProgram(vertexShader, fragmentShader);
         }
     }
 
-    private static Texture createWhiteSinglePixelTexture() {
+    private static GraphicsTexture createWhiteSinglePixelTexture() {
         try {
-            return TextureBuilder.buildFromClassPath("graphics-2d-single-white-pixel.png");
+            return GraphicsTextureBuilder.buildFromClassPath("graphics-2d-single-white-pixel.png");
         } catch (Exception e) {
             System.err.println("Could not create single white pixel texture from resource. Creating manually.");
             e.printStackTrace();
@@ -635,20 +635,20 @@ public class Renderer2D implements MemoryResourceHolder {
             buffer.put((byte) ((0xFFFFFFFF >> 24) & 0xFF));   // Alpha component
             buffer.flip();
             int glHandle = GL11.glGenTextures();
-            Texture texture = new Texture(glHandle,
+            GraphicsTexture texture = new GraphicsTexture(glHandle,
                     1, 1,
-                    Texture.Filter.NEAREST, Texture.Filter.NEAREST,
-                    Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE
+                    GraphicsTexture.Filter.NEAREST, GraphicsTexture.Filter.NEAREST,
+                    GraphicsTexture.Wrap.CLAMP_TO_EDGE, GraphicsTexture.Wrap.CLAMP_TO_EDGE
             );
-            TextureBinder.bind(texture);
+            GraphicsTextureBinder.bind(texture);
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, 1, 1, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
             return texture;
         }
     }
 
-    private static Camera createDefaultCamera() {
-        return new Camera(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight(), 1);
+    private static GraphicsCamera createDefaultCamera() {
+        return new GraphicsCamera(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight(), 1);
     }
 
 }

@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TexturePacker {
+public class GraphicsTexturePacker {
 
     public static synchronized void packDirectory(final String outputName, final String directory, final boolean recursive) {
         if (directory == null) throw new IllegalArgumentException("Must provide non-null directory name.");
@@ -312,25 +312,25 @@ public class TexturePacker {
 
         public final String outputDirectory;
         public final String outputName;
-        public final Texture.Filter magFilter;
-        public final Texture.Filter minFilter;
-        public final Texture.Wrap uWrap;
-        public final Texture.Wrap vWrap;
+        public final GraphicsTexture.Filter magFilter;
+        public final GraphicsTexture.Filter minFilter;
+        public final GraphicsTexture.Wrap uWrap;
+        public final GraphicsTexture.Wrap vWrap;
         public final int extrude; // extrude REPEATS the border i.e. adding colors.
         public final int padding;
         public final int maxTexturesSize;
 
         public Options(String outputDirectory, String outputName) {
-            this(outputDirectory, outputName, Texture.Filter.MIP_MAP_NEAREST_NEAREST, Texture.Filter.MIP_MAP_NEAREST_NEAREST, Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE, 1,1, Size.XX_LARGE_8192);
+            this(outputDirectory, outputName, GraphicsTexture.Filter.MIP_MAP_NEAREST_NEAREST, GraphicsTexture.Filter.MIP_MAP_NEAREST_NEAREST, GraphicsTexture.Wrap.CLAMP_TO_EDGE, GraphicsTexture.Wrap.CLAMP_TO_EDGE, 1,1, Size.XX_LARGE_8192);
         }
 
-        public Options(String outputDirectory, String outputName, Texture.Filter magFilter, Texture.Filter minFilter, Texture.Wrap uWrap, Texture.Wrap vWrap, int extrude, int padding, Size size) {
+        public Options(String outputDirectory, String outputName, GraphicsTexture.Filter magFilter, GraphicsTexture.Filter minFilter, GraphicsTexture.Wrap uWrap, GraphicsTexture.Wrap vWrap, int extrude, int padding, Size size) {
             this.outputDirectory = outputDirectory;
             this.outputName = outputName;
-            this.magFilter = magFilter == null ? Texture.Filter.MIP_MAP_NEAREST_NEAREST : magFilter;
-            this.minFilter = minFilter == null ? Texture.Filter.MIP_MAP_NEAREST_NEAREST : minFilter;
-            this.uWrap = uWrap == null ? Texture.Wrap.CLAMP_TO_EDGE : uWrap;
-            this.vWrap = vWrap == null ? Texture.Wrap.CLAMP_TO_EDGE : vWrap;
+            this.magFilter = magFilter == null ? GraphicsTexture.Filter.MIP_MAP_NEAREST_NEAREST : magFilter;
+            this.minFilter = minFilter == null ? GraphicsTexture.Filter.MIP_MAP_NEAREST_NEAREST : minFilter;
+            this.uWrap = uWrap == null ? GraphicsTexture.Wrap.CLAMP_TO_EDGE : uWrap;
+            this.vWrap = vWrap == null ? GraphicsTexture.Wrap.CLAMP_TO_EDGE : vWrap;
             this.extrude = Math.max(extrude, 0);
             this.padding = Math.max(padding, 0);
             this.maxTexturesSize = size.value;

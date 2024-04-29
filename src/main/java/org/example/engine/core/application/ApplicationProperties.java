@@ -1,6 +1,6 @@
 package org.example.engine.core.application;
 
-import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.GraphicsRenderer2D;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +14,7 @@ public class ApplicationProperties {
         Properties properties = new Properties();
         try {
             // Load the properties file
-            inputStream = Renderer2D.class.getClassLoader().getResourceAsStream("application-" + profile + ".properties");
+            inputStream = GraphicsRenderer2D.class.getClassLoader().getResourceAsStream("application-" + profile + ".properties");
 
             properties.load(inputStream);
 

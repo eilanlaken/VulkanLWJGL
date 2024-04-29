@@ -2,10 +2,10 @@ package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.graphics.Camera;
-import org.example.engine.core.graphics.Color;
+import org.example.engine.core.graphics.GraphicsCamera;
+import org.example.engine.core.graphics.GraphicsColor;
 import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.MathVector2;
@@ -20,9 +20,9 @@ import org.lwjgl.opengl.GL11;
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
 public class ScenePhysics2D_3 extends ApplicationScreen {
 
-    private Renderer2D renderer2D;
-    private Color staleTint = new Color(1,0,0,1);
-    private Camera camera;
+    private GraphicsRenderer2D renderer2D;
+    private GraphicsColor staleTint = new GraphicsColor(1,0,0,1);
+    private GraphicsCamera camera;
 
     private Shape2D composite;
     private Shape2D otherCircle;
@@ -36,7 +36,7 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
     private Shape2DPolygon contactIndicator = ShapeUtils.createPolygonCircleFilled(1, 10);
 
     public ScenePhysics2D_3() {
-        renderer2D = new Renderer2D();
+        renderer2D = new GraphicsRenderer2D();
     }
 
     @Override
@@ -50,7 +50,7 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
         //otherPolygon = new Shape2DPolygon(new float[] { 0, 0, 5, 0, 5, 5, 0, 5, 1, 1, 4, 1, 4, 4, 1, 4 }, new int[] { 4 });
 
 
-        camera = new Camera(640f/64,480f/64, 1);
+        camera = new GraphicsCamera(640f/64,480f/64, 1);
         camera.update();
 
         body = world.createBody(composite, new MathVector2(0,0),0, new MathVector2(0.f, 0));
@@ -107,20 +107,20 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
 
         // render contact points
         if (manifold.contactPoint1 != null) {
-            renderer2D.pushPolygon(contactIndicator, new Color(1,0,0,1), manifold.contactPoint1.x, manifold.contactPoint1.y, 0,0,0,scaleX,scaleY,null,null);
+            renderer2D.pushPolygon(contactIndicator, new GraphicsColor(1,0,0,1), manifold.contactPoint1.x, manifold.contactPoint1.y, 0,0,0,scaleX,scaleY,null,null);
             Shape2DSegment segment = new Shape2DSegment(manifold.contactPoint1.x, manifold.contactPoint1.y, manifold.contactPoint1.x + penetration.x, manifold.contactPoint1.y + penetration.y);
-            renderer2D.pushDebugShape(segment, new Color(1,0,1,1));
+            renderer2D.pushDebugShape(segment, new GraphicsColor(1,0,1,1));
         }
         if (manifold.contactPoint2 != null) {
-            renderer2D.pushPolygon(contactIndicator, new Color(1,0,0,1), manifold.contactPoint2.x, manifold.contactPoint2.y, 0,0,0,scaleX,scaleY,null,null);
+            renderer2D.pushPolygon(contactIndicator, new GraphicsColor(1,0,0,1), manifold.contactPoint2.x, manifold.contactPoint2.y, 0,0,0,scaleX,scaleY,null,null);
             Shape2DSegment segment = new Shape2DSegment(manifold.contactPoint2.x, manifold.contactPoint2.y, manifold.contactPoint2.x + penetration.x, manifold.contactPoint2.y + penetration.y);
-            renderer2D.pushDebugShape(segment, new Color(1,0,1,1));
+            renderer2D.pushDebugShape(segment, new GraphicsColor(1,0,1,1));
         }
     }
 
     private void renderBounds(Shape2D shape2D) {
         Shape2DCircle bounds = new Shape2DCircle(shape2D.getBoundingRadius(), shape2D.x(), shape2D.y());
-        renderer2D.pushDebugShape(bounds,new Color(1,1,0,1));
+        renderer2D.pushDebugShape(bounds,new GraphicsColor(1,1,0,1));
     }
 
     @Override

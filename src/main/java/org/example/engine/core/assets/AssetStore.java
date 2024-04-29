@@ -3,10 +3,10 @@ package org.example.engine.core.assets;
 import org.example.engine.core.async.AsyncTaskRunner;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.collections.CollectionsQueue;
-import org.example.engine.core.graphics.Model;
-import org.example.engine.core.graphics.ShaderProgram;
-import org.example.engine.core.graphics.Texture;
-import org.example.engine.core.graphics.TexturePack;
+import org.example.engine.core.graphics.GraphicsModel;
+import org.example.engine.core.graphics.GraphicsShaderProgram;
+import org.example.engine.core.graphics.GraphicsTexture;
+import org.example.engine.core.graphics.GraphicsTexturePack;
 import org.example.engine.core.memory.MemoryResource;
 
 import java.lang.reflect.Constructor;
@@ -133,10 +133,10 @@ public final class AssetStore {
 
     private static HashMap<Class<? extends MemoryResource>, Class<? extends AssetLoader<? extends MemoryResource>>> getLoadersMap() {
         HashMap<Class<? extends MemoryResource>, Class<? extends AssetLoader<? extends MemoryResource>>> loaders = new HashMap<>();
-        loaders.put(Texture.class, AssetLoaderTexture.class);
-        loaders.put(Model.class, AssetLoaderModel.class);
-        loaders.put(ShaderProgram.class, AssetLoaderShaderProgram.class);
-        loaders.put(TexturePack.class, AssetLoaderTexturePack.class);
+        loaders.put(GraphicsTexture.class, AssetLoaderTexture.class);
+        loaders.put(GraphicsModel.class, AssetLoaderModel.class);
+        loaders.put(GraphicsShaderProgram.class, AssetLoaderShaderProgram.class);
+        loaders.put(GraphicsTexturePack.class, AssetLoaderTexturePack.class);
         return loaders;
     }
 

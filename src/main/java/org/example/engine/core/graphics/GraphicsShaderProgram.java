@@ -13,7 +13,7 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ShaderProgram implements MemoryResource {
+public class GraphicsShaderProgram implements MemoryResource {
 
     public final String vertexShaderSource;
     public final String fragmentShaderSource;
@@ -32,7 +32,7 @@ public class ShaderProgram implements MemoryResource {
     private String[] attributeNames;
     private Object[] uniformCache;
 
-    public ShaderProgram(final String vertexShaderSource, final String fragmentShaderSource) {
+    public GraphicsShaderProgram(final String vertexShaderSource, final String fragmentShaderSource) {
         if (vertexShaderSource == null) throw new IllegalArgumentException("Vertex shader cannot be null.");
         if (fragmentShaderSource == null) throw new IllegalArgumentException("Fragment shader cannot be null.");
         this.vertexShaderSource = vertexShaderSource;
@@ -168,8 +168,8 @@ public class ShaderProgram implements MemoryResource {
         switch (type) {
 
             case GL20.GL_SAMPLER_2D:
-                Texture texture = (Texture) value;
-                int slot = TextureBinder.bind(texture);
+                GraphicsTexture texture = (GraphicsTexture) value;
+                int slot = GraphicsTextureBinder.bind(texture);
                 if (isUniformIntegerCached(location, slot)) return;
                 GL20.glUniform1i(location, slot);
                 cacheUniformInteger(location, slot);
@@ -204,8 +204,8 @@ public class ShaderProgram implements MemoryResource {
                 break;
 
             case GL20.GL_FLOAT_VEC4:
-                if (value instanceof Color) {
-                    Color color = (Color) value;
+                if (value instanceof GraphicsColor) {
+                    GraphicsColor color = (GraphicsColor) value;
                     if (isUniformFloatTupleCached(location, color.r, color.g, color.b, color.a)) return;
                     GL20.glUniform4f(location, color.r, color.g, color.b, color.a);
                     cacheUniformFloatTuple(location, color.r, color.g, color.b, color.a);

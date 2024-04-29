@@ -4,9 +4,9 @@ import java.awt.image.BufferedImage;
 
 // Equivalent to libGDXs' Pixmap
 // TODO: later.
-public class TexturePixels extends BufferedImage {
+public class GraphicsTexturePixels extends BufferedImage {
 
-    public TexturePixels(int width, int height) {
+    public GraphicsTexturePixels(int width, int height) {
         super(width, height, BufferedImage.TYPE_INT_ARGB);
     }
 

@@ -6,17 +6,17 @@ import org.lwjgl.opengl.GL20;
 
 // REFERENCE TODO: DefaultTextureBinder (libGDX)
 // TODO: fix
-public class TextureBinder {
+public class GraphicsTextureBinder {
 
     private static final int RESERVED_OFFSET = 0; // we will begin binding from slots OFFSET, OFFSET + 1,... leaving slots 0... OFFSET - 1 for texture loading and manipulation?
     private static final int MAXIMUM_BOUND_TEXTURE_UNITS = GraphicsUtils.getMaxBoundTextureUnits();
     private static final int AVAILABLE_TEXTURE_SLOTS = MAXIMUM_BOUND_TEXTURE_UNITS - RESERVED_OFFSET;
-    private static final Texture[] boundTextures = new Texture[MAXIMUM_BOUND_TEXTURE_UNITS];
+    private static final GraphicsTexture[] boundTextures = new GraphicsTexture[MAXIMUM_BOUND_TEXTURE_UNITS];
     private static int roundRobinCounter = 0;
 
     // TODO: fix
-    public static synchronized int bind(final Texture texture) {
-        if (texture.handle == 0) throw new IllegalStateException("Trying to bind " + Texture.class.getSimpleName() + " that was already freed.");
+    public static synchronized int bind(final GraphicsTexture texture) {
+        if (texture.handle == 0) throw new IllegalStateException("Trying to bind " + GraphicsTexture.class.getSimpleName() + " that was already freed.");
         if (texture.getSlot() >= 0) return texture.getSlot();
         int slot = roundRobinCounter + RESERVED_OFFSET;
         if (boundTextures[slot] != null) unbind(boundTextures[slot]);
@@ -29,8 +29,8 @@ public class TextureBinder {
         return slot;
     }
 
-    public static synchronized void unbind(Texture texture) {
-        if (texture.handle == 0) throw new IllegalStateException("Trying to unbind " + Texture.class.getSimpleName() + " that was already freed.");
+    public static synchronized void unbind(GraphicsTexture texture) {
+        if (texture.handle == 0) throw new IllegalStateException("Trying to unbind " + GraphicsTexture.class.getSimpleName() + " that was already freed.");
         int slot = texture.getSlot();
         if (slot < 0) return;
         GL13.glActiveTexture(GL20.GL_TEXTURE0 + slot);
@@ -40,7 +40,7 @@ public class TextureBinder {
     }
 
     // TODO: see all texture parameters (formats: RGB, RGBA, ...; packing, compression, etc.)
-    private static void updateTextureParameters(final Texture texture) {
+    private static void updateTextureParameters(final GraphicsTexture texture) {
         GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MIN_FILTER, texture.minFilter.glValue);
         GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MAG_FILTER, texture.magFilter.glValue);
         GL11.glTexParameteri(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_WRAP_S, texture.uWrap.glValue);

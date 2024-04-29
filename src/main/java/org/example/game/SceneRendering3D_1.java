@@ -16,24 +16,22 @@ import java.util.Map;
 
 public class SceneRendering3D_1 extends ApplicationScreen {
 
-    private Renderer3D renderer3DOld;
-    private Model model;
-    private ShaderProgram shader;
+    private GraphicsRenderer3D renderer3DOld;
+    private GraphicsModel model;
+    private GraphicsShaderProgram shader;
     private ComponentTransform transform;
-    private Camera camera;
-    private Lights lights;
+    private GraphicsCamera camera;
 
 
     public SceneRendering3D_1() {
-        this.renderer3DOld = new Renderer3D();
+        this.renderer3DOld = new GraphicsRenderer3D();
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default.frag");
-        this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
+        this.shader = new GraphicsShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
 
-        this.camera = new Camera(100, 100, 1, 0.1f, 100, 70);
-        this.lights = new Lights();
+        this.camera = new GraphicsCamera(100, 100, 1, 0.1f, 100, 70);
 
     }
 
@@ -41,7 +39,7 @@ public class SceneRendering3D_1 extends ApplicationScreen {
     public Map<String, Class<? extends MemoryResource>> getRequiredAssets() {
         Map<String, Class<? extends MemoryResource>> requiredAssets = new HashMap<>();
 
-        requiredAssets.put("assets/models/cube-blue.fbx", Model.class);
+        requiredAssets.put("assets/models/cube-blue.fbx", GraphicsModel.class);
 
         return requiredAssets;
     }
@@ -53,7 +51,6 @@ public class SceneRendering3D_1 extends ApplicationScreen {
         model = AssetStore.get("assets/models/cube-blue.fbx");
         System.out.println(model.parts[0].material.uniformParams);
         //environment.add(new EnvironmentLightAmbient(0.2f,0.1f,11.1f,0.2f));
-        lights.add(new LightPoint(new Color(1,0.2f,0,1), 1f, 0, 0, -3));
         //transform3D.matrix4.rotateSelfAxis(Vector3.Y, 30);
     }
 
@@ -105,7 +102,6 @@ public class SceneRendering3D_1 extends ApplicationScreen {
         GL11.glClearColor(0,0,0,1);
         renderer3DOld.begin(shader);
         renderer3DOld.setCamera(camera);
-        renderer3DOld.setEnvironment(lights);
         renderer3DOld.draw(model.parts[0], transform);
         //renderer3DOld.draw(model.parts[1], transform3D.matrix4);
         renderer3DOld.end();

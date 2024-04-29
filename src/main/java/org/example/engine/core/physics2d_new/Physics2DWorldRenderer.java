@@ -1,9 +1,9 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.graphics.Color;
+import org.example.engine.core.graphics.GraphicsColor;
 import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.shape.Shape2DPolygon;
 import org.example.engine.core.shape.Shape2DSegment;
@@ -11,11 +11,11 @@ import org.example.engine.core.shape.ShapeUtils;
 
 public final class Physics2DWorldRenderer {
 
-    private static final Color TINT_FIXED     = new Color(1,1,0,1);
-    private static final Color TINT_LOGICAL   = new Color(1,0,1,1);
-    private static final Color TINT_NEWTONIAN = new Color(0,1,1,1);
-    private static final Color TINT_CELL_OFF  = new Color(1,0.5f, 0.5f, 0.5f);
-    private static final Color TINT_CELL_ON   = new Color(0,0.5f, 1f, 0.5f);
+    private static final GraphicsColor TINT_FIXED     = new GraphicsColor(1,1,0,1);
+    private static final GraphicsColor TINT_LOGICAL   = new GraphicsColor(1,0,1,1);
+    private static final GraphicsColor TINT_NEWTONIAN = new GraphicsColor(0,1,1,1);
+    private static final GraphicsColor TINT_CELL_OFF  = new GraphicsColor(1,0.5f, 0.5f, 0.5f);
+    private static final GraphicsColor TINT_CELL_ON   = new GraphicsColor(0,0.5f, 1f, 0.5f);
 
     private final Shape2DSegment segment    = new Shape2DSegment(0,0,0,0);
     private final Shape2DPolygon polyCircle = ShapeUtils.createPolygonCircleFilled(1, 10);
@@ -27,7 +27,7 @@ public final class Physics2DWorldRenderer {
         this.world = world;
     }
 
-    public void render(Renderer2D renderer) {
+    public void render(GraphicsRenderer2D renderer) {
         final float pointPixelRadius = 6;
         float scaleX = renderer.getCurrentCamera().lens.getViewportWidth() * pointPixelRadius / GraphicsUtils.getWindowWidth();
         float scaleY = renderer.getCurrentCamera().lens.getViewportHeight() * pointPixelRadius / GraphicsUtils.getWindowHeight();
@@ -64,17 +64,17 @@ public final class Physics2DWorldRenderer {
             MathVector2 penetration = new MathVector2(manifold.normal).scl(manifold.depth);
 
             // render first contact point.
-            renderer.pushPolygon(polyCircle, new Color(1,0,0,1), manifold.contactPoint1.x, manifold.contactPoint1.y, 0,0,0,scaleX,scaleY,null,null);
+            renderer.pushPolygon(polyCircle, new GraphicsColor(1,0,0,1), manifold.contactPoint1.x, manifold.contactPoint1.y, 0,0,0,scaleX,scaleY,null,null);
             segment.localA(manifold.contactPoint1.x, manifold.contactPoint1.y);
             segment.localB(manifold.contactPoint1.x + penetration.x, manifold.contactPoint1.y + penetration.y);
-            renderer.pushDebugShape(segment, new Color(1,0,1,1));
+            renderer.pushDebugShape(segment, new GraphicsColor(1,0,1,1));
 
             // render second contact point
             if (manifold.contactsCount == 1) continue;
-            renderer.pushPolygon(polyCircle, new Color(1,0,0,1), manifold.contactPoint2.x, manifold.contactPoint2.y, 0,0,0,scaleX,scaleY,null,null);
+            renderer.pushPolygon(polyCircle, new GraphicsColor(1,0,0,1), manifold.contactPoint2.x, manifold.contactPoint2.y, 0,0,0,scaleX,scaleY,null,null);
             segment.localA(manifold.contactPoint2.x, manifold.contactPoint2.y);
             segment.localB(manifold.contactPoint2.x + penetration.x, manifold.contactPoint2.y + penetration.y);
-            renderer.pushDebugShape(segment, new Color(1,0,1,1));
+            renderer.pushDebugShape(segment, new GraphicsColor(1,0,1,1));
         }
     }
 
