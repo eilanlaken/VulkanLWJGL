@@ -4,7 +4,7 @@ public final class Physics2DWorldPhaseAPreparation implements Physics2DWorldPhas
 
     // TODO: test.
     @Override
-    public void update(Physics2DWorld world, float delta) {
+    public synchronized void update(Physics2DWorld world, float delta) {
         world.collisionCandidates.clear();
         world.activeCells.clear();
         world.manifoldMemoryPool.freeAll(world.collisionManifolds);
@@ -17,6 +17,8 @@ public final class Physics2DWorldPhaseAPreparation implements Physics2DWorldPhas
         for (Physics2DBody body : world.bodiesToAdd) {
             world.allBodies.add(body);
             body.created = true;
+            body.index = world.bodiesCreated;
+            world.bodiesCreated++;
         }
         world.bodiesToRemove.clear();
         world.bodiesToAdd.clear();

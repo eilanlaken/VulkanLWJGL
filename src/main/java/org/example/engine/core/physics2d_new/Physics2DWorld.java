@@ -31,17 +31,18 @@ public class Physics2DWorld {
 
     protected final CollectionsArray<Physics2DWorldPhaseCBroad.Cell> spacePartition = new CollectionsArray<>(false, 1024);
     protected final CollectionsArray<Physics2DWorldPhaseCBroad.Cell> activeCells    = new CollectionsArray<>();
-    protected float worldWidth  = 0;
-    protected float worldMinX   = 0;
-    protected float worldMaxX   = 0;
-    protected float worldMinY   = 0;
-    protected float worldMaxY   = 0;
-    protected float worldMaxR   = 0;
-    protected float worldHeight = 0;
-    protected int   rows        = 0;
-    protected int   cols        = 0;
-    protected float cellWidth   = 0;
-    protected float cellHeight  = 0;
+    protected float worldWidth    = 0;
+    protected float worldMinX     = 0;
+    protected float worldMaxX     = 0;
+    protected float worldMinY     = 0;
+    protected float worldMaxY     = 0;
+    protected float worldMaxR     = 0;
+    protected float worldHeight   = 0;
+    protected int   rows          = 0;
+    protected int   cols          = 0;
+    protected float cellWidth     = 0;
+    protected float cellHeight    = 0;
+    protected int   bodiesCreated = 0;
 
     // [0, 1], [2, 3], [4, 5], ... are collision candidates.
     protected final CollectionsArray<Physics2DBody>     collisionCandidates = new CollectionsArray<>(false, 400);

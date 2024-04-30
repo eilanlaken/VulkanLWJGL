@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 // TODO: continue.
 public final class Physics2DBodyFactory {
 
-    public static final Class<? extends Shape2D>[] supportedShapeType = new Class[] {Shape2DAABB.class, Shape2DCircle.class, Shape2DRectangle.class, Shape2DPolygon.class, Shape2DUnion.class};
     private final MemoryPool<Physics2DBody> bodyMemoryPool;
 
     Physics2DBodyFactory(Physics2DWorld world) {

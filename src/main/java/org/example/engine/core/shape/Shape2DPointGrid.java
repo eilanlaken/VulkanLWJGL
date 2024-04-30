@@ -68,8 +68,8 @@ public class Shape2DPointGrid extends Shape2D {
     public void getWorldEdge(int index, @NotNull MathVector2 tail, @NotNull MathVector2 head) {
         if (!updated) update();
         int next = (index + 1) % vertexCount;
-        tail.set(worldVertices.getCircular(index));
-        head.set(worldVertices.getCircular(next));
+        tail.set(worldVertices.getCyclic(index));
+        head.set(worldVertices.getCyclic(next));
     }
 
 }

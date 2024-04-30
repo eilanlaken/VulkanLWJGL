@@ -117,8 +117,8 @@ public class Shape2DPolygon extends Shape2D {
                 if (index == loop.t2) next = loop.t1;
             }
         }
-        tail.set(worldVertices.getCircular(index));
-        head.set(worldVertices.getCircular(next));
+        tail.set(worldVertices.getCyclic(index));
+        head.set(worldVertices.getCyclic(next));
     }
 
 }

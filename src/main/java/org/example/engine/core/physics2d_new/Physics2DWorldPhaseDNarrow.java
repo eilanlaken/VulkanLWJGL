@@ -773,8 +773,8 @@ public final class Physics2DWorldPhaseDNarrow implements Physics2DWorldPhase {
         float px = Float.NaN;
         float py = Float.NaN;
         for (int i = 0; i < vertices.size; i++) {
-            MathVector2 tail = vertices.getCircular(i);
-            MathVector2 head = vertices.getCircular(i + 1);
+            MathVector2 tail = vertices.getCyclic(i);
+            MathVector2 head = vertices.getCyclic(i + 1);
             float dx = head.x - tail.x;
             float dy = head.y - tail.y;
             if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;

@@ -23,7 +23,7 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
         cellMemoryPool.freeAll(world.spacePartition);
         world.spacePartition.clear();
         if (world.allBodies.isEmpty()) return;
-        //if (world.allBodies.size == 1) return; // TODO: put back.
+        if (world.allBodies.size == 1) return;
 
         // data from previous phase
         final float minX = world.worldMinX;
@@ -62,25 +62,31 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
         }
 
         for (int i = 0; i < processors; i++) {
-            ProcessCells task = taskMemoryPool.allocate();
-            broadPhaseTasks.add(task);
+            broadPhaseTasks.add(taskMemoryPool.allocate());
         }
-
         for (int i = 0; i < world.activeCells.size; i++) {
-            broadPhaseTasks.getCircular(i).cellsToProcess.add(world.activeCells.get(i));
+            broadPhaseTasks.getCyclic(i).cellsToProcess.add(world.activeCells.get(i));
         }
-
         AsyncTaskRunner.await(AsyncTaskRunner.async(broadPhaseTasks));
 
         // merge all collision candidates.
-        // TODO: merge correctly. Don't merge existing pairs or their symmetries.
         for (Cell cell : world.activeCells) {
-            for (Physics2DBody body : cell.candidates) {
-                world.collisionCandidates.add(body);
+            CollectionsArray<Physics2DBody> cellCandidates  = cell.candidates;
+            CollectionsArray<Physics2DBody> worldCandidates = world.collisionCandidates;
+            for (int i = 0; i < cellCandidates.size - 1; i += 2) {
+                Physics2DBody a = cellCandidates.get(i);
+                Physics2DBody b = cellCandidates.get(i + 1);
+                boolean alreadyInserted = false;
+                for (int j = 0; j < worldCandidates.size - 1; j += 2) {
+                    if (a == worldCandidates.get(j) && b == worldCandidates.get(j+1)) {
+                        alreadyInserted = true;
+                        break;
+                    }
+                }
+                if (alreadyInserted) continue;
+                worldCandidates.add(a, b);
             }
         }
-
-        System.out.println(world.collisionCandidates.size);
     }
 
     public static final class ProcessCells extends AsyncTask {
@@ -99,7 +105,11 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
                         if (a.off) continue;
                         if (b.off) continue;
                         if (a.motionType == Physics2DBody.MotionType.STATIC && b.motionType == Physics2DBody.MotionType.STATIC) continue;
-                        if (boundingCirclesCollide(a.shape, b.shape)) cell.candidates.add(a, b);
+                        if (a == b) continue;
+                        if (!boundingCirclesCollide(a.shape, b.shape)) continue;
+
+                        if (a.index < b.index) cell.candidates.add(a, b);
+                        else cell.candidates.add(b, a);
                     }
                 }
             }

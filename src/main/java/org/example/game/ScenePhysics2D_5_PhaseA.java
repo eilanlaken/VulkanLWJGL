@@ -41,7 +41,7 @@ public class ScenePhysics2D_5_PhaseA extends ApplicationScreen {
         }
 
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.E)) {
-            world.destroyBody(world.allBodies.getCircular(0));
+            world.destroyBody(world.allBodies.getCyclic(0));
         }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);

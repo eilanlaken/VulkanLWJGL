@@ -12,6 +12,7 @@ public class Physics2DBody implements MemoryPool.Reset {
 
     public    Object      owner;
     protected boolean     created;
+    protected int         index;
     public    boolean     off;
     public    MotionType  motionType;
     public    Shape2D     shape;
@@ -80,6 +81,7 @@ public class Physics2DBody implements MemoryPool.Reset {
     public void reset() {
         this.owner = null;
         this.created = false;
+        this.index = -1;
         this.off = false;
         this.motionType = null;
         this.shape = null;
