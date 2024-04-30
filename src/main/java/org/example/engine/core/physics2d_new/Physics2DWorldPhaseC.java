@@ -7,18 +7,20 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 
+import java.util.Objects;
+
 public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
 
     private final int                      processors     = AsyncUtils.getAvailableProcessorsNum();
-    private final MemoryPool<Cell>         cellMemoryPool = new MemoryPool<>(Cell.class, 1024);
+    private final MemoryPool<Cell>         cellMemoryPool = new MemoryPool<>(Cell.class,1024);
     private final MemoryPool<ProcessCells> taskMemoryPool = new MemoryPool<>(ProcessCells.class, processors);
 
-    private final CollectionsArray<ProcessCells> broadPhaseTasks = new CollectionsArray<>();
+    private final CollectionsArray<ProcessCells> tasks = new CollectionsArray<>();
 
     @Override
     public void update(Physics2DWorld world, float delta) {
-        taskMemoryPool.freeAll(broadPhaseTasks);
-        broadPhaseTasks.clear();
+        taskMemoryPool.freeAll(tasks);
+        tasks.clear();
         cellMemoryPool.freeAll(world.spacePartition);
         world.spacePartition.clear();
         if (world.allBodies.isEmpty()) return;
@@ -61,30 +63,17 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
         }
 
         for (int i = 0; i < processors; i++) {
-            broadPhaseTasks.add(taskMemoryPool.allocate());
+            tasks.add(taskMemoryPool.allocate());
         }
         for (int i = 0; i < world.activeCells.size; i++) {
-            broadPhaseTasks.getCyclic(i).cellsToProcess.add(world.activeCells.get(i));
+            tasks.getCyclic(i).cellsToProcess.add(world.activeCells.get(i));
         }
-        AsyncTaskRunner.await(AsyncTaskRunner.async(broadPhaseTasks));
+        AsyncTaskRunner.await(AsyncTaskRunner.async(tasks));
 
         // merge all collision candidates.
-        // TODO: problem. O(n2)
         for (Cell cell : world.activeCells) {
-            CollectionsArray<Physics2DBody> cellCandidates  = cell.candidates;
-            CollectionsArray<Physics2DBody> worldCandidates = world.collisionCandidates;
-            for (int i = 0; i < cellCandidates.size - 1; i += 2) {
-                Physics2DBody a = cellCandidates.get(i);
-                Physics2DBody b = cellCandidates.get(i + 1);
-                boolean alreadyInserted = false;
-                for (int j = 0; j < worldCandidates.size - 1; j += 2) {
-                    if (a == worldCandidates.get(j) && b == worldCandidates.get(j+1)) {
-                        alreadyInserted = true;
-                        break;
-                    }
-                }
-                if (alreadyInserted) continue;
-                worldCandidates.add(a, b);
+            for (CollisionPair pair : cell.pairs) {
+                world.collisionCandidates.add(pair);
             }
         }
     }
@@ -92,6 +81,7 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
     public static final class ProcessCells extends AsyncTask {
 
         private final CollectionsArray<Cell> cellsToProcess = new CollectionsArray<>();
+        private final MemoryPool<CollisionPair> pairMemoryPool = new MemoryPool<>(CollisionPair.class, 4);
 
         public ProcessCells() {}
 
@@ -108,8 +98,10 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
                         if (a == b) continue;
                         if (!boundingCirclesCollide(a.shape, b.shape)) continue;
 
-                        if (a.index < b.index) cell.candidates.add(a, b);
-                        else cell.candidates.add(b, a);
+                        CollisionPair pair = pairMemoryPool.allocate();
+                        pair.a = a;
+                        pair.b = b;
+                        cell.pairs.add(pair);
                     }
                 }
             }
@@ -125,6 +117,9 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
         @Override
         public void reset() {
             super.reset();
+            for (Cell cell : cellsToProcess) {
+                pairMemoryPool.freeAll(cell.pairs);
+            }
             cellsToProcess.clear();
         }
 
@@ -132,8 +127,8 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
 
     public static final class Cell implements MemoryPool.Reset {
 
-        private final CollectionsArray<Physics2DBody> candidates = new CollectionsArray<>(false, 2);
         private final CollectionsArray<Physics2DBody> bodies     = new CollectionsArray<>(false, 2);
+        private final CollectionsArray<CollisionPair> pairs = new CollectionsArray<>(false, 2);
 
         private boolean active = false;
 
@@ -145,11 +140,45 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
 
         @Override
         public void reset() {
-            candidates.clear();
+            pairs.clear();
             bodies.clear();
             active = false;
         }
 
     }
 
+    public static class CollisionPair implements MemoryPool.Reset {
+
+        public Physics2DBody a;
+        public Physics2DBody b;
+
+        public CollisionPair() {}
+
+        public CollisionPair(Physics2DBody a, Physics2DBody b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CollisionPair that = (CollisionPair) o;
+            if (Objects.equals(a, that.a) && Objects.equals(b, that.b)) return true;
+            if (Objects.equals(b, that.a) && Objects.equals(a, that.b)) return true;
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(a) + Objects.hashCode(b); // A commutative operation to ensure symmetry
+        }
+
+        @Override
+        public void reset() {
+            a = null;
+            b = null;
+        }
+
+    }
 }

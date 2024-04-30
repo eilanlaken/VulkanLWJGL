@@ -5,6 +5,9 @@ import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
 
+import java.util.HashSet;
+import java.util.Set;
+
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-core-engine--gamedev-7493t
@@ -41,9 +44,8 @@ public class Physics2DWorld {
     protected float cellHeight    = 0;
     protected int   bodiesCreated = 0;
 
-    // [0, 1], [2, 3], [4, 5], ... are collision candidates.
-    protected final CollectionsArray<Physics2DBody>     collisionCandidates = new CollectionsArray<>(false, 400);
-    protected final CollectionsArray<CollisionManifold> collisionManifolds  = new CollectionsArray<>(false, 200);
+    protected final Set<Physics2DWorldPhaseC.CollisionPair> collisionCandidates = new HashSet<>();
+    protected final CollectionsArray<CollisionManifold>     collisionManifolds  = new CollectionsArray<>(false, 200);
 
     protected final Physics2DWorldPhase[]  phases        = new Physics2DWorldPhase[5];
     protected final Physics2DWorldRenderer debugRenderer = new Physics2DWorldRenderer(this);
