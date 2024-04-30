@@ -1,20 +1,25 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.async.AsyncTask;
+import org.example.engine.core.async.AsyncTaskRunner;
 import org.example.engine.core.async.AsyncUtils;
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.collections.CollectionsArrayConcurrent;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 
 // this should be multithreaded
 public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
 
-    private final MemoryPool<Cell> cellMemoryPool = new MemoryPool<>(Cell.class, 1024);
-    private final int              processors     = AsyncUtils.getAvailableProcessorsNum();
+    private final int                      processors     = AsyncUtils.getAvailableProcessorsNum();
+    private final MemoryPool<Cell>         cellMemoryPool = new MemoryPool<>(Cell.class, 1024);
+    private final MemoryPool<ProcessCells> taskMemoryPool = new MemoryPool<>(ProcessCells.class, processors);
+
+    private final CollectionsArray<ProcessCells> broadPhaseTasks = new CollectionsArray<>();
 
     @Override
     public void update(Physics2DWorld world, float delta) {
+        taskMemoryPool.freeAll(broadPhaseTasks);
+        broadPhaseTasks.clear();
         cellMemoryPool.freeAll(world.spacePartition);
         world.spacePartition.clear();
         if (world.allBodies.isEmpty()) return;
@@ -56,17 +61,21 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
             }
         }
 
-        // TODO: run broad phase. Use async tasks for multithreading
-        for (Cell cell : world.activeCells) {
-            for (int i = 0; i < cell.bodies.size - 1; i++) {
-                for (int j = i + 1; j < cell.bodies.size; j++) {
-                    Physics2DBody a = cell.bodies.get(i);
-                    Physics2DBody b = cell.bodies.get(j);
-                    if (a.off) continue;
-                    if (b.off) continue;
-                    if (a.motionType == Physics2DBody.MotionType.STATIC && b.motionType == Physics2DBody.MotionType.STATIC) continue;
-                    if (cell.boundingCirclesCollide(a.shape, b.shape)) cell.candidates.add(a, b);
-                }
+        for (int i = 0; i < processors; i++) {
+            ProcessCells task = taskMemoryPool.allocate();
+            broadPhaseTasks.add(task);
+        }
+
+        for (int i = 0; i < world.activeCells.size; i++) {
+            broadPhaseTasks.getCircular(i).cellsToProcess.add(world.activeCells.get(i));
+        }
+
+        Thread[] broadPhaseThreads = AsyncTaskRunner.runAsync(broadPhaseTasks);
+        for (Thread broadPhaseThread : broadPhaseThreads) {
+            try {
+                broadPhaseThread.join();
+            } catch (InterruptedException e) {
+                throw new Physics2DException(e.getLocalizedMessage());
             }
         }
 
@@ -80,9 +89,11 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
         System.out.println(world.collisionCandidates.size);
     }
 
-    public static final class BroadPhaseAsyncTask extends AsyncTask {
+    public static final class ProcessCells extends AsyncTask {
 
-        private CollectionsArray<Cell> cellsToProcess = new CollectionsArray<>();
+        private final CollectionsArray<Cell> cellsToProcess = new CollectionsArray<>();
+
+        public ProcessCells() {}
 
         @Override
         public void task() {
@@ -94,10 +105,23 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
                         if (a.off) continue;
                         if (b.off) continue;
                         if (a.motionType == Physics2DBody.MotionType.STATIC && b.motionType == Physics2DBody.MotionType.STATIC) continue;
-                        if (cell.boundingCirclesCollide(a.shape, b.shape)) cell.candidates.add(a, b);
+                        if (boundingCirclesCollide(a.shape, b.shape)) cell.candidates.add(a, b);
                     }
                 }
             }
+        }
+
+        private boolean boundingCirclesCollide(final Shape2D a, final Shape2D b) {
+            final float dx  = b.x() - a.x();
+            final float dy  = b.y() - a.y();
+            final float sum = a.getBoundingRadius() + b.getBoundingRadius();
+            return dx * dx + dy * dy < sum * sum;
+        }
+
+        @Override
+        public void reset() {
+            super.reset();
+            cellsToProcess.clear();
         }
 
     }
@@ -113,7 +137,7 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
 
         public Cell() {}
 
-        private boolean boundingCirclesCollide(final Shape2D a, final Shape2D b) {
+        @Deprecated private boolean boundingCirclesCollide(final Shape2D a, final Shape2D b) {
             final float dx  = b.x() - a.x();
             final float dy  = b.y() - a.y();
             final float sum = a.getBoundingRadius() + b.getBoundingRadius();

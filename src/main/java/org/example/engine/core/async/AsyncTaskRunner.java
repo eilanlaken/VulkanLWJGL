@@ -6,7 +6,15 @@ import java.util.*;
 
 public class AsyncTaskRunner {
 
-    public static Thread[] runAsync(AsyncTask ...tasks) {
+    public static <T extends AsyncTask> Thread[] runAsync(T ...tasks) {
+        CollectionsArray<Thread> tThreads = new CollectionsArray<>();
+        for (T task : tasks) {
+            tThreads.add(runAsync(task));
+        }
+        return tThreads.toArray(Thread.class);
+    }
+
+    public static <T extends AsyncTask> Thread[] runAsync(Iterable<T> tasks) {
         CollectionsArray<Thread> tThreads = new CollectionsArray<>();
         for (AsyncTask task : tasks) {
             tThreads.add(runAsync(task));
@@ -14,15 +22,7 @@ public class AsyncTaskRunner {
         return tThreads.toArray(Thread.class);
     }
 
-    public static Thread[] runAsync(Iterable<AsyncTask> tasks) {
-        CollectionsArray<Thread> tThreads = new CollectionsArray<>();
-        for (AsyncTask task : tasks) {
-            tThreads.add(runAsync(task));
-        }
-        return tThreads.toArray(Thread.class);
-    }
-
-    public static Thread runAsync(AsyncTask task) {
+    public static <T extends AsyncTask> Thread runAsync(T task) {
         if (task.prerequisites != null && !task.prerequisites.isEmpty()) {
             List<Thread> pThreads = new ArrayList<>();
             for (AsyncTask prerequisite : task.prerequisites) {

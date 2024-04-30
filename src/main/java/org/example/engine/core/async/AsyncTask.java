@@ -6,8 +6,8 @@ import org.example.engine.core.memory.MemoryPool;
 public abstract class AsyncTask implements MemoryPool.Reset {
 
     protected CollectionsArray<AsyncTask> prerequisites = new CollectionsArray<>();
-    private volatile boolean              inProgress    = false;
-    private volatile boolean              complete      = false;
+    protected volatile boolean            inProgress    = false;
+    protected volatile boolean            complete      = false;
 
     public AsyncTask(AsyncTask... prerequisites) {
         for (final AsyncTask task : prerequisites) {
