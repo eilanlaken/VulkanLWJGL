@@ -7,7 +7,7 @@ import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.NotNull;
 
-public final class Physics2DWorldPhaseDNarrow implements Physics2DWorldPhase {
+public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
 
     private static final MemoryPool<Projection> projectionsPool = new MemoryPool<>(Projection.class, 200);
 

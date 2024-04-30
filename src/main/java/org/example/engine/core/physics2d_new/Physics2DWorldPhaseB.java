@@ -1,7 +1,7 @@
 package org.example.engine.core.physics2d_new;
 
 // TODO: continue. consider torque, constraints, joints.
-public final class Physics2DWorldPhaseBIntegration implements Physics2DWorldPhase {
+public final class Physics2DWorldPhaseB implements Physics2DWorldPhase {
 
     @Override
     public void update(Physics2DWorld world, float delta) {

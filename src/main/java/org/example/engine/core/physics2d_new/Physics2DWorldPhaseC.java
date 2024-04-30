@@ -7,8 +7,7 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 
-// this should be multithreaded
-public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
+public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
 
     private final int                      processors     = AsyncUtils.getAvailableProcessorsNum();
     private final MemoryPool<Cell>         cellMemoryPool = new MemoryPool<>(Cell.class, 1024);
@@ -70,6 +69,7 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
         AsyncTaskRunner.await(AsyncTaskRunner.async(broadPhaseTasks));
 
         // merge all collision candidates.
+        // TODO: problem. O(n2)
         for (Cell cell : world.activeCells) {
             CollectionsArray<Physics2DBody> cellCandidates  = cell.candidates;
             CollectionsArray<Physics2DBody> worldCandidates = world.collisionCandidates;

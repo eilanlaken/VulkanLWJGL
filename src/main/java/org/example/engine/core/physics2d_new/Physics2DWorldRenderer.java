@@ -36,11 +36,11 @@ public final class Physics2DWorldRenderer {
         float cellWidth = world.cellWidth;
         float cellHeight = world.cellHeight;
 
-        for (Physics2DWorldPhaseCBroad.Cell cell : world.spacePartition) {
+        for (Physics2DWorldPhaseC.Cell cell : world.spacePartition) {
             renderer.pushPolygon(polyRect, TINT_CELL_OFF, cell.x, cell.y,0,0,0, cellWidth, cellHeight,null,null);
         }
 
-        for (Physics2DWorldPhaseCBroad.Cell cell : world.activeCells) {
+        for (Physics2DWorldPhaseC.Cell cell : world.activeCells) {
             renderer.pushPolygon(polyRect, TINT_CELL_ON, cell.x, cell.y,0,0,0, cellWidth, cellHeight,null,null);
         }
 

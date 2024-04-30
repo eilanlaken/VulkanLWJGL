@@ -1,6 +1,6 @@
 package org.example.engine.core.physics2d_new;
 
-public final class Physics2DWorldPhaseAPreparation implements Physics2DWorldPhase {
+public final class Physics2DWorldPhaseA implements Physics2DWorldPhase {
 
     // TODO: test.
     @Override

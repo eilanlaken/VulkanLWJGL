@@ -70,11 +70,16 @@ public class Physics2DBody implements MemoryPool.Reset {
         this.off = true;
     }
 
-    public enum MotionType {
-        STATIC,
-        KINEMATIC,
-        NEWTONIAN,
-        RELATIVISTIC, // for now, just an idea.
+    @Override
+    public int hashCode() {
+        return index;
+    }
+
+    @Override
+    public String toString() {
+        return "Physics2DBody{" +
+                "index=" + index +
+                '}';
     }
 
     @Override
@@ -97,4 +102,12 @@ public class Physics2DBody implements MemoryPool.Reset {
         this.ghost = false;
         this.bitmask = 0;
     }
+
+    public enum MotionType {
+        STATIC,
+        KINEMATIC,
+        NEWTONIAN,
+        RELATIVISTIC, // for now, just an idea.
+    }
+
 }

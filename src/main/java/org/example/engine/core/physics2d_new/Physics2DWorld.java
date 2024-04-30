@@ -5,9 +5,6 @@ import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
 
-import java.util.HashSet;
-import java.util.Set;
-
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-core-engine--gamedev-7493t
@@ -29,8 +26,8 @@ public class Physics2DWorld {
     public CollectionsArray<Physics2DBody> bodiesToAdd         = new CollectionsArray<>(false, 100);
     public CollectionsArray<Physics2DBody> bodiesToRemove      = new CollectionsArray<>(false, 500);
 
-    protected final CollectionsArray<Physics2DWorldPhaseCBroad.Cell> spacePartition = new CollectionsArray<>(false, 1024);
-    protected final CollectionsArray<Physics2DWorldPhaseCBroad.Cell> activeCells    = new CollectionsArray<>();
+    protected final CollectionsArray<Physics2DWorldPhaseC.Cell> spacePartition = new CollectionsArray<>(false, 1024);
+    protected final CollectionsArray<Physics2DWorldPhaseC.Cell> activeCells    = new CollectionsArray<>();
     protected float worldWidth    = 0;
     protected float worldMinX     = 0;
     protected float worldMaxX     = 0;
@@ -53,11 +50,11 @@ public class Physics2DWorld {
     protected final Physics2DBodyFactory   bodyFactory   = new Physics2DBodyFactory(this);
 
     public Physics2DWorld() {
-        this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseAPreparation();
-        this.phases[PHASE_B_INTEGRATION] = new Physics2DWorldPhaseBIntegration();
-        this.phases[PHASE_C_BROAD]       = new Physics2DWorldPhaseCBroad      ();
-        this.phases[PHASE_D_NARROW]      = new Physics2DWorldPhaseDNarrow     ();
-        this.phases[PHASE_E_RESOLUTION]  = new Physics2DWorldPhaseEResolution ();
+        this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseA();
+        this.phases[PHASE_B_INTEGRATION] = new Physics2DWorldPhaseB();
+        this.phases[PHASE_C_BROAD]       = new Physics2DWorldPhaseC();
+        this.phases[PHASE_D_NARROW]      = new Physics2DWorldPhaseD();
+        this.phases[PHASE_E_RESOLUTION]  = new Physics2DWorldPhaseE();
     }
 
     public void update(final float delta) {
