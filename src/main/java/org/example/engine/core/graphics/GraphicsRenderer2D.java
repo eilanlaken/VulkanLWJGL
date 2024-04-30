@@ -21,7 +21,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-// TODO: to make it a standalone, make it initialize the opengl context itself, in case it is not initialized.
+// TODO: to make it a standalone, make it initialize the opengl context itself, in case it is not initialized. Maybe.
+// TODO: fix rendering bug.
+// TODO: overhaul, rename some methods, give option to render functions using lines.
 public class GraphicsRenderer2D implements MemoryResourceHolder {
 
     // constants
@@ -30,24 +32,23 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
     private static final int TRIANGLES_CAPACITY = BATCH_SIZE * 2;
 
     // defaults
-    private final GraphicsShaderProgram defaultShader           = createDefaultShaderProgram();
-    private final GraphicsTexture whiteSinglePixelTexture = createWhiteSinglePixelTexture();
-    // TODO: test
-    private final GraphicsCamera defaultCamera           = createDefaultCamera();
+    private final GraphicsShaderProgram defaultShader = createDefaultShaderProgram();
+    private final GraphicsTexture       whitePixel    = createWhiteSinglePixelTexture();
+    private final GraphicsCamera        defaultCamera = createDefaultCamera();
 
     // cached colors
     private final float TINT_WHITE = new GraphicsColor(1,1,1,1).toFloatBits();
     private final float TINT_SHAPE = new GraphicsColor(0,0,1,1).toFloatBits();
 
     // state
-    private GraphicsCamera currentCamera = null;
-    private GraphicsTexture lastTexture   = null;
+    private GraphicsCamera        currentCamera = null;
+    private GraphicsTexture       lastTexture   = null;
     private GraphicsShaderProgram currentShader = null;
-    private boolean       drawing       = false;
-    private int           vertexIndex   = 0;
-    private int           triangleIndex = 0;
-    private int           mode          = GL11.GL_TRIANGLES;
-    private int           drawCalls     = 0;
+    private boolean               drawing       = false;
+    private int                   vertexIndex   = 0;
+    private int                   triangleIndex = 0;
+    private int                   mode          = GL11.GL_TRIANGLES;
+    private int                   drawCalls     = 0;
 
     // buffers
     private final int vao;
@@ -226,7 +227,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
             flush();
         }
         useShader(shader);
-        useTexture(whiteSinglePixelTexture);
+        useTexture(whitePixel);
         useCustomAttributes(customAttributes);
         useMode(GL11.GL_TRIANGLES);
 
@@ -279,7 +280,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         }
 
         useShader(defaultShader);
-        useTexture(whiteSinglePixelTexture);
+        useTexture(whitePixel);
         useCustomAttributes(null);
         useMode(GL11.GL_LINES);
 
@@ -322,7 +323,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         }
 
         useShader(defaultShader);
-        useTexture(whiteSinglePixelTexture);
+        useTexture(whitePixel);
         useCustomAttributes(null);
         useMode(GL11.GL_LINES);
 
@@ -370,7 +371,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         }
 
         useShader(defaultShader);
-        useTexture(whiteSinglePixelTexture);
+        useTexture(whitePixel);
         useCustomAttributes(null);
         useMode(GL11.GL_LINES);
 
@@ -419,7 +420,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         }
 
         useShader(defaultShader);
-        useTexture(whiteSinglePixelTexture);
+        useTexture(whitePixel);
         useCustomAttributes(null);
         useMode(GL11.GL_LINES);
 
@@ -449,7 +450,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         }
 
         useShader(defaultShader);
-        useTexture(whiteSinglePixelTexture);
+        useTexture(whitePixel);
         useCustomAttributes(null);
         useMode(GL11.GL_LINES);
 
@@ -566,7 +567,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         GL30.glDeleteVertexArrays(vao);
         GL30.glDeleteBuffers(vbo);
         GL30.glDeleteBuffers(ebo);
-        whiteSinglePixelTexture.delete();
+        whitePixel.delete();
     }
 
     private static GraphicsShaderProgram createDefaultShaderProgram() {

@@ -80,6 +80,7 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
         }
 
         // merge all collision candidates.
+        // TODO: merge correctly. Don't merge existing pairs or their symmetries.
         for (Cell cell : world.activeCells) {
             for (Physics2DBody body : cell.candidates) {
                 world.collisionCandidates.add(body);
@@ -128,26 +129,21 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
 
     public static final class Cell implements MemoryPool.Reset {
 
-        private final CollectionsArray<Physics2DBody> bodies     = new CollectionsArray<>(false, 2);
         private final CollectionsArray<Physics2DBody> candidates = new CollectionsArray<>(false, 2);
-        private       boolean                         active     = false;
+        private final CollectionsArray<Physics2DBody> bodies     = new CollectionsArray<>(false, 2);
 
+        private boolean active = false;
+
+        // TODO: remove, just for debug rendering
         float x;
         float y;
 
         public Cell() {}
 
-        @Deprecated private boolean boundingCirclesCollide(final Shape2D a, final Shape2D b) {
-            final float dx  = b.x() - a.x();
-            final float dy  = b.y() - a.y();
-            final float sum = a.getBoundingRadius() + b.getBoundingRadius();
-            return dx * dx + dy * dy < sum * sum;
-        }
-
         @Override
         public void reset() {
-            bodies.clear();
             candidates.clear();
+            bodies.clear();
             active = false;
         }
 
