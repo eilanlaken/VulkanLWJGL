@@ -27,6 +27,11 @@ public class Physics2DCollisionPair implements MemoryPool.Reset {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hashCode(a) + Objects.hashCode(b); // A commutative operation to ensure symmetry
+    }
+
+    @Override
     public void reset() {
         a = null;
         b = null;
