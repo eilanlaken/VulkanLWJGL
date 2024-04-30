@@ -70,14 +70,7 @@ public final class Physics2DWorldPhaseCBroad implements Physics2DWorldPhase {
             broadPhaseTasks.getCircular(i).cellsToProcess.add(world.activeCells.get(i));
         }
 
-        Thread[] broadPhaseThreads = AsyncTaskRunner.runAsync(broadPhaseTasks);
-        for (Thread broadPhaseThread : broadPhaseThreads) {
-            try {
-                broadPhaseThread.join();
-            } catch (InterruptedException e) {
-                throw new Physics2DException(e.getLocalizedMessage());
-            }
-        }
+        AsyncTaskRunner.await(AsyncTaskRunner.async(broadPhaseTasks));
 
         // merge all collision candidates.
         // TODO: merge correctly. Don't merge existing pairs or their symmetries.

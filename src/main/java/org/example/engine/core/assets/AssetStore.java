@@ -41,7 +41,7 @@ public final class AssetStore {
         for (AssetDescriptor descriptor : loadQueue) {
             AssetStoreLoadingTask task = new AssetStoreLoadingTask(descriptor);
             asyncTasks.add(task);
-            AsyncTaskRunner.runAsync(task);
+            AsyncTaskRunner.async(task);
         }
         loadQueue.clear();
 

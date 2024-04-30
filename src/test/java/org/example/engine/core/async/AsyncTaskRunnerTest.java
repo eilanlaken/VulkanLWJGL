@@ -459,8 +459,8 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        Thread thread1 = AsyncTaskRunner.runAsync(t1);
-        Thread thread2 = AsyncTaskRunner.runAsync(t2);
+        Thread thread1 = AsyncTaskRunner.async(t1);
+        Thread thread2 = AsyncTaskRunner.async(t2);
 
         thread1.join();
         thread2.join();
@@ -489,7 +489,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        Thread thread = AsyncTaskRunner.runAsync(t2);
+        Thread thread = AsyncTaskRunner.async(t2);
         thread.join();
         Assertions.assertEquals(2, arrayFloat3.size);
     }
@@ -522,7 +522,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        Thread[] threads = AsyncTaskRunner.runAsync(t1, t2, t3);
+        Thread[] threads = AsyncTaskRunner.async(t1, t2, t3);
         for (Thread thread : threads) {
             thread.join();
         }
@@ -557,7 +557,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        Thread[] threads = AsyncTaskRunner.runAsync(t3, t1, t2);
+        Thread[] threads = AsyncTaskRunner.async(t3, t1, t2);
         for (Thread thread : threads) {
             thread.join();
         }
