@@ -17,7 +17,7 @@ public final class Physics2DWorldPhaseB implements Physics2DWorldPhase {
                 body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
             }
             if (body.motionType != Physics2DBody.MotionType.STATIC) {
-                body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.angularVelocityDeg);
+                body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omega);
             }
             body.shape.update();
             body.netForce.set(0, 0);

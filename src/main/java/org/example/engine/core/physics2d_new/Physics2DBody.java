@@ -4,21 +4,22 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class Physics2DBody implements MemoryPool.Reset {
+public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody> {
 
-    public    Object      owner;
-    protected boolean     created;
-    protected int         index;
-    public    boolean     off;
-    public    MotionType  motionType;
-    public    Shape2D     shape;
-    public    MathVector2 velocity;
-    public    float       angularVelocityDeg;
-    public    MathVector2 netForce;
+    public    Object      owner      = null;
+    protected boolean     created    = false;
+    protected int         index      = -1;
+    public    boolean     off        = false;
+    public    Shape2D     shape      = null;
+    public    MotionType  motionType = null;
+    public    MathVector2 velocity   = new MathVector2();
+    public    float       omega      = 0;
+    public    MathVector2 netForce   = new MathVector2();
 
     public CollectionsArray<Physics2DConstraint> constraints = new CollectionsArray<>(false, 1);
     public CollectionsArray<Physics2DJoint>      joints      = new CollectionsArray<>(false, 1);
@@ -32,8 +33,7 @@ public class Physics2DBody implements MemoryPool.Reset {
     public int     bitmask;
 
     public Physics2DBody() {
-        this.velocity = new MathVector2();
-        this.netForce = new MathVector2();
+
     }
 
     public void setPosition(float x, float y) {
@@ -48,8 +48,8 @@ public class Physics2DBody implements MemoryPool.Reset {
         velocity.set(x, y);
     }
 
-    public void setAngularVelocityDeg(float angularVelocityDeg) {
-        this.angularVelocityDeg = angularVelocityDeg;
+    public void setOmega(float omega) {
+        this.omega = omega;
     }
 
     public void applyForce(float fx, float fy) {
@@ -59,7 +59,7 @@ public class Physics2DBody implements MemoryPool.Reset {
     public void setMotionState(float x, float y, float angleDeg, float velX, float velY, float velAngleDeg) {
         this.shape.setTransform(x, y, angleDeg);
         this.velocity.set(velX, velY);
-        this.angularVelocityDeg = velAngleDeg;
+        this.omega = velAngleDeg;
     }
 
     public void turnOn() {
@@ -91,7 +91,7 @@ public class Physics2DBody implements MemoryPool.Reset {
         this.motionType = null;
         this.shape = null;
         this.velocity.set(0, 0);
-        this.angularVelocityDeg = 0;
+        this.omega = 0;
         this.netForce.set(0,0);
         this.constraints.clear();
         this.joints.clear();
@@ -101,6 +101,11 @@ public class Physics2DBody implements MemoryPool.Reset {
         this.restitution = 0;
         this.ghost = false;
         this.bitmask = 0;
+    }
+
+    @Override
+    public int compareTo(@NotNull Physics2DBody o) {
+        return Integer.compare(index, o.index);
     }
 
     public enum MotionType {
