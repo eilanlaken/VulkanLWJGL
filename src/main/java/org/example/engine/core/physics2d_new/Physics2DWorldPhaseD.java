@@ -7,16 +7,21 @@ import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
+
 public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
 
-    private static final MemoryPool<Projection> projectionsPool = new MemoryPool<>(Projection.class, 200);
+    private final MemoryPool<Projection> projectionsPool = new MemoryPool<>(Projection.class, 200);
 
     @Override
     public void update(Physics2DWorld world, float delta) {
-
+        Set<Physics2DWorld.CollisionPair> collisionPairs = world.collisionCandidates;
+        for (Physics2DWorld.CollisionPair collisionCandidate : collisionPairs) {
+            narrowPhaseCollision(collisionCandidate.a.shape, collisionCandidate.b.shape, world.collisionManifolds);
+        }
     }
 
-    public static void narrowPhaseCollision(org.example.engine.core.physics2d.Physics2DBody a, org.example.engine.core.physics2d.Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+    public void narrowPhaseCollision(Shape2D a, Shape2D b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
 
     }
 
@@ -675,6 +680,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
             float rect1_max_axis = MathUtils.max(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
             float axis_overlap = MathUtils.intervalsOverlap(rect1_min_axis, rect1_max_axis, 0, rect2.unscaledWidth * rect2.scaleX());
             if (MathUtils.isZero(axis_overlap)) return; // no collision
+
             min_axis_overlap = axis_overlap;
             min_overlap_axis_x = axis.x;
             min_overlap_axis_y = axis.y;
@@ -691,6 +697,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
             float rect1_max_axis = MathUtils.max(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
             float axis_overlap = MathUtils.intervalsOverlap(rect1_min_axis, rect1_max_axis, 0, rect2.unscaledHeight * rect2.scaleY());
             if (MathUtils.isZero(axis_overlap)) return; // no collision
+
             if (axis_overlap < min_axis_overlap) {
                 min_axis_overlap = axis_overlap;
                 min_overlap_axis_x = axis.x;
@@ -709,6 +716,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
             float rect2_max_axis = MathUtils.max(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
             float axis_overlap = MathUtils.intervalsOverlap(rect2_min_axis, rect2_max_axis, 0, rect1.unscaledWidth * rect1.scaleX());
             if (MathUtils.isZero(axis_overlap)) return; // no collision
+
             if (axis_overlap < min_axis_overlap) {
                 min_axis_overlap = axis_overlap;
                 min_overlap_axis_x = axis.x;
@@ -727,6 +735,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
             float rect2_max_axis = MathUtils.max(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
             float axis_overlap = MathUtils.intervalsOverlap(rect2_min_axis, rect2_max_axis, 0, rect1.unscaledHeight * rect1.scaleY());
             if (MathUtils.isZero(axis_overlap)) return; // no collision
+
             if (axis_overlap < min_axis_overlap) {
                 min_axis_overlap = axis_overlap;
                 min_overlap_axis_x = axis.x;

@@ -7,8 +7,6 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 
-import java.util.Objects;
-
 public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
 
     private final int                      processors     = AsyncUtils.getAvailableProcessorsNum();
@@ -72,7 +70,7 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
 
         // merge all collision candidates.
         for (Cell cell : world.activeCells) {
-            for (CollisionPair pair : cell.pairs) {
+            for (Physics2DWorld.CollisionPair pair : cell.pairs) {
                 world.collisionCandidates.add(pair);
             }
         }
@@ -81,7 +79,7 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
     public static final class ProcessCells extends AsyncTask {
 
         private final CollectionsArray<Cell> cellsToProcess = new CollectionsArray<>();
-        private final MemoryPool<CollisionPair> pairMemoryPool = new MemoryPool<>(CollisionPair.class, 4);
+        private final MemoryPool<Physics2DWorld.CollisionPair> pairMemoryPool = new MemoryPool<>(Physics2DWorld.CollisionPair.class, 4);
 
         public ProcessCells() {}
 
@@ -98,7 +96,7 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
                         if (a == b) continue;
                         if (!boundingCirclesCollide(a.shape, b.shape)) continue;
 
-                        CollisionPair pair = pairMemoryPool.allocate();
+                        Physics2DWorld.CollisionPair pair = pairMemoryPool.allocate();
                         pair.a = a;
                         pair.b = b;
                         cell.pairs.add(pair);
@@ -128,7 +126,7 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
     public static final class Cell implements MemoryPool.Reset {
 
         private final CollectionsArray<Physics2DBody> bodies     = new CollectionsArray<>(false, 2);
-        private final CollectionsArray<CollisionPair> pairs = new CollectionsArray<>(false, 2);
+        private final CollectionsArray<Physics2DWorld.CollisionPair> pairs = new CollectionsArray<>(false, 2);
 
         private boolean active = false;
 
@@ -147,38 +145,4 @@ public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
 
     }
 
-    public static class CollisionPair implements MemoryPool.Reset {
-
-        public Physics2DBody a;
-        public Physics2DBody b;
-
-        public CollisionPair() {}
-
-        public CollisionPair(Physics2DBody a, Physics2DBody b) {
-            this.a = a;
-            this.b = b;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            CollisionPair that = (CollisionPair) o;
-            if (Objects.equals(a, that.a) && Objects.equals(b, that.b)) return true;
-            if (Objects.equals(b, that.a) && Objects.equals(a, that.b)) return true;
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(a) + Objects.hashCode(b); // A commutative operation to ensure symmetry
-        }
-
-        @Override
-        public void reset() {
-            a = null;
-            b = null;
-        }
-
-    }
 }
