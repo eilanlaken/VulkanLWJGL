@@ -52,7 +52,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
 
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         manifold.depth = Math.min(x_overlap, y_overlap);
-        manifold.contactsCount = 2;
+        manifold.contacts = 2;
         if (x_overlap < y_overlap) {
             manifold.normal = new MathVector2(1,0);
             float left = Math.max(a_min.x, b_min.x);
@@ -237,7 +237,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         if (eX * eX + eY * eY > circleWorldRadius * circleWorldRadius) return;
 
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
-        manifold.contactsCount = 1;
+        manifold.contacts = 1;
         manifold.normal = new MathVector2();
         manifold.contactPoint1 = new MathVector2();
 
@@ -277,7 +277,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         if (distanceSquared > radiusSum * radiusSum) return null;
 
         Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
-        manifold.contactsCount = 1;
+        manifold.contacts = 1;
         final float distance = (float) Math.sqrt(distanceSquared);
 
         if (distance != 0) {
@@ -303,7 +303,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         final float distance = (float) Math.sqrt(distanceSquared);
 
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
-        manifold.contactsCount = 1;
+        manifold.contacts = 1;
         manifold.normal = new MathVector2();
         if (distance != 0) {
             manifold.depth = radiusSum - distance;

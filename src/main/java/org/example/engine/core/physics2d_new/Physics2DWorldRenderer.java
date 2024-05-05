@@ -59,7 +59,7 @@ public final class Physics2DWorldRenderer {
         // render manifolds
         CollectionsArray<Physics2DWorld.CollisionManifold> manifolds = world.collisionManifolds;
         for (Physics2DWorld.CollisionManifold manifold : manifolds) {
-            if (manifold.contactsCount == 0) continue;
+            if (manifold.contacts == 0) continue;
 
             MathVector2 penetration = new MathVector2(manifold.normal).scl(manifold.depth);
 
@@ -70,7 +70,7 @@ public final class Physics2DWorldRenderer {
             renderer.pushDebugShape(segment, new GraphicsColor(1,0,1,1));
 
             // render second contact point
-            if (manifold.contactsCount == 1) continue;
+            if (manifold.contacts == 1) continue;
             renderer.pushPolygon(polyCircle, new GraphicsColor(1,0,0,1), manifold.contactPoint2.x, manifold.contactPoint2.y, 0,0,0,scaleX,scaleY,null,null);
             segment.localA(manifold.contactPoint2.x, manifold.contactPoint2.y);
             segment.localB(manifold.contactPoint2.x + penetration.x, manifold.contactPoint2.y + penetration.y);

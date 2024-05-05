@@ -102,24 +102,22 @@ public class Physics2DWorld {
 
     public static final class CollisionManifold implements MemoryPool.Reset {
 
-        public Physics2DBody a = null;
-        public Physics2DBody b = null;
-
-        public int         contactsCount = 0;
-        public float       depth         = 0;
-        public MathVector2 normal        = new MathVector2();
-        public MathVector2 contactPoint1 = new MathVector2();
-        public MathVector2 contactPoint2 = new MathVector2();
-
-        public float mixedRestitution     = 0;
-        public float mixedStaticFriction  = 0;
-        public float mixedDynamicFriction = 0;
+        public Physics2DBody a               = null;
+        public Physics2DBody b               = null;
+        public int           contacts        = 0;
+        public float         depth           = 0;
+        public MathVector2   normal          = new MathVector2();
+        public MathVector2   contactPoint1   = new MathVector2();
+        public MathVector2   contactPoint2   = new MathVector2();
+        public float         restitution     = 0;
+        public float         staticFriction  = 0;
+        public float         dynamicFriction = 0;
 
         @Override
         public void reset() {
             this.a = null;
             this.b = null;
-            this.contactsCount = 0;
+            this.contacts = 0;
         }
 
     }
