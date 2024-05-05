@@ -49,7 +49,7 @@ public class ScenePhysics2D_5_PhaseB_2 extends ApplicationScreen {
         if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.E)) {
             screen.set(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
             camera.lens.unproject(screen);
-            world.createBodyCircle(null, Physics2DBody.MotionType.STATIC,
+            world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
                     screen.x,screen.y,0,
                     0f,0f,0,
                     1, 1, 1, false, 1,

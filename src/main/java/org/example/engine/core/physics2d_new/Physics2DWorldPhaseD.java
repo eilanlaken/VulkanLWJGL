@@ -17,12 +17,25 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
     public void update(Physics2DWorld world, float delta) {
         Set<Physics2DWorld.CollisionPair> collisionPairs = world.collisionCandidates;
         for (Physics2DWorld.CollisionPair collisionCandidate : collisionPairs) {
-            narrowPhaseCollision(collisionCandidate.a.shape, collisionCandidate.b.shape, world.collisionManifolds);
+            narrowPhaseCollision(world, collisionCandidate.a, collisionCandidate.b, world.collisionManifolds);
         }
     }
 
-    public void narrowPhaseCollision(Shape2D a, Shape2D b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+    private void narrowPhaseCollision(Physics2DWorld world, Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+        Shape2D shape_a = a.shape;
+        Shape2D shape_b = b.shape;
 
+        Physics2DWorld.CollisionManifold manifold = null;
+
+        if (shape_a instanceof Shape2DCircle) {
+            if (shape_b instanceof Shape2DCircle) manifold = circleVsCircle(shape_a, shape_b, world);
+        }
+
+        if (manifold == null) return;
+
+        manifold.a = a;
+        manifold.b = b;
+        manifolds.add(manifold);
     }
 
     /** AABB vs ____ **/
@@ -252,7 +265,34 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         manifolds.add(manifold);
     }
 
-    private void circleVsCircle(Shape2DCircle c1, Shape2DCircle c2, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+    private Physics2DWorld.CollisionManifold circleVsCircle(Shape2D a, Shape2D b, Physics2DWorld world) {
+        final Shape2DCircle c1 = (Shape2DCircle) a;
+        final Shape2DCircle c2 = (Shape2DCircle) b;
+
+        final float dx = c2.x() - c1.x();
+        final float dy = c2.y() - c1.y();
+        final float radiusSum = c1.getWorldRadius() + c2.getWorldRadius();
+        final float distanceSquared = dx * dx + dy * dy;
+
+        if (distanceSquared > radiusSum * radiusSum) return null;
+
+        Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
+        manifold.contactsCount = 1;
+        final float distance = (float) Math.sqrt(distanceSquared);
+
+        if (distance != 0) {
+            manifold.depth = radiusSum - distance;
+            manifold.normal.set(dx, dy).scl(-1.0f / distance);
+        } else {
+            manifold.depth = c1.getWorldRadius();
+            manifold.normal.set(1, 0);
+        }
+        manifold.contactPoint1.set(manifold.normal).scl(-c1.getWorldRadius()).add(c1.getWorldCenter());
+
+        return manifold;
+    }
+
+    @Deprecated private void circleVsCircle(Shape2DCircle c1, Shape2DCircle c2, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         final float dx = c2.x() - c1.x();
         final float dy = c2.y() - c1.y();
         final float radiusSum = c1.getWorldRadius() + c2.getWorldRadius();
