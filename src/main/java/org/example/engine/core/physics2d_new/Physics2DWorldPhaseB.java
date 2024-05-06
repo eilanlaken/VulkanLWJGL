@@ -21,7 +21,7 @@ public final class Physics2DWorldPhaseB implements Physics2DWorldPhase {
             }
             body.shape.update();
             body.netForce.set(0, 0);
-            body.collision.clear();
+            body.collidesWith.clear();
 
             // prepare heuristics for the broad phase
             world.worldMinX = Math.min(world.worldMinX, body.shape.getMinExtentX());

@@ -45,19 +45,25 @@ public class Physics2DWorld {
     protected float cellHeight    = 0;
     protected int   bodiesCreated = 0;
 
-    protected final Set<CollisionPair> collisionCandidates = new HashSet<>();
+    protected final Set<CollisionPair>                      collisionCandidates = new HashSet<>();
     protected final CollectionsArray<CollisionManifold>     collisionManifolds  = new CollectionsArray<>(false, 200);
 
-    protected final Physics2DWorldPhase[]  phases        = new Physics2DWorldPhase[5];
-    protected final Physics2DWorldRenderer debugRenderer = new Physics2DWorldRenderer(this);
-    protected final Physics2DBodyFactory   bodyFactory   = new Physics2DBodyFactory(this);
+    protected final Physics2DWorldPhase[]      phases        = new Physics2DWorldPhase[5];
+    protected final Physics2DWorldRenderer     debugRenderer = new Physics2DWorldRenderer(this);
+    protected final Physics2DBodyFactory       bodyFactory   = new Physics2DBodyFactory(this);
+    protected       Physics2DCollisionListener collisionListener;
 
-    public Physics2DWorld() {
+    public Physics2DWorld(Physics2DCollisionListener collisionListener) {
+        this.collisionListener = collisionListener != null ? collisionListener : new Physics2DCollisionListener() {};
         this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseA();
         this.phases[PHASE_B_INTEGRATION] = new Physics2DWorldPhaseB();
         this.phases[PHASE_C_BROAD]       = new Physics2DWorldPhaseC();
         this.phases[PHASE_D_NARROW]      = new Physics2DWorldPhaseD();
         this.phases[PHASE_E_RESOLUTION]  = new Physics2DWorldPhaseE();
+    }
+
+    public Physics2DWorld() {
+        this(null);
     }
 
     public void update(final float delta) {
@@ -106,7 +112,7 @@ public class Physics2DWorld {
         public Physics2DBody b               = null;
         public int           contacts        = 0;
         public float         depth           = 0;
-        public MathVector2   normal          = new MathVector2();
+        public MathVector2   mtv             = new MathVector2(); // minimum translation vector
         public MathVector2   contactPoint1   = new MathVector2();
         public MathVector2   contactPoint2   = new MathVector2();
         public float         restitution     = 0;

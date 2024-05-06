@@ -6,9 +6,6 @@ import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody> {
 
     public    Object      owner      = null;
@@ -21,9 +18,9 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public    float       omega      = 0;
     public    MathVector2 netForce   = new MathVector2();
 
-    public CollectionsArray<Physics2DConstraint> constraints = new CollectionsArray<>(false, 1);
-    public CollectionsArray<Physics2DJoint>      joints      = new CollectionsArray<>(false, 1);
-    public Set<Physics2DBody>                    collision   = new HashSet<>();
+    public CollectionsArray<Physics2DBody>       collidesWith = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DConstraint> constraints  = new CollectionsArray<>(false, 1);
+    public CollectionsArray<Physics2DJoint>      joints       = new CollectionsArray<>(false, 1);
 
     public float   massInv;
     public float   density;

@@ -61,7 +61,7 @@ public final class Physics2DWorldRenderer {
         for (Physics2DWorld.CollisionManifold manifold : manifolds) {
             if (manifold.contacts == 0) continue;
 
-            MathVector2 penetration = new MathVector2(manifold.normal).scl(manifold.depth);
+            MathVector2 penetration = new MathVector2(manifold.mtv).scl(manifold.depth);
 
             // render first contact point.
             renderer.pushPolygon(polyCircle, new GraphicsColor(1,0,0,1), manifold.contactPoint1.x, manifold.contactPoint1.y, 0,0,0,scaleX,scaleY,null,null);
