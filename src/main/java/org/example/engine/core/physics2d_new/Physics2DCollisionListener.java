@@ -27,15 +27,17 @@ public interface Physics2DCollisionListener {
         float aMassInv = a.motionType == Physics2DBody.MotionType.STATIC ? 0 : a.massInv;
         float bMassInv = b.motionType == Physics2DBody.MotionType.STATIC ? 0 : b.massInv;
         final float percent = 0.2f;
-        final float threshold = 0.01f;
+        final float threshold = 0.05f;
         final float depth = manifold.depth;
         final MathVector2 normal = manifold.normal;
         final float pushback = Math.max(depth - threshold, 0.0f);
         MathVector2 correction = new MathVector2(normal).scl(pushback * percent).scl(1.0f / (aMassInv + bMassInv));
-        a.shape.dx_dy(-aMassInv * correction.x, -aMassInv * correction.y);
+        a.shape.dx_dy(aMassInv * correction.x, aMassInv * correction.y);
         b.shape.dx_dy(-bMassInv * correction.x, -bMassInv * correction.y);
 
         if (normalVelocity > 0) return;
+
+        if (true) return; // for now, test separation only.
 
         float e = Math.min(a.restitution, b.restitution);
 
@@ -45,7 +47,7 @@ public interface Physics2DCollisionListener {
         MathVector2 deltaVelA = new MathVector2(impulse).scl(aMassInv);
         MathVector2 deltaVelB = new MathVector2(impulse).scl(bMassInv);
         a.velocity.sub(deltaVelA);
-        b.velocity.sub(deltaVelB);
+        b.velocity.add(deltaVelB);
     }
 
     default void postSolve() {
