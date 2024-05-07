@@ -1,5 +1,6 @@
 package org.example.engine.core.physics2d_new;
 
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.*;
@@ -29,7 +30,7 @@ public final class Physics2DBodyFactory {
         body.shape = new Shape2DCircle(radius);
         body.massInv = 1.0f / (body.shape.getArea() * density);
         body.friction = friction;
-        body.restitution = restitution;
+        body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
         body.ghost = ghost;
         body.bitmask = bitmask;
         return body;

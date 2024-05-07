@@ -102,6 +102,12 @@ public abstract class Shape2D {
         updated = false;
     }
 
+    public final void  dx_dy(float dx, float dy) {
+        this.x += dx;
+        this.y += dy;
+        updated = false;
+    }
+
     public final void dx_dy_rot(float dx, float dy, float da) {
         this.x += dx;
         this.y += dy;

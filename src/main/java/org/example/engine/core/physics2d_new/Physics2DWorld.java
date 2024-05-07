@@ -112,10 +112,9 @@ public class Physics2DWorld {
         public Physics2DBody b               = null;
         public int           contacts        = 0;
         public float         depth           = 0;
-        public MathVector2   mtv             = new MathVector2(); // minimum translation vector
+        public MathVector2   normal          = new MathVector2();
         public MathVector2   contactPoint1   = new MathVector2();
         public MathVector2   contactPoint2   = new MathVector2();
-        public float         restitution     = 0;
         public float         staticFriction  = 0;
         public float         dynamicFriction = 0;
 

@@ -54,14 +54,14 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         manifold.depth = Math.min(x_overlap, y_overlap);
         manifold.contacts = 2;
         if (x_overlap < y_overlap) {
-            manifold.mtv = new MathVector2(1,0);
+            manifold.normal = new MathVector2(1,0);
             float left = Math.max(a_min.x, b_min.x);
             float right = Math.min(a_max.x, b_max.x);
             float top = Math.min(a_max.y, b_max.y);
             manifold.contactPoint1 = new MathVector2(left, top);
             manifold.contactPoint2 = new MathVector2(right, top);
         } else {
-            manifold.mtv = new MathVector2(0,1);
+            manifold.normal = new MathVector2(0,1);
             float left = Math.max(a_min.x, b_min.x);
             float top = Math.min(a_max.y, b_max.y);
             float bottom = Math.max(a_min.y, b_min.y);
@@ -147,9 +147,9 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(aabb.worldVertices(), polygon.worldVertices(), manifold);
         float min_overlap = MathUtils.min(x_overlap, y_overlap, minOverlapPolygon);
-        if (MathUtils.floatsEqual(min_overlap, x_overlap)) manifold.mtv = new MathVector2(1,0);
-        else if (MathUtils.floatsEqual(min_overlap, y_overlap)) manifold.mtv = new MathVector2(0,1);
-        else manifold.mtv = new MathVector2(minOverlapPolygonAxis);
+        if (MathUtils.floatsEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
+        else if (MathUtils.floatsEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
+        else manifold.normal = new MathVector2(minOverlapPolygonAxis);
         manifold.depth = min_overlap;
         manifolds.add(manifold);
     }
@@ -212,10 +212,10 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(aabb.worldVertices(), rect.worldVertices(), manifold);
         float min_overlap = MathUtils.min(x_overlap, y_overlap, axis1_overlap, axis2_overlap);
-        if (MathUtils.floatsEqual(min_overlap, x_overlap)) manifold.mtv = new MathVector2(1,0);
-        else if (MathUtils.floatsEqual(min_overlap, y_overlap)) manifold.mtv = new MathVector2(0,1);
-        else if (MathUtils.floatsEqual(min_overlap, axis1_overlap)) manifold.mtv = new MathVector2(ax, ay).nor();
-        else manifold.mtv = new MathVector2(bx, by).nor();
+        if (MathUtils.floatsEqual(min_overlap, x_overlap)) manifold.normal = new MathVector2(1,0);
+        else if (MathUtils.floatsEqual(min_overlap, y_overlap)) manifold.normal = new MathVector2(0,1);
+        else if (MathUtils.floatsEqual(min_overlap, axis1_overlap)) manifold.normal = new MathVector2(ax, ay).nor();
+        else manifold.normal = new MathVector2(bx, by).nor();
         manifold.depth = min_overlap;
         manifolds.add(manifold);
     }
@@ -238,7 +238,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
 
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         manifold.contacts = 1;
-        manifold.mtv = new MathVector2();
+        manifold.normal = new MathVector2();
         manifold.contactPoint1 = new MathVector2();
 
         if (aabb.contains(circleWorldCenter)) {
@@ -253,13 +253,13 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
             else if (MathUtils.floatsEqual(minDstSquared, dstCSquared)) closest.set(worldMax.x, circleWorldCenter.y);
             else if (MathUtils.floatsEqual(minDstSquared, dstDSquared)) closest.set(circleWorldCenter.x, worldMin.y);
             manifold.contactPoint1.set(closest);
-            manifold.mtv.set(closest).sub(circleWorldCenter).nor();
+            manifold.normal.set(closest).sub(circleWorldCenter).nor();
             manifold.depth = circleWorldRadius + MathVector2.dst(circleWorldCenter, manifold.contactPoint1);
         } else {
             MathVector2 closest = new MathVector2(circleWorldCenter).clamp(worldMin, worldMax);
             manifold.contactPoint1.set(closest);
             manifold.depth = circleWorldRadius - MathVector2.dst(circleWorldCenter, manifold.contactPoint1);
-            manifold.mtv.set(circleWorldCenter).sub(closest).nor();
+            manifold.normal.set(circleWorldCenter).sub(closest).nor();
         }
 
         manifolds.add(manifold);
@@ -282,12 +282,12 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
 
         if (distance != 0) {
             manifold.depth = radiusSum - distance;
-            manifold.mtv.set(dx, dy).scl(-1.0f / distance);
+            manifold.normal.set(dx, dy).scl(-1.0f / distance);
         } else {
             manifold.depth = c1.getWorldRadius();
-            manifold.mtv.set(1, 0);
+            manifold.normal.set(1, 0);
         }
-        manifold.contactPoint1.set(manifold.mtv).scl(-c1.getWorldRadius()).add(c1.getWorldCenter());
+        manifold.contactPoint1.set(manifold.normal).scl(-c1.getWorldRadius()).add(c1.getWorldCenter());
 
         return manifold;
     }
@@ -304,16 +304,16 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
 
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         manifold.contacts = 1;
-        manifold.mtv = new MathVector2();
+        manifold.normal = new MathVector2();
         if (distance != 0) {
             manifold.depth = radiusSum - distance;
-            manifold.mtv.set(dx, dy).scl(-1.0f / distance);
+            manifold.normal.set(dx, dy).scl(-1.0f / distance);
         } else {
             manifold.depth = c1.getWorldRadius();
-            manifold.mtv.set(1, 0);
+            manifold.normal.set(1, 0);
         }
 
-        manifold.contactPoint1 = new MathVector2(manifold.mtv).scl(-c1.getWorldRadius()).add(c1.getWorldCenter());
+        manifold.contactPoint1 = new MathVector2(manifold.normal).scl(-c1.getWorldRadius()).add(c1.getWorldCenter());
 
         manifolds.add(manifold);
     }
@@ -365,10 +365,10 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         manifold.contactPoint1 = new MathVector2(projection);
         final float minDstEdge = (float) Math.sqrt(minDistanceSquared);
         if (polygonContainsCenter) {
-            manifold.mtv = new MathVector2(projection).sub(circleWorldCenter).nor();
+            manifold.normal = new MathVector2(projection).sub(circleWorldCenter).nor();
             manifold.depth = minDstEdge + circle.getWorldRadius();
         } else {
-            manifold.mtv = new MathVector2(circleWorldCenter).sub(projection).nor();
+            manifold.normal = new MathVector2(circleWorldCenter).sub(projection).nor();
             manifold.depth = circle.getWorldRadius() - minDstEdge;
         }
         manifolds.add(manifold);
@@ -442,10 +442,10 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         manifold.contactPoint1 = new MathVector2(projection);
         final float minDstEdge = (float) Math.sqrt(minDstEdgeSquared);
         if (rectContainsCenter) {
-            manifold.mtv = new MathVector2(projection).sub(circleWorldCenter).nor();
+            manifold.normal = new MathVector2(projection).sub(circleWorldCenter).nor();
             manifold.depth = minDstEdge + circle.getWorldRadius();
         } else {
-            manifold.mtv = new MathVector2(circleWorldCenter).sub(projection).nor();
+            manifold.normal = new MathVector2(circleWorldCenter).sub(projection).nor();
             manifold.depth = circle.getWorldRadius() - minDstEdge;
         }
         manifolds.add(manifold);
@@ -571,7 +571,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
 
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(p1_vertices, p2_vertices, manifold);
-        manifold.mtv = new MathVector2(normal_x, normal_y);
+        manifold.normal = new MathVector2(normal_x, normal_y);
         manifold.depth = depth;
         manifolds.add(manifold);
     }
@@ -685,7 +685,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
 
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(rect_v, polygon_v, manifold);
-        manifold.mtv = new MathVector2(normal_x, normal_y);
+        manifold.normal = new MathVector2(normal_x, normal_y);
         manifold.depth = depth;
         manifolds.add(manifold);
     }
@@ -785,7 +785,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
 
         Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
         setContactPoints(vertices_1, vertices_2, manifold);
-        manifold.mtv = new MathVector2(min_overlap_axis_x, min_overlap_axis_y).nor();
+        manifold.normal = new MathVector2(min_overlap_axis_x, min_overlap_axis_y).nor();
         manifold.depth = min_axis_overlap;
         manifolds.add(manifold);
     }
