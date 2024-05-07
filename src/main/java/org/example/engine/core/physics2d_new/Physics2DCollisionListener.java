@@ -37,8 +37,7 @@ public interface Physics2DCollisionListener {
 
         if (normalVelocity > 0) return;
 
-        if (true) return; // for now, test separation only.
-
+        // FIXME collision response
         float e = Math.min(a.restitution, b.restitution);
 
         // what if one of the masses are 0?
