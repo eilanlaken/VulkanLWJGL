@@ -55,6 +55,10 @@ public class Shape2DRectangle extends Shape2D {
         this.worldVertices.addAll(c0, c1, c2, c3);
     }
 
+    public Shape2DRectangle(float width, float height, float angle) {
+        this(0,0, width, height, angle);
+    }
+
     @Override
     protected boolean containsPoint(float x, float y) {
         MathVector2 tmp1 = new MathVector2();
