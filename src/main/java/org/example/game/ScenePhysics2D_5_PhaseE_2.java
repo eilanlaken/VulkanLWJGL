@@ -54,7 +54,7 @@ public class ScenePhysics2D_5_PhaseE_2 extends ApplicationScreen {
                     screen.x,screen.y,0,
                     MathUtils.random(),MathUtils.random(),0,
                     1, 1, 1, false, 1,
-                    1, 1, MathUtils.random() * 360);
+                    1, 1, MathUtils.random() * 0);
         }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
