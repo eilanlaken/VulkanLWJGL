@@ -24,11 +24,11 @@ public interface Physics2DCollisionListener {
         float aMassInv = a.motionType == Physics2DBody.MotionType.STATIC ? 0 : a.massInv;
         float bMassInv = b.motionType == Physics2DBody.MotionType.STATIC ? 0 : b.massInv;
         final float percent = 0.2f;
-        final float threshold = 0.05f;
+        final float threshold = 0.001f;
         final float depth = manifold.depth;
         final MathVector2 normal = manifold.normal;
-        final float pushback = Math.max(depth - threshold, 0.0f);
-        MathVector2 correction = new MathVector2(normal).scl(pushback * percent).scl(1.0f / (aMassInv + bMassInv));
+        final float pushBack = Math.max(depth - threshold, 0.0f);
+        MathVector2 correction = new MathVector2(normal).scl(pushBack * percent).scl(1.0f / (aMassInv + bMassInv));
         a.shape.dx_dy(aMassInv * correction.x, aMassInv * correction.y);
         b.shape.dx_dy(-bMassInv * correction.x, -bMassInv * correction.y);
 

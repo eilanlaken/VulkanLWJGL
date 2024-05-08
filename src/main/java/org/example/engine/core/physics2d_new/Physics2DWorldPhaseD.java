@@ -668,6 +668,11 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         manifolds.add(manifold);
     }
 
+    // FIXME: setting collision normal is possibly wrong here.
+    /***  here is the problem  ***/
+    // FIXME: order of operations is possibly wrong here.
+    // TODO ??? : after each manifold generation, we need to resolve, then recreate manifolds?
+    // FIXME: Maybe the problem is only for multiple contact points.
     private Physics2DWorld.CollisionManifold rectangleVsRectangle(Shape2D a, Shape2D b, Physics2DWorld world) {
         Shape2DRectangle rect1 = (Shape2DRectangle) a;
         Shape2DRectangle rect2 = (Shape2DRectangle) b;
@@ -687,9 +692,9 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         MathVector2 rect2_c3 = vertices_2.get(3);
 
         MathVector2 axis = new MathVector2();
-        float min_axis_overlap;
-        float min_overlap_axis_x;
-        float min_overlap_axis_y;
+        float min_axis_overlap   = Float.POSITIVE_INFINITY;
+        float min_overlap_axis_x = Float.POSITIVE_INFINITY;
+        float min_overlap_axis_y = Float.POSITIVE_INFINITY;
         // rect1 axis1: c1-c2 axis
         {
             axis.set(rect2_c2.x - rect2_c1.x, rect2_c2.y - rect2_c1.y).nor();
@@ -702,9 +707,11 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
             float axis_overlap = MathUtils.intervalsOverlap(rect1_min_axis, rect1_max_axis, 0, rect2.unscaledWidth * rect2.scaleX());
             if (MathUtils.isZero(axis_overlap)) return null; // no collision
 
-            min_axis_overlap = axis_overlap;
-            min_overlap_axis_x = axis.x;
-            min_overlap_axis_y = axis.y;
+            if (axis_overlap < min_axis_overlap) {
+                min_axis_overlap = axis_overlap;
+                min_overlap_axis_x = axis.x;
+                min_overlap_axis_y = axis.y;
+            }
         }
 
         // rect1 axis2: c2-c3 axis
@@ -793,7 +800,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
             manifold.contactPoint1.set(p0.px, p0.py);
             manifold.contacts = 1;
         }
-        if (p0 != null && p1 != null && MathUtils.floatsEqual(p0.dst, p1.dst, 0.001f)) {
+        if (p0 != null && p1 != null && MathUtils.floatsEqual(p0.dst, p1.dst)) {
             manifold.contactPoint2.set(p1.px, p1.py);
             manifold.contacts = 2;
         }

@@ -53,6 +53,12 @@ public class Physics2DWorld {
     protected final Physics2DBodyFactory       bodyFactory   = new Physics2DBodyFactory(this);
     protected       Physics2DCollisionListener collisionListener;
 
+    // debugger options
+    public boolean renderBroadPhase = false;
+    public boolean renderManifolds  = true;
+    public boolean renderVelocities = false;
+    public boolean renderBodies     = true;
+
     public Physics2DWorld(Physics2DCollisionListener collisionListener) {
         this.collisionListener = collisionListener != null ? collisionListener : new Physics2DCollisionListener() {};
         this.phases[PHASE_A_PREPARATION] = new Physics2DWorldPhaseA();
