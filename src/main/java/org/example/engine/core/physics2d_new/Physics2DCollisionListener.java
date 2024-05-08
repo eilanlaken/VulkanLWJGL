@@ -20,9 +20,6 @@ public interface Physics2DCollisionListener {
         Physics2DBody a = manifold.a;
         Physics2DBody b = manifold.b;
 
-        MathVector2 vRel = new MathVector2(b.velocity).sub(a.velocity);
-        float normalVelocity = vRel.dot(manifold.normal);
-
         // separate bodies
         float aMassInv = a.motionType == Physics2DBody.MotionType.STATIC ? 0 : a.massInv;
         float bMassInv = b.motionType == Physics2DBody.MotionType.STATIC ? 0 : b.massInv;
@@ -35,9 +32,11 @@ public interface Physics2DCollisionListener {
         a.shape.dx_dy(aMassInv * correction.x, aMassInv * correction.y);
         b.shape.dx_dy(-bMassInv * correction.x, -bMassInv * correction.y);
 
-        if (normalVelocity > 0) return;
+        MathVector2 vRel = new MathVector2(b.velocity).sub(a.velocity);
+        float normalVelocity = vRel.dot(manifold.normal);
+        if (normalVelocity <= 0) return;
 
-        // FIXME collision response
+        // TODO: collision response
         float e = Math.min(a.restitution, b.restitution);
 
         // what if one of the masses are 0?
