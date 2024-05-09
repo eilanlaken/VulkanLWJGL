@@ -77,12 +77,14 @@ public class Shape2DRectangle extends Shape2D {
         return true;
     }
 
+    // TODO: test
     public float getWidth() {
-        return unscaledWidth * Math.abs(unscaledWidth);
+        return unscaledWidth * Math.abs(scaleX);
     }
 
+    // TODO: test
     public float getHeight() {
-        return unscaledHeight * Math.abs(unscaledHeight);
+        return unscaledHeight * Math.abs(scaleY);
     }
 
     @Override

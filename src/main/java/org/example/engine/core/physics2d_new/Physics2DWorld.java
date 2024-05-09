@@ -73,7 +73,7 @@ public class Physics2DWorld {
         phaseB.update();
         phaseC.update();
         phaseD.update();
-        phaseE.update();
+        //phaseE.update();
     }
 
     public Physics2DBody createBodyCircle(Object owner, Physics2DBody.MotionType motionType,
