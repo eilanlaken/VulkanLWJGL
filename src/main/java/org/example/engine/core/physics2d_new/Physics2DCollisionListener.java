@@ -32,8 +32,15 @@ public interface Physics2DCollisionListener {
 
         // TODO:
         // smartly apply the correction so that shapes are pushed away from each other.
-        a.shape.dx_dy(aMassInv * correction.x, aMassInv * correction.y);
-        b.shape.dx_dy(-bMassInv * correction.x, -bMassInv * correction.y);
+        float dot = manifold.a_b.dot(manifold.normal);
+        if (dot > 0) {
+            a.shape.dx_dy(-aMassInv * correction.x, -aMassInv * correction.y);
+            b.shape.dx_dy(bMassInv * correction.x, bMassInv * correction.y);
+        } else {
+            a.shape.dx_dy(aMassInv * correction.x, aMassInv * correction.y);
+            b.shape.dx_dy(-bMassInv * correction.x, -bMassInv * correction.y);
+        }
+
 
         MathVector2 vRel = new MathVector2(b.velocity).sub(a.velocity);
         float normalVelocity = vRel.dot(manifold.normal);
