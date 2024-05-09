@@ -28,7 +28,7 @@ public final class Physics2DWorldRenderer {
     }
 
     public void render(GraphicsRenderer2D renderer) {
-        final float pointPixelRadius = 6;
+        final float pointPixelRadius = 3;
         float scaleX = renderer.getCurrentCamera().lens.getViewportWidth() * pointPixelRadius / GraphicsUtils.getWindowWidth();
         float scaleY = renderer.getCurrentCamera().lens.getViewportHeight() * pointPixelRadius / GraphicsUtils.getWindowHeight();
 
@@ -64,7 +64,6 @@ public final class Physics2DWorldRenderer {
         // render manifolds
         if (world.renderManifolds) {
             CollectionsArray<Physics2DWorld.CollisionManifold> manifolds = world.collisionManifolds;
-            System.out.println(world.collisionManifolds.size);
             for (Physics2DWorld.CollisionManifold manifold : manifolds) {
                 if (manifold.contacts == 0) continue;
 

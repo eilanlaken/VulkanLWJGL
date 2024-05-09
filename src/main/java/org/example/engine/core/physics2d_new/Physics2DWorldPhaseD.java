@@ -38,7 +38,6 @@ public final class Physics2DWorldPhaseD {
 
         if (shape_a instanceof Shape2DRectangle) {
             if (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle(shape_a, shape_b, world);
-            //else if (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle_old(shape_a, shape_b, world);
         }
 
         if (manifold == null) return;
@@ -844,7 +843,7 @@ public final class Physics2DWorldPhaseD {
             }
         }
 
-        // rect_2, axis1: c1-c2 axis
+        // rect_2, axis1 (c1-c2) axis
         {
             axis.set(rect1_c2.x - rect1_c1.x, rect1_c2.y - rect1_c1.y).nor();
             float rect2_c0_axis = MathVector2.dot(axis.x, axis.y, rect2_c0.x - rect1_c1.x, rect2_c0.y - rect1_c1.y);
@@ -863,7 +862,7 @@ public final class Physics2DWorldPhaseD {
             }
         }
 
-        // rect_2, axis2: c2-c3 axis
+        // rect_2, axis2 (c2-c3) axis
         {
             axis.set(rect1_c3.x - rect1_c2.x, rect1_c3.y - rect1_c2.y).nor();
             float rect2_c0_axis = MathVector2.dot(axis.x, axis.y, rect2_c0.x - rect1_c2.x, rect2_c0.y - rect1_c2.y);
@@ -884,8 +883,10 @@ public final class Physics2DWorldPhaseD {
 
         Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
         setContactPoints(vertices_1, vertices_2, manifold);
-        // calculate normal
-        manifold.normal.set(min_overlap_axis_x, min_overlap_axis_y);
+        MathVector2 a_b = new MathVector2(rect_2.x() - rect_1.x(), rect_2.y() - rect_1.y());
+        // it either breaks here or in the resolution.
+        float sign = -1 * Math.signum(MathVector2.dot(a_b, axis));
+        manifold.normal.set(sign * min_overlap_axis_x, sign * min_overlap_axis_y);
         manifold.depth = min_axis_overlap;
         return manifold;
     }
