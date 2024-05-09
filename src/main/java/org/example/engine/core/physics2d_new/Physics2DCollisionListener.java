@@ -29,6 +29,9 @@ public interface Physics2DCollisionListener {
         final MathVector2 normal = manifold.normal;
         final float pushBack = Math.max(depth - threshold, 0.0f);
         MathVector2 correction = new MathVector2(normal).scl(pushBack * percent).scl(1.0f / (aMassInv + bMassInv));
+
+        // TODO:
+        // smartly apply the correction so that shapes are pushed away from each other.
         a.shape.dx_dy(aMassInv * correction.x, aMassInv * correction.y);
         b.shape.dx_dy(-bMassInv * correction.x, -bMassInv * correction.y);
 

@@ -29,7 +29,7 @@ public class ScenePhysics2D_5_PhaseE_3 extends ApplicationScreen {
 
     @Override
     public void show() {
-        camera = new GraphicsCamera(640f/32,480f/32, 1);
+        camera = new GraphicsCamera(640f/128,480f/128, 1);
         camera.update();
 
         body1 = world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,

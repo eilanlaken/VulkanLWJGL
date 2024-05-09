@@ -802,6 +802,7 @@ public final class Physics2DWorldPhaseD {
         MathVector2 By = new MathVector2(rect_2.c3()).sub(rect_2.c2()).nor();
 
         float minOverlap = Float.POSITIVE_INFINITY;
+        float nx = 0, ny = 0;
 
         // L = Ax
         {
@@ -809,7 +810,15 @@ public final class Physics2DWorldPhaseD {
             float leftSide   = Math.abs(T.dot(L));
             float firstTerm  = Math.abs(wb * Bx.dot(Ax));
             float secondTerm = Math.abs(hb * By.dot(Ax));
-            if (leftSide > wa + firstTerm + secondTerm) return null;
+            float sum = wa + firstTerm + secondTerm;
+            if (leftSide >= sum) return null;
+
+            float diff = sum - leftSide;
+            if (diff < minOverlap) {
+                minOverlap = diff;
+                nx = L.x;
+                ny = L.y;
+            }
         }
 
         // L = Ay
@@ -818,7 +827,15 @@ public final class Physics2DWorldPhaseD {
             float leftSide = Math.abs(T.dot(L));
             float firstTerm = Math.abs(wb * Bx.dot(Ay));
             float secondTerm = Math.abs(hb * By.dot(Ay));
-            if (leftSide > ha + firstTerm + secondTerm) return null;
+            float sum = ha + firstTerm + secondTerm;
+            if (leftSide >= sum) return null;
+
+            float diff = sum - leftSide;
+            if (diff < minOverlap) {
+                minOverlap = diff;
+                nx = L.x;
+                ny = L.y;
+            }
         }
 
         // L = Bx
@@ -827,7 +844,15 @@ public final class Physics2DWorldPhaseD {
             float leftSide = Math.abs(T.dot(L));
             float firstTerm = Math.abs(wa * Ax.dot(Bx));
             float secondTerm = Math.abs(ha * Ay.dot(Bx));
-            if (leftSide > wb + firstTerm + secondTerm) return null;
+            float sum = wb + firstTerm + secondTerm;
+            if (leftSide >= sum) return null;
+
+            float diff = sum - leftSide;
+            if (diff < minOverlap) {
+                minOverlap = diff;
+                nx = L.x;
+                ny = L.y;
+            }
         }
 
         // L = By
@@ -836,19 +861,25 @@ public final class Physics2DWorldPhaseD {
             float leftSide = Math.abs(T.dot(L));
             float firstTerm = Math.abs(wa * Ax.dot(By));
             float secondTerm = Math.abs(ha * Ay.dot(By));
-            if (leftSide > hb + firstTerm + secondTerm) return null;
+            float sum = hb + firstTerm + secondTerm;
+            if (leftSide >= sum) return null;
+
+            float diff = sum - leftSide;
+            if (diff < minOverlap) {
+                minOverlap = diff;
+                nx = L.x;
+                ny = L.y;
+            }
         }
 
         System.out.println("colliding");
 
-        float min_axis_overlap   = Float.POSITIVE_INFINITY;
-        float min_overlap_axis_x = Float.POSITIVE_INFINITY;
-        float min_overlap_axis_y = Float.POSITIVE_INFINITY;
 
         Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
-        //setContactPoints(vertices_1, vertices_2, manifold);
-        manifold.normal.set(min_overlap_axis_x, min_overlap_axis_y);
-        manifold.depth = min_axis_overlap;
+        setContactPoints(rect_1.worldVertices(), rect_2.worldVertices(), manifold);
+        manifold.a_b.set(rect_2.x() - rect_1.x(), rect_2.y() - rect_1.y());
+        manifold.normal.set(nx, ny);
+        manifold.depth = minOverlap;
         return manifold;
     }
 
