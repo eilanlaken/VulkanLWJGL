@@ -64,6 +64,7 @@ public final class Physics2DWorldRenderer {
         // render manifolds
         if (world.renderManifolds) {
             CollectionsArray<Physics2DWorld.CollisionManifold> manifolds = world.collisionManifolds;
+            System.out.println(world.collisionManifolds.size);
             for (Physics2DWorld.CollisionManifold manifold : manifolds) {
                 if (manifold.contacts == 0) continue;
 

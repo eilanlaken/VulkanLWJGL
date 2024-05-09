@@ -19,6 +19,9 @@ public class ScenePhysics2D_5_PhaseE_3 extends ApplicationScreen {
     private GraphicsRenderer2D renderer2D;
     private GraphicsCamera camera;
     private Physics2DWorld world = new Physics2DWorld();
+    Physics2DBody body1;
+    Physics2DBody body2;
+
 
     public ScenePhysics2D_5_PhaseE_3() {
         renderer2D = new GraphicsRenderer2D();
@@ -28,33 +31,34 @@ public class ScenePhysics2D_5_PhaseE_3 extends ApplicationScreen {
     public void show() {
         camera = new GraphicsCamera(640f/32,480f/32, 1);
         camera.update();
+
+        body1 = world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
+                0,0,0,
+                0f,0f,0,
+                1, 1, 1, false, 1,
+                1, 1, 0);
+
+        body2 = world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
+                0,0,0,
+                0f,0f,0,
+                1, 1, 1, false, 1,
+                1, 1, 0);
     }
 
 
     @Override
     protected void refresh() {
-        world.update(GraphicsUtils.getDeltaTime());
         MathVector3 screen = new MathVector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
         camera.lens.unproject(screen);
+        body1.setPosition(screen.x, screen.y);
+        world.update(GraphicsUtils.getDeltaTime());
 
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.E)) {
-            screen.set(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
-            camera.lens.unproject(screen);
-            world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
-                    screen.x,screen.y,0,
-                    0f,0f,0,
-                    1, 1, 1, false, 1,
-                    1, 1, 0);
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.E)) {
+            body1.shape.rot(3);
         }
 
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.Q)) {
-            screen.set(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
-            camera.lens.unproject(screen);
-            world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
-                    screen.x,screen.y,0,
-                    MathUtils.random(),MathUtils.random(),0,
-                    1, 1, 1, false, 1,
-                    1, 1, MathUtils.random() * 0);
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.Q)) {
+            body1.shape.rot(-3);
         }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);

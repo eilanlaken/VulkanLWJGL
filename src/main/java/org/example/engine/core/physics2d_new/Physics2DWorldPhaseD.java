@@ -32,7 +32,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         }
 
         if (shape_a instanceof Shape2DRectangle) {
-            if (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle(shape_a, shape_b, world);
+            if (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle_old(shape_a, shape_b, world);
         }
 
         if (manifold == null) return;
@@ -673,7 +673,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
     // FIXME: order of operations is possibly wrong here.
     // TODO ??? : after each manifold generation, we need to resolve, then recreate manifolds?
     // FIXME: Maybe the problem is only for multiple contact points.
-    private Physics2DWorld.CollisionManifold rectangleVsRectangle(Shape2D a, Shape2D b, Physics2DWorld world) {
+    private Physics2DWorld.CollisionManifold rectangleVsRectangle_old(Shape2D a, Shape2D b, Physics2DWorld world) {
         Shape2DRectangle rect1 = (Shape2DRectangle) a;
         Shape2DRectangle rect2 = (Shape2DRectangle) b;
 
