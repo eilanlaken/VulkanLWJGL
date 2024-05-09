@@ -795,51 +795,48 @@ public final class Physics2DWorldPhaseD {
         float wb = rect_2.getWidth() * 0.5f;
         float hb = rect_2.getHeight() * 0.5f;
 
+        MathVector2 L  = new MathVector2();
         MathVector2 Ax = new MathVector2(rect_1.c2()).sub(rect_1.c1()).nor();
         MathVector2 Ay = new MathVector2(rect_1.c3()).sub(rect_1.c2()).nor();
         MathVector2 Bx = new MathVector2(rect_2.c2()).sub(rect_2.c1()).nor();
         MathVector2 By = new MathVector2(rect_2.c3()).sub(rect_2.c2()).nor();
 
-        MathVector2 L = new MathVector2();
+        float minOverlap = Float.POSITIVE_INFINITY;
 
         // L = Ax
         {
             L.set(Ax);
-            float leftSide = Math.abs(T.dot(L));
-            float firstTerm = wa;
-            float secondTerm = Math.abs(wb * Bx.dot(Ax));
-            float thirdTerm = Math.abs(hb * By.dot(Ax));
-            if (leftSide > firstTerm + secondTerm + thirdTerm) return null;
+            float leftSide   = Math.abs(T.dot(L));
+            float firstTerm  = Math.abs(wb * Bx.dot(Ax));
+            float secondTerm = Math.abs(hb * By.dot(Ax));
+            if (leftSide > wa + firstTerm + secondTerm) return null;
         }
 
         // L = Ay
         {
             L.set(Ay);
             float leftSide = Math.abs(T.dot(L));
-            float firstTerm = ha;
-            float secondTerm = Math.abs(wb * Bx.dot(Ay));
-            float thirdTerm = Math.abs(hb * By.dot(Ay));
-            if (leftSide > firstTerm + secondTerm + thirdTerm) return null;
+            float firstTerm = Math.abs(wb * Bx.dot(Ay));
+            float secondTerm = Math.abs(hb * By.dot(Ay));
+            if (leftSide > ha + firstTerm + secondTerm) return null;
         }
 
         // L = Bx
         {
             L.set(Bx);
             float leftSide = Math.abs(T.dot(L));
-            float firstTerm = wb;
-            float secondTerm = Math.abs(wa * Ax.dot(Bx));
-            float thirdTerm = Math.abs(ha * Ay.dot(Bx));
-            if (leftSide > firstTerm + secondTerm + thirdTerm) return null;
+            float firstTerm = Math.abs(wa * Ax.dot(Bx));
+            float secondTerm = Math.abs(ha * Ay.dot(Bx));
+            if (leftSide > wb + firstTerm + secondTerm) return null;
         }
 
         // L = By
         {
             L.set(By);
             float leftSide = Math.abs(T.dot(L));
-            float firstTerm = hb;
-            float secondTerm = Math.abs(wa * Ax.dot(By));
-            float thirdTerm = Math.abs(ha * Ay.dot(By));
-            if (leftSide > firstTerm + secondTerm + thirdTerm) return null;
+            float firstTerm = Math.abs(wa * Ax.dot(By));
+            float secondTerm = Math.abs(ha * Ay.dot(By));
+            if (leftSide > hb + firstTerm + secondTerm) return null;
         }
 
         System.out.println("colliding");
@@ -883,10 +880,7 @@ public final class Physics2DWorldPhaseD {
         }
 
         // free projections
-        for (Projection projection : projections) {
-            projectionsPool.free(projection);
-        }
-        projections.clear();
+        projectionsPool.freeAll(projections);
     }
 
     private Projection getClosestProjection(MathVector2 point, CollectionsArray<MathVector2> vertices) {
