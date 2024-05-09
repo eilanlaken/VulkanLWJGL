@@ -1,10 +1,14 @@
 package org.example.engine.core.physics2d_new;
 
-public final class Physics2DWorldPhaseA implements Physics2DWorldPhase {
+public final class Physics2DWorldPhaseA {
 
-    // TODO: test.
-    @Override
-    public synchronized void update(Physics2DWorld world, float delta) {
+    private final Physics2DWorld world;
+
+    protected Physics2DWorldPhaseA(final Physics2DWorld world) {
+        this.world = world;
+    }
+
+    public synchronized void update() {
         world.collisionCandidates.clear();
         world.activeCells.clear();
         world.manifoldMemoryPool.freeAll(world.collisionManifolds);

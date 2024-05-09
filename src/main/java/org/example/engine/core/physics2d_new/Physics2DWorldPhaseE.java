@@ -1,9 +1,14 @@
 package org.example.engine.core.physics2d_new;
 
-public final class Physics2DWorldPhaseE implements Physics2DWorldPhase {
+public final class Physics2DWorldPhaseE {
 
-    @Override
-    public void update(Physics2DWorld world, float delta) {
+    private final Physics2DWorld world;
+
+    protected Physics2DWorldPhaseE(Physics2DWorld world) {
+        this.world = world;
+    }
+
+    public void update() {
         for (Physics2DWorld.CollisionManifold manifold : world.collisionManifolds) {
             Physics2DBody a = manifold.a;
             Physics2DBody b = manifold.b;

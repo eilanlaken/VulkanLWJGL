@@ -7,16 +7,20 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 
-public final class Physics2DWorldPhaseC implements Physics2DWorldPhase {
+public final class Physics2DWorldPhaseC {
 
-    private final int                      processors     = AsyncUtils.getAvailableProcessorsNum();
-    private final MemoryPool<Cell>         cellMemoryPool = new MemoryPool<>(Cell.class,1024);
-    private final MemoryPool<ProcessCells> taskMemoryPool = new MemoryPool<>(ProcessCells.class, processors);
+    private final int                            processors     = AsyncUtils.getAvailableProcessorsNum();
+    private final MemoryPool<ProcessCells>       taskMemoryPool = new MemoryPool<>(ProcessCells.class, processors);
+    private final MemoryPool<Cell>               cellMemoryPool = new MemoryPool<>(Cell.class,1024);
+    private final CollectionsArray<ProcessCells> tasks          = new CollectionsArray<>();
 
-    private final CollectionsArray<ProcessCells> tasks = new CollectionsArray<>();
+    private final Physics2DWorld world;
 
-    @Override
-    public void update(Physics2DWorld world, float delta) {
+    protected Physics2DWorldPhaseC(Physics2DWorld world) {
+        this.world = world;
+    }
+
+    public void update() {
         taskMemoryPool.freeAll(tasks);
         tasks.clear();
         cellMemoryPool.freeAll(world.spacePartition);

@@ -1,10 +1,15 @@
 package org.example.engine.core.physics2d_new;
 
 // TODO: continue. consider torque, constraints, joints.
-public final class Physics2DWorldPhaseB implements Physics2DWorldPhase {
+public final class Physics2DWorldPhaseB {
 
-    @Override
-    public void update(Physics2DWorld world, float delta) {
+    private final Physics2DWorld world;
+
+    protected Physics2DWorldPhaseB(final Physics2DWorld world) {
+        this.world = world;
+    }
+
+    public void update() {
         world.worldMinX =  Float.MAX_VALUE;
         world.worldMaxX = -Float.MAX_VALUE;
         world.worldMinY =  Float.MAX_VALUE;
@@ -14,10 +19,10 @@ public final class Physics2DWorldPhaseB implements Physics2DWorldPhase {
         for (Physics2DBody body : world.allBodies) {
             if (body.off) continue;
             if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
-                body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
+                body.velocity.add(body.massInv * world.deltaTime * body.netForce.x, body.massInv * world.deltaTime * body.netForce.y);
             }
             if (body.motionType != Physics2DBody.MotionType.STATIC) {
-                body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omega);
+                body.shape.dx_dy_rot(world.deltaTime * body.velocity.x, world.deltaTime * body.velocity.y, world.deltaTime * body.omega);
             }
             body.shape.update();
             body.netForce.set(0, 0);

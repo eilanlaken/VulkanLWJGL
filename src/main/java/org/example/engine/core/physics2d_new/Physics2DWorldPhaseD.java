@@ -9,12 +9,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
+public final class Physics2DWorldPhaseD {
 
     private final MemoryPool<Projection> projectionsPool = new MemoryPool<>(Projection.class, 200);
 
-    @Override
-    public void update(Physics2DWorld world, float delta) {
+    private final Physics2DWorld world;
+
+    protected Physics2DWorldPhaseD(Physics2DWorld world) {
+        this.world = world;
+    }
+
+    public void update() {
         Set<Physics2DWorld.CollisionPair> collisionPairs = world.collisionCandidates;
         for (Physics2DWorld.CollisionPair collisionCandidate : collisionPairs) {
             narrowPhaseCollision(world, collisionCandidate.a, collisionCandidate.b, world.collisionManifolds);
@@ -32,7 +37,8 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         }
 
         if (shape_a instanceof Shape2DRectangle) {
-            if (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle_old(shape_a, shape_b, world);
+            if (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle(shape_a, shape_b, world);
+            //else if (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle_old(shape_a, shape_b, world);
         }
 
         if (manifold == null) return;
@@ -673,7 +679,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
     // FIXME: order of operations is possibly wrong here.
     // TODO ??? : after each manifold generation, we need to resolve, then recreate manifolds?
     // FIXME: Maybe the problem is only for multiple contact points.
-    private Physics2DWorld.CollisionManifold rectangleVsRectangle_old(Shape2D a, Shape2D b, Physics2DWorld world) {
+    @Deprecated private Physics2DWorld.CollisionManifold rectangleVsRectangle_old(Shape2D a, Shape2D b, Physics2DWorld world) {
         Shape2DRectangle rect1 = (Shape2DRectangle) a;
         Shape2DRectangle rect2 = (Shape2DRectangle) b;
 
@@ -695,7 +701,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         float min_axis_overlap   = Float.POSITIVE_INFINITY;
         float min_overlap_axis_x = Float.POSITIVE_INFINITY;
         float min_overlap_axis_y = Float.POSITIVE_INFINITY;
-        // rect1 axis1: c1-c2 axis
+        // rect1, axis1 (c1-c2)
         {
             axis.set(rect2_c2.x - rect2_c1.x, rect2_c2.y - rect2_c1.y).nor();
             float rect1_c0_axis = MathVector2.dot(axis.x, axis.y, rect1_c0.x - rect2_c1.x, rect1_c0.y - rect2_c1.y);
@@ -714,7 +720,7 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
             }
         }
 
-        // rect1 axis2: c2-c3 axis
+        // rect1, axis2 (c2-c3)
         {
             axis.set(rect2_c3.x - rect2_c2.x, rect2_c3.y - rect2_c2.y).nor();
             float rect1_c0_axis = MathVector2.dot(axis.x, axis.y, rect1_c0.x - rect2_c2.x, rect1_c0.y - rect2_c2.y);
@@ -774,6 +780,112 @@ public final class Physics2DWorldPhaseD implements Physics2DWorldPhase {
         Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
         setContactPoints(vertices_1, vertices_2, manifold);
         manifold.normal.set(min_overlap_axis_x, min_overlap_axis_y).nor();
+        manifold.depth = min_axis_overlap;
+        return manifold;
+    }
+
+    private Physics2DWorld.CollisionManifold rectangleVsRectangle(Shape2D a, Shape2D b, Physics2DWorld world) {
+        Shape2DRectangle rect_1 = (Shape2DRectangle) a;
+        Shape2DRectangle rect_2 = (Shape2DRectangle) b;
+
+        // rect_1 corners
+        CollectionsArray<MathVector2> vertices_1 = rect_1.worldVertices();
+        MathVector2 rect1_c0 = vertices_1.get(0);
+        MathVector2 rect1_c1 = vertices_1.get(1);
+        MathVector2 rect1_c2 = vertices_1.get(2);
+        MathVector2 rect1_c3 = vertices_1.get(3);
+
+        // rect_2 corners
+        CollectionsArray<MathVector2> vertices_2 = rect_2.worldVertices();
+        MathVector2 rect2_c0 = vertices_2.get(0);
+        MathVector2 rect2_c1 = vertices_2.get(1);
+        MathVector2 rect2_c2 = vertices_2.get(2);
+        MathVector2 rect2_c3 = vertices_2.get(3);
+
+        MathVector2 axis = new MathVector2();
+        float min_axis_overlap   = Float.POSITIVE_INFINITY;
+        float min_overlap_axis_x = Float.POSITIVE_INFINITY;
+        float min_overlap_axis_y = Float.POSITIVE_INFINITY;
+        // rect_1, axis1 (c1-c2)
+        {
+            axis.set(rect2_c2.x - rect2_c1.x, rect2_c2.y - rect2_c1.y).nor();
+            float rect1_c0_axis = MathVector2.dot(axis.x, axis.y, rect1_c0.x - rect2_c1.x, rect1_c0.y - rect2_c1.y);
+            float rect1_c1_axis = MathVector2.dot(axis.x, axis.y, rect1_c1.x - rect2_c1.x, rect1_c1.y - rect2_c1.y);
+            float rect1_c2_axis = MathVector2.dot(axis.x, axis.y, rect1_c2.x - rect2_c1.x, rect1_c2.y - rect2_c1.y);
+            float rect1_c3_axis = MathVector2.dot(axis.x, axis.y, rect1_c3.x - rect2_c1.x, rect1_c3.y - rect2_c1.y);
+            float rect1_min_axis = MathUtils.min(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
+            float rect1_max_axis = MathUtils.max(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
+            float axis_overlap = MathUtils.intervalsOverlap(rect1_min_axis, rect1_max_axis, 0, rect_2.unscaledWidth * rect_2.scaleX());
+            if (MathUtils.isZero(axis_overlap)) return null; // no collision
+
+            if (axis_overlap < min_axis_overlap) {
+                min_axis_overlap = axis_overlap;
+                min_overlap_axis_x = axis.x;
+                min_overlap_axis_y = axis.y;
+            }
+        }
+
+        // rect_1, axis2 (c2-c3)
+        {
+            axis.set(rect2_c3.x - rect2_c2.x, rect2_c3.y - rect2_c2.y).nor();
+            float rect1_c0_axis = MathVector2.dot(axis.x, axis.y, rect1_c0.x - rect2_c2.x, rect1_c0.y - rect2_c2.y);
+            float rect1_c1_axis = MathVector2.dot(axis.x, axis.y, rect1_c1.x - rect2_c2.x, rect1_c1.y - rect2_c2.y);
+            float rect1_c2_axis = MathVector2.dot(axis.x, axis.y, rect1_c2.x - rect2_c2.x, rect1_c2.y - rect2_c2.y);
+            float rect1_c3_axis = MathVector2.dot(axis.x, axis.y, rect1_c3.x - rect2_c2.x, rect1_c3.y - rect2_c2.y);
+            float rect1_min_axis = MathUtils.min(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
+            float rect1_max_axis = MathUtils.max(rect1_c0_axis, rect1_c1_axis, rect1_c2_axis, rect1_c3_axis);
+            float axis_overlap = MathUtils.intervalsOverlap(rect1_min_axis, rect1_max_axis, 0, rect_2.unscaledHeight * rect_2.scaleY());
+            if (MathUtils.isZero(axis_overlap)) return null; // no collision
+
+            if (axis_overlap < min_axis_overlap) {
+                min_axis_overlap = axis_overlap;
+                min_overlap_axis_x = axis.x;
+                min_overlap_axis_y = axis.y;
+            }
+        }
+
+        // rect_2, axis1: c1-c2 axis
+        {
+            axis.set(rect1_c2.x - rect1_c1.x, rect1_c2.y - rect1_c1.y).nor();
+            float rect2_c0_axis = MathVector2.dot(axis.x, axis.y, rect2_c0.x - rect1_c1.x, rect2_c0.y - rect1_c1.y);
+            float rect2_c1_axis = MathVector2.dot(axis.x, axis.y, rect2_c1.x - rect1_c1.x, rect2_c1.y - rect1_c1.y);
+            float rect2_c2_axis = MathVector2.dot(axis.x, axis.y, rect2_c2.x - rect1_c1.x, rect2_c2.y - rect1_c1.y);
+            float rect2_c3_axis = MathVector2.dot(axis.x, axis.y, rect2_c3.x - rect1_c1.x, rect2_c3.y - rect1_c1.y);
+            float rect2_min_axis = MathUtils.min(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
+            float rect2_max_axis = MathUtils.max(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
+            float axis_overlap = MathUtils.intervalsOverlap(rect2_min_axis, rect2_max_axis, 0, rect_1.unscaledWidth * rect_1.scaleX());
+            if (MathUtils.isZero(axis_overlap)) return null; // no collision
+
+            if (axis_overlap < min_axis_overlap) {
+                min_axis_overlap = axis_overlap;
+                min_overlap_axis_x = axis.x;
+                min_overlap_axis_y = axis.y;
+            }
+        }
+
+        // rect_2, axis2: c2-c3 axis
+        {
+            axis.set(rect1_c3.x - rect1_c2.x, rect1_c3.y - rect1_c2.y).nor();
+            float rect2_c0_axis = MathVector2.dot(axis.x, axis.y, rect2_c0.x - rect1_c2.x, rect2_c0.y - rect1_c2.y);
+            float rect2_c1_axis = MathVector2.dot(axis.x, axis.y, rect2_c1.x - rect1_c2.x, rect2_c1.y - rect1_c2.y);
+            float rect2_c2_axis = MathVector2.dot(axis.x, axis.y, rect2_c2.x - rect1_c2.x, rect2_c2.y - rect1_c2.y);
+            float rect2_c3_axis = MathVector2.dot(axis.x, axis.y, rect2_c3.x - rect1_c2.x, rect2_c3.y - rect1_c2.y);
+            float rect2_min_axis = MathUtils.min(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
+            float rect2_max_axis = MathUtils.max(rect2_c0_axis, rect2_c1_axis, rect2_c2_axis, rect2_c3_axis);
+            float axis_overlap = MathUtils.intervalsOverlap(rect2_min_axis, rect2_max_axis, 0, rect_1.unscaledHeight * rect_1.scaleY());
+            if (MathUtils.isZero(axis_overlap)) return null; // no collision
+
+            if (axis_overlap < min_axis_overlap) {
+                min_axis_overlap = axis_overlap;
+                min_overlap_axis_x = axis.x;
+                min_overlap_axis_y = axis.y;
+            }
+        }
+
+        Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
+        setContactPoints(vertices_1, vertices_2, manifold);
+        // calculate normal
+        manifold.normal.set(min_overlap_axis_x, min_overlap_axis_y);
         manifold.depth = min_axis_overlap;
         return manifold;
     }
