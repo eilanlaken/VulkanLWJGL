@@ -14,13 +14,13 @@ import org.lwjgl.opengl.GL11;
 
 // contact points polygon vs polygon:
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
-public class ScenePhysics2D_5_PhaseE_2 extends ApplicationScreen {
+public class ScenePhysics2D_5_PhaseE_4 extends ApplicationScreen {
 
     private GraphicsRenderer2D renderer2D;
     private GraphicsCamera camera;
     private Physics2DWorld world = new Physics2DWorld();
 
-    public ScenePhysics2D_5_PhaseE_2() {
+    public ScenePhysics2D_5_PhaseE_4() {
         renderer2D = new GraphicsRenderer2D();
     }
 

@@ -2,72 +2,114 @@ package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
+import org.jetbrains.annotations.NotNull;
 
-public final class Physics2DBody {
+public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody> {
 
-    public Object owner;
-    public boolean active;
+    public    Object      owner      = null;
+    protected boolean     created    = false;
+    protected int         index      = -1;
+    public    boolean     off        = false;
+    public    Shape2D     shape      = null;
+    public    MotionType  motionType = null;
+    public    MathVector2 velocity   = new MathVector2();
+    public    float       omega      = 0;
+    public    MathVector2 netForce   = new MathVector2();
 
-    public Type type;
-    // TODO: should be protected, internal data. For example
-    // TODO: concave polygons will be converted to morphed shapes.
-    public Shape2D shape;
-    public MathVector2 velocity;
-    public float angularVelocity;
-    public CollectionsArray<MathVector2> forces;
+    public CollectionsArray<Physics2DBody>       collidesWith = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DConstraint> constraints  = new CollectionsArray<>(false, 1);
+    public CollectionsArray<Physics2DJoint>      joints       = new CollectionsArray<>(false, 1);
 
-    public float massInv;
-    public float density;
-    public float friction;
-    public float restitution;
+    public float   massInv;
+    public float   density;
+    public float   friction;
+    public float   restitution;
     public boolean ghost;
-    public int bitmask;
+    public int     bitmask;
 
-    // todo: change to protected.
-    public Physics2DBody(Object owner, boolean active, Type type, Shape2D shape, MathVector2 position, float angle, MathVector2 velocity, float angularVelocity, float density, float friction, float restitution, boolean ghost, int bitmask) {
-        this.owner = owner;
-        this.active = active;
-        this.type = type;
-        this.shape = shape;
-        shape.setTransform(position.x, position.y, angle, 1,1);
-        this.velocity = new MathVector2(velocity);
-        this.angularVelocity = angularVelocity;
-        this.forces = new CollectionsArray<>(false, 2);
-        this.massInv = 1f / Physics2DUtils.calculateMass(shape, density);
-        this.density = density;
-        this.friction = friction;
-        this.restitution = restitution;
-        this.ghost = ghost;
-        this.bitmask = bitmask;
-    }
+    public Physics2DBody() {
 
-    public Physics2DBody(Shape2D shape, MathVector2 position, float angle, MathVector2 velocity) {
-        this.owner = null;
-        this.active = true;
-        this.type = Type.DYNAMIC;
-        this.shape = shape;
-        this.shape.setTransform(position.x, position.y, angle, 1, 1);
-        this.velocity = new MathVector2(velocity);
-        this.forces = new CollectionsArray<>(false, 2);
     }
 
     public void setPosition(float x, float y) {
         shape.xy(x, y);
     }
 
+    public void setAngleDeg(float angleDeg) {
+        shape.angle(angleDeg);
+    }
+
     public void setVelocity(float x, float y) {
         velocity.set(x, y);
     }
 
-    public void dx_dy_rot(float dx, float dy, float da) {
-        shape.dx_dy_rot(dx, dy, da);
+    public void setOmega(float omega) {
+        this.omega = omega;
     }
 
-    public enum Type {
+    public void applyForce(float fx, float fy) {
+        netForce.add(fx, fy);
+    }
+
+    public void setMotionState(float x, float y, float angleDeg, float velX, float velY, float velAngleDeg) {
+        this.shape.setTransform(x, y, angleDeg);
+        this.velocity.set(velX, velY);
+        this.omega = velAngleDeg;
+    }
+
+    public void turnOn() {
+        this.off = false;
+    }
+
+    public void turnOff() {
+        this.off = true;
+    }
+
+    @Override
+    public int hashCode() {
+        return index;
+    }
+
+    @Override
+    public String toString() {
+        return "Physics2DBody{" +
+                "index=" + index +
+                '}';
+    }
+
+    @Override
+    public void reset() {
+        this.owner = null;
+        this.created = false;
+        this.index = -1;
+        this.off = false;
+        this.motionType = null;
+        this.shape = null;
+        this.velocity.set(0, 0);
+        this.omega = 0;
+        this.netForce.set(0,0);
+        this.constraints.clear();
+        this.joints.clear();
+        this.massInv = 0;
+        this.density = 0;
+        this.friction = 0;
+        this.restitution = 0;
+        this.ghost = false;
+        this.bitmask = 0;
+    }
+
+    @Override
+    public int compareTo(@NotNull Physics2DBody o) {
+        return Integer.compare(index, o.index);
+    }
+
+    public enum MotionType {
         STATIC,
         KINEMATIC,
-        DYNAMIC
+        NEWTONIAN,
+        RELATIVISTIC, // for now, just an idea.
     }
 
 }

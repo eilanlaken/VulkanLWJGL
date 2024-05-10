@@ -8,8 +8,8 @@ import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector3;
-import org.example.engine.core.physics2d_new.Physics2DBody;
-import org.example.engine.core.physics2d_new.Physics2DWorld;
+import org.example.engine.core.physics2d.Physics2DBody;
+import org.example.engine.core.physics2d.Physics2DWorld;
 import org.lwjgl.opengl.GL11;
 
 // contact points polygon vs polygon:

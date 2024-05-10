@@ -1,7 +1,7 @@
 package org.example.engine.core.async;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.physics2d_new.Physics2DException;
+import org.example.engine.core.physics2d.Physics2DException;
 
 import java.util.*;
 
