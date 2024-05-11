@@ -17,12 +17,14 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public    MathVector2 velocity   = new MathVector2();
     public    float       omega      = 0;
     public    MathVector2 netForce   = new MathVector2();
+    public    float       netTorque  = 0;
 
     public CollectionsArray<Physics2DBody>       collidesWith = new CollectionsArray<>(false, 2);
     public CollectionsArray<Physics2DConstraint> constraints  = new CollectionsArray<>(false, 1);
     public CollectionsArray<Physics2DJoint>      joints       = new CollectionsArray<>(false, 1);
 
     public float   massInv;
+    public float   inertiaInv;
     public float   density;
     public float   friction;
     public float   restitution;
@@ -53,10 +55,14 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         netForce.add(fx, fy);
     }
 
-    public void setMotionState(float x, float y, float angleDeg, float velX, float velY, float velAngleDeg) {
+    public void applyTorque(final float tau) {
+        netTorque += tau;
+    }
+
+    public void setMotionState(float x, float y, float angleDeg, float vx, float vy, float omega) {
         this.shape.setTransform(x, y, angleDeg);
-        this.velocity.set(velX, velY);
-        this.omega = velAngleDeg;
+        this.velocity.set(vx, vy);
+        this.omega = omega;
     }
 
     public void turnOn() {
@@ -90,9 +96,11 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         this.velocity.set(0, 0);
         this.omega = 0;
         this.netForce.set(0,0);
+        this.netTorque = 0;
         this.constraints.clear();
         this.joints.clear();
         this.massInv = 0;
+        this.inertiaInv = 0;
         this.density = 0;
         this.friction = 0;
         this.restitution = 0;

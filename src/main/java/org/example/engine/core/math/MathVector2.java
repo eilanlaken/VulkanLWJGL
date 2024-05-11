@@ -227,6 +227,15 @@ public class MathVector2 {
         return this.x * y - this.y * x;
     }
 
+    // TODO: move to physics
+    public static MathVector2 crs(final MathVector2 a, float s) {
+        return new MathVector2(s * a.y, -s * a.x);
+    }
+
+    // TODO: move to physics
+    public static MathVector2 crs(float s, final MathVector2 a) {
+        return new MathVector2(-s * a.y, s * a.x);
+    }
 
     public float angleDeg() {
         float angle = (float)Math.atan2(y, x) * MathUtils.radiansToDegrees;

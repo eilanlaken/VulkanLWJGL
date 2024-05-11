@@ -4,7 +4,6 @@ import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.graphics.GraphicsCamera;
 import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector3;
@@ -14,13 +13,13 @@ import org.lwjgl.opengl.GL11;
 
 // contact points polygon vs polygon:
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
-public class ScenePhysics2D_5_PhaseE_4 extends ApplicationScreen {
+public class ScenePhysics2D_5_PhaseE_5 extends ApplicationScreen {
 
     private GraphicsRenderer2D renderer2D;
     private GraphicsCamera camera;
     private Physics2DWorld world = new Physics2DWorld();
 
-    public ScenePhysics2D_5_PhaseE_4() {
+    public ScenePhysics2D_5_PhaseE_5() {
         renderer2D = new GraphicsRenderer2D();
     }
 
@@ -50,11 +49,11 @@ public class ScenePhysics2D_5_PhaseE_4 extends ApplicationScreen {
         if (InputMouse.isButtonPressed(InputMouse.Button.RIGHT)) {
             screen.set(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
             camera.lens.unproject(screen);
-            world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
+            world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
                     screen.x,screen.y,0,
                     MathUtils.random(),MathUtils.random(),0,
                     1, 1, 1, false, 1,
-                    1, 1, MathUtils.random() * 0);
+                    1);
         }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);

@@ -29,6 +29,7 @@ public final class Physics2DBodyFactory {
         body.density = density;
         body.shape = new Shape2DCircle(radius);
         body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
         body.friction = friction;
         body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
         body.ghost = ghost;
@@ -36,7 +37,6 @@ public final class Physics2DBodyFactory {
         return body;
     }
 
-    // TODO
     @Contract(pure = true)
     @NotNull Physics2DBody createBodyRectangle(Object owner,
                                       Physics2DBody.MotionType motionType,
@@ -50,6 +50,7 @@ public final class Physics2DBodyFactory {
         body.density = density;
         body.shape = new Shape2DRectangle(width, height, angle);
         body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
         body.friction = friction;
         body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
         body.ghost = ghost;
@@ -87,6 +88,10 @@ public final class Physics2DBodyFactory {
         body.motionType = motionType;
 
         return body;
+    }
+
+    public static float calculateMomentOfInertia(final Shape2D shape, float density) {
+        return 1;
     }
 
 }

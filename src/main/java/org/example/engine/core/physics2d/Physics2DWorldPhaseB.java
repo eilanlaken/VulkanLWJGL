@@ -20,12 +20,14 @@ public final class Physics2DWorldPhaseB {
             if (body.off) continue;
             if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
                 body.velocity.add(body.massInv * world.deltaTime * body.netForce.x, body.massInv * world.deltaTime * body.netForce.y);
+                body.omega += body.netTorque * (body.inertiaInv) * world.deltaTime;
             }
             if (body.motionType != Physics2DBody.MotionType.STATIC) {
                 body.shape.dx_dy_rot(world.deltaTime * body.velocity.x, world.deltaTime * body.velocity.y, world.deltaTime * body.omega);
             }
             body.shape.update();
             body.netForce.set(0, 0);
+            body.netTorque = 0;
             body.collidesWith.clear();
 
             // prepare heuristics for the broad phase
