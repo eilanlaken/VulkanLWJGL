@@ -29,7 +29,8 @@ public interface Physics2DCollisionListener {
         final float pushBack = Math.max(depth - threshold, 0.0f);
         MathVector2 correction = new MathVector2(normal).scl(pushBack * percent).scl(1.0f / (aMassInv + bMassInv));
 
-        float dot = manifold.a_b.dot(manifold.normal);
+        MathVector2 a_b = new MathVector2(b.shape.x() - a.shape.x(), b.shape.y() - a.shape.y());
+        float dot = a_b.dot(manifold.normal);
         if (dot > 0) {
             a.shape.dx_dy(-aMassInv * correction.x, -aMassInv * correction.y);
             b.shape.dx_dy(bMassInv * correction.x, bMassInv * correction.y);

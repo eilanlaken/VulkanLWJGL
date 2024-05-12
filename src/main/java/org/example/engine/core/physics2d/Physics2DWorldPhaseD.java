@@ -298,7 +298,6 @@ public final class Physics2DWorldPhaseD {
             manifold.normal.set(1, 0);
         }
         manifold.contactPoint1.set(manifold.normal).scl(-c1.getWorldRadius()).add(c1.getWorldCenter());
-        manifold.a_b.set(b.x() - a.x(), b.y() - a.y());
         return manifold;
     }
 
@@ -880,7 +879,6 @@ public final class Physics2DWorldPhaseD {
 
         Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
         setContactPoints(rect_1.worldVertices(), rect_2.worldVertices(), manifold);
-        manifold.a_b.set(rect_2.x() - rect_1.x(), rect_2.y() - rect_1.y());
         manifold.normal.set(nx, ny);
         manifold.depth = minOverlap;
         return manifold;

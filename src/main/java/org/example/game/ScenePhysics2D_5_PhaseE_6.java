@@ -37,7 +37,7 @@ public class ScenePhysics2D_5_PhaseE_6 extends ApplicationScreen {
         MathVector3 screen = new MathVector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
         camera.lens.unproject(screen);
 
-        if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
+        if (InputMouse.isButtonPressed(InputMouse.Button.LEFT)) {
             screen.set(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
             camera.lens.unproject(screen);
             world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
@@ -47,7 +47,7 @@ public class ScenePhysics2D_5_PhaseE_6 extends ApplicationScreen {
                     1, 1, 0);
         }
 
-        if (InputMouse.isButtonClicked(InputMouse.Button.RIGHT)) {
+        if (InputMouse.isButtonPressed(InputMouse.Button.RIGHT)) {
             screen.set(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
             camera.lens.unproject(screen);
             world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
