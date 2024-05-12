@@ -12,9 +12,7 @@ public interface Physics2DCollisionListener {
 
     }
 
-    default void preSolve(Physics2DWorld.CollisionManifold manifold) {
-
-    }
+    default void preSolve(Physics2DWorld.CollisionManifold manifold) {}
 
     default void solve(Physics2DWorld.CollisionManifold manifold) {
         Physics2DBody a = manifold.a;
@@ -30,8 +28,6 @@ public interface Physics2DCollisionListener {
         final float pushBack = Math.max(depth - threshold, 0.0f);
         MathVector2 correction = new MathVector2(normal).scl(pushBack * percent).scl(1.0f / (aMassInv + bMassInv));
 
-        // TODO:
-        // smartly apply the correction so that shapes are pushed away from each other.
         float dot = manifold.a_b.dot(manifold.normal);
         if (dot > 0) {
             a.shape.dx_dy(-aMassInv * correction.x, -aMassInv * correction.y);
@@ -46,10 +42,8 @@ public interface Physics2DCollisionListener {
         float normalVelocity = vRel.dot(manifold.normal);
         if (normalVelocity <= 0) return;
 
-        // TODO: collision response
+        // TODO: collision response - friction, torque
         float e = Math.min(a.restitution, b.restitution);
-
-        // what if one of the masses are 0?
         float j = -(1 + e) * normalVelocity / (aMassInv + bMassInv);
         MathVector2 impulse = new MathVector2(normal).scl(j);
         MathVector2 deltaVelA = new MathVector2(impulse).scl(aMassInv);
@@ -58,8 +52,6 @@ public interface Physics2DCollisionListener {
         b.velocity.add(deltaVelB);
     }
 
-    default void postSolve() {
-
-    }
+    default void postSolve(Physics2DWorld.CollisionManifold manifold) {}
 
 }

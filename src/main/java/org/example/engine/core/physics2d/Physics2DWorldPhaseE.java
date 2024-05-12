@@ -20,7 +20,7 @@ public final class Physics2DWorldPhaseE {
             listener.beginContact(a, b);
             listener.preSolve(manifold);
             listener.solve(manifold);
-            listener.postSolve();
+            listener.postSolve(manifold);
             listener.endContact(a, b);
         }
     }
