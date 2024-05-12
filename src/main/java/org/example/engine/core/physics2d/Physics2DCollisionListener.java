@@ -14,6 +14,7 @@ public interface Physics2DCollisionListener {
 
     default void preSolve(Physics2DWorld.CollisionManifold manifold) {}
 
+    // TODO: when the world is mixed with circles and rectangles, the collision resolution breaks.
     default void solve(Physics2DWorld.CollisionManifold manifold) {
         Physics2DBody a = manifold.a;
         Physics2DBody b = manifold.b;

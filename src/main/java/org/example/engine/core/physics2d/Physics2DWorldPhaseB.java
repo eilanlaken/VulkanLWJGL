@@ -10,11 +10,12 @@ public final class Physics2DWorldPhaseB {
     }
 
     public void update() {
-        world.worldMinX =  Float.MAX_VALUE;
-        world.worldMaxX = -Float.MAX_VALUE;
-        world.worldMinY =  Float.MAX_VALUE;
-        world.worldMaxY = -Float.MAX_VALUE;
-        world.worldMaxR = -Float.MAX_VALUE;
+        // TODO: change to POSITIVE and NEGATIVE INFINITY
+        world.worldMinX = Float.POSITIVE_INFINITY;
+        world.worldMaxX = Float.NEGATIVE_INFINITY;
+        world.worldMinY = Float.POSITIVE_INFINITY;
+        world.worldMaxY = Float.NEGATIVE_INFINITY;
+        world.worldMaxR = Float.NEGATIVE_INFINITY;
 
         for (Physics2DBody body : world.allBodies) {
             if (body.off) continue;

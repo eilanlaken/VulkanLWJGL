@@ -23,10 +23,12 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public CollectionsArray<Physics2DConstraint> constraints  = new CollectionsArray<>(false, 1);
     public CollectionsArray<Physics2DJoint>      joints       = new CollectionsArray<>(false, 1);
 
+    // TODO: must set some default values.
     public float   massInv;
     public float   inertiaInv;
     public float   density;
-    public float   friction;
+    public float   staticFriction;
+    public float   dynamicFriction;
     public float   restitution;
     public boolean ghost;
     public int     bitmask;
@@ -102,7 +104,8 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         this.massInv = 0;
         this.inertiaInv = 0;
         this.density = 0;
-        this.friction = 0;
+        this.staticFriction = 0;
+        this.dynamicFriction = 0;
         this.restitution = 0;
         this.ghost = false;
         this.bitmask = 0;

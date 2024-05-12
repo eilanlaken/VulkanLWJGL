@@ -30,7 +30,7 @@ public final class Physics2DBodyFactory {
         body.shape = new Shape2DCircle(radius);
         body.massInv = 1.0f / (body.shape.getArea() * density);
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
-        body.friction = friction;
+        body.staticFriction = friction;
         body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
         body.ghost = ghost;
         body.bitmask = bitmask;
@@ -51,7 +51,7 @@ public final class Physics2DBodyFactory {
         body.shape = new Shape2DRectangle(width, height, angle);
         body.massInv = 1.0f / (body.shape.getArea() * density);
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
-        body.friction = friction;
+        body.staticFriction = friction;
         body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
         body.ghost = ghost;
         body.bitmask = bitmask;
