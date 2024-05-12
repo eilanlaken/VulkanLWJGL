@@ -16,7 +16,7 @@ public final class Physics2DWorldPhaseC {
 
     private final Physics2DWorld world;
 
-    protected Physics2DWorldPhaseC(Physics2DWorld world) {
+    Physics2DWorldPhaseC(Physics2DWorld world) {
         this.world = world;
     }
 

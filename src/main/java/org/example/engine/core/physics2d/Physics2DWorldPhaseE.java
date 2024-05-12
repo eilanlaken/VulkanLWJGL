@@ -4,7 +4,7 @@ public final class Physics2DWorldPhaseE {
 
     private final Physics2DWorld world;
 
-    protected Physics2DWorldPhaseE(Physics2DWorld world) {
+    Physics2DWorldPhaseE(Physics2DWorld world) {
         this.world = world;
     }
 

@@ -12,10 +12,9 @@ import java.util.Set;
 public final class Physics2DWorldPhaseD {
 
     private final MemoryPool<Projection> projectionsPool = new MemoryPool<>(Projection.class, 200);
+    private final Physics2DWorld         world;
 
-    private final Physics2DWorld world;
-
-    protected Physics2DWorldPhaseD(Physics2DWorld world) {
+    Physics2DWorldPhaseD(Physics2DWorld world) {
         this.world = world;
     }
 
