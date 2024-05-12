@@ -4,13 +4,12 @@ public final class Physics2DWorldPhaseA {
 
     private final Physics2DWorld world;
 
-    protected Physics2DWorldPhaseA(final Physics2DWorld world) {
+    Physics2DWorldPhaseA(final Physics2DWorld world) {
         this.world = world;
     }
 
     public synchronized void update() {
-        world.collisionCandidates.clear();
-        world.activeCells.clear();
+
         world.manifoldMemoryPool.freeAll(world.collisionManifolds);
         world.collisionManifolds.clear();
         for (Physics2DBody body : world.bodiesToRemove) {

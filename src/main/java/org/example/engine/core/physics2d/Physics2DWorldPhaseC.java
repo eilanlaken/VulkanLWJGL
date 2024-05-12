@@ -21,10 +21,13 @@ public final class Physics2DWorldPhaseC {
     }
 
     public void update() {
+        cellMemoryPool.freeAll(world.spacePartition);
+        world.collisionCandidates.clear();
+        world.activeCells.clear();
         taskMemoryPool.freeAll(tasks);
         tasks.clear();
-        cellMemoryPool.freeAll(world.spacePartition);
         world.spacePartition.clear();
+
         if (world.allBodies.isEmpty()) return;
         if (world.allBodies.size == 1) return;
 
