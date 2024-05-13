@@ -28,7 +28,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
 
     // constants
     private static final int VERTEX_SIZE        = 5;
-    private static final int BATCH_SIZE         = 4000;
+    private static final int BATCH_SIZE         = 8000;
     private static final int TRIANGLES_CAPACITY = BATCH_SIZE * 2;
 
     // defaults
@@ -259,12 +259,12 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    public void pushDebugShape(Shape2D shape, final GraphicsColor tint) {
+    @Deprecated public void pushDebugShape(Shape2D shape, final GraphicsColor tint) {
         final float tintFloatBits = tint == null ? TINT_SHAPE : tint.toFloatBits();
         pushDebugShape(shape, tintFloatBits);
     }
 
-    public void pushDebugShape(Shape2D shape, final float tintFloatBits) {
+    @Deprecated public void pushDebugShape(Shape2D shape, final float tintFloatBits) {
         if (shape instanceof Shape2DCircle) pushDebugCircle((Shape2DCircle) shape, tintFloatBits);
         if (shape instanceof Shape2DRectangle) pushDebugRectangle((Shape2DRectangle) shape, tintFloatBits);
         if (shape instanceof Shape2DAABB) pushDebugAABB((Shape2DAABB) shape, tintFloatBits);
@@ -275,7 +275,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
 
     private void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (triangleIndex + 34 > indicesBuffer.limit() || vertexIndex + 17 * 5 > BATCH_SIZE * 4) {
+        if (triangleIndex + 34 * 2 > indicesBuffer.limit() || vertexIndex + 17 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 
@@ -318,7 +318,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
 
     private void pushDebugRectangle(final Shape2DRectangle rectangle, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (triangleIndex + 10 > indicesBuffer.limit() || vertexIndex + 6 * 5 > BATCH_SIZE * 4) {
+        if (triangleIndex + 10 * 2> indicesBuffer.limit() || vertexIndex + 6 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 
@@ -366,7 +366,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
 
     private void pushDebugAABB(final Shape2DAABB aabb, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (triangleIndex + 10 > indicesBuffer.limit() || vertexIndex + 6 * 5 > BATCH_SIZE * 4) {
+        if (triangleIndex + 10 * 2 > indicesBuffer.limit() || vertexIndex + 6 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 
@@ -415,7 +415,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
 
     private void pushDebugSegment(final Shape2DSegment segment, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (triangleIndex + 2 > indicesBuffer.limit() || vertexIndex + 2 * 5 > BATCH_SIZE * 4) {
+        if (triangleIndex + 2 * 2 > indicesBuffer.limit() || vertexIndex + 2 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 
@@ -445,7 +445,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
 
     private void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
-        if (triangleIndex + polygon.indices.length * 2 + 2 > indicesBuffer.limit() || vertexIndex + polygon.vertexCount * 5 > BATCH_SIZE * 4) {
+        if (triangleIndex + polygon.indices.length * 2 * 2 + 2 > indicesBuffer.limit() || vertexIndex + polygon.vertexCount * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 

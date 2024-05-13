@@ -48,10 +48,11 @@ public class ScenePhysics2D_5_PhaseE_6 extends ApplicationScreen {
         }
 
         if (InputMouse.isButtonPressed(InputMouse.Button.RIGHT)) {
-            screen.set(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
+        //if (InputMouse.isButtonClicked(InputMouse.Button.RIGHT)) {
+                screen.set(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
             camera.lens.unproject(screen);
-            world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
-                    screen.x,screen.y,0,
+            for (int i = 0; i < 10; i++) world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
+                    screen.x + (float) Math.random() * 10, screen.y + (float) Math.random() * 10,0,
                     0,0,0,
                     1, 1, 1, false, 1,
                     1);
