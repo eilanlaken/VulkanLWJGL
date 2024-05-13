@@ -58,19 +58,27 @@ public final class Physics2DBodyFactory {
         return body;
     }
 
-    // TODO
     @Contract(pure = true)
     @NotNull Physics2DBody createBodyPolygon(Object owner,
-                                               boolean sleeping, Physics2DBody.MotionType motionType,
-                                               MathVector2 velocity, float angularVelocity,
-                                               float massInv, float density, float friction, float restitution,
-                                               boolean ghost, int bitmask,
-                                               float[] vertices, int[] holes) {
+                                             Physics2DBody.MotionType motionType,
+                                             float density, float friction, float restitution,
+                                             boolean ghost, int bitmask,
+                                             float[] vertices) {
         Physics2DBody body = bodyMemoryPool.allocate();
         body.owner = owner;
-        body.off = sleeping;
+        body.off = false;
         body.motionType = motionType;
+        body.density = density;
 
+        final boolean isConvex = ShapeUtils.isPolygonConvex(vertices);
+        //body.shape = new Shape2DRectangle(width, height, angle);
+
+        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
+        body.staticFriction = friction;
+        body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
+        body.ghost = ghost;
+        body.bitmask = bitmask;
         return body;
     }
 

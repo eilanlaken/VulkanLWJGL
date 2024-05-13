@@ -239,7 +239,7 @@ public final class ShapeUtils {
     }
 
     public static boolean isPolygonConvex(final float[] vertices) {
-        if (vertices.length <= 6) return true;
+        if (vertices.length == 6) return true;
         MathVector2 tmp1 = new MathVector2();
         MathVector2 tmp2 = new MathVector2();
 

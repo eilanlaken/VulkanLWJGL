@@ -100,6 +100,18 @@ public class Physics2DWorld {
         return body;
     }
 
+    public Physics2DBody createBodyPolygon(Object owner, Physics2DBody.MotionType motionType,
+                                           float x, float y, float angleDeg,
+                                           float velX, float velY, float velAngleDeg,
+                                           float density, float friction, float restitution,
+                                           boolean ghost, int bitmask,
+                                           float[] vertices) {
+        Physics2DBody body = bodyFactory.createBodyPolygon(owner, motionType, density, friction, restitution, ghost, bitmask, vertices);
+        body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
+        return body;
+    }
+
     public void destroyBody(final Physics2DBody body) {
         bodiesToRemove.add(body);
     }
