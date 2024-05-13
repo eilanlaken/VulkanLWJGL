@@ -279,10 +279,10 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
             flush();
         }
 
-        useShader(defaultShader);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
         useMode(GL11.GL_LINES);
+        useTexture(whitePixel);
+        useShader(defaultShader);
+        useCustomAttributes(null);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;

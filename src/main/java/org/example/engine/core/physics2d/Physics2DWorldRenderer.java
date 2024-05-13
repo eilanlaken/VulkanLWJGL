@@ -57,7 +57,6 @@ public final class Physics2DWorldRenderer {
         }
 
         // print sections
-        System.out.println(world.allBodies.size);
 
         // TODO: render constraints
 
