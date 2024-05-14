@@ -51,7 +51,7 @@ public class Shape2DAABB extends Shape2D {
 
     @Override
     public void updateWorldCoordinates() {
-        if (angle != 0.0f) throw new IllegalStateException("Cannot rotate an AABB: must remain aligned to axis. angle must remain 0. Current value: angle = " + angle);
+        if (!MathUtils.isZero(angle % 90.0f)) throw new IllegalStateException("Cannot rotate an AABB: must remain aligned to axis. angle must remain 0. Current value: angle = " + angle);
         if (MathUtils.floatsEqual(scaleX, 1.0f) && MathUtils.floatsEqual(scaleY, 1.0f)) {
             this.worldMin.set(localMin).add(x, y);
             this.worldMax.set(localMax).add(x, y);
