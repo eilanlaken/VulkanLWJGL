@@ -21,11 +21,11 @@ public final class Physics2DWorldPhaseD {
     public void update() {
         Set<Physics2DWorld.CollisionPair> collisionPairs = world.collisionCandidates;
         for (Physics2DWorld.CollisionPair collisionCandidate : collisionPairs) {
-            narrowPhaseCollision(world, collisionCandidate.a, collisionCandidate.b, world.collisionManifolds);
+            narrowPhaseCollision(collisionCandidate.a, collisionCandidate.b);
         }
     }
 
-    private void narrowPhaseCollision(Physics2DWorld world, Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+    private void narrowPhaseCollision(Physics2DBody a, Physics2DBody b) {
         Shape2D shape_a = a.shape;
         Shape2D shape_b = b.shape;
 
@@ -51,7 +51,7 @@ public final class Physics2DWorldPhaseD {
 
         manifold.a = a;
         manifold.b = b;
-        manifolds.add(manifold);
+        world.collisionManifolds.add(manifold);
     }
 
     /** Circle vs ____ **/
