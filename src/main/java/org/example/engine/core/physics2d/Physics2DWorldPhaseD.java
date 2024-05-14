@@ -508,7 +508,7 @@ public final class Physics2DWorldPhaseD {
         // p1 edges normals as axis
         for (int i = 0; i < p1.vertexCount; i++) {
             p1.getWorldEdge(i, tail, head);
-            axis.set(head).sub(tail).nor();
+            axis.set(head).sub(tail).nor().rotate90(1);
             // project p1 on the axis
             float min_p1_axis = Float.MAX_VALUE;
             float max_p1_axis = -Float.MAX_VALUE;
@@ -539,7 +539,7 @@ public final class Physics2DWorldPhaseD {
         // p1 edges normals as axis
         for (int i = 0; i < p2.vertexCount; i++) {
             p2.getWorldEdge(i, tail, head);
-            axis.set(head).sub(tail).nor();
+            axis.set(head).sub(tail).nor().rotate90(1);
             // project p1 on the axis
             float min_p1_axis = Float.MAX_VALUE;
             float max_p1_axis = -Float.MAX_VALUE;
@@ -569,7 +569,7 @@ public final class Physics2DWorldPhaseD {
 
         Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
         setContactPoints(p1_vertices, p2_vertices, manifold);
-        manifold.normal = new MathVector2(normal_x, normal_y);
+        manifold.normal.set(normal_x, normal_y);
         manifold.depth = depth;
         return manifold;
     }
