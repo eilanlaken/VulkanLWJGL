@@ -40,6 +40,7 @@ public final class Physics2DWorldPhaseD {
         else if (shape_a instanceof Shape2DRectangle) {
             if      (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle(shape_a, shape_b);
             else if (shape_b instanceof Shape2DCircle)    manifold = rectangleVsCircle   (shape_a, shape_b);
+            else if (shape_b instanceof Shape2DPolygon)   manifold = null; // TODO
         }
 
         else if (shape_a instanceof Shape2DPolygon) {
