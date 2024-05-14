@@ -26,27 +26,36 @@ public final class Physics2DWorldPhaseD {
     }
 
     private void narrowPhaseCollision(Physics2DBody a, Physics2DBody b) {
+        Physics2DWorld.CollisionManifold manifold = null;
         Shape2D shape_a = a.shape;
         Shape2D shape_b = b.shape;
-
-        Physics2DWorld.CollisionManifold manifold = null;
 
         if (shape_a instanceof Shape2DCircle) {
             if      (shape_b instanceof Shape2DCircle)    manifold = circleVsCircle   (shape_a, shape_b);
             else if (shape_b instanceof Shape2DRectangle) manifold = circleVsRectangle(shape_a, shape_b);
             else if (shape_b instanceof Shape2DPolygon)   manifold = circleVsPolygon  (shape_a, shape_b);
+            else if (shape_b instanceof Shape2DUnion)     manifold = circleVsUnion    (shape_a, shape_b); // TODO
         }
 
         else if (shape_a instanceof Shape2DRectangle) {
             if      (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle(shape_a, shape_b);
             else if (shape_b instanceof Shape2DCircle)    manifold = rectangleVsCircle   (shape_a, shape_b);
-            else if (shape_b instanceof Shape2DPolygon)   manifold = null; // TODO
+            else if (shape_b instanceof Shape2DPolygon)   manifold = rectangleVsPolygon  (shape_a, shape_b); // TODO
+            else if (shape_b instanceof Shape2DUnion)     manifold = rectangleVsUnion    (shape_a, shape_b); // TODO
         }
 
         else if (shape_a instanceof Shape2DPolygon) {
-            if      (shape_b instanceof Shape2DCircle)    manifold = polygonVsCircle(shape_a, shape_b);
-            else if (shape_b instanceof Shape2DRectangle) manifold = null; // TODO
-            else if (shape_b instanceof Shape2DPolygon)   manifold = polygonVsPolygon(shape_a, shape_b);
+            if      (shape_b instanceof Shape2DCircle)    manifold = polygonVsCircle   (shape_a, shape_b);
+            else if (shape_b instanceof Shape2DRectangle) manifold = polygonVsRectangle(shape_a, shape_b); // TODO
+            else if (shape_b instanceof Shape2DPolygon)   manifold = polygonVsPolygon  (shape_a, shape_b);
+            else if (shape_b instanceof Shape2DUnion)     manifold = polygonVsUnion    (shape_a, shape_b); // TODO
+        }
+
+        else if (shape_a instanceof Shape2DUnion) {
+            if      (shape_b instanceof Shape2DCircle)    manifold = unionVsCircle   (shape_a, shape_b); // TODO
+            else if (shape_b instanceof Shape2DRectangle) manifold = unionVsRectangle(shape_a, shape_b); // TODO
+            else if (shape_b instanceof Shape2DPolygon)   manifold = unionVsPolygon  (shape_a, shape_b); // TODO
+            else if (shape_b instanceof Shape2DUnion)     manifold = unionVsUnion    (shape_a, shape_b); // TODO
         }
 
         if (manifold == null) return;
@@ -83,9 +92,11 @@ public final class Physics2DWorldPhaseD {
         return manifold;
     }
 
-    private boolean circleVsUnion(Shape2DCircle circle, Shape2DUnion union, Physics2DWorld.CollisionManifold manifold) {
+    private Physics2DWorld.CollisionManifold circleVsUnion(Shape2D a, Shape2D b) {
+        Shape2DCircle circle = (Shape2DCircle) a;
+        Shape2DUnion  union  = (Shape2DUnion)  b;
 
-        return false;
+        return null;
     }
 
     private Physics2DWorld.CollisionManifold circleVsPolygon(Shape2D a, Shape2D b) {
@@ -226,30 +237,37 @@ public final class Physics2DWorldPhaseD {
 
     // TODO:
     /** Union vs ___ **/
-    private void unionVsCircle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+    private Physics2DWorld.CollisionManifold unionVsCircle(Shape2D a, Shape2D b) {
+        Shape2DUnion  union  = (Shape2DUnion)  a;
+        Shape2DCircle circle = (Shape2DCircle) b;
 
+        return null;
     }
 
-    private void unionVsUnion(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+    private Physics2DWorld.CollisionManifold unionVsPolygon(Shape2D a, Shape2D b) {
+        Shape2DUnion   union   = (Shape2DUnion)   a;
+        Shape2DPolygon polygon = (Shape2DPolygon) b;
 
+        return null;
     }
 
-    private void unionVsPolygon(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+    private Physics2DWorld.CollisionManifold unionVsRectangle(Shape2D a, Shape2D b) {
+        Shape2DUnion     union = (Shape2DUnion)     a;
+        Shape2DRectangle rect  = (Shape2DRectangle) b;
 
+        return null;
     }
 
-    private void unionVsRectangle(Physics2DBody a, Physics2DBody b, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+    private Physics2DWorld.CollisionManifold unionVsUnion(Shape2D a, Shape2D b) {
+        Shape2DUnion u1 = (Shape2DUnion) a;
+        Shape2DUnion u2 = (Shape2DUnion) b;
 
+        return null;
     }
 
     /** Polygon vs ____ **/
     private Physics2DWorld.CollisionManifold polygonVsCircle(Shape2D a, Shape2D b) {
         return circleVsPolygon(b, a);
-    }
-
-    private boolean polygonVsUnion(Shape2DPolygon polygon, Shape2DUnion union, Physics2DWorld.CollisionManifold manifold) {
-
-        return false;
     }
 
     private Physics2DWorld.CollisionManifold polygonVsPolygon(Shape2D a, Shape2D b) {
@@ -335,8 +353,15 @@ public final class Physics2DWorldPhaseD {
         return manifold;
     }
 
-    private void polygonVsRectangle(Shape2DPolygon polygon, Shape2DRectangle rect, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
-        rectangleVsPolygon(rect, polygon, manifolds);
+    private Physics2DWorld.CollisionManifold polygonVsRectangle(Shape2D a, Shape2D b) {
+        return rectangleVsPolygon(b, a);
+    }
+
+    private Physics2DWorld.CollisionManifold polygonVsUnion(Shape2D a, Shape2D b) {
+        Shape2DPolygon polygon = (Shape2DPolygon) a;
+        Shape2DUnion   union   = (Shape2DUnion)   b;
+
+        return null;
     }
 
     /** Rectangle vs ____ **/
@@ -344,12 +369,10 @@ public final class Physics2DWorldPhaseD {
         return circleVsRectangle(circle, rect);
     }
 
-    private boolean rectangleVsUnion(Shape2DRectangle rectangle, Shape2DUnion union, Physics2DWorld.CollisionManifold manifold) {
+    private Physics2DWorld.CollisionManifold rectangleVsPolygon(Shape2D a, Shape2D b) {
+        Shape2DRectangle rect    = (Shape2DRectangle) a;
+        Shape2DPolygon   polygon = (Shape2DPolygon)   b;
 
-        return false;
-    }
-
-    private void rectangleVsPolygon(Shape2DRectangle rect, Shape2DPolygon polygon, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
         // rect corners
         CollectionsArray<MathVector2> rect_v = rect.worldVertices();
         MathVector2 rect_c0 = rect_v.get(0);
@@ -376,7 +399,7 @@ public final class Physics2DWorldPhaseD {
                 if (projection > max_polygon_overlap) max_polygon_overlap = projection;
             }
             float axis_overlap = MathUtils.intervalsOverlap(min_polygon_overlap, max_polygon_overlap, 0, rect.unscaledWidth * rect.scaleX());
-            if (MathUtils.isZero(axis_overlap)) return; // no collision
+            if (MathUtils.isZero(axis_overlap)) return null; // no collision
 
             depth = axis_overlap;
             normal_x = axis.x;
@@ -394,7 +417,7 @@ public final class Physics2DWorldPhaseD {
                 if (projection > max_axis_overlap) max_axis_overlap = projection;
             }
             float axis_overlap = MathUtils.intervalsOverlap(min_axis_overlap, max_axis_overlap, 0, rect.unscaledHeight * rect.scaleY());
-            if (MathUtils.isZero(axis_overlap)) return; // no collision
+            if (MathUtils.isZero(axis_overlap)) return null; // no collision
 
             if (axis_overlap < depth) {
                 depth = axis_overlap;
@@ -428,7 +451,7 @@ public final class Physics2DWorldPhaseD {
                     if (prj_vertex > max_prj_vertex) max_prj_vertex = prj_vertex;
                 }
                 float axis_overlap = MathUtils.intervalsOverlap(min_prj_rect, max_prj_rect, min_prj_vertex, max_prj_vertex);
-                if (MathUtils.isZero(axis_overlap)) return;
+                if (MathUtils.isZero(axis_overlap)) return null;
 
                 if (axis_overlap < depth) {
                     depth = axis_overlap;
@@ -438,11 +461,11 @@ public final class Physics2DWorldPhaseD {
             }
         }
 
-        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
+        Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
         setContactPoints(rect_v, polygon_v, manifold);
-        manifold.normal = new MathVector2(normal_x, normal_y);
+        manifold.normal.set(normal_x, normal_y);
         manifold.depth = depth;
-        manifolds.add(manifold);
+        return manifold;
     }
 
     // https://www.jkh.me/files/tutorials/Separating%20Axis%20Theorem%20for%20Oriented%20Bounding%20Boxes.pdf
@@ -538,6 +561,13 @@ public final class Physics2DWorldPhaseD {
         manifold.normal.set(nx, ny);
         manifold.depth = minOverlap;
         return manifold;
+    }
+
+    private Physics2DWorld.CollisionManifold rectangleVsUnion(Shape2D a, Shape2D b) {
+        Shape2DRectangle rect  = (Shape2DRectangle) a;
+        Shape2DUnion     union = (Shape2DUnion)     b;
+
+        return null;
     }
 
     private void setContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB, Physics2DWorld.CollisionManifold manifold) {
