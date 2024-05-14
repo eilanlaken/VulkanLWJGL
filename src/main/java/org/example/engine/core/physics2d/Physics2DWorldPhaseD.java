@@ -41,6 +41,12 @@ public final class Physics2DWorldPhaseD {
             else if (shape_b instanceof Shape2DCircle) manifold = rectangleVsCircle(shape_a, shape_b, world);
         }
 
+        else if (shape_a instanceof Shape2DPolygon) {
+            if (shape_b instanceof Shape2DCircle) manifold = null; // TODO
+            else if (shape_b instanceof Shape2DRectangle) manifold = null; // TODO
+            else if (shape_b instanceof Shape2DPolygon) manifold = polygonVsPolygon(shape_a, shape_b, world);
+        }
+
         if (manifold == null) return;
 
         manifold.a = a;
@@ -484,7 +490,10 @@ public final class Physics2DWorldPhaseD {
         return false;
     }
 
-    private void polygonVsPolygon(Shape2DPolygon p1, Shape2DPolygon p2, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {
+    private Physics2DWorld.CollisionManifold polygonVsPolygon(Shape2D a, Shape2D b, Physics2DWorld world) {
+        Shape2DPolygon p1 = (Shape2DPolygon) a;
+        Shape2DPolygon p2 = (Shape2DPolygon) b;
+
         CollectionsArray<MathVector2> p1_vertices = p1.worldVertices();
         CollectionsArray<MathVector2> p2_vertices = p2.worldVertices();
 
@@ -517,7 +526,7 @@ public final class Physics2DWorldPhaseD {
             }
 
             float axis_overlap = MathUtils.intervalsOverlap(min_p1_axis, max_p1_axis, min_p2_axis, max_p2_axis);
-            if (MathUtils.isZero(axis_overlap)) return;
+            if (MathUtils.isZero(axis_overlap)) return null;
 
             if (axis_overlap < depth) {
                 depth = axis_overlap;
@@ -548,7 +557,7 @@ public final class Physics2DWorldPhaseD {
             }
 
             float axis_overlap = MathUtils.intervalsOverlap(min_p1_axis, max_p1_axis, min_p2_axis, max_p2_axis);
-            if (MathUtils.isZero(axis_overlap)) return;
+            if (MathUtils.isZero(axis_overlap)) return null;
 
             if (axis_overlap < depth) {
                 depth = axis_overlap;
@@ -557,11 +566,11 @@ public final class Physics2DWorldPhaseD {
             }
         }
 
-        Physics2DWorld.CollisionManifold manifold = new Physics2DWorld.CollisionManifold();
+        Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
         setContactPoints(p1_vertices, p2_vertices, manifold);
         manifold.normal = new MathVector2(normal_x, normal_y);
         manifold.depth = depth;
-        manifolds.add(manifold);
+        return manifold;
     }
 
     private void polygonVsRectangle(Shape2DPolygon polygon, Shape2DRectangle rect, CollectionsArray<Physics2DWorld.CollisionManifold> manifolds) {

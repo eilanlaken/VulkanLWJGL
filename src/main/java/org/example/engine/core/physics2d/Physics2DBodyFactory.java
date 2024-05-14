@@ -71,6 +71,11 @@ public final class Physics2DBodyFactory {
         body.density = density;
 
         final boolean isConvex = ShapeUtils.isPolygonConvex(vertices);
+        if (isConvex) {
+            body.shape = new Shape2DPolygon(vertices);
+        } else {
+            // TODO: create union of triangles.
+        }
         //body.shape = new Shape2DRectangle(width, height, angle);
 
         body.massInv = 1.0f / (body.shape.getArea() * density);
