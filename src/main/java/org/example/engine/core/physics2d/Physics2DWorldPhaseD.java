@@ -32,19 +32,20 @@ public final class Physics2DWorldPhaseD {
         Physics2DWorld.CollisionManifold manifold = null;
 
         if (shape_a instanceof Shape2DCircle) {
-            if (shape_b instanceof Shape2DCircle) manifold = circleVsCircle(shape_a, shape_b);
+            if      (shape_b instanceof Shape2DCircle)    manifold = circleVsCircle   (shape_a, shape_b);
             else if (shape_b instanceof Shape2DRectangle) manifold = circleVsRectangle(shape_a, shape_b);
+            else if (shape_b instanceof Shape2DPolygon)   manifold = circleVsPolygon  (shape_a, shape_b);
         }
 
         else if (shape_a instanceof Shape2DRectangle) {
-            if (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle(shape_a, shape_b);
-            else if (shape_b instanceof Shape2DCircle) manifold = rectangleVsCircle(shape_a, shape_b);
+            if      (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle(shape_a, shape_b);
+            else if (shape_b instanceof Shape2DCircle)    manifold = rectangleVsCircle   (shape_a, shape_b);
         }
 
         else if (shape_a instanceof Shape2DPolygon) {
-            if (shape_b instanceof Shape2DCircle) manifold = null; // TODO
+            if      (shape_b instanceof Shape2DCircle)    manifold = polygonVsCircle(shape_a, shape_b);
             else if (shape_b instanceof Shape2DRectangle) manifold = null; // TODO
-            else if (shape_b instanceof Shape2DPolygon) manifold = polygonVsPolygon(shape_a, shape_b);
+            else if (shape_b instanceof Shape2DPolygon)   manifold = polygonVsPolygon(shape_a, shape_b);
         }
 
         if (manifold == null) return;
@@ -86,7 +87,7 @@ public final class Physics2DWorldPhaseD {
         return false;
     }
 
-    private Physics2DWorld.CollisionManifold circleVsPolygon(Shape2D a, Shape2D b, Physics2DWorld world) {
+    private Physics2DWorld.CollisionManifold circleVsPolygon(Shape2D a, Shape2D b) {
         Shape2DCircle  circle  = (Shape2DCircle)  a;
         Shape2DPolygon polygon = (Shape2DPolygon) b;
 
@@ -241,8 +242,8 @@ public final class Physics2DWorldPhaseD {
     }
 
     /** Polygon vs ____ **/
-    private Physics2DWorld.CollisionManifold polygonVsCircle(Shape2D a, Shape2D b, Physics2DWorld world) {
-        return circleVsPolygon(b, a, world);
+    private Physics2DWorld.CollisionManifold polygonVsCircle(Shape2D a, Shape2D b) {
+        return circleVsPolygon(b, a);
     }
 
     private boolean polygonVsUnion(Shape2DPolygon polygon, Shape2DUnion union, Physics2DWorld.CollisionManifold manifold) {
