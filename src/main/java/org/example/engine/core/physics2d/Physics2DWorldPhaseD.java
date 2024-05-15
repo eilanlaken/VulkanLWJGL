@@ -141,6 +141,7 @@ public final class Physics2DWorldPhaseD {
         // build manifold
         Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
         MathVector2 projection = projections.get(closestProjectionIndex);
+        manifold.contacts = 1;
         manifold.contactPoint1.set(projection);
         final float minDstEdge = (float) Math.sqrt(minDistanceSquared);
         if (polygonContainsCenter) {
