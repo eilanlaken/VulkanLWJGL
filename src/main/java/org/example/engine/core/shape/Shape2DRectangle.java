@@ -60,6 +60,17 @@ public class Shape2DRectangle extends Shape2D {
     }
 
     @Override
+    protected MathVector2 calculateLocalGeometryCenter() {
+        MathVector2 center = new MathVector2();
+        center.add(c0Local);
+        center.add(c1Local);
+        center.add(c2Local);
+        center.add(c3Local);
+        center.scl(0.25f);
+        return center;
+    }
+
+    @Override
     protected boolean containsPoint(float x, float y) {
         MathVector2 tmp1 = new MathVector2();
         MathVector2 tmp2 = new MathVector2();

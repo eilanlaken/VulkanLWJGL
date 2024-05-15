@@ -62,6 +62,16 @@ public class Shape2DPolygon extends Shape2D {
     }
 
     @Override
+    protected MathVector2 calculateLocalGeometryCenter() {
+        MathVector2 center = new MathVector2();
+        for (int i = 0; i < vertices.length - 1; i += 2) {
+            center.add(vertices[i], vertices[i+1]);
+        }
+        center.scl(1.0f / vertexCount);
+        return center;
+    }
+
+    @Override
     protected float calculateUnscaledBoundingRadius() {
         return ShapeUtils.calculatePolygonBoundingRadius(this.vertices);
     }

@@ -6,10 +6,10 @@ import org.example.engine.core.math.MathVector2;
 
 public class Shape2DCircle extends Shape2D {
 
-    public final MathVector2 localCenter;
-    public final float localRadius;
-    private MathVector2 worldCenter;
-    private float worldRadius;
+    public  final MathVector2 localCenter;
+    public  final float       localRadius;
+    private final MathVector2 worldCenter;
+    private float             worldRadius;
 
     public Shape2DCircle(float r, float x, float y) {
         if (r < 0) throw new IllegalArgumentException("Radius must be positive. Got: " + r);
@@ -31,6 +31,11 @@ public class Shape2DCircle extends Shape2D {
         if (!MathUtils.isZero(angle)) worldCenter.rotateDeg(angle);
         worldCenter.add(x, y);
         worldRadius = scaleX * localRadius;
+    }
+
+    @Override
+    protected MathVector2 calculateLocalGeometryCenter() {
+        return localCenter;
     }
 
     @Override

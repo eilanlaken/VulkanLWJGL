@@ -88,6 +88,18 @@ public class Physics2DWorld {
         return body;
     }
 
+    public Physics2DBody createBodyCircle(Object owner, Physics2DBody.MotionType motionType,
+                                          float x, float y, float angleDeg,
+                                          float velX, float velY, float velAngleDeg,
+                                          float density, float friction, float restitution,
+                                          boolean ghost, int bitmask,
+                                          float r, float offsetX, float offsetY) {
+        Physics2DBody body = bodyFactory.createBodyCircle(owner, motionType, density, friction, restitution, ghost, bitmask, r, offsetX, offsetY);
+        body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
+        return body;
+    }
+
     public Physics2DBody createBodyRectangle(Object owner, Physics2DBody.MotionType motionType,
                                              float x, float y, float angleDeg,
                                              float velX, float velY, float velAngleDeg,

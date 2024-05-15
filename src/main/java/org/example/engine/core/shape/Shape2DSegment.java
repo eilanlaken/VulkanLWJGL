@@ -25,6 +25,14 @@ public class Shape2DSegment extends Shape2D {
     }
 
     @Override
+    protected MathVector2 calculateLocalGeometryCenter() {
+        MathVector2 center = new MathVector2();
+        center.add(localB).scl(0.5f);
+        center.add(localA);
+        return center;
+    }
+
+    @Override
     protected float calculateUnscaledBoundingRadius() {
         float centerX = (localA.x + localB.x) * 0.5f;
         float centerY = (localA.y + localB.y) * 0.5f;

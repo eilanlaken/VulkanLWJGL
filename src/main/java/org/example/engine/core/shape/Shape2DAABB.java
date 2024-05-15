@@ -37,6 +37,13 @@ public class Shape2DAABB extends Shape2D {
     }
 
     @Override
+    protected MathVector2 calculateLocalGeometryCenter() {
+        MathVector2 center = new MathVector2();
+        center.add(localMin).add(localMax).scl(0.5f);
+        return center;
+    }
+
+    @Override
     protected float calculateUnscaledBoundingRadius() {
         float centerX = (localMin.x + localMax.x) * 0.5f;
         float centerY = (localMin.y + localMax.y) * 0.5f;

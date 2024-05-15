@@ -72,4 +72,8 @@ public class Shape2DPointGrid extends Shape2D {
         head.set(worldVertices.getCyclic(next));
     }
 
+    @Override
+    protected MathVector2 calculateLocalGeometryCenter() {
+        return null;
+    }
 }

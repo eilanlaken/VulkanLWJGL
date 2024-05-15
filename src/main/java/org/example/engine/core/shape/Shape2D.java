@@ -12,20 +12,19 @@ public abstract class Shape2D {
     protected float scaleX = 1;
     protected float scaleY = 1;
 
-    private float     area                       = 0;
-    private float     boundingRadius             = 0;
-    private float     boundingRadiusSquared      = 0;
-    private float     minExtentX                 = 0;
-    private float     maxExtentX                 = 0;
-    private float     minExtentY                 = 0;
-    private float     maxExtentY                 = 0;
-    private float     unscaledArea               = 0;
-    private float     unscaledBoundingRadius     = 0;
-    private boolean   calcUnscaledArea           = false;
-    private boolean   calcUnscaledBoundingRadius = false;
-    protected boolean updated                    = false;
-    private boolean   areaUpdated                = false;
-    private boolean   boundingRadiusUpdated      = false;
+    private   float       area                       = 0;
+    private   float       boundingRadius             = 0;
+    private   float       boundingRadiusSquared      = 0;
+    private   float       unscaledArea               = 0;
+    private   float       unscaledBoundingRadius     = 0;
+    private   boolean     calcUnscaledArea           = false;
+    private   boolean     calcUnscaledBoundingRadius = false;
+    private   boolean     calcLocalGeometryCenter    = false;
+    protected boolean     updated                    = false;
+    private   boolean     areaUpdated                = false;
+    private   boolean     boundingRadiusUpdated      = false;
+    protected MathVector2 localGeometryCenter        = new MathVector2();
+    protected MathVector2 geometryCenter             = new MathVector2();
 
     public final boolean contains(final MathVector2 point) {
         return contains(point.x, point.y);
@@ -39,6 +38,15 @@ public abstract class Shape2D {
     public final CollectionsArray<MathVector2> worldVertices() {
         if (!updated) update();
         return getWorldVertices();
+    }
+
+    public final MathVector2 geometryCenter() {
+        if (!updated) update();
+        if (!calcLocalGeometryCenter) {
+            localGeometryCenter.set(calculateLocalGeometryCenter());
+            calcLocalGeometryCenter = true;
+        }
+        return geometryCenter.set(localGeometryCenter).rotateDeg(angle).add(x,y);
     }
 
     public final float getArea() {
@@ -219,5 +227,6 @@ public abstract class Shape2D {
     protected abstract CollectionsArray<MathVector2> getWorldVertices();
     protected abstract float                         calculateUnscaledBoundingRadius();
     protected abstract float                         calculateUnscaledArea();
+    protected abstract MathVector2                   calculateLocalGeometryCenter();
 
 }

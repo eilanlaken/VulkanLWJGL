@@ -18,6 +18,12 @@ public class Shape2DUnion extends Shape2D {
         this.shapes.pack();
     }
 
+    // TODO: implement
+    @Override
+    protected MathVector2 calculateLocalGeometryCenter() {
+        return null;
+    }
+
     @Override
     protected boolean containsPoint(float x, float y) {
         for (Shape2D shape : shapes)

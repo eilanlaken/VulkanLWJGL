@@ -38,6 +38,27 @@ public final class Physics2DBodyFactory {
     }
 
     @Contract(pure = true)
+    @NotNull Physics2DBody createBodyCircle(Object owner,
+                                            Physics2DBody.MotionType motionType,
+                                            float density, float friction, float restitution,
+                                            boolean ghost, int bitmask,
+                                            float radius, float offsetX, float offsetY) {
+        Physics2DBody body = bodyMemoryPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+        body.density = density;
+        body.shape = new Shape2DCircle(radius, offsetX, offsetY);
+        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
+        body.staticFriction = friction;
+        body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
+        body.ghost = ghost;
+        body.bitmask = bitmask;
+        return body;
+    }
+
+    @Contract(pure = true)
     @NotNull Physics2DBody createBodyRectangle(Object owner,
                                       Physics2DBody.MotionType motionType,
                                       float density, float friction, float restitution,

@@ -33,7 +33,7 @@ public final class Physics2DWorldPhaseD {
         Shape2D shape_b = b.shape;
 
         if (shape_a instanceof Shape2DCircle) {
-            if      (shape_b instanceof Shape2DCircle)    manifold = circleVsCircle   (shape_a, shape_b);
+            if      (shape_b instanceof Shape2DCircle)    manifold = circleVsCircle   (shape_a, shape_b); // TODO
             else if (shape_b instanceof Shape2DRectangle) manifold = circleVsRectangle(shape_a, shape_b);
             else if (shape_b instanceof Shape2DPolygon)   manifold = circleVsPolygon  (shape_a, shape_b);
             else if (shape_b instanceof Shape2DUnion)     manifold = circleVsUnion    (shape_a, shape_b); // TODO
@@ -72,8 +72,11 @@ public final class Physics2DWorldPhaseD {
         final Shape2DCircle c1 = (Shape2DCircle) a;
         final Shape2DCircle c2 = (Shape2DCircle) b;
 
-        final float dx = c2.x() - c1.x();
-        final float dy = c2.y() - c1.y();
+        MathVector2 c2Center = c2.geometryCenter();
+        MathVector2 c1Center = c1.geometryCenter();
+        final float dx = c2Center.x - c1Center.x;
+        final float dy = c2Center.y - c1Center.y;
+
         final float radiusSum = c1.getWorldRadius() + c2.getWorldRadius();
         final float distanceSquared = dx * dx + dy * dy;
 
