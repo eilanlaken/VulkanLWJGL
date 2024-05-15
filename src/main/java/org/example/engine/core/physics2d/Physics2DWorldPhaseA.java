@@ -9,9 +9,6 @@ public final class Physics2DWorldPhaseA {
     }
 
     public synchronized void update() {
-
-        world.manifoldMemoryPool.freeAll(world.collisionManifolds);
-        world.collisionManifolds.clear();
         for (Physics2DBody body : world.bodiesToRemove) {
             world.allBodies.removeValue(body, true);
             world.bodyMemoryPool.free(body);

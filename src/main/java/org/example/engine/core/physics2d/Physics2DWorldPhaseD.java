@@ -19,6 +19,8 @@ public final class Physics2DWorldPhaseD {
     }
 
     public void update() {
+        world.manifoldMemoryPool.freeAll(world.collisionManifolds);
+        world.collisionManifolds.clear();
         Set<Physics2DWorld.CollisionPair> collisionPairs = world.collisionCandidates;
         for (Physics2DWorld.CollisionPair collisionCandidate : collisionPairs) {
             narrowPhaseCollision(collisionCandidate.a, collisionCandidate.b);
