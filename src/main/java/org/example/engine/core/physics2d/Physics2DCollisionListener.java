@@ -22,7 +22,7 @@ public interface Physics2DCollisionListener {
         // separate bodies
         float aMassInv = a.motionType == Physics2DBody.MotionType.STATIC ? 0 : a.massInv;
         float bMassInv = b.motionType == Physics2DBody.MotionType.STATIC ? 0 : b.massInv;
-        final float percent = 0.5f;
+        final float percent = 0.65f;
         final float threshold = 0.001f;
         final float depth = manifold.depth;
         final MathVector2 normal = manifold.normal;
