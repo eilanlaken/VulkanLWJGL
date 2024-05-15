@@ -42,13 +42,13 @@ public final class Physics2DWorldPhaseD {
         else if (shape_a instanceof Shape2DRectangle) {
             if      (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle(shape_a, shape_b);
             else if (shape_b instanceof Shape2DCircle)    manifold = rectangleVsCircle   (shape_a, shape_b);
-            else if (shape_b instanceof Shape2DPolygon)   manifold = rectangleVsPolygon  (shape_a, shape_b); // TODO
+            else if (shape_b instanceof Shape2DPolygon)   manifold = rectangleVsPolygon  (shape_a, shape_b);
             else if (shape_b instanceof Shape2DUnion)     manifold = rectangleVsUnion    (shape_a, shape_b); // TODO
         }
 
         else if (shape_a instanceof Shape2DPolygon) {
             if      (shape_b instanceof Shape2DCircle)    manifold = polygonVsCircle   (shape_a, shape_b);
-            else if (shape_b instanceof Shape2DRectangle) manifold = polygonVsRectangle(shape_a, shape_b); // TODO
+            else if (shape_b instanceof Shape2DRectangle) manifold = polygonVsRectangle(shape_a, shape_b);
             else if (shape_b instanceof Shape2DPolygon)   manifold = polygonVsPolygon  (shape_a, shape_b);
             else if (shape_b instanceof Shape2DUnion)     manifold = polygonVsUnion    (shape_a, shape_b); // TODO
         }
@@ -394,8 +394,8 @@ public final class Physics2DWorldPhaseD {
         // rect axis1: c1-c2 axis
         {
             axis.set(rect_c2.x - rect_c1.x, rect_c2.y - rect_c1.y).nor();
-            float min_polygon_overlap = Float.MAX_VALUE;
-            float max_polygon_overlap = -Float.MAX_VALUE;
+            float min_polygon_overlap = Float.POSITIVE_INFINITY;
+            float max_polygon_overlap = Float.NEGATIVE_INFINITY;
             for (MathVector2 p_vertex : polygon_v) {
                 float projection = MathVector2.dot(axis.x, axis.y, p_vertex.x - rect_c1.x, p_vertex.y - rect_c1.y);
                 if (projection < min_polygon_overlap) min_polygon_overlap = projection;
@@ -412,8 +412,8 @@ public final class Physics2DWorldPhaseD {
         // rect axis2: c2-c3 axis
         {
             axis.set(rect_c3.x - rect_c2.x, rect_c3.y - rect_c2.y).nor();
-            float min_axis_overlap = Float.MAX_VALUE;
-            float max_axis_overlap = -Float.MAX_VALUE;
+            float min_axis_overlap = Float.POSITIVE_INFINITY;
+            float max_axis_overlap = Float.NEGATIVE_INFINITY;
             for (MathVector2 p_vertex : polygon_v) {
                 float projection = MathVector2.dot(axis.x, axis.y, p_vertex.x - rect_c2.x, p_vertex.y - rect_c2.y);
                 if (projection < min_axis_overlap) min_axis_overlap = projection;
@@ -446,8 +446,8 @@ public final class Physics2DWorldPhaseD {
                 float max_prj_rect = MathUtils.max(prj_rect_c0, prj_rect_c1, prj_rect_c2, prj_rect_c3);
 
                 // project polygon on the axis
-                float min_prj_vertex = Float.MAX_VALUE;
-                float max_prj_vertex = -Float.MAX_VALUE;
+                float min_prj_vertex = Float.POSITIVE_INFINITY;
+                float max_prj_vertex = Float.NEGATIVE_INFINITY;
                 for (MathVector2 vertex : polygon_v) {
                     float prj_vertex = MathVector2.dot(axis.x, axis.y, vertex.x - tail.x, vertex.y - tail.y);
                     if (prj_vertex < min_prj_vertex) min_prj_vertex = prj_vertex;
