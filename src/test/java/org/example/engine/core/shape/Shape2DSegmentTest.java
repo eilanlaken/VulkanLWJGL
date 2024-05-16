@@ -1,26 +1,31 @@
 package org.example.engine.core.shape;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class Shape2DSegmentTest {
 
-    @Test
-    void calculateOriginalBoundingRadius() {
+    private static Shape2D aabb;
+
+    @BeforeEach
+    private void setup() {
+        aabb = new Shape2DAABB(3,3);
     }
 
     @Test
-    void bakeCurrentTransformToLocalCoordinates() {
+    void geometryCenter() {
     }
 
     @Test
-    void calculateOriginalArea() {
+    void getBoundingRadius() {
+    }
+
+    @Test
+    void getArea() {
     }
 
     @Test
     void contains() {
     }
 
-    @Test
-    void updateWorldCoordinates() {
-    }
 }

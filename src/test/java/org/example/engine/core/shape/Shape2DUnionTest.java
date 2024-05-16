@@ -30,18 +30,14 @@ class Shape2DUnionTest {
     }
 
     @Test
-    void calculateOriginalBoundingRadius() {
+    void getBoundingRadius() {
     }
 
     @Test
-    void bakeCurrentTransformToLocalCoordinates() {
+    void getArea() {
     }
 
     @Test
-    void calculateOriginalArea() {
-    }
-
-    @Test
-    void updateWorldCoordinates() {
+    void geometryCenter() {
     }
 }

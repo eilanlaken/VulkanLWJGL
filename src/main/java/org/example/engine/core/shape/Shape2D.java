@@ -41,12 +41,11 @@ public abstract class Shape2D {
     }
 
     public final MathVector2 geometryCenter() {
-        if (!updated) update();
         if (!calcLocalGeometryCenter) {
             localGeometryCenter.set(calculateLocalGeometryCenter());
             calcLocalGeometryCenter = true;
         }
-        return geometryCenter.set(localGeometryCenter).rotateDeg(angle).add(x,y);
+        return geometryCenter.set(localGeometryCenter).scl(scaleX, scaleY).rotateDeg(angle).add(x,y);
     }
 
     public final float getArea() {

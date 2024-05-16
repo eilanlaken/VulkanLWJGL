@@ -22,9 +22,7 @@ class Shape2DTest {
             }
 
             @Override
-            protected void updateWorldCoordinates() {
-
-            }
+            protected void updateWorldCoordinates() {}
 
             @Override
             protected float calculateUnscaledBoundingRadius() {
@@ -35,6 +33,9 @@ class Shape2DTest {
             protected float calculateUnscaledArea() {
                 return 0;
             }
+
+            @Override
+            protected MathVector2 calculateLocalGeometryCenter() { return null; }
 
             @Override
             protected CollectionsArray<MathVector2> getWorldVertices() {

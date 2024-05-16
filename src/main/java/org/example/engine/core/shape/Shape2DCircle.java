@@ -25,12 +25,12 @@ public class Shape2DCircle extends Shape2D {
 
     @Override
     protected void updateWorldCoordinates() {
-        if (scaleX != scaleY) throw new IllegalStateException(this.getClass().getSimpleName() + " must have scaleX == scaleY to maintain circle proportions. scaleX: " + scaleX + " and scaleY: " + scaleX + ".");
+        if (!MathUtils.floatsEqual(scaleX, scaleY)) throw new IllegalStateException(this.getClass().getSimpleName() + " must have scaleX == scaleY to maintain circle proportions. scaleX: " + scaleX + " and scaleY: " + scaleX + ".");
         worldCenter.set(localCenter);
         if (!MathUtils.floatsEqual(scaleX, 1.0f)) worldCenter.scl(scaleX, scaleY);
         if (!MathUtils.isZero(angle)) worldCenter.rotateDeg(angle);
         worldCenter.add(x, y);
-        worldRadius = scaleX * localRadius;
+        worldRadius = Math.abs(scaleX) * localRadius;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class Shape2DCircle extends Shape2D {
 
     @Override
     protected boolean containsPoint(float x, float y) {
-        return (x - worldCenter.x) * (x - worldCenter.x) + (y - worldCenter.y) * (y - worldCenter.y) <= worldRadius * worldRadius;
+        return (x - worldCenter.x) * (x - worldCenter.x) + (y - worldCenter.y) * (y - worldCenter.y) <= worldRadius * worldRadius + MathUtils.FLOAT_ROUNDING_ERROR;
     }
 
     @Override
@@ -53,9 +53,17 @@ public class Shape2DCircle extends Shape2D {
         return MathUtils.PI * localRadius * localRadius;
     }
 
+    public MathVector2 getLocalCenter() {
+        return localCenter;
+    }
+
     public MathVector2 getWorldCenter() {
         if (!updated) update();
         return worldCenter;
+    }
+
+    public float getLocalRadius() {
+        return localRadius;
     }
 
     public float getWorldRadius() {

@@ -4,29 +4,32 @@ import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class Shape2DPolygonTest {
 
-    @BeforeAll
-    private static void setup() {
+    private static Shape2D aabb;
+
+    @BeforeEach
+    private void setup() {
+        aabb = new Shape2DAABB(3,3);
     }
 
     @Test
-    void calculateOriginalBoundingRadius() {
+    void getBoundingRadius() {
     }
 
-    @Test
-    void updateWorldCoordinates() {
-    }
-
-    @Test
-    void getWorldPoints() {
-    }
-
-    // TODO: implement
     @Test
     void contains() {
+    }
+
+    @Test
+    void area() {
+    }
+
+    @Test
+    void geometryCenter() {
     }
 
     @Test

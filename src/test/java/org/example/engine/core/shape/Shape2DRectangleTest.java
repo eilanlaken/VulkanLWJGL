@@ -25,7 +25,7 @@ class Shape2DRectangleTest {
     }
 
     @Test
-    void calculateOriginalBoundingRadius() {
+    void getBoundingRadius() {
     }
 
     @Test
@@ -81,16 +81,22 @@ class Shape2DRectangleTest {
     }
 
     @Test
-    void getUnscaledBoundingRadius() {
-    }
-
-    @Test
     void getUnscaledArea() {
         Assertions.assertEquals(8,  rectangle1.getUnscaledArea(), MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(25, rectangle2.getUnscaledArea(), MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(6,  rectangle3.getUnscaledArea(), MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(18, rectangle4.getUnscaledArea(), MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(4,  rectangle5.getUnscaledArea(), MathUtils.FLOAT_ROUNDING_ERROR);
+    }
+
+    @Test
+    void getArea() {
+
+    }
+
+    @Test
+    void geometryCenter() {
+
     }
 
 

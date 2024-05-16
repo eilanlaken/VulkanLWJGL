@@ -53,7 +53,7 @@ public class Shape2DAABB extends Shape2D {
 
     @Override
     protected float calculateUnscaledArea() {
-        return (localMax.x - localMin.x) * (localMax.y - localMax.y);
+        return (localMax.x - localMin.x) * (localMax.y - localMin.y);
     }
 
     @Override
