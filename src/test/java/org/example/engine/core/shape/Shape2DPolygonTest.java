@@ -9,15 +9,37 @@ import org.junit.jupiter.api.Test;
 
 class Shape2DPolygonTest {
 
-    private static Shape2D aabb;
+    private static Shape2DPolygon polygon_1;
+    private static Shape2DPolygon polygon_2;
+    private static Shape2DPolygon polygon_3;
+    private static Shape2DPolygon polygon_4;
+    private static Shape2DPolygon polygon_5;
+    private static Shape2DPolygon polygon_6;
+    private static Shape2DPolygon polygon_7;
+    private static Shape2DPolygon polygon_8;
+    private static Shape2DPolygon polygon_9;
+    private static Shape2DPolygon polygon_10;
 
     @BeforeEach
     private void setup() {
-        aabb = new Shape2DAABB(3,3);
+        // convex
+        polygon_1 = new Shape2DPolygon(new float[] {0,0,1,0,1,1,0,1});
+        polygon_2 = new Shape2DPolygon(new float[] {1,3,-2,3,-2,-1,1,-1});
+        polygon_3 = new Shape2DPolygon(new float[] {1,4,-2,3,-3,1});
+        polygon_4 = new Shape2DPolygon(new float[] {-1,-1,9,-1,1,1,-1,1});
+        polygon_5 = new Shape2DPolygon(new float[] {1,2,-1,1,-1,-1,1,0});
+
+        // concave
+//        polygon_6 = new Shape2DPolygon(new float[] {});
+//        polygon_7 = new Shape2DPolygon(new float[] {});
+//        polygon_8 = new Shape2DPolygon(new float[] {});
+//        polygon_9 = new Shape2DPolygon(new float[] {});
+//        polygon_10 = new Shape2DPolygon(new float[] {});
     }
 
     @Test
     void getBoundingRadius() {
+
     }
 
     @Test
@@ -26,14 +48,11 @@ class Shape2DPolygonTest {
 
     @Test
     void area() {
+        Assertions.assertEquals(1.0f, polygon_1.getArea(), MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test
     void geometryCenter() {
-    }
-
-    @Test
-    void calculateOriginalArea() {
     }
 
     @Test
@@ -92,11 +111,4 @@ class Shape2DPolygonTest {
         Assertions.assertEquals(0.0f, head5.y, MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
-    @Test
-    void testGetVertexX() {
-    }
-
-    @Test
-    void testGetVertexY() {
-    }
 }

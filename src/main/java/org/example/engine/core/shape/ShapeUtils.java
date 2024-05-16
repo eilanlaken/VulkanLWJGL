@@ -290,30 +290,6 @@ public final class ShapeUtils {
         return center.scl(1f / (vertices.length * 0.5f));
     }
 
-    // TODO: test - doesn't work in the case of polygon with holes.
-    @Deprecated public static float incorrect_calculatePolygonSignedArea(final float[] vertices) {
-        float area = 0;
-        final int n = vertices.length;
-        for (int i = 0; i < n - 1; i += 2) {
-            float x1 = vertices[i];
-            float y1 = vertices[i+1];
-            float x2 = vertices[(i + 2) % n];
-            float y2 = vertices[(i + 3) % n];
-            area += x1 * y2;
-            area -= x2 * y1;
-        }
-        return area * 0.5f;
-    }
-
-    public static float calculatePolygonBoundingRadius(final float[] vertices) {
-        float max = 0;
-        for (int i = 0; i < vertices.length - 1; i += 2) {
-            float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
-            if (l2 > max) max = l2;
-        }
-        return (float) Math.sqrt(max);
-    }
-
     // TODO: bonus implement.
     public CollectionsArray<Shape2D> fracture(Shape2D shape, MathVector2... controlPoints) {
 

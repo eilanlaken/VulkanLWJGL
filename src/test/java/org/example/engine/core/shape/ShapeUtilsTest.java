@@ -59,18 +59,7 @@ class ShapeUtilsTest {
     }
 
     @Test
-    void calculateCenterOfGeometry() {
-    }
-
-    @Test
-    void calculatePolygonSignedArea() {
-    }
-
-    @Test
     void triangulatePolygon() {
     }
 
-    @Test
-    void testTriangulatePolygon() {
-    }
 }

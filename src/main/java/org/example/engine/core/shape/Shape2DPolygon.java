@@ -11,16 +11,17 @@ import java.util.Arrays;
 
 public class Shape2DPolygon extends Shape2D {
 
-    public final int vertexCount;
-    public final float[] vertices;
-    public final int[] indices;
-    public final boolean isConvex;
-    private final CollectionsArray<MathVector2> worldVertices;
-    public final int[] holes;
-    public final boolean hasHoles;
-    private final CollectionsArray<CollectionsTuple2<Integer, Integer>> loops;
+    public  final int     vertexCount;
+    public  final float[] vertices;
+    public  final int[]   indices;
+    public  final boolean isConvex;
+    public  final int[]   holes;
+    public  final boolean hasHoles;
 
-    protected Shape2DPolygon(int[] indices, float[] vertices) {
+    private final CollectionsArray<CollectionsTuple2<Integer, Integer>> loops;
+    private final CollectionsArray<MathVector2>                         worldVertices;
+
+    Shape2DPolygon(int[] indices, float[] vertices) {
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
         this.vertexCount = vertices.length / 2;
@@ -73,13 +74,33 @@ public class Shape2DPolygon extends Shape2D {
 
     @Override
     protected float calculateUnscaledBoundingRadius() {
-        return ShapeUtils.calculatePolygonBoundingRadius(this.vertices);
+        float max = 0;
+        for (int i = 0; i < vertices.length - 1; i += 2) {
+            float l2 = vertices[i] * vertices[i] + vertices[i+1] * vertices[i+1];
+            if (l2 > max) max = l2;
+        }
+        return (float) Math.sqrt(max);
     }
 
     @Override
     protected float calculateUnscaledArea() {
-        // TODO: fix and write unit tests.
-        return Math.abs(ShapeUtils.incorrect_calculatePolygonSignedArea(this.vertices));
+        float sum = 0;
+        for (int i = 0; i < indices.length - 2; i += 3) {
+            int   v1 = indices[i];
+            float x1 = vertices[v1];
+            float y1 = vertices[v1 + 1];
+
+            int   v2 = indices[i + 1];
+            float x2 = vertices[v2];
+            float y2 = vertices[v2 + 1];
+
+            int   v3 = indices[i + 2];
+            float x3 = vertices[v3];
+            float y3 = vertices[v3 + 1];
+
+            sum += MathUtils.areaTriangle(x1, y1, x2, y2, x3, y3);
+        }
+        return sum;
     }
 
     @Override
