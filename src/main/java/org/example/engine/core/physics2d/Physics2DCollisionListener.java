@@ -22,7 +22,7 @@ public interface Physics2DCollisionListener {
         // separate bodies
         float aMassInv = a.motionType == Physics2DBody.MotionType.STATIC ? 0 : a.massInv;
         float bMassInv = b.motionType == Physics2DBody.MotionType.STATIC ? 0 : b.massInv;
-        final float percent = 0.65f;
+        final float percent = 0.9f;
         final float threshold = 0.001f;
         final float depth = manifold.depth;
         final MathVector2 normal = manifold.normal;
@@ -32,15 +32,7 @@ public interface Physics2DCollisionListener {
         MathVector2 aCenter = a.shape.geometryCenter();
         MathVector2 bCenter = b.shape.geometryCenter();
         MathVector2 a_b = new MathVector2(bCenter.x - aCenter.x, bCenter.y - aCenter.y);
-
         float dot = a_b.dot(manifold.normal);
-
-        System.out.println("dot: " + dot);
-        System.out.println("normal: " + manifold.normal);
-        System.out.println("depth: " + depth);
-        System.out.println("correction: " + correction);
-
-        //if (true) return;
 
         if (dot > 0) {
             a.shape.dx_dy(-aMassInv * correction.x, -aMassInv * correction.y);
