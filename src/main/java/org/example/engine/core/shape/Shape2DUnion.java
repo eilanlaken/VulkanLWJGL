@@ -18,10 +18,17 @@ public class Shape2DUnion extends Shape2D {
         this.shapes.pack();
     }
 
-    // TODO: implement
+    // TODO: test
     @Override
     protected MathVector2 calculateLocalGeometryCenter() {
-        return null;
+        MathVector2 center = new MathVector2();
+        float totalArea = 0;
+        for (Shape2D shape : shapes) {
+            center.add(shape.geometryCenter());
+            totalArea += shape.getArea();
+        }
+        center.scl(1.0f / totalArea);
+        return center;
     }
 
     @Override

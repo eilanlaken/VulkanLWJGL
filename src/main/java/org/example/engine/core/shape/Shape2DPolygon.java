@@ -65,10 +65,30 @@ public class Shape2DPolygon extends Shape2D {
     @Override
     protected MathVector2 calculateLocalGeometryCenter() {
         MathVector2 center = new MathVector2();
-        for (int i = 0; i < vertices.length - 1; i += 2) {
-            center.add(vertices[i], vertices[i+1]);
+        if (!hasHoles) {
+            for (int i = 0; i < vertices.length - 1; i += 2) {
+                center.add(vertices[i], vertices[i + 1]);
+            }
+            center.scl(1.0f / vertexCount);
+        } else {
+            for (int i = 0; i < indices.length - 2; i += 3) {
+                int   v1 = indices[i];
+                float x1 = vertices[v1];
+                float y1 = vertices[v1 + 1];
+
+                int   v2 = indices[i + 1];
+                float x2 = vertices[v2];
+                float y2 = vertices[v2 + 1];
+
+                int   v3 = indices[i + 2];
+                float x3 = vertices[v3];
+                float y3 = vertices[v3 + 1];
+
+                MathVector2 triangleCenter = new MathVector2((x1 + x2 + x3) / 3, (y1 + y2 + y3) / 3);
+                center.add(triangleCenter);
+            }
+            center.scl(1f / (indices.length - 2));
         }
-        center.scl(1.0f / vertexCount);
         return center;
     }
 

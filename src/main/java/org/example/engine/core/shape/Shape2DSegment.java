@@ -8,7 +8,6 @@ public class Shape2DSegment extends Shape2D {
 
     private final MathVector2 localA;
     private final MathVector2 localB;
-
     private final MathVector2 worldA;
     private final MathVector2 worldB;
 
@@ -21,7 +20,6 @@ public class Shape2DSegment extends Shape2D {
         this.worldB = new MathVector2(localB);
         this.worldVertices = new CollectionsArray<>(true, 2);
         this.worldVertices.addAll(worldA, worldB);
-
     }
 
     @Override
@@ -34,9 +32,9 @@ public class Shape2DSegment extends Shape2D {
 
     @Override
     protected float calculateUnscaledBoundingRadius() {
-        float centerX = (localA.x + localB.x) * 0.5f;
-        float centerY = (localA.y + localB.y) * 0.5f;
-        float halfDiagonal = MathVector2.dst(localA, localB) * 0.5f;
+        float  centerX = (localA.x + localB.x) * 0.5f;
+        float  centerY = (localA.y + localB.y) * 0.5f;
+        float  halfDiagonal = MathVector2.dst(localA, localB) * 0.5f;
         return MathVector2.len(centerX, centerY) + halfDiagonal;
     }
 
