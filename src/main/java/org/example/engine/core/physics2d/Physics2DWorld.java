@@ -88,7 +88,7 @@ public class Physics2DWorld {
                                           float density, float friction, float restitution,
                                           boolean ghost, int bitmask,
                                           float r) {
-        Physics2DBody body = bodyFactory.createBodyCircle(owner, motionType, density, friction, restitution, ghost, bitmask, r);
+        Physics2DBody body = bodyFactory.createBodyCircle(owner, motionType, density, friction, restitution, ghost, bitmask, Math.abs(r));
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
         bodiesToAdd.add(body);
         return body;
@@ -100,7 +100,7 @@ public class Physics2DWorld {
                                           float density, float friction, float restitution,
                                           boolean ghost, int bitmask,
                                           float r, float offsetX, float offsetY) {
-        Physics2DBody body = bodyFactory.createBodyCircle(owner, motionType, density, friction, restitution, ghost, bitmask, r, offsetX, offsetY);
+        Physics2DBody body = bodyFactory.createBodyCircle(owner, motionType, density, friction, restitution, ghost, bitmask, Math.abs(r), offsetX, offsetY);
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
         bodiesToAdd.add(body);
         return body;
@@ -112,7 +112,7 @@ public class Physics2DWorld {
                                              float density, float friction, float restitution,
                                              boolean ghost, int bitmask,
                                              float width, float height, float angle) {
-        Physics2DBody body = bodyFactory.createBodyRectangle(owner, motionType, density, friction, restitution, ghost, bitmask, width, height, angle);
+        Physics2DBody body = bodyFactory.createBodyRectangle(owner, motionType, density, friction, restitution, ghost, bitmask, Math.abs(width), Math.abs(height), angle);
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
         bodiesToAdd.add(body);
         return body;
@@ -124,7 +124,7 @@ public class Physics2DWorld {
                                              float density, float friction, float restitution,
                                              boolean ghost, int bitmask,
                                              float width, float height, float offsetX, float offsetY, float angle) {
-        Physics2DBody body = bodyFactory.createBodyRectangle(owner, motionType, density, friction, restitution, ghost, bitmask, width, height, offsetX, offsetY, angle);
+        Physics2DBody body = bodyFactory.createBodyRectangle(owner, motionType, density, friction, restitution, ghost, bitmask, Math.abs(width), Math.abs(height), offsetX, offsetY, angle);
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
         bodiesToAdd.add(body);
         return body;
