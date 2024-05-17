@@ -27,13 +27,21 @@ public interface Physics2DCollisionListener {
         final float depth = manifold.depth;
         final MathVector2 normal = manifold.normal;
         final float pushBack = Math.max(depth - threshold, 0.0f);
-        MathVector2 correction = new MathVector2(normal).scl(pushBack * percent).scl(1.0f / (aMassInv + bMassInv));
+        MathVector2 correction = new MathVector2(normal).scl(pushBack * percent);
 
         MathVector2 aCenter = a.shape.geometryCenter();
         MathVector2 bCenter = b.shape.geometryCenter();
         MathVector2 a_b = new MathVector2(bCenter.x - aCenter.x, bCenter.y - aCenter.y);
 
         float dot = a_b.dot(manifold.normal);
+
+        System.out.println("dot: " + dot);
+        System.out.println("normal: " + manifold.normal);
+        System.out.println("depth: " + depth);
+        System.out.println("correction: " + correction);
+
+        //if (true) return;
+
         if (dot > 0) {
             a.shape.dx_dy(-aMassInv * correction.x, -aMassInv * correction.y);
             b.shape.dx_dy(bMassInv * correction.x, bMassInv * correction.y);
