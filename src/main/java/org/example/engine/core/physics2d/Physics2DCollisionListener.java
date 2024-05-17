@@ -32,6 +32,7 @@ public interface Physics2DCollisionListener {
         MathVector2 aCenter = a.shape.geometryCenter();
         MathVector2 bCenter = b.shape.geometryCenter();
         MathVector2 a_b = new MathVector2(bCenter.x - aCenter.x, bCenter.y - aCenter.y);
+
         float dot = a_b.dot(manifold.normal);
         if (dot > 0) {
             a.shape.dx_dy(-aMassInv * correction.x, -aMassInv * correction.y);

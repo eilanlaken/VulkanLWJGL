@@ -73,7 +73,7 @@ public class Physics2DWorld {
         phaseB.update();
         phaseC.update();
         phaseD.update();
-        phaseE.update();
+        //phaseE.update();
     }
 
     public Physics2DBody createBodyCircle(Object owner, Physics2DBody.MotionType motionType,
@@ -107,6 +107,18 @@ public class Physics2DWorld {
                                              boolean ghost, int bitmask,
                                              float width, float height, float angle) {
         Physics2DBody body = bodyFactory.createBodyRectangle(owner, motionType, density, friction, restitution, ghost, bitmask, width, height, angle);
+        body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
+        return body;
+    }
+
+    public Physics2DBody createBodyRectangle(Object owner, Physics2DBody.MotionType motionType,
+                                             float x, float y, float angleDeg,
+                                             float velX, float velY, float velAngleDeg,
+                                             float density, float friction, float restitution,
+                                             boolean ghost, int bitmask,
+                                             float width, float height, float offsetX, float offsetY, float angle) {
+        Physics2DBody body = bodyFactory.createBodyRectangle(owner, motionType, density, friction, restitution, ghost, bitmask, width, height, offsetX, offsetY, angle);
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
         bodiesToAdd.add(body);
         return body;
