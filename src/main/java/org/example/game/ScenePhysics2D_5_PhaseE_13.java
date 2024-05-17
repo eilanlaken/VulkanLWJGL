@@ -18,12 +18,8 @@ public class ScenePhysics2D_5_PhaseE_13 extends ApplicationScreen {
     private GraphicsCamera camera;
     private Physics2DWorld world = new Physics2DWorld();
 
-    private Physics2DBody body1;
-    private Physics2DBody body2;
-
     public ScenePhysics2D_5_PhaseE_13() {
         renderer2D = new GraphicsRenderer2D();
-        world.renderBroadPhase = true;
     }
 
     @Override
@@ -31,17 +27,6 @@ public class ScenePhysics2D_5_PhaseE_13 extends ApplicationScreen {
         camera = new GraphicsCamera(640f/32,480f/32, 1);
         camera.update();
 
-        body1 = world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
-                0,0,30,
-                0f,0f,0,
-                1, 1, 1, false, 1,
-                1, -3, 0);
-
-        body2 = world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
-                0, 0,0,
-                0f,0f,0,
-                1, 1, 1, false, 1,
-                1, -3f, 1, 1,30);
 
     }
 
@@ -51,14 +36,22 @@ public class ScenePhysics2D_5_PhaseE_13 extends ApplicationScreen {
         world.update(GraphicsUtils.getDeltaTime());
         MathVector3 screen = new MathVector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
         camera.lens.unproject(screen);
-        body2.shape.xy(screen.x, screen.y);
+        //body2.shape.xy(screen.x, screen.y);
 
-        if (InputMouse.isButtonPressed(InputMouse.Button.LEFT)) {
-            body1.shape.rot(1);
+        if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
+            world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
+                    -3,0,30,
+                    2f,0f,0,
+                    1, 1, 1, false, 1,
+                    1, 0, 0);
         }
 
-        if (InputMouse.isButtonPressed(InputMouse.Button.RIGHT)) {
-            body2.shape.rot(-1);
+        if (InputMouse.isButtonClicked(InputMouse.Button.RIGHT)) {
+            world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
+                    3,0,30,
+                    0f,0f,0,
+                    10, 1, 1, false, 1,
+                    3, 0, 0);
         }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);

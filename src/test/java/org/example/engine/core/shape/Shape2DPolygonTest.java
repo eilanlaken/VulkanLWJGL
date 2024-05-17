@@ -53,6 +53,7 @@ class Shape2DPolygonTest {
 
     @Test
     void geometryCenter() {
+        Assertions.assertTrue(polygon_1.geometryCenter().epsilonEquals(new MathVector2(0.5f,0.5f), MathUtils.FLOAT_ROUNDING_ERROR));
     }
 
     @Test

@@ -72,8 +72,14 @@ public class Physics2DWorld {
         phaseA.update();
         phaseB.update();
         phaseC.update();
-        phaseD.update();
-        for (int i = 0; i < 6; i++) phaseE.update();
+        //phaseD.update();
+        //phaseE.update();
+
+        // accuracy alternative:
+        for (int i = 0; i < 2; i++) {
+            phaseD.update();
+            phaseE.update();
+        }
     }
 
     public Physics2DBody createBodyCircle(Object owner, Physics2DBody.MotionType motionType,

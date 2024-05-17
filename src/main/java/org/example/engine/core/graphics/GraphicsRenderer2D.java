@@ -279,9 +279,9 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
             flush();
         }
 
+        useShader(defaultShader);
         useMode(GL11.GL_LINES);
         useTexture(whitePixel);
-        useShader(defaultShader);
         useCustomAttributes(null);
 
         // put indices
