@@ -34,20 +34,6 @@ public final class Physics2DWorldRenderer {
         float scaleX = renderer.getCurrentCamera().lens.getViewportWidth() * pointPixelRadius / GraphicsUtils.getWindowWidth();
         float scaleY = renderer.getCurrentCamera().lens.getViewportHeight() * pointPixelRadius / GraphicsUtils.getWindowHeight();
 
-        // render broad phase
-        if (world.renderBroadPhase) {
-            float cellWidth = world.cellWidth;
-            float cellHeight = world.cellHeight;
-
-//            for (Physics2DWorldPhaseC.Cell cell : world.spacePartition) {
-//                renderer.pushPolygon(polyRect, TINT_CELL_OFF, cell.x, cell.y, 0, 0, 0, cellWidth, cellHeight, null, null);
-//            }
-//
-//            for (Physics2DWorldPhaseC.Cell cell : world.activeCells) {
-//                renderer.pushPolygon(polyRect, TINT_CELL_ON, cell.x, cell.y, 0, 0, 0, cellWidth, cellHeight, null, null);
-//            }
-        }
-
         // render bodies
         if (world.renderBodies) {
             CollectionsArray<Physics2DBody> bodies = world.allBodies;
@@ -62,32 +48,9 @@ public final class Physics2DWorldRenderer {
 
         // print sections
 
-        // TODO: render constraints
+        // TODO: render velocities
 
         // TODO: render joints
-
-        // render manifolds
-        if (world.renderManifolds) {
-            CollectionsArray<Physics2DWorld.CollisionManifold> manifolds = world.collisionManifolds;
-            for (Physics2DWorld.CollisionManifold manifold : manifolds) {
-                if (manifold.contacts == 0) continue;
-
-                MathVector2 penetration = new MathVector2(manifold.normal).scl(manifold.depth);
-
-                // render first contact point.
-                renderer.pushPolygon(polyCircle, new GraphicsColor(1,0,0,1), manifold.contactPoint1.x, manifold.contactPoint1.y, 0,0,0,scaleX,scaleY,null,null);
-                segment.localA(manifold.contactPoint1.x, manifold.contactPoint1.y);
-                segment.localB(manifold.contactPoint1.x + penetration.x, manifold.contactPoint1.y + penetration.y);
-                renderer.pushDebugShape(segment, new GraphicsColor(1,0,1,1));
-
-                // render second contact point
-                if (manifold.contacts == 1) continue;
-                renderer.pushPolygon(polyCircle, new GraphicsColor(1,0,0,1), manifold.contactPoint2.x, manifold.contactPoint2.y, 0,0,0,scaleX,scaleY,null,null);
-                segment.localA(manifold.contactPoint2.x, manifold.contactPoint2.y);
-                segment.localB(manifold.contactPoint2.x + penetration.x, manifold.contactPoint2.y + penetration.y);
-                renderer.pushDebugShape(segment, new GraphicsColor(1,0,1,1));
-            }
-        }
     }
 
 }

@@ -4,20 +4,52 @@ import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
-import org.example.engine.core.physics2d.Physics2DWorld;
-import org.example.engine.core.physics2d.Physics2DWorldPhaseD;
-import org.example.engine.core.shape.Shape2D;
-import org.example.engine.core.shape.Shape2DCircle;
-import org.example.engine.core.shape.Shape2DRectangle;
+import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.NotNull;
 
-public class Physics2DWorldCollision {
+public class Physics2DCollisionDetection {
 
     private final MemoryPool<Projection> projectionsPool = new MemoryPool<>(Projection.class, 200);
     private final Physics2DWorld         world;
 
-    Physics2DWorldCollision(Physics2DWorld world) {
+    Physics2DCollisionDetection(Physics2DWorld world) {
         this.world = world;
+    }
+
+    Physics2DWorld.CollisionManifold detectCollision(Physics2DBody body_a, Physics2DBody body_b) {
+        Physics2DWorld.CollisionManifold manifold = null;
+        Shape2D shape_a = body_a.shape;
+        Shape2D shape_b = body_b.shape;
+
+        if (shape_a instanceof Shape2DCircle) {
+            if      (shape_b instanceof Shape2DCircle)    manifold = circleVsCircle   (shape_a, shape_b); // TODO
+            else if (shape_b instanceof Shape2DRectangle) manifold = circleVsRectangle(shape_a, shape_b);
+            //else if (shape_b instanceof Shape2DPolygon)   manifold = circleVsPolygon  (shape_a, shape_b);
+            //else if (shape_b instanceof Shape2DUnion)     manifold = circleVsUnion    (shape_a, shape_b); // TODO
+        }
+
+        else if (shape_a instanceof Shape2DRectangle) {
+            if      (shape_b instanceof Shape2DRectangle) manifold = rectangleVsRectangle(shape_a, shape_b);
+            else if (shape_b instanceof Shape2DCircle)    manifold = rectangleVsCircle   (shape_a, shape_b);
+            //else if (shape_b instanceof Shape2DPolygon)   manifold = rectangleVsPolygon  (shape_a, shape_b);
+            //else if (shape_b instanceof Shape2DUnion)     manifold = rectangleVsUnion    (shape_a, shape_b); // TODO
+        }
+
+//        else if (shape_a instanceof Shape2DPolygon) {
+//            if      (shape_b instanceof Shape2DCircle)    manifold = polygonVsCircle   (shape_a, shape_b);
+//            else if (shape_b instanceof Shape2DRectangle) manifold = polygonVsRectangle(shape_a, shape_b);
+//            else if (shape_b instanceof Shape2DPolygon)   manifold = polygonVsPolygon  (shape_a, shape_b);
+//            else if (shape_b instanceof Shape2DUnion)     manifold = polygonVsUnion    (shape_a, shape_b); // TODO
+//        }
+
+//        else if (shape_a instanceof Shape2DUnion) {
+//            if      (shape_b instanceof Shape2DCircle)    manifold = unionVsCircle   (shape_a, shape_b); // TODO
+//            else if (shape_b instanceof Shape2DRectangle) manifold = unionVsRectangle(shape_a, shape_b); // TODO
+//            else if (shape_b instanceof Shape2DPolygon)   manifold = unionVsPolygon  (shape_a, shape_b); // TODO
+//            else if (shape_b instanceof Shape2DUnion)     manifold = unionVsUnion    (shape_a, shape_b); // TODO
+//        }
+
+        return manifold;
     }
 
     private Physics2DWorld.CollisionManifold circleVsCircle(Shape2D a, Shape2D b) {
@@ -46,10 +78,11 @@ public class Physics2DWorldCollision {
             manifold.normal.set(1, 0);
         }
         manifold.contactPoint1.set(manifold.normal).scl(-c1.getWorldRadius()).add(c1.getWorldCenter());
+        manifold.shape_a = a;
+        manifold.shape_b = b;
         return manifold;
     }
 
-    // TODO: fix
     private Physics2DWorld.CollisionManifold circleVsRectangle(Shape2D a, Shape2D b) {
         Shape2DCircle    circle = (Shape2DCircle)    a;
         Shape2DRectangle rect   = (Shape2DRectangle) b;
@@ -120,6 +153,8 @@ public class Physics2DWorldCollision {
         Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
         manifold.contacts = 1;
         manifold.contactPoint1.set(projection);
+        manifold.shape_a = a;
+        manifold.shape_b = b;
         final float minDstEdge = (float) Math.sqrt(minDstEdgeSquared);
         if (rectContainsCenter) {
             manifold.normal.set(projection).sub(circleWorldCenter).nor();
@@ -130,6 +165,10 @@ public class Physics2DWorldCollision {
         }
 
         return manifold;
+    }
+
+    private Physics2DWorld.CollisionManifold rectangleVsCircle(Shape2D rect, Shape2D circle) {
+        return circleVsRectangle(circle, rect);
     }
 
     // https://www.jkh.me/files/tutorials/Separating%20Axis%20Theorem%20for%20Oriented%20Bounding%20Boxes.pdf
@@ -224,6 +263,8 @@ public class Physics2DWorldCollision {
         setContactPoints(rect_1.worldVertices(), rect_2.worldVertices(), manifold);
         manifold.normal.set(nx, ny);
         manifold.depth = minOverlap;
+        manifold.shape_a = a;
+        manifold.shape_b = b;
         return manifold;
     }
 
@@ -286,7 +327,7 @@ public class Physics2DWorldCollision {
         return p;
     }
 
-    public static final class Projection implements Comparable<Physics2DWorldPhaseD.Projection>, MemoryPool.Reset {
+    public static final class Projection implements Comparable<Projection>, MemoryPool.Reset {
 
         public float px;
         public float py;
@@ -295,7 +336,7 @@ public class Physics2DWorldCollision {
         public Projection() {}
 
         @Override
-        public int compareTo(@NotNull Physics2DWorldPhaseD.Projection other) {
+        public int compareTo(@NotNull Projection other) {
             return Float.compare(this.dst, other.dst);
         }
 
