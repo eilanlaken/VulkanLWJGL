@@ -163,7 +163,6 @@ public class Physics2DWorld {
         public int           contacts        = 0;
         public float         depth           = 0;
         public MathVector2   normal          = new MathVector2();
-        public MathVector2   a_b             = new MathVector2();
         public MathVector2   contactPoint1   = new MathVector2();
         public MathVector2   contactPoint2   = new MathVector2();
         public float         staticFriction  = 0;
