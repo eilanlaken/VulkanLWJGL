@@ -62,7 +62,7 @@ public class ScenePhysics2D_5_PhaseE_14 extends ApplicationScreen {
             world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
                     1,-2,30,
                     0f,0f,0,
-                    1, 1, 1, false, 1,
+                    10, 1, 1, false, 1,
                     1.5f, 0, 0);
         }
 

@@ -20,6 +20,7 @@ public final class Physics2DWorldPhaseA {
             body.index = world.bodiesCreated;
             world.bodiesCreated++;
         }
+
         world.bodiesToRemove.clear();
         world.bodiesToAdd.clear();
     }
