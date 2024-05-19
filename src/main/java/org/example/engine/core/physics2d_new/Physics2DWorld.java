@@ -176,6 +176,7 @@ public class Physics2DWorld {
                     if (!boundingCirclesCollide) continue;
 
                     CollisionManifold manifold = collisionDetection.detectCollision(a, b);
+                    if (manifold == null) continue;
 
                     a.collidesWith.add(b);
                     b.collidesWith.add(a);
@@ -285,7 +286,7 @@ public class Physics2DWorld {
     }
 
     @Contract(pure = true)
-    @NotNull Physics2DBody createBodyCircle(Object owner,
+    @NotNull public Physics2DBody createBodyCircle(Object owner,
                                             Physics2DBody.MotionType motionType,
                                             float x, float y, float angle,
                                             float velX, float velY, float velAngleDeg,
@@ -305,11 +306,12 @@ public class Physics2DWorld {
         body.ghost = ghost;
         body.bitmask = bitmask;
         body.setMotionState(x, y, angle, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
         return body;
     }
 
     @Contract(pure = true)
-    @NotNull Physics2DBody createBodyCircle(Object owner,
+    @NotNull public Physics2DBody createBodyCircle(Object owner,
                                             Physics2DBody.MotionType motionType,
                                             float x, float y, float angleDeg,
                                             float velX, float velY, float velAngleDeg,
@@ -329,11 +331,12 @@ public class Physics2DWorld {
         body.ghost = ghost;
         body.bitmask = bitmask;
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
         return body;
     }
 
     @Contract(pure = true)
-    @NotNull Physics2DBody createBodyRectangle(Object owner,
+    @NotNull public Physics2DBody createBodyRectangle(Object owner,
                                                Physics2DBody.MotionType motionType,
                                                float x, float y, float angleDeg,
                                                float velX, float velY, float velAngleDeg,
@@ -353,11 +356,12 @@ public class Physics2DWorld {
         body.ghost = ghost;
         body.bitmask = bitmask;
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
         return body;
     }
 
     @Contract(pure = true)
-    @NotNull Physics2DBody createBodyRectangle(Object owner,
+    @NotNull public Physics2DBody createBodyRectangle(Object owner,
                                                Physics2DBody.MotionType motionType,
                                                float x, float y, float angleDeg,
                                                float velX, float velY, float velAngleDeg,
@@ -377,11 +381,12 @@ public class Physics2DWorld {
         body.ghost = ghost;
         body.bitmask = bitmask;
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
         return body;
     }
 
     @Contract(pure = true)
-    @NotNull Physics2DBody createBodyPolygon(Object owner,
+    @NotNull public Physics2DBody createBodyPolygon(Object owner,
                                              Physics2DBody.MotionType motionType,
                                              float x, float y, float angleDeg,
                                              float velX, float velY, float velAngleDeg,
@@ -409,6 +414,7 @@ public class Physics2DWorld {
         body.ghost = ghost;
         body.bitmask = bitmask;
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
         return body;
     }
 
@@ -427,7 +433,7 @@ public class Physics2DWorld {
         body.motionType = motionType;
 
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
-
+        bodiesToAdd.add(body);
         return body;
     }
 
