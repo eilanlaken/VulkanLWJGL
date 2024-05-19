@@ -72,7 +72,13 @@ public class Physics2DWorld {
         bodiesToRemove.clear();
         bodiesToAdd.clear();
 
-        // collision
+        worldMinX = Float.POSITIVE_INFINITY;
+        worldMaxX = Float.NEGATIVE_INFINITY;
+        worldMinY = Float.POSITIVE_INFINITY;
+        worldMaxY = Float.NEGATIVE_INFINITY;
+        worldMaxR = Float.NEGATIVE_INFINITY;
+
+        // integration
         for (Physics2DBody body : allBodies) {
             if (body.off) continue;
             if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
@@ -102,37 +108,9 @@ public class Physics2DWorld {
         cellWidth  = worldWidth  / cols;
         cellHeight = worldHeight / rows;
 
-        worldMinX = Float.POSITIVE_INFINITY;
-        worldMaxX = Float.NEGATIVE_INFINITY;
-        worldMinY = Float.POSITIVE_INFINITY;
-        worldMaxY = Float.NEGATIVE_INFINITY;
-        worldMaxR = Float.NEGATIVE_INFINITY;
-
-        for (Physics2DBody body : allBodies) {
-            if (body.off) continue;
-            if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
-                body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
-                body.omega += body.netTorque * (body.inertiaInv) * delta;
-            }
-            if (body.motionType != Physics2DBody.MotionType.STATIC) {
-                body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omega);
-            }
-            body.shape.update();
-            body.netForce.set(0, 0);
-            body.netTorque = 0;
-            body.collidesWith.clear();
-
-            worldMinX = Math.min(worldMinX, body.shape.getMinExtentX());
-            worldMaxX = Math.max(worldMaxX, body.shape.getMaxExtentX());
-            worldMinY = Math.min(worldMinY, body.shape.getMinExtentY());
-            worldMaxY = Math.max(worldMaxY, body.shape.getMaxExtentY());
-            worldMaxR = Math.max(worldMaxR, body.shape.getBoundingRadius());
-        }
-
         cellMemoryPool.freeAll(spacePartition);
         activeCells.clear();
         spacePartition.clear();
-
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Cell cell = cellMemoryPool.allocate();
