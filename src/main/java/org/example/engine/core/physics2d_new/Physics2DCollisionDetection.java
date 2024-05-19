@@ -69,7 +69,6 @@ public class Physics2DCollisionDetection {
         Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
         manifold.contacts = 1;
         final float distance = (float) Math.sqrt(distanceSquared);
-
         if (distance != 0) {
             manifold.depth = radiusSum - distance;
             manifold.normal.set(dx, dy).scl(-1.0f / distance);

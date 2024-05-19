@@ -44,11 +44,23 @@ public class ScenePhysics2D_5_PhaseE_17 extends ApplicationScreen {
                     2f,0f,0,
                     1, 1, 1, false, 1,
                     1, 0, 0);
+
+            world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
+                    -3,-2,30,
+                    2f,0f,0,
+                    1, 1, 1, false, 1,
+                    1, 0, 0);
         }
 
         if (InputMouse.isButtonClicked(InputMouse.Button.RIGHT)) {
             world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
                     1,2,30,
+                    0f,0f,0,
+                    10, 1, 1, false, 1,
+                    1.5f, 0, 0);
+
+            world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
+                    1,-2,30,
                     0f,0f,0,
                     10, 1, 1, false, 1,
                     1.5f, 0, 0);

@@ -11,6 +11,10 @@ import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-core-engine--gamedev-7493t
@@ -19,8 +23,10 @@ import org.jetbrains.annotations.NotNull;
 public class Physics2DWorld {
 
     // bodies, joints, constraints and manifolds
-    public MemoryPool<Physics2DBody>       bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
-    public MemoryPool<CollisionManifold>   manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
+    public MemoryPool<Physics2DBody>        bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
+    public MemoryPool<CollisionManifold>    manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
+    private final MemoryPool<CollisionPair> pairMemoryPool     = new MemoryPool<>(CollisionPair.class, 5);
+
     public CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
     public CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
     public CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
@@ -41,9 +47,11 @@ public class Physics2DWorld {
     protected float cellHeight    = 0;
     protected int   bodiesCreated = 0;
 
-    private   final Physics2DCollisionDetection collisionDetection  = new Physics2DCollisionDetection(this);
-    protected final Physics2DWorldRenderer      debugRenderer       = new Physics2DWorldRenderer(this);
-    protected       Physics2DCollisionResolver  collisionResolver;
+    protected final Set<CollisionPair>                  collisionCandidates = new HashSet<>();
+    private   final Physics2DCollisionDetection         collisionDetection  = new Physics2DCollisionDetection(this);
+    protected final Physics2DWorldRenderer              debugRenderer       = new Physics2DWorldRenderer(this);
+    protected final CollectionsArray<CollisionManifold> manifolds           = new CollectionsArray<>(false, 20);
+    protected       Physics2DCollisionResolver          collisionResolver;
 
     // debugger options
     public boolean renderManifolds  = true;
@@ -137,130 +145,60 @@ public class Physics2DWorld {
             }
         }
 
+        // collision detection - broad phase
+        pairMemoryPool.freeAll(collisionCandidates);
+        collisionCandidates.clear();
         for (Cell cell : activeCells) {
             for (int i = 0; i < cell.bodies.size - 1; i++) {
                 for (int j = i + 1; j < cell.bodies.size; j++) {
-                    Physics2DBody a = cell.bodies.get(i);
-                    Physics2DBody b = cell.bodies.get(j);
-                    if (a.off) continue;
-                    if (b.off) continue;
-                    if (a.motionType == Physics2DBody.MotionType.STATIC && b.motionType == Physics2DBody.MotionType.STATIC) continue;
-                    if (a == b) continue;
-                    final float dx  = b.shape.x() - a.shape.x();
-                    final float dy  = b.shape.y() - a.shape.y();
-                    final float sum = a.shape.getBoundingRadius() + b.shape.getBoundingRadius();
+                    Physics2DBody body_a = cell.bodies.get(i);
+                    Physics2DBody body_b = cell.bodies.get(j);
+                    if (body_a.off) continue;
+                    if (body_b.off) continue;
+                    if (body_a.motionType == Physics2DBody.MotionType.STATIC && body_b.motionType == Physics2DBody.MotionType.STATIC) continue;
+                    if (body_a == body_b) continue;
+                    final float dx  = body_b.shape.x() - body_a.shape.x();
+                    final float dy  = body_b.shape.y() - body_a.shape.y();
+                    final float sum = body_a.shape.getBoundingRadius() + body_b.shape.getBoundingRadius();
                     boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
-
                     if (!boundingCirclesCollide) continue;
 
-                    CollisionManifold manifold = collisionDetection.detectCollision(a, b);
-                    if (manifold == null) continue;
-
-                    a.collidesWith.add(b);
-                    b.collidesWith.add(a);
-                    collisionResolver.beginContact(a, b);
-                    collisionResolver.preSolve(manifold);
-                    collisionResolver.solve(a, b, manifold);
-                    collisionResolver.postSolve(manifold);
-                    collisionResolver.endContact(a, b);
+                    CollisionPair pair = pairMemoryPool.allocate();
+                    pair.a = body_a;
+                    pair.b = body_b;
+                    collisionCandidates.add(pair);
                 }
             }
         }
 
-    }
-
-
-    private void updateBroadPhase_old(float deltaTime) {
-        worldMinX = Float.POSITIVE_INFINITY;
-        worldMaxX = Float.NEGATIVE_INFINITY;
-        worldMinY = Float.POSITIVE_INFINITY;
-        worldMaxY = Float.NEGATIVE_INFINITY;
-        worldMaxR = Float.NEGATIVE_INFINITY;
-
-        for (Physics2DBody body : allBodies) {
-            if (body.off) continue;
-            if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
-                body.velocity.add(body.massInv * deltaTime * body.netForce.x, body.massInv * deltaTime * body.netForce.y);
-                body.omega += body.netTorque * (body.inertiaInv) * deltaTime;
-            }
-            if (body.motionType != Physics2DBody.MotionType.STATIC) {
-                body.shape.dx_dy_rot(deltaTime * body.velocity.x, deltaTime * body.velocity.y, deltaTime * body.omega);
-            }
-            body.shape.update();
-            body.netForce.set(0, 0);
-            body.netTorque = 0;
-            body.collidesWith.clear();
-
-            worldMinX = Math.min(worldMinX, body.shape.getMinExtentX());
-            worldMaxX = Math.max(worldMaxX, body.shape.getMaxExtentX());
-            worldMinY = Math.min(worldMinY, body.shape.getMinExtentY());
-            worldMaxY = Math.max(worldMaxY, body.shape.getMaxExtentY());
-            worldMaxR = Math.max(worldMaxR, body.shape.getBoundingRadius());
+        // collision detection - narrow phase
+        manifoldMemoryPool.freeAll(manifolds);
+        manifolds.clear();
+        for (CollisionPair pair : collisionCandidates) {
+            Physics2DBody body_a = pair.a;
+            Physics2DBody body_b = pair.b;
+            CollisionManifold manifold = collisionDetection.detectCollision(body_a, body_b);
+            if (manifold == null) continue;
+            manifold.body_a = body_a;
+            manifold.body_b = body_b;
+            manifolds.add(manifold);
         }
 
-        final float maxDiameter = 2 * worldMaxR;
-        worldWidth  = Math.abs(worldMaxX - worldMinX);
-        worldHeight = Math.abs(worldMaxY - worldMinY);
-        rows = Math.min((int) Math.ceil(worldHeight  / maxDiameter), 32);
-        cols = Math.min((int) Math.ceil(worldWidth   / maxDiameter), 32);
-        cellWidth  = worldWidth  / cols;
-        cellHeight = worldHeight / rows;
+        // collision resolution
+        System.out.println(manifolds.size);
+        for (CollisionManifold manifold : manifolds) {
+            Physics2DBody body_a = manifold.body_a;
+            Physics2DBody body_b = manifold.body_b;
 
-        cellMemoryPool.freeAll(spacePartition);
-        activeCells.clear();
-        spacePartition.clear();
-
-        // data from previous phase
-        final float minX = worldMinX;
-        final float minY = worldMinY;
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                Cell cell = cellMemoryPool.allocate();
-                spacePartition.add(cell);
-            }
+            body_a.collidesWith.add(body_b);
+            body_b.collidesWith.add(body_a);
+            collisionResolver.beginContact(body_a, body_b);
+            collisionResolver.preSolve(manifold);
+            collisionResolver.solve(body_a, body_b, manifold);
+            collisionResolver.postSolve(manifold);
+            collisionResolver.endContact(body_a, body_b);
         }
 
-        for (Physics2DBody body : allBodies) {
-            int startCol = Math.max(0, (int) ((body.shape.getMinExtentX() - minX) / cellWidth));
-            int endCol   = Math.min(cols - 1, (int) ((body.shape.getMaxExtentX() - minX) / cellWidth));
-            int startRow = Math.max(0, (int) ((body.shape.getMinExtentY() - minY) / cellHeight));
-            int endRow   = Math.min(rows - 1, (int) ((body.shape.getMaxExtentY() - minY) / cellHeight));
-
-            for (int row = startRow; row <= endRow; row++) {
-                for (int col = startCol; col <= endCol; col++) {
-                    int cellIndex = row * cols + col;
-                    Cell cell = spacePartition.get(cellIndex);
-                    cell.bodies.add(body);
-                    if (!cell.active) {
-                        cell.active = true;
-                        activeCells.add(cell);
-                    }
-                }
-            }
-        }
-
-        for (Cell cell : activeCells) {
-            for (int i = 0; i < cell.bodies.size - 1; i++) {
-                for (int j = i + 1; j < cell.bodies.size; j++) {
-                    Physics2DBody a = cell.bodies.get(i);
-                    Physics2DBody b = cell.bodies.get(j);
-                    if (a.off) continue;
-                    if (b.off) continue;
-                    if (a.motionType == Physics2DBody.MotionType.STATIC && b.motionType == Physics2DBody.MotionType.STATIC) continue;
-                    if (a == b) continue;
-                    final float dx  = b.shape.x() - a.shape.x();
-                    final float dy  = b.shape.y() - a.shape.y();
-                    final float sum = a.shape.getBoundingRadius() + b.shape.getBoundingRadius();
-                    boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
-
-                    if (!boundingCirclesCollide) continue;
-
-                    CollisionManifold manifold = collisionDetection.detectCollision(a, b);
-
-                }
-            }
-        }
     }
 
     @Contract(pure = true)
@@ -441,20 +379,23 @@ public class Physics2DWorld {
 
     public static final class CollisionManifold implements MemoryPool.Reset {
 
+        public Physics2DBody body_a        = null;
+        public Physics2DBody body_b        = null;
+
         public Shape2D     shape_a         = null;
         public Shape2D     shape_b         = null;
+
         public int         contacts        = 0;
         public float       depth           = 0;
         public MathVector2 normal          = new MathVector2();
         public MathVector2 contactPoint1   = new MathVector2();
         public MathVector2 contactPoint2   = new MathVector2();
+
         public float       staticFriction  = 0;
         public float       dynamicFriction = 0;
 
         @Override
         public void reset() {
-            this.shape_a = null;
-            this.shape_b = null;
             this.contacts = 0;
         }
 
@@ -472,6 +413,41 @@ public class Physics2DWorld {
         public void reset() {
             bodies.clear();
             active = false;
+        }
+
+    }
+
+    public static class CollisionPair implements MemoryPool.Reset {
+
+        public Physics2DBody a;
+        public Physics2DBody b;
+
+        public CollisionPair() {}
+
+        public CollisionPair(Physics2DBody a, Physics2DBody b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CollisionPair that = (CollisionPair) o;
+            if (Objects.equals(a, that.a) && Objects.equals(b, that.b)) return true;
+            if (Objects.equals(b, that.a) && Objects.equals(a, that.b)) return true;
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(a) + Objects.hashCode(b); // A commutative operation to ensure symmetry
+        }
+
+        @Override
+        public void reset() {
+            a = null;
+            b = null;
         }
 
     }
