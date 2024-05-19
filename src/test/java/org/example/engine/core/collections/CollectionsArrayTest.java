@@ -75,6 +75,46 @@ class CollectionsArrayTest {
     }
 
     @Test
+    void containsDuplicates() {
+        Object a1 = new Object();
+        Object a2 = new Object();
+        Object a3 = new Object();
+        Object a4 = new Object();
+        Object a5 = new Object();
+
+        CollectionsArray<Object> arr1 = new CollectionsArray<>();
+        arr1.add(a1);
+        arr1.add(a1);
+        Assertions.assertTrue(arr1.containsDuplicates(true));
+
+        CollectionsArray<Object> arr2 = new CollectionsArray<>();
+        arr2.add(a1);
+        arr2.add(a2);
+        Assertions.assertFalse(arr2.containsDuplicates(true));
+
+        CollectionsArray<Object> arr3 = new CollectionsArray<>();
+        arr3.add(a1);
+        arr3.add(a2);
+        arr3.add(a3);
+        arr3.add(a4);
+        arr3.add(a5);
+        Assertions.assertFalse(arr3.containsDuplicates(true));
+
+        CollectionsArray<Object> arr4 = new CollectionsArray<>();
+        arr4.add(null);
+        arr4.add(a2);
+        Assertions.assertFalse(arr4.containsDuplicates(true));
+
+        CollectionsArray<Object> arr5 = new CollectionsArray<>();
+        arr5.add(null);
+        arr5.add(null);
+        Assertions.assertTrue(arr5.containsDuplicates(true));
+
+        CollectionsArray<Object> arr6 = new CollectionsArray<>();
+        Assertions.assertFalse(arr6.containsDuplicates(true));
+    }
+
+    @Test
     void indexOf() {
     }
 

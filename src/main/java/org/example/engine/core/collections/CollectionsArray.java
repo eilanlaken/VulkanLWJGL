@@ -329,6 +329,7 @@ public class CollectionsArray<T> implements Iterable<T> {
         }
     }
 
+    // TODO: test
     public void removeDuplicates(boolean identity) {
         CollectionsArray<T> uniques = new CollectionsArray<>();
         for (int i = 0; i < size; i++) {
@@ -338,6 +339,18 @@ public class CollectionsArray<T> implements Iterable<T> {
         }
         this.items = uniques.items;
         this.size = uniques.size;
+    }
+
+    public boolean containsDuplicates(boolean identity) {
+        for (int i = 0; i < size; i++) {
+            T obj = items[i];
+            for (int j = i + 1; j < size; j++) {
+                T other = items[j];
+                if (identity && obj == other) return true;
+                if (!identity && Objects.equals(obj, other)) return true;
+            }
+        }
+        return false;
     }
 
     /** Reduces the size of the array to the specified size. If the array is already smaller than the specified size, no action is

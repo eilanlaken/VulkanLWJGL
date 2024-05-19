@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
@@ -109,8 +110,8 @@ public class Physics2DWorld {
         cellHeight = worldHeight / rows;
 
         cellMemoryPool.freeAll(spacePartition);
-        activeCells.clear();
         spacePartition.clear();
+        activeCells.clear();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Cell cell = cellMemoryPool.allocate();
@@ -126,8 +127,7 @@ public class Physics2DWorld {
 
             for (int row = startRow; row <= endRow; row++) {
                 for (int col = startCol; col <= endCol; col++) {
-                    int cellIndex = row * cols + col;
-                    Cell cell = spacePartition.get(cellIndex);
+                    Cell cell = spacePartition.get(row * cols + col);
                     cell.bodies.add(body);
                     if (!cell.active) {
                         cell.active = true;
