@@ -51,7 +51,8 @@ public class AsyncTaskRunner {
             try {
                 thread.join();
             } catch (InterruptedException e) {
-                throw new Physics2DException(e.getLocalizedMessage());
+                e.printStackTrace();
+                throw new AsyncException(e.getMessage());
             }
         }
     }
@@ -66,17 +67,17 @@ public class AsyncTaskRunner {
         }
     }
 
-    @Deprecated public static void runSync(AsyncTask ...tasks) {
-        for (AsyncTask task : tasks) runSync(task);
+    public static void execute(AsyncTask ...tasks) {
+        for (AsyncTask task : tasks) execute(task);
     }
 
-    @Deprecated public static void runSync(Iterable<AsyncTask> tasks) {
-        for (AsyncTask task : tasks) runSync(task);
+    public static void execute(Iterable<AsyncTask> tasks) {
+        for (AsyncTask task : tasks) execute(task);
     }
 
-    @Deprecated public static void runSync(AsyncTask task) {
+    public static void execute(AsyncTask task) {
         for (AsyncTask preRequisite : task.prerequisites) {
-            runSync(preRequisite);
+            execute(preRequisite);
         }
         task.run();
     }

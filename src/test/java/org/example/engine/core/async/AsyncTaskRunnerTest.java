@@ -146,8 +146,8 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        AsyncTaskRunner.runSync(a1);
-        AsyncTaskRunner.runSync(a2);
+        AsyncTaskRunner.execute(a1);
+        AsyncTaskRunner.execute(a2);
 
         Assertions.assertEquals(1, arrayFloat.get(0),  MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(1, arrayFloat.get(1),  MathUtils.FLOAT_ROUNDING_ERROR);
@@ -177,7 +177,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        AsyncTaskRunner.runSync(a2);
+        AsyncTaskRunner.execute(a2);
 
         Assertions.assertEquals(1, arrayFloat.get(0),  MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(1, arrayFloat.get(1),  MathUtils.FLOAT_ROUNDING_ERROR);
@@ -207,7 +207,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        AsyncTaskRunner.runSync(a2);
+        AsyncTaskRunner.execute(a2);
 
         Assertions.assertEquals(8, arrayFloat2.get(0),  MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(8, arrayFloat2.get(1),  MathUtils.FLOAT_ROUNDING_ERROR);
@@ -244,7 +244,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        AsyncTaskRunner.runSync(a3);
+        AsyncTaskRunner.execute(a3);
 
         Assertions.assertEquals(10, arrayFloat2.get(0),  MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(10, arrayFloat2.get(1),  MathUtils.FLOAT_ROUNDING_ERROR);
@@ -282,7 +282,7 @@ class AsyncTaskRunnerTest {
 
         CollectionsArray<AsyncTask> tasks = new CollectionsArray<>();
         tasks.addAll(a1, a2, a3);
-        AsyncTaskRunner.runSync(tasks);
+        AsyncTaskRunner.execute(tasks);
 
         Assertions.assertEquals(10, arrayFloat2.get(0),  MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(10, arrayFloat2.get(1),  MathUtils.FLOAT_ROUNDING_ERROR);
@@ -320,7 +320,7 @@ class AsyncTaskRunnerTest {
 
         CollectionsArray<AsyncTask> tasks = new CollectionsArray<>();
         tasks.addAll(a1, a2, a3);
-        AsyncTaskRunner.runSync(tasks);
+        AsyncTaskRunner.execute(tasks);
 
         Assertions.assertEquals(10, arrayFloat2.get(0),  MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(10, arrayFloat2.get(1),  MathUtils.FLOAT_ROUNDING_ERROR);
@@ -358,7 +358,7 @@ class AsyncTaskRunnerTest {
 
         CollectionsArray<AsyncTask> tasks = new CollectionsArray<>();
         tasks.addAll(a1, a2, a3);
-        AsyncTaskRunner.runSync(tasks);
+        AsyncTaskRunner.execute(tasks);
 
         Assertions.assertEquals(10, arrayFloat2.get(0),  MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(10, arrayFloat2.get(1),  MathUtils.FLOAT_ROUNDING_ERROR);
@@ -396,7 +396,7 @@ class AsyncTaskRunnerTest {
 
         CollectionsArray<AsyncTask> tasks = new CollectionsArray<>();
         tasks.addAll(a2, a3);
-        AsyncTaskRunner.runSync(tasks);
+        AsyncTaskRunner.execute(tasks);
 
         Assertions.assertEquals(10, arrayFloat2.get(0),  MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(10, arrayFloat2.get(1),  MathUtils.FLOAT_ROUNDING_ERROR);
@@ -432,7 +432,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        AsyncTaskRunner.runSync(a2, a3);
+        AsyncTaskRunner.execute(a2, a3);
         Assertions.assertEquals(10, arrayFloat2.get(0),  MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(10, arrayFloat2.get(1),  MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(10, arrayFloat2.get(2),  MathUtils.FLOAT_ROUNDING_ERROR);

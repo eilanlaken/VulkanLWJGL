@@ -60,7 +60,7 @@ public final class AsyncUtils {
         return (long)(GLFW.glfwGetTime() * NANOS_IN_SECOND);
     }
 
-    public static int getAvailableProcessorsNum() {
+    public static int getAvailableProcessorsNumber() {
         return Runtime.getRuntime().availableProcessors();
     }
 

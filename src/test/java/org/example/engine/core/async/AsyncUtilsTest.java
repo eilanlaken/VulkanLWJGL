@@ -11,6 +11,6 @@ class AsyncUtilsTest {
 
     @Test
     void getAvailableProcessors() {
-        Assertions.assertTrue(AsyncUtils.getAvailableProcessorsNum() > 0);
+        Assertions.assertTrue(AsyncUtils.getAvailableProcessorsNumber() > 0);
     }
 }
