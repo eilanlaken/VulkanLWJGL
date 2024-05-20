@@ -9,7 +9,7 @@ import org.example.engine.core.shape.Shape2D;
 
 public final class Physics2DWorldPhaseC {
 
-    private final int                            processors     = AsyncUtils.getAvailableProcessorsNum();
+    private final int                            processors     = AsyncUtils.getAvailableProcessorsNumber();
     private final MemoryPool<ProcessCells>       taskMemoryPool = new MemoryPool<>(ProcessCells.class, processors);
     private final MemoryPool<Cell>               cellMemoryPool = new MemoryPool<>(Cell.class,1024);
     private final CollectionsArray<ProcessCells> tasks          = new CollectionsArray<>();
