@@ -67,7 +67,8 @@ public class Physics2DWorld {
     }
 
     public void update(final float delta) {
-        // add and remove bodies.
+        /* preparation: add and remove bodies */
+
         for (Physics2DBody body : bodiesToRemove) {
             allBodies.removeValue(body, true);
             bodyMemoryPool.free(body);
@@ -81,13 +82,14 @@ public class Physics2DWorld {
         bodiesToRemove.clear();
         bodiesToAdd.clear();
 
+        /* integration: update velocities, clear forces and move bodies. */
+
         worldMinX = Float.POSITIVE_INFINITY;
         worldMaxX = Float.NEGATIVE_INFINITY;
         worldMinY = Float.POSITIVE_INFINITY;
         worldMaxY = Float.NEGATIVE_INFINITY;
         worldMaxR = Float.NEGATIVE_INFINITY;
 
-        // integration
         for (Physics2DBody body : allBodies) {
             if (body.off) continue;
             if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
@@ -109,22 +111,20 @@ public class Physics2DWorld {
             worldMaxR = Math.max(worldMaxR, body.shape.getBoundingRadius());
         }
 
-        final float maxDiameter = 2 * worldMaxR;
-        worldWidth  = Math.abs(worldMaxX - worldMinX);
-        worldHeight = Math.abs(worldMaxY - worldMinY);
-        rows = Math.min((int) Math.ceil(worldHeight / maxDiameter), 32);
-        cols = Math.min((int) Math.ceil(worldWidth  / maxDiameter), 32);
-        cellWidth  = worldWidth  / cols;
-        cellHeight = worldHeight / rows;
+        float maxDiameter = 2 * worldMaxR;
+        float worldWidth  = Math.abs(worldMaxX - worldMinX);
+        float worldHeight = Math.abs(worldMaxY - worldMinY);
+        int   rows        = Math.min((int) Math.ceil(worldHeight / maxDiameter), 32);
+        int   cols        = Math.min((int) Math.ceil(worldWidth  / maxDiameter), 32);
+        float cellWidth   = worldWidth  / cols;
+        float cellHeight  = worldHeight / rows;
 
+        /* collision detection - broad phase */
         cellMemoryPool.freeAll(spacePartition);
         spacePartition.clear();
         activeCells.clear();
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                Cell cell = cellMemoryPool.allocate();
-                spacePartition.add(cell);
-            }
+        for (int i = 0; i < rows * cols; i++) {
+            spacePartition.add(cellMemoryPool.allocate());
         }
 
         for (Physics2DBody body : allBodies) {
@@ -145,7 +145,6 @@ public class Physics2DWorld {
             }
         }
 
-        // collision detection - broad phase
         pairMemoryPool.freeAll(collisionCandidates);
         collisionCandidates.clear();
         for (Cell cell : activeCells) {
@@ -171,7 +170,8 @@ public class Physics2DWorld {
             }
         }
 
-        // collision detection - narrow phase
+
+        /* collision detection - narrow phase */
         manifoldMemoryPool.freeAll(manifolds);
         manifolds.clear();
         for (CollisionPair pair : collisionCandidates) {
@@ -184,8 +184,8 @@ public class Physics2DWorld {
             manifolds.add(manifold);
         }
 
-        // collision resolution
-        System.out.println(manifolds.size);
+        /* collision resolution */
+        manifolds.sort(); // to achieve deterministic behaviour, we should resolve the collisions in consistent order. We resolve collisions with greater penetration depth first.
         for (CollisionManifold manifold : manifolds) {
             Physics2DBody body_a = manifold.body_a;
             Physics2DBody body_b = manifold.body_b;
@@ -342,7 +342,7 @@ public class Physics2DWorld {
                                            float velX, float velY, float velAngleDeg,
                                            float massInv, float density, float friction, float restitution,
                                            boolean ghost, int bitmask,
-                                           Shape2D...shapes) {
+                                           Shape2D... shapes) {
         Physics2DBody body = bodyMemoryPool.allocate();
         body.owner = owner;
         body.off = sleeping;
@@ -377,19 +377,17 @@ public class Physics2DWorld {
         debugRenderer.render(renderer);
     }
 
-    public static final class CollisionManifold implements MemoryPool.Reset {
+    public static final class CollisionManifold implements MemoryPool.Reset, Comparable<CollisionManifold> {
 
         public Physics2DBody body_a        = null;
         public Physics2DBody body_b        = null;
-
-        public Shape2D     shape_a         = null;
-        public Shape2D     shape_b         = null;
-
-        public int         contacts        = 0;
-        public float       depth           = 0;
-        public MathVector2 normal          = new MathVector2();
-        public MathVector2 contactPoint1   = new MathVector2();
-        public MathVector2 contactPoint2   = new MathVector2();
+        public Shape2D       shape_a       = null;
+        public Shape2D       shape_b       = null;
+        public int           contacts      = 0;
+        public float         depth         = 0;
+        public MathVector2   normal        = new MathVector2();
+        public MathVector2   contactPoint1 = new MathVector2();
+        public MathVector2   contactPoint2 = new MathVector2();
 
         public float       staticFriction  = 0;
         public float       dynamicFriction = 0;
@@ -399,28 +397,38 @@ public class Physics2DWorld {
             this.contacts = 0;
         }
 
-    }
-
-    public static class BVHNode implements MemoryPool.Reset {
-
-        private int           index = -1;
-        private float         x     = Float.NaN;
-        private float         y     = Float.NaN;
-        private float         r     = Float.NaN;
-        private Physics2DBody body  = null;
+        @Override
+        public String toString() {
+            return "CollisionManifold{" +
+                    "body_a=" + body_a +
+                    ", body_b=" + body_b +
+                    ", contacts=" + contacts +
+                    ", depth=" + depth +
+                    ", normal=" + normal +
+                    '}';
+        }
 
         @Override
-        public void reset() {
-            index = -1;
-            x = Float.NaN;
-            y = Float.NaN;
-            r = Float.NaN;
-            body = null;
+        public int compareTo(@NotNull CollisionManifold other) {
+            // Compare by depth
+            int depthCompare = Float.compare(other.depth, this.depth);
+            if (depthCompare != 0) {
+                return depthCompare;
+            }
+
+            // Compare by body_a
+            int bodyACompare = this.body_a.compareTo(other.body_a);
+            if (bodyACompare != 0) {
+                return bodyACompare;
+            }
+
+            // Compare by body_b
+            return this.body_b.compareTo(other.body_b);
         }
 
     }
 
-    @Deprecated public static final class Cell implements MemoryPool.Reset {
+    public static final class Cell implements MemoryPool.Reset {
 
         private final CollectionsArray<Physics2DBody> bodies = new CollectionsArray<>(false, 2);
 
@@ -436,7 +444,7 @@ public class Physics2DWorld {
 
     }
 
-    @Deprecated public static class CollisionPair implements MemoryPool.Reset {
+    public static class CollisionPair implements MemoryPool.Reset {
 
         public Physics2DBody a;
         public Physics2DBody b;
@@ -464,10 +472,7 @@ public class Physics2DWorld {
         }
 
         @Override
-        public void reset() {
-            a = null;
-            b = null;
-        }
+        public void reset() {}
 
     }
 
