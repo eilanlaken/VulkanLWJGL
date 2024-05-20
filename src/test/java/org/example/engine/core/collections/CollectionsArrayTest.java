@@ -52,6 +52,41 @@ class CollectionsArrayTest {
 
     @Test
     void set() {
+        CollectionsArray<Integer> arr1 = new CollectionsArray<>(5);
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> arr1.set(0, 1,  false));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> arr1.set(2, 1,  false));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> arr1.set(-1, 1, false));
+
+        CollectionsArray<Integer> arr2 = new CollectionsArray<>(1);
+        arr2.add(1);
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> arr2.set(-1, 1,  false));
+        Assertions.assertDoesNotThrow(() -> arr2.set(0, 2, false));
+        Assertions.assertEquals(2, arr2.get(0));
+        Assertions.assertEquals(1, arr2.size);
+
+        CollectionsArray<Integer> arr3 = new CollectionsArray<>(1);
+        arr3.add(0,1,2,3);
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> arr3.set(-1, 7,  true));
+        Assertions.assertDoesNotThrow(() -> arr3.set(2, 7, true));
+        Assertions.assertEquals(7, arr3.get(2));
+        Assertions.assertEquals(4, arr3.size);
+
+        Assertions.assertDoesNotThrow(() -> arr3.set(10, 7, true));
+        Assertions.assertEquals(7, arr3.get(10));
+        Assertions.assertEquals(11, arr3.size);
+        Assertions.assertNull(arr3.get(4));
+        Assertions.assertNull(arr3.get(5));
+        Assertions.assertNull(arr3.get(6));
+        Assertions.assertNull(arr3.get(7));
+        Assertions.assertNull(arr3.get(8));
+        Assertions.assertNull(arr3.get(9));
+
+        Assertions.assertDoesNotThrow(() -> arr3.set(7, 7, true));
+        Assertions.assertEquals(7, arr3.get(7));
+        Assertions.assertEquals(11, arr3.size);
+
+        arr3.clear();
+        Assertions.assertDoesNotThrow(() -> arr3.set(7, 7, true));
     }
 
     @Test

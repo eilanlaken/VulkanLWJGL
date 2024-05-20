@@ -401,7 +401,26 @@ public class Physics2DWorld {
 
     }
 
-    public static final class Cell implements MemoryPool.Reset {
+    public static class BVHNode implements MemoryPool.Reset {
+
+        private int           index = -1;
+        private float         x     = Float.NaN;
+        private float         y     = Float.NaN;
+        private float         r     = Float.NaN;
+        private Physics2DBody body  = null;
+
+        @Override
+        public void reset() {
+            index = -1;
+            x = Float.NaN;
+            y = Float.NaN;
+            r = Float.NaN;
+            body = null;
+        }
+
+    }
+
+    @Deprecated public static final class Cell implements MemoryPool.Reset {
 
         private final CollectionsArray<Physics2DBody> bodies = new CollectionsArray<>(false, 2);
 
@@ -417,7 +436,7 @@ public class Physics2DWorld {
 
     }
 
-    public static class CollisionPair implements MemoryPool.Reset {
+    @Deprecated public static class CollisionPair implements MemoryPool.Reset {
 
         public Physics2DBody a;
         public Physics2DBody b;

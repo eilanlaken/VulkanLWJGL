@@ -114,9 +114,31 @@ public class CollectionsArray<T> implements Iterable<T> {
         return items[index];
     }
 
-    public void set(int index, T value) {
-        if (index >= size) throw new IndexOutOfBoundsException("index can't be >= size: " + index + " >= " + size);
+    // if force is true, the item will be inserted into the index, growing the array if needed.
+    // TODO: test
+    public void set(int index, T value, boolean force) {
+        if (index < 0) throw new IndexOutOfBoundsException("index can't be < 0: " + index + " < 0");
+
+        if (!force) {
+            if (index >= size) throw new IndexOutOfBoundsException("index can't be >= size: " + index + " >= " + size);
+            items[index] = value;
+            return;
+        }
+
+        if (index < size) {
+            items[index] = value;
+            return;
+        }
+
+        if (index > size && index < items.length) {
+            items[index] = value;
+            size = index + 1;
+            return;
+        }
+
+        items = resize(index + 1);
         items[index] = value;
+        size = index + 1;
     }
 
     public void insert(int index, T value) {
