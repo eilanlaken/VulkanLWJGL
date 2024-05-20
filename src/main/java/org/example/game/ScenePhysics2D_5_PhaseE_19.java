@@ -27,8 +27,6 @@ public class ScenePhysics2D_5_PhaseE_19 extends ApplicationScreen {
     public void show() {
         camera = new GraphicsCamera(640f/32,480f/32, 1);
         camera.update();
-
-
     }
 
 
@@ -81,12 +79,13 @@ public class ScenePhysics2D_5_PhaseE_19 extends ApplicationScreen {
 
     @Override
     public void hide() {
-        renderer2D.deleteAll();
+
     }
 
     @Override
     public void deleteAll() {
-
+        world.shutdown();
+        renderer2D.deleteAll();
     }
 
 }

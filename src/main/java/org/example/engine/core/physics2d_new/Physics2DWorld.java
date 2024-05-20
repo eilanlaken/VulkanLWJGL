@@ -28,7 +28,7 @@ public class Physics2DWorld {
     // bodies, joints, constraints and manifolds
     MemoryPool<Physics2DBody>       bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
     MemoryPool<CollisionManifold>   manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
-    //private MemoryPool<CollisionPair>       pairMemoryPool     = new MemoryPool<>(CollisionPair.class, 5);
+
     public  CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
     public  CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
     public  CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
@@ -167,30 +167,6 @@ public class Physics2DWorld {
                 collisionCandidates.add(pair);
             }
         }
-        //pairMemoryPool.freeAll(collisionCandidates);
-        //collisionCandidates.clear();
-//        for (Cell cell : activeCells) {
-//            for (int i = 0; i < cell.bodies.size - 1; i++) {
-//                for (int j = i + 1; j < cell.bodies.size; j++) {
-//                    Physics2DBody body_a = cell.bodies.get(i);
-//                    Physics2DBody body_b = cell.bodies.get(j);
-//                    if (body_a.off) continue;
-//                    if (body_b.off) continue;
-//                    if (body_a.motionType == Physics2DBody.MotionType.STATIC && body_b.motionType == Physics2DBody.MotionType.STATIC) continue;
-//                    final float dx  = body_b.shape.x() - body_a.shape.x();
-//                    final float dy  = body_b.shape.y() - body_a.shape.y();
-//                    final float sum = body_a.shape.getBoundingRadius() + body_b.shape.getBoundingRadius();
-//                    boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
-//                    if (!boundingCirclesCollide) continue;
-//
-//                    CollisionPair pair = pairMemoryPool.allocate();
-//                    pair.a = body_a;
-//                    pair.b = body_b;
-//                    collisionCandidates.add(pair);
-//                }
-//            }
-//        }
-
 
         /* collision detection - narrow phase */
         manifoldMemoryPool.freeAll(manifolds);

@@ -90,25 +90,16 @@ public class ApplicationWindow implements MemoryResource {
     private final GLFWWindowMaximizeCallback defaultMaximizedCallback = new GLFWWindowMaximizeCallback() {
         @Override
         public synchronized void invoke(long windowHandle, final boolean maximized) {
-            tasks.add(new Runnable() {
-                @Override
-                public void run() {
-                    ApplicationWindow.this.attributes.maximized = maximized;
-                }
-            });
+            tasks.add(() -> ApplicationWindow.this.attributes.maximized = maximized);
         }
     };
 
     private final GLFWWindowCloseCallback defaultCloseCallback = new GLFWWindowCloseCallback() {
         @Override
         public synchronized void invoke(final long handle) {
-            tasks.add(new Runnable() {
-                @Override
-                public void run() {
-                    GLFW.glfwSetWindowShouldClose(handle, false);
-                }
-            });
-
+            tasks.add(() -> GLFW.glfwSetWindowShouldClose(handle, false));
+            tasks.add(() -> screen.hide());
+            tasks.add(() -> screen.deleteAll());
         }
     };
 
@@ -334,6 +325,10 @@ public class ApplicationWindow implements MemoryResource {
 
     @Override
     public void delete() {
+        // TODO: is this correct?
+        screen.hide();
+        screen.deleteAll();
+
         GLFW.glfwSetWindowFocusCallback(handle, null);
         GLFW.glfwSetWindowIconifyCallback(handle, null);
         GLFW.glfwSetWindowCloseCallback(handle, null);
