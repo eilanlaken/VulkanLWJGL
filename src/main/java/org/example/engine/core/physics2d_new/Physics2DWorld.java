@@ -34,17 +34,6 @@ public class Physics2DWorld {
     protected final CollectionsArray<Cell> spacePartition = new CollectionsArray<>(false, 1024);
     protected final CollectionsArray<Cell> activeCells    = new CollectionsArray<>();
     private   final MemoryPool<Cell>       cellMemoryPool = new MemoryPool<>(Cell.class,1024);
-    protected float worldWidth    = 0;
-    protected float worldHeight   = 0;
-    protected float worldMinX     = 0;
-    protected float worldMaxX     = 0;
-    protected float worldMinY     = 0;
-    protected float worldMaxY     = 0;
-    protected float worldMaxR     = 0;
-    protected int   rows          = 0;
-    protected int   cols          = 0;
-    protected float cellWidth     = 0;
-    protected float cellHeight    = 0;
     protected int   bodiesCreated = 0;
 
     protected final Set<CollisionPair>                  collisionCandidates = new HashSet<>();
@@ -84,11 +73,11 @@ public class Physics2DWorld {
 
         /* integration: update velocities, clear forces and move bodies. */
 
-        worldMinX = Float.POSITIVE_INFINITY;
-        worldMaxX = Float.NEGATIVE_INFINITY;
-        worldMinY = Float.POSITIVE_INFINITY;
-        worldMaxY = Float.NEGATIVE_INFINITY;
-        worldMaxR = Float.NEGATIVE_INFINITY;
+        float worldMinX = Float.POSITIVE_INFINITY;
+        float worldMaxX = Float.NEGATIVE_INFINITY;
+        float worldMinY = Float.POSITIVE_INFINITY;
+        float worldMaxY = Float.NEGATIVE_INFINITY;
+        float worldMaxR = Float.NEGATIVE_INFINITY;
 
         for (Physics2DBody body : allBodies) {
             if (body.off) continue;
@@ -155,7 +144,6 @@ public class Physics2DWorld {
                     if (body_a.off) continue;
                     if (body_b.off) continue;
                     if (body_a.motionType == Physics2DBody.MotionType.STATIC && body_b.motionType == Physics2DBody.MotionType.STATIC) continue;
-                    if (body_a == body_b) continue;
                     final float dx  = body_b.shape.x() - body_a.shape.x();
                     final float dy  = body_b.shape.y() - body_a.shape.y();
                     final float sum = body_a.shape.getBoundingRadius() + body_b.shape.getBoundingRadius();
