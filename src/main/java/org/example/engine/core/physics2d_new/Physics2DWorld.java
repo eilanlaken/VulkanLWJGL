@@ -1,19 +1,22 @@
 package org.example.engine.core.physics2d_new;
 
+import org.example.engine.core.async.AsyncTask;
+import org.example.engine.core.async.AsyncUtils;
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
-import org.example.engine.core.physics2d.Physics2DCollisionListener;
+import org.example.engine.core.physics2d.Physics2DWorldPhaseC;
 import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
@@ -23,13 +26,19 @@ import java.util.Set;
 public class Physics2DWorld {
 
     // bodies, joints, constraints and manifolds
-    public MemoryPool<Physics2DBody>        bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
-    public MemoryPool<CollisionManifold>    manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
-    private final MemoryPool<CollisionPair> pairMemoryPool     = new MemoryPool<>(CollisionPair.class, 5);
+    MemoryPool<Physics2DBody>       bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
+    MemoryPool<CollisionManifold>   manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
+    //private MemoryPool<CollisionPair>       pairMemoryPool     = new MemoryPool<>(CollisionPair.class, 5);
+    public  CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
+    public  CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
+    public  CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
 
-    public CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
-    public CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
-    public CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
+    // multi-threading
+    private final int                              processors     = AsyncUtils.getAvailableProcessorsNumber();
+    private final MemoryPool<CellsProcessor>       taskMemoryPool = new MemoryPool<>(CellsProcessor.class, processors);
+    private final ExecutorService                  executor       = Executors.newFixedThreadPool(processors);
+    private final CollectionsArray<CellsProcessor> tasks          = new CollectionsArray<>();
+
 
     protected final CollectionsArray<Cell> spacePartition = new CollectionsArray<>(false, 1024);
     protected final CollectionsArray<Cell> activeCells    = new CollectionsArray<>();
@@ -134,29 +143,53 @@ public class Physics2DWorld {
             }
         }
 
-        pairMemoryPool.freeAll(collisionCandidates);
-        collisionCandidates.clear();
-        for (Cell cell : activeCells) {
-            for (int i = 0; i < cell.bodies.size - 1; i++) {
-                for (int j = i + 1; j < cell.bodies.size; j++) {
-                    Physics2DBody body_a = cell.bodies.get(i);
-                    Physics2DBody body_b = cell.bodies.get(j);
-                    if (body_a.off) continue;
-                    if (body_b.off) continue;
-                    if (body_a.motionType == Physics2DBody.MotionType.STATIC && body_b.motionType == Physics2DBody.MotionType.STATIC) continue;
-                    final float dx  = body_b.shape.x() - body_a.shape.x();
-                    final float dy  = body_b.shape.y() - body_a.shape.y();
-                    final float sum = body_a.shape.getBoundingRadius() + body_b.shape.getBoundingRadius();
-                    boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
-                    if (!boundingCirclesCollide) continue;
+        taskMemoryPool.freeAll(tasks);
+        tasks.clear();
+        for (int i = 0; i < processors; i++) {
+            tasks.add(taskMemoryPool.allocate());
+        }
+        for (int i = 0; i < activeCells.size; i++) {
+            tasks.getCyclic(i).cellsToProcess.add(activeCells.get(i));
+        }
 
-                    CollisionPair pair = pairMemoryPool.allocate();
-                    pair.a = body_a;
-                    pair.b = body_b;
-                    collisionCandidates.add(pair);
-                }
+        collisionCandidates.clear();
+        final List<Callable<Void>> taskList = new LinkedList<>();
+        for (Callable<Void> callable : tasks) {
+            taskList.add(callable);
+        }
+        try {
+            executor.invokeAll(taskList);
+        } catch (InterruptedException e) {
+            throw new Physics2DException("Update thread interrupted with Exception: " + e);
+        }
+        for (Cell cell : activeCells) {
+            for (CollisionPair pair : cell.pairs) {
+                collisionCandidates.add(pair);
             }
         }
+        //pairMemoryPool.freeAll(collisionCandidates);
+        //collisionCandidates.clear();
+//        for (Cell cell : activeCells) {
+//            for (int i = 0; i < cell.bodies.size - 1; i++) {
+//                for (int j = i + 1; j < cell.bodies.size; j++) {
+//                    Physics2DBody body_a = cell.bodies.get(i);
+//                    Physics2DBody body_b = cell.bodies.get(j);
+//                    if (body_a.off) continue;
+//                    if (body_b.off) continue;
+//                    if (body_a.motionType == Physics2DBody.MotionType.STATIC && body_b.motionType == Physics2DBody.MotionType.STATIC) continue;
+//                    final float dx  = body_b.shape.x() - body_a.shape.x();
+//                    final float dy  = body_b.shape.y() - body_a.shape.y();
+//                    final float sum = body_a.shape.getBoundingRadius() + body_b.shape.getBoundingRadius();
+//                    boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
+//                    if (!boundingCirclesCollide) continue;
+//
+//                    CollisionPair pair = pairMemoryPool.allocate();
+//                    pair.a = body_a;
+//                    pair.b = body_b;
+//                    collisionCandidates.add(pair);
+//                }
+//            }
+//        }
 
 
         /* collision detection - narrow phase */
@@ -365,6 +398,22 @@ public class Physics2DWorld {
         debugRenderer.render(renderer);
     }
 
+    // TODO: find where to use
+    public void shutdown() {
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    System.err.println("Executor did not terminate");
+                }
+            }
+        } catch (InterruptedException ie) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
+
     public static final class CollisionManifold implements MemoryPool.Reset, Comparable<CollisionManifold> {
 
         public Physics2DBody body_a        = null;
@@ -377,8 +426,10 @@ public class Physics2DWorld {
         public MathVector2   contactPoint1 = new MathVector2();
         public MathVector2   contactPoint2 = new MathVector2();
 
-        public float       staticFriction  = 0;
-        public float       dynamicFriction = 0;
+        // TODO: remove these - we will calculate them on resolution. No need to waste memory space.
+        public float mixedRestitution = 0;
+        public float staticFriction   = 0;
+        public float dynamicFriction  = 0;
 
         @Override
         public void reset() {
@@ -419,6 +470,7 @@ public class Physics2DWorld {
     public static final class Cell implements MemoryPool.Reset {
 
         private final CollectionsArray<Physics2DBody> bodies = new CollectionsArray<>(false, 2);
+        private final CollectionsArray<CollisionPair> pairs  = new CollectionsArray<>(false, 2);
 
         private boolean active = false;
 
@@ -427,7 +479,55 @@ public class Physics2DWorld {
         @Override
         public void reset() {
             bodies.clear();
+            pairs.clear();
             active = false;
+        }
+
+    }
+
+    public static final class CellsProcessor implements MemoryPool.Reset, Callable<Void> {
+
+        private final CollectionsArray<Cell>    cellsToProcess = new CollectionsArray<>();
+        private final MemoryPool<CollisionPair> pairMemoryPool = new MemoryPool<>(CollisionPair.class, 4);
+
+        public CellsProcessor() {}
+
+        @Override
+        public Void call() {
+            for (Cell cell : cellsToProcess) {
+                for (int i = 0; i < cell.bodies.size - 1; i++) {
+                    for (int j = i + 1; j < cell.bodies.size; j++) {
+                        Physics2DBody a = cell.bodies.get(i);
+                        Physics2DBody b = cell.bodies.get(j);
+                        if (a.off) continue;
+                        if (b.off) continue;
+                        if (a.motionType == Physics2DBody.MotionType.STATIC && b.motionType == Physics2DBody.MotionType.STATIC) continue;
+                        if (a == b) continue;
+                        if (!boundingCirclesCollide(a.shape, b.shape)) continue;
+
+                        CollisionPair pair = pairMemoryPool.allocate();
+                        pair.a = a;
+                        pair.b = b;
+                        cell.pairs.add(pair);
+                    }
+                }
+            }
+            return null;
+        }
+
+        private boolean boundingCirclesCollide(final Shape2D a, final Shape2D b) {
+            final float dx  = b.x() - a.x();
+            final float dy  = b.y() - a.y();
+            final float sum = a.getBoundingRadius() + b.getBoundingRadius();
+            return dx * dx + dy * dy < sum * sum;
+        }
+
+        @Override
+        public void reset() {
+            for (Cell cell : cellsToProcess) {
+                pairMemoryPool.freeAll(cell.pairs);
+            }
+            cellsToProcess.clear();
         }
 
     }
