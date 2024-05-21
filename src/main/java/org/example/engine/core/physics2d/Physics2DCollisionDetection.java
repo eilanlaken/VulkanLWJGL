@@ -171,6 +171,7 @@ public class Physics2DCollisionDetection {
     private Physics2DWorld.CollisionManifold rectangleVsCircle(Physics2DBody body_a, Shape2D rect, Physics2DBody body_b, Shape2D circle) {
         Physics2DWorld.CollisionManifold manifold = circleVsRectangle(body_b, circle, body_a, rect);
 
+        // reverse bodies and shapes.
         if (manifold != null) {
             manifold.body_a = body_b;
             manifold.body_b = body_a;

@@ -169,7 +169,6 @@ public class Physics2DWorld {
         }
 
         /* collision resolution */
-        manifolds.sort(); // to achieve deterministic behaviour, we should resolve the collisions in consistent order. We resolve collisions with greater penetration depth first.
         for (CollisionManifold manifold : manifolds) {
             Physics2DBody body_a = manifold.body_a;
             Physics2DBody body_b = manifold.body_b;
