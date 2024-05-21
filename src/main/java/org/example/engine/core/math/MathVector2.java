@@ -314,6 +314,12 @@ public class MathVector2 {
         return this;
     }
 
+    public MathVector2 flip() {
+        this.x = -this.x;
+        this.y = -this.y;
+        return this;
+    }
+
     public MathVector2 clamp(MathVector2 min, MathVector2 max) {
         this.x = MathUtils.clampFloat(this.x, min.x, max.x);
         this.y = MathUtils.clampFloat(this.y, min.y, max.y);

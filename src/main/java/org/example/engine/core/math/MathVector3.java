@@ -421,6 +421,13 @@ public class MathVector3 {
         return this.mul(tmpMat.setToRotation(axisX, axisY, axisZ, degrees));
     }
 
+    public MathVector3 flip() {
+        this.x = -this.x;
+        this.y = -this.y;
+        this.z = -this.z;
+        return this;
+    }
+
     /** Rotates this vector by the given angle in radians around the given axis.
      *
      * @param radians the angle in radians
