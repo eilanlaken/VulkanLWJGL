@@ -27,7 +27,8 @@ public class Physics2DCollisionResolver {
         final float depth = manifold.depth;
         final MathVector2 normal = manifold.normal;
         final float pushBack = Math.max(depth - threshold, 0.0f);
-        MathVector2 correction = new MathVector2(normal).scl(pushBack * percent).scl(1 / (aMassInv + bMassInv));
+        final float invMassTotal = aMassInv + bMassInv;
+        MathVector2 correction = new MathVector2(normal).scl(pushBack * percent).scl(1 / invMassTotal);
 
         MathVector2 aCenter = shape_a.geometryCenter();
         MathVector2 bCenter = shape_b.geometryCenter();

@@ -37,7 +37,7 @@ public class ScenePhysics2D_2 extends ApplicationScreen {
         world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
                 2, -3,0,
                 0f,0f,0,
-                1, 1, 1, false, 1,
+                100, 1, 1, false, 1,
                 1, 1f, 0, 0, MathUtils.random() * 360);
 
     }
@@ -54,7 +54,7 @@ public class ScenePhysics2D_2 extends ApplicationScreen {
 
             world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
                     screen.x,screen.y,0,
-                    2f,0f,0,
+                    0f,0f,0,
                     1, 1, 1, false, 1,
                     1, 0, 0);
 
@@ -63,8 +63,8 @@ public class ScenePhysics2D_2 extends ApplicationScreen {
         if (InputMouse.isButtonClicked(InputMouse.Button.RIGHT)) {
             world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
                     screen.x,screen.y,0,
-                    2f,0f,0,
-                    1, 1, 1, false, 1,
+                    0f,0f,0,
+                    100, 1, 1, false, 1,
                     1, 1f, 0, 0, MathUtils.random() * 360);
         }
 
