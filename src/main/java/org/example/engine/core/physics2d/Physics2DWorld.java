@@ -44,6 +44,7 @@ public class Physics2DWorld {
     public boolean renderManifolds  = true;
     public boolean renderVelocities = false;
     public boolean renderBodies     = true;
+    public boolean renderJoints     = true;
 
     public Physics2DWorld(Physics2DCollisionResolver collisionResolver) {
         this.collisionResolver = collisionResolver != null ? collisionResolver : new Physics2DCollisionResolver() {};
@@ -89,7 +90,7 @@ public class Physics2DWorld {
             body.shape.update();
             body.netForce.set(0, 0);
             body.netTorque = 0;
-            body.collidesWith.clear();
+            body.touching.clear();
 
             worldMinX = Math.min(worldMinX, body.shape.getMinExtentX());
             worldMaxX = Math.max(worldMaxX, body.shape.getMaxExtentX());
@@ -169,12 +170,13 @@ public class Physics2DWorld {
         }
 
         /* collision resolution */
+        // TODO: need to figure out how to properly set the Body's: justCollided, touching, justSeparated.
         for (CollisionManifold manifold : manifolds) {
             Physics2DBody body_a = manifold.body_a;
             Physics2DBody body_b = manifold.body_b;
 
-            body_a.collidesWith.add(body_b);
-            body_b.collidesWith.add(body_a);
+            body_a.touching.add(body_b);
+            body_b.touching.add(body_a);
             collisionResolver.beginContact(manifold);
             collisionResolver.resolve(manifold);
             collisionResolver.endContact(manifold);

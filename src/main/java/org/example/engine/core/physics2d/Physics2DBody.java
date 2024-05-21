@@ -19,7 +19,9 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public    MathVector2 netForce   = new MathVector2();
     public    float       netTorque  = 0;
 
-    public CollectionsArray<Physics2DBody>       collidesWith = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DBody> touching      = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DBody> justCollided  = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DBody> justSeparated = new CollectionsArray<>(false, 2);
 
     // TODO: must set some default values.
     public float   massInv;

@@ -13,8 +13,6 @@ public final class Physics2DWorldRenderer {
     private static final GraphicsColor TINT_FIXED     = new GraphicsColor(1,1,0,1);
     private static final GraphicsColor TINT_LOGICAL   = new GraphicsColor(1,0,1,1);
     private static final GraphicsColor TINT_NEWTONIAN = new GraphicsColor(0,1,1,1);
-    private static final GraphicsColor TINT_CELL_OFF  = new GraphicsColor(1,0.5f, 0.5f, 0.5f);
-    private static final GraphicsColor TINT_CELL_ON   = new GraphicsColor(0,0.5f, 1f, 0.5f);
 
     private final Shape2DSegment segment    = new Shape2DSegment(0,0,0,0);
     private final Shape2DPolygon polyCircle = ShapeUtils.createPolygonCircleFilled(1, 10);
@@ -28,7 +26,7 @@ public final class Physics2DWorldRenderer {
 
     public void render(GraphicsRenderer2D renderer) {
         final float pointPixelRadius = 3;
-        float scaleX = renderer.getCurrentCamera().lens.getViewportWidth() * pointPixelRadius / GraphicsUtils.getWindowWidth();
+        float scaleX = renderer.getCurrentCamera().lens.getViewportWidth()  * pointPixelRadius / GraphicsUtils.getWindowWidth();
         float scaleY = renderer.getCurrentCamera().lens.getViewportHeight() * pointPixelRadius / GraphicsUtils.getWindowHeight();
 
         // render bodies
@@ -46,8 +44,14 @@ public final class Physics2DWorldRenderer {
         // print sections
 
         // TODO: render velocities
+        if (world.renderVelocities) {
+
+        }
 
         // TODO: render joints
+        if (world.renderJoints) {
+
+        }
     }
 
 }
