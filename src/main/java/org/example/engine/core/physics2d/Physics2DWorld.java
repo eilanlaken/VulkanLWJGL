@@ -163,10 +163,8 @@ public class Physics2DWorld {
         for (CollisionPair pair : collisionCandidates) {
             Physics2DBody body_a = pair.a;
             Physics2DBody body_b = pair.b;
-            CollisionManifold manifold = collisionDetection.detectCollision(body_a, body_b);
+            CollisionManifold manifold = collisionDetection.detectCollision(body_a, body_a.shape, body_b, body_b.shape);
             if (manifold == null) continue;
-            manifold.body_a = body_a;
-            manifold.body_b = body_b;
             manifolds.add(manifold);
         }
 
@@ -361,7 +359,7 @@ public class Physics2DWorld {
         debugRenderer.render(renderer);
     }
 
-    public static final class CollisionManifold implements MemoryPool.Reset, Comparable<CollisionManifold> {
+    public static final class CollisionManifold implements MemoryPool.Reset {
 
         public Physics2DBody body_a        = null;
         public Physics2DBody body_b        = null;
@@ -373,41 +371,9 @@ public class Physics2DWorld {
         public MathVector2   contactPoint1 = new MathVector2();
         public MathVector2   contactPoint2 = new MathVector2();
 
-        public float       staticFriction  = 0;
-        public float       dynamicFriction = 0;
-
         @Override
         public void reset() {
             this.contacts = 0;
-        }
-
-        @Override
-        public String toString() {
-            return "CollisionManifold{" +
-                    "body_a=" + body_a +
-                    ", body_b=" + body_b +
-                    ", contacts=" + contacts +
-                    ", depth=" + depth +
-                    ", normal=" + normal +
-                    '}';
-        }
-
-        @Override
-        public int compareTo(@NotNull CollisionManifold other) {
-            // Compare by depth
-            int depthCompare = Float.compare(other.depth, this.depth);
-            if (depthCompare != 0) {
-                return depthCompare;
-            }
-
-            // Compare by body_a
-            int bodyACompare = this.body_a.compareTo(other.body_a);
-            if (bodyACompare != 0) {
-                return bodyACompare;
-            }
-
-            // Compare by body_b
-            return this.body_b.compareTo(other.body_b);
         }
 
     }
