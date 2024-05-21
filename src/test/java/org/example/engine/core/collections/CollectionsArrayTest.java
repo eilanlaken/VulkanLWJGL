@@ -235,6 +235,38 @@ class CollectionsArrayTest {
 
     @Test
     void removeDuplicates() {
+        CollectionsArray<Object> arr1 = new CollectionsArray<>();
+        Assertions.assertDoesNotThrow(() -> arr1.removeDuplicates(true));
+
+        CollectionsArray<Object> arr2 = new CollectionsArray<>();
+        arr2.add(null);
+        arr2.add(null);
+        arr2.removeDuplicates(true);
+        Assertions.assertEquals(1, arr2.size);
+
+        CollectionsArray<Object> arr3 = new CollectionsArray<>();
+        arr3.add(new Object());
+        arr3.add(new Object());
+        arr3.add(new Object());
+        arr3.removeDuplicates(true);
+        arr3.removeDuplicates(true);
+        Assertions.assertEquals(3, arr3.size);
+
+        CollectionsArray<Object> arr4 = new CollectionsArray<>();
+        Object obj1 = new Object();
+        arr4.add(obj1);
+        arr4.add(obj1);
+        arr4.add(obj1);
+        arr4.add(null);
+        arr4.removeDuplicates(true);
+        Assertions.assertEquals(2, arr4.size);
+
+        CollectionsArray<Integer> arr5 = new CollectionsArray<>();
+        arr5.add(5);
+        arr5.add(5);
+        arr5.add(5);
+        arr5.removeDuplicates(true);
+        Assertions.assertEquals(1, arr5.size);
     }
 
     @Test

@@ -351,7 +351,6 @@ public class CollectionsArray<T> implements Iterable<T> {
         }
     }
 
-    // TODO: test
     public void removeDuplicates(boolean identity) {
         CollectionsArray<T> uniques = new CollectionsArray<>();
         for (int i = 0; i < size; i++) {
