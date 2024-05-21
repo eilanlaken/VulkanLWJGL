@@ -1,4 +1,4 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.shape.Shape2D;

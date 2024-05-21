@@ -2,8 +2,12 @@ package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.graphics.GraphicsRenderer2D;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
+import org.example.engine.core.shape.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -16,51 +20,33 @@ import java.util.Set;
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
 public class Physics2DWorld {
 
-    // phases
-    protected final Physics2DWorldPhaseA phaseA = new Physics2DWorldPhaseA(this);
-    protected final Physics2DWorldPhaseB phaseB = new Physics2DWorldPhaseB(this);
-    protected final Physics2DWorldPhaseC phaseC = new Physics2DWorldPhaseC(this);
-    protected final Physics2DWorldPhaseD phaseD = new Physics2DWorldPhaseD(this);
-    protected final Physics2DWorldPhaseE phaseE = new Physics2DWorldPhaseE(this);
-
     // bodies, joints, constraints and manifolds
-    public MemoryPool<Physics2DBody>       bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
-    public MemoryPool<CollisionManifold>   manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
+    public MemoryPool<Physics2DBody>        bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
+    public MemoryPool<CollisionManifold>    manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
+    private final MemoryPool<CollisionPair> pairMemoryPool     = new MemoryPool<>(CollisionPair.class, 5);
+
     public CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
     public CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
     public CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
 
-    protected final CollectionsArray<Physics2DWorldPhaseC.Cell> spacePartition = new CollectionsArray<>(false, 1024);
-    protected final CollectionsArray<Physics2DWorldPhaseC.Cell> activeCells    = new CollectionsArray<>();
-    protected float worldWidth    = 0;
-    protected float worldMinX     = 0;
-    protected float worldMaxX     = 0;
-    protected float worldMinY     = 0;
-    protected float worldMaxY     = 0;
-    protected float worldMaxR     = 0;
-    protected float worldHeight   = 0;
-    protected int   rows          = 0;
-    protected int   cols          = 0;
-    protected float cellWidth     = 0;
-    protected float cellHeight    = 0;
+    protected final CollectionsArray<Cell> spacePartition = new CollectionsArray<>(false, 1024);
+    protected final CollectionsArray<Cell> activeCells    = new CollectionsArray<>();
+    private   final MemoryPool<Cell>       cellMemoryPool = new MemoryPool<>(Cell.class,1024);
     protected int   bodiesCreated = 0;
-    protected float deltaTime     = 0;
 
     protected final Set<CollisionPair>                  collisionCandidates = new HashSet<>();
-    protected final CollectionsArray<CollisionManifold> collisionManifolds  = new CollectionsArray<>(false, 200);
+    private   final Physics2DCollisionDetection         collisionDetection  = new Physics2DCollisionDetection(this);
     protected final Physics2DWorldRenderer              debugRenderer       = new Physics2DWorldRenderer(this);
-    protected final Physics2DBodyFactory                bodyFactory         = new Physics2DBodyFactory(this);
-
-    protected Physics2DCollisionListener collisionListener;
+    protected final CollectionsArray<CollisionManifold> manifolds           = new CollectionsArray<>(false, 20);
+    protected       Physics2DCollisionResolver          collisionResolver;
 
     // debugger options
-    public boolean renderBroadPhase = false;
     public boolean renderManifolds  = true;
     public boolean renderVelocities = false;
     public boolean renderBodies     = true;
 
-    public Physics2DWorld(Physics2DCollisionListener collisionListener) {
-        this.collisionListener = collisionListener != null ? collisionListener : new Physics2DCollisionListener() {};
+    public Physics2DWorld(Physics2DCollisionResolver collisionResolver) {
+        this.collisionResolver = collisionResolver != null ? collisionResolver : new Physics2DCollisionResolver() {};
     }
 
     public Physics2DWorld() {
@@ -68,72 +54,293 @@ public class Physics2DWorld {
     }
 
     public void update(final float delta) {
-        this.deltaTime = delta;
-        phaseA.update();
-        phaseB.update();
-        phaseC.update();
-        phaseD.update();
-        phaseE.update();
+        /* preparation: add and remove bodies */
+
+        for (Physics2DBody body : bodiesToRemove) {
+            allBodies.removeValue(body, true);
+            bodyMemoryPool.free(body);
+        }
+        for (Physics2DBody body : bodiesToAdd) {
+            allBodies.add(body);
+            body.created = true;
+            body.index = bodiesCreated;
+            bodiesCreated++;
+        }
+        bodiesToRemove.clear();
+        bodiesToAdd.clear();
+
+        /* integration: update velocities, clear forces and move bodies. */
+
+        float worldMinX = Float.POSITIVE_INFINITY;
+        float worldMaxX = Float.NEGATIVE_INFINITY;
+        float worldMinY = Float.POSITIVE_INFINITY;
+        float worldMaxY = Float.NEGATIVE_INFINITY;
+        float worldMaxR = Float.NEGATIVE_INFINITY;
+
+        for (Physics2DBody body : allBodies) {
+            if (body.off) continue;
+            if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
+                body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
+                body.omega += body.netTorque * (body.inertiaInv) * delta;
+            }
+            if (body.motionType != Physics2DBody.MotionType.STATIC) {
+                body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omega);
+            }
+            body.shape.update();
+            body.netForce.set(0, 0);
+            body.netTorque = 0;
+            body.collidesWith.clear();
+
+            worldMinX = Math.min(worldMinX, body.shape.getMinExtentX());
+            worldMaxX = Math.max(worldMaxX, body.shape.getMaxExtentX());
+            worldMinY = Math.min(worldMinY, body.shape.getMinExtentY());
+            worldMaxY = Math.max(worldMaxY, body.shape.getMaxExtentY());
+            worldMaxR = Math.max(worldMaxR, body.shape.getBoundingRadius());
+        }
+
+        float maxDiameter = 2 * worldMaxR;
+        float worldWidth  = Math.abs(worldMaxX - worldMinX);
+        float worldHeight = Math.abs(worldMaxY - worldMinY);
+        int   rows        = Math.min((int) Math.ceil(worldHeight / maxDiameter), 32);
+        int   cols        = Math.min((int) Math.ceil(worldWidth  / maxDiameter), 32);
+        float cellWidth   = worldWidth  / cols;
+        float cellHeight  = worldHeight / rows;
+
+        /* collision detection - broad phase */
+        cellMemoryPool.freeAll(spacePartition);
+        spacePartition.clear();
+        activeCells.clear();
+        for (int i = 0; i < rows * cols; i++) {
+            spacePartition.add(cellMemoryPool.allocate());
+        }
+
+        for (Physics2DBody body : allBodies) {
+            int startCol = Math.max(0, (int) ((body.shape.getMinExtentX() - worldMinX) / cellWidth));
+            int endCol   = Math.min(cols - 1, (int) ((body.shape.getMaxExtentX() - worldMinX) / cellWidth));
+            int startRow = Math.max(0, (int) ((body.shape.getMinExtentY() - worldMinY) / cellHeight));
+            int endRow   = Math.min(rows - 1, (int) ((body.shape.getMaxExtentY() - worldMinY) / cellHeight));
+
+            for (int row = startRow; row <= endRow; row++) {
+                for (int col = startCol; col <= endCol; col++) {
+                    Cell cell = spacePartition.get(row * cols + col);
+                    cell.bodies.add(body);
+                    if (!cell.active) {
+                        cell.active = true;
+                        activeCells.add(cell);
+                    }
+                }
+            }
+        }
+
+        pairMemoryPool.freeAll(collisionCandidates);
+        collisionCandidates.clear();
+        for (Cell cell : activeCells) {
+            for (int i = 0; i < cell.bodies.size - 1; i++) {
+                for (int j = i + 1; j < cell.bodies.size; j++) {
+                    Physics2DBody body_a = cell.bodies.get(i);
+                    Physics2DBody body_b = cell.bodies.get(j);
+                    if (body_a.off) continue;
+                    if (body_b.off) continue;
+                    if (body_a.motionType == Physics2DBody.MotionType.STATIC && body_b.motionType == Physics2DBody.MotionType.STATIC) continue;
+                    final float dx  = body_b.shape.x() - body_a.shape.x();
+                    final float dy  = body_b.shape.y() - body_a.shape.y();
+                    final float sum = body_a.shape.getBoundingRadius() + body_b.shape.getBoundingRadius();
+                    boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
+                    if (!boundingCirclesCollide) continue;
+
+                    CollisionPair pair = pairMemoryPool.allocate();
+                    pair.a = body_a;
+                    pair.b = body_b;
+                    collisionCandidates.add(pair);
+                }
+            }
+        }
+
+
+        /* collision detection - narrow phase */
+        manifoldMemoryPool.freeAll(manifolds);
+        manifolds.clear();
+        for (CollisionPair pair : collisionCandidates) {
+            Physics2DBody body_a = pair.a;
+            Physics2DBody body_b = pair.b;
+            CollisionManifold manifold = collisionDetection.detectCollision(body_a, body_b);
+            if (manifold == null) continue;
+            manifold.body_a = body_a;
+            manifold.body_b = body_b;
+            manifolds.add(manifold);
+        }
+
+        /* collision resolution */
+        manifolds.sort(); // to achieve deterministic behaviour, we should resolve the collisions in consistent order. We resolve collisions with greater penetration depth first.
+        for (CollisionManifold manifold : manifolds) {
+            Physics2DBody body_a = manifold.body_a;
+            Physics2DBody body_b = manifold.body_b;
+
+            body_a.collidesWith.add(body_b);
+            body_b.collidesWith.add(body_a);
+            collisionResolver.beginContact(body_a, body_b);
+            collisionResolver.preSolve(manifold);
+            collisionResolver.solve(body_a, body_b, manifold);
+            collisionResolver.postSolve(manifold);
+            collisionResolver.endContact(body_a, body_b);
+        }
+
     }
 
-    public Physics2DBody createBodyCircle(Object owner, Physics2DBody.MotionType motionType,
-                                          float x, float y, float angleDeg,
-                                          float velX, float velY, float velAngleDeg,
-                                          float density, float friction, float restitution,
-                                          boolean ghost, int bitmask,
-                                          float r) {
-        Physics2DBody body = bodyFactory.createBodyCircle(owner, motionType, density, friction, restitution, ghost, bitmask, Math.abs(r));
+    @Contract(pure = true)
+    @NotNull public Physics2DBody createBodyCircle(Object owner,
+                                            Physics2DBody.MotionType motionType,
+                                            float x, float y, float angle,
+                                            float velX, float velY, float velAngleDeg,
+                                            float density, float friction, float restitution,
+                                            boolean ghost, int bitmask,
+                                            float radius) {
+        Physics2DBody body = bodyMemoryPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+        body.density = density;
+        body.shape = new Shape2DCircle(radius);
+        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
+        body.staticFriction = friction;
+        body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
+        body.ghost = ghost;
+        body.bitmask = bitmask;
+        body.setMotionState(x, y, angle, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
+        return body;
+    }
+
+    @Contract(pure = true)
+    @NotNull public Physics2DBody createBodyCircle(Object owner,
+                                            Physics2DBody.MotionType motionType,
+                                            float x, float y, float angleDeg,
+                                            float velX, float velY, float velAngleDeg,
+                                            float density, float friction, float restitution,
+                                            boolean ghost, int bitmask,
+                                            float radius, float offsetX, float offsetY) {
+        Physics2DBody body = bodyMemoryPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+        body.density = density;
+        body.shape = new Shape2DCircle(radius, offsetX, offsetY);
+        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
+        body.staticFriction = friction;
+        body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
+        body.ghost = ghost;
+        body.bitmask = bitmask;
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
         bodiesToAdd.add(body);
         return body;
     }
 
-    public Physics2DBody createBodyCircle(Object owner, Physics2DBody.MotionType motionType,
-                                          float x, float y, float angleDeg,
-                                          float velX, float velY, float velAngleDeg,
-                                          float density, float friction, float restitution,
-                                          boolean ghost, int bitmask,
-                                          float r, float offsetX, float offsetY) {
-        Physics2DBody body = bodyFactory.createBodyCircle(owner, motionType, density, friction, restitution, ghost, bitmask, Math.abs(r), offsetX, offsetY);
+    @Contract(pure = true)
+    @NotNull public Physics2DBody createBodyRectangle(Object owner,
+                                               Physics2DBody.MotionType motionType,
+                                               float x, float y, float angleDeg,
+                                               float velX, float velY, float velAngleDeg,
+                                               float density, float friction, float restitution,
+                                               boolean ghost, int bitmask,
+                                               float width, float height, float rot) {
+        Physics2DBody body = bodyMemoryPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+        body.density = density;
+        body.shape = new Shape2DRectangle(width, height, rot);
+        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
+        body.staticFriction = friction;
+        body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
+        body.ghost = ghost;
+        body.bitmask = bitmask;
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
         bodiesToAdd.add(body);
         return body;
     }
 
-    public Physics2DBody createBodyRectangle(Object owner, Physics2DBody.MotionType motionType,
+    @Contract(pure = true)
+    @NotNull public Physics2DBody createBodyRectangle(Object owner,
+                                               Physics2DBody.MotionType motionType,
+                                               float x, float y, float angleDeg,
+                                               float velX, float velY, float velAngleDeg,
+                                               float density, float friction, float restitution,
+                                               boolean ghost, int bitmask,
+                                               float width, float height, float offsetX, float offsetY, float rot) {
+        Physics2DBody body = bodyMemoryPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+        body.density = density;
+        body.shape = new Shape2DRectangle(offsetX, offsetY, width, height, rot);
+        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
+        body.staticFriction = friction;
+        body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
+        body.ghost = ghost;
+        body.bitmask = bitmask;
+        body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
+        bodiesToAdd.add(body);
+        return body;
+    }
+
+    @Contract(pure = true)
+    @NotNull public Physics2DBody createBodyPolygon(Object owner,
+                                             Physics2DBody.MotionType motionType,
                                              float x, float y, float angleDeg,
                                              float velX, float velY, float velAngleDeg,
                                              float density, float friction, float restitution,
                                              boolean ghost, int bitmask,
-                                             float width, float height, float angle) {
-        Physics2DBody body = bodyFactory.createBodyRectangle(owner, motionType, density, friction, restitution, ghost, bitmask, Math.abs(width), Math.abs(height), angle);
+                                             float[] vertices) {
+        Physics2DBody body = bodyMemoryPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+        body.density = density;
+
+        final boolean isConvex = ShapeUtils.isPolygonConvex(vertices);
+        if (isConvex) {
+            body.shape = new Shape2DPolygon(vertices);
+        } else {
+            // TODO: create union of triangles.
+        }
+        //body.shape = new Shape2DRectangle(width, height, angle);
+
+        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
+        body.staticFriction = friction;
+        body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
+        body.ghost = ghost;
+        body.bitmask = bitmask;
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
         bodiesToAdd.add(body);
         return body;
     }
 
-    public Physics2DBody createBodyRectangle(Object owner, Physics2DBody.MotionType motionType,
-                                             float x, float y, float angleDeg,
-                                             float velX, float velY, float velAngleDeg,
-                                             float density, float friction, float restitution,
-                                             boolean ghost, int bitmask,
-                                             float width, float height, float offsetX, float offsetY, float angle) {
-        Physics2DBody body = bodyFactory.createBodyRectangle(owner, motionType, density, friction, restitution, ghost, bitmask, Math.abs(width), Math.abs(height), offsetX, offsetY, angle);
-        body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
-        bodiesToAdd.add(body);
-        return body;
-    }
-
-    public Physics2DBody createBodyPolygon(Object owner, Physics2DBody.MotionType motionType,
+    // TODO
+    @Contract(pure = true)
+    @NotNull Physics2DBody createBodyUnion(Object owner,
+                                           boolean sleeping, Physics2DBody.MotionType motionType,
                                            float x, float y, float angleDeg,
                                            float velX, float velY, float velAngleDeg,
-                                           float density, float friction, float restitution,
+                                           float massInv, float density, float friction, float restitution,
                                            boolean ghost, int bitmask,
-                                           float[] vertices) {
-        Physics2DBody body = bodyFactory.createBodyPolygon(owner, motionType, density, friction, restitution, ghost, bitmask, vertices);
+                                           Shape2D... shapes) {
+        Physics2DBody body = bodyMemoryPool.allocate();
+        body.owner = owner;
+        body.off = sleeping;
+        body.motionType = motionType;
+
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
         bodiesToAdd.add(body);
         return body;
+    }
+
+    public static float calculateMomentOfInertia(final Shape2D shape, float density) {
+        return 1;
     }
 
     public void destroyBody(final Physics2DBody body) {
@@ -156,23 +363,69 @@ public class Physics2DWorld {
         debugRenderer.render(renderer);
     }
 
-    public static final class CollisionManifold implements MemoryPool.Reset {
+    public static final class CollisionManifold implements MemoryPool.Reset, Comparable<CollisionManifold> {
 
-        public Physics2DBody a               = null;
-        public Physics2DBody b               = null;
-        public int           contacts        = 0;
-        public float         depth           = 0;
-        public MathVector2   normal          = new MathVector2();
-        public MathVector2   contactPoint1   = new MathVector2();
-        public MathVector2   contactPoint2   = new MathVector2();
-        public float         staticFriction  = 0;
-        public float         dynamicFriction = 0;
+        public Physics2DBody body_a        = null;
+        public Physics2DBody body_b        = null;
+        public Shape2D       shape_a       = null;
+        public Shape2D       shape_b       = null;
+        public int           contacts      = 0;
+        public float         depth         = 0;
+        public MathVector2   normal        = new MathVector2();
+        public MathVector2   contactPoint1 = new MathVector2();
+        public MathVector2   contactPoint2 = new MathVector2();
+
+        public float       staticFriction  = 0;
+        public float       dynamicFriction = 0;
 
         @Override
         public void reset() {
-            this.a = null;
-            this.b = null;
             this.contacts = 0;
+        }
+
+        @Override
+        public String toString() {
+            return "CollisionManifold{" +
+                    "body_a=" + body_a +
+                    ", body_b=" + body_b +
+                    ", contacts=" + contacts +
+                    ", depth=" + depth +
+                    ", normal=" + normal +
+                    '}';
+        }
+
+        @Override
+        public int compareTo(@NotNull CollisionManifold other) {
+            // Compare by depth
+            int depthCompare = Float.compare(other.depth, this.depth);
+            if (depthCompare != 0) {
+                return depthCompare;
+            }
+
+            // Compare by body_a
+            int bodyACompare = this.body_a.compareTo(other.body_a);
+            if (bodyACompare != 0) {
+                return bodyACompare;
+            }
+
+            // Compare by body_b
+            return this.body_b.compareTo(other.body_b);
+        }
+
+    }
+
+    public static final class Cell implements MemoryPool.Reset {
+
+        private final CollectionsArray<Physics2DBody> bodies = new CollectionsArray<>(false, 2);
+
+        private boolean active = false;
+
+        public Cell() {}
+
+        @Override
+        public void reset() {
+            bodies.clear();
+            active = false;
         }
 
     }
@@ -205,10 +458,8 @@ public class Physics2DWorld {
         }
 
         @Override
-        public void reset() {
-            a = null;
-            b = null;
-        }
+        public void reset() {}
 
     }
+
 }

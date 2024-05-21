@@ -3,8 +3,6 @@ package org.example.engine.core.physics2d;
 import org.example.engine.core.collections.CollectionsArray;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.MemoryPool;
-import org.example.engine.core.physics2d_new.Physics2DBody;
-import org.example.engine.core.physics2d_new.Physics2DWorld;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

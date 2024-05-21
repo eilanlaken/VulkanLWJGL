@@ -20,8 +20,6 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public    float       netTorque  = 0;
 
     public CollectionsArray<Physics2DBody>       collidesWith = new CollectionsArray<>(false, 2);
-    public CollectionsArray<Physics2DConstraint> constraints  = new CollectionsArray<>(false, 1);
-    public CollectionsArray<Physics2DJoint>      joints       = new CollectionsArray<>(false, 1);
 
     // TODO: must set some default values.
     public float   massInv;
@@ -99,8 +97,6 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         this.omega = 0;
         this.netForce.set(0,0);
         this.netTorque = 0;
-        this.constraints.clear();
-        this.joints.clear();
         this.massInv = 0;
         this.inertiaInv = 0;
         this.density = 0;
