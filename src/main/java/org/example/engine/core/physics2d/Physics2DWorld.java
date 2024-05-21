@@ -175,9 +175,9 @@ public class Physics2DWorld {
 
             body_a.collidesWith.add(body_b);
             body_b.collidesWith.add(body_a);
-            collisionResolver.beginContact(body_a, body_b);
-            collisionResolver.resolve(body_a, body_b, manifold);
-            collisionResolver.endContact(body_a, body_b);
+            collisionResolver.beginContact(manifold);
+            collisionResolver.resolve(manifold);
+            collisionResolver.endContact(manifold);
         }
 
     }

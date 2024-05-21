@@ -5,11 +5,13 @@ import org.example.engine.core.shape.Shape2D;
 
 public class Physics2DCollisionResolver {
 
-    protected void beginContact(Physics2DBody a, Physics2DBody b) {
+    protected void beginContact(Physics2DWorld.CollisionManifold manifold) {
 
     }
 
-    protected void resolve(Physics2DBody body_a, Physics2DBody body_b, Physics2DWorld.CollisionManifold manifold) {
+    protected void resolve(Physics2DWorld.CollisionManifold manifold) {
+        Physics2DBody body_a = manifold.body_a;
+        Physics2DBody body_b = manifold.body_b;
         Shape2D shape_a = manifold.shape_a;
         Shape2D shape_b = manifold.shape_b;
 
@@ -45,7 +47,7 @@ public class Physics2DCollisionResolver {
         body_b.velocity.add(deltaVelB);
     }
 
-    protected void endContact(Physics2DBody a, Physics2DBody b) {
+    protected void endContact(Physics2DWorld.CollisionManifold manifold) {
 
     }
 
