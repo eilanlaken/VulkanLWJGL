@@ -45,7 +45,7 @@ public class Physics2DCollisionResolver {
 
         MathVector2 vRel = new MathVector2(body_b.velocity).sub(body_a.velocity);
         float normalVelocity = vRel.dot(manifold.normal);
-        if (normalVelocity <= 0) return; // TODO see why it breaks things
+        //if (normalVelocity <= 0) return; // TODO see why it breaks things
 
         // TODO: collision response - friction, torque
         float e = Math.min(body_a.restitution, body_b.restitution);
