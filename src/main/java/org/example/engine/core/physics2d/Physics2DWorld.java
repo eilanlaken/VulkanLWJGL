@@ -41,7 +41,7 @@ public class Physics2DWorld {
     protected       Physics2DCollisionResolver          collisionResolver;
 
     // debugger options
-    public boolean renderManifolds  = true;
+    public boolean renderContacts   = true;
     public boolean renderVelocities = false;
     public boolean renderBodies     = true;
     public boolean renderJoints     = true;

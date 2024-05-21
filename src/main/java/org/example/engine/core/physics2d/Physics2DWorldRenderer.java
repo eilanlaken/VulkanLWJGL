@@ -52,6 +52,11 @@ public final class Physics2DWorldRenderer {
         if (world.renderJoints) {
 
         }
+
+        // TODO: render contact points
+        if (world.renderContacts) {
+
+        }
     }
 
 }
