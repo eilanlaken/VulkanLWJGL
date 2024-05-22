@@ -16,7 +16,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public    MotionType  motionType = null;
     public    MathVector2 velocity   = new MathVector2();
     public    MathVector2 com        = new MathVector2();
-    public    float       omega      = 0;
+    public    float       omegaDeg   = 0;
     public    MathVector2 netForce   = new MathVector2();
     public    float       netTorque  = 0;
 
@@ -39,8 +39,9 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     }
 
     // TODO: FIXME
-    public MathVector2 getCenterOfMass() {
-        return shape.geometryCenter();
+    public MathVector2 getCenterOfMass(MathVector2 out) {
+        return out.set(shape.x(), shape.y());
+        //return shape.geometryCenter();
     }
 
     public void setPosition(float x, float y) {
@@ -55,8 +56,8 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         velocity.set(x, y);
     }
 
-    public void setOmega(float omega) {
-        this.omega = omega;
+    public void setOmegaDeg(float omegaDeg) {
+        this.omegaDeg = omegaDeg;
     }
 
     public void applyForce(float fx, float fy) {
@@ -70,7 +71,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public void setMotionState(float x, float y, float angleDeg, float vx, float vy, float omega) {
         this.shape.setTransform(x, y, angleDeg);
         this.velocity.set(vx, vy);
-        this.omega = omega;
+        this.omegaDeg = omega;
     }
 
     public void turnOn() {
@@ -102,7 +103,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         this.motionType = null;
         this.shape = null;
         this.velocity.set(0, 0);
-        this.omega = 0;
+        this.omegaDeg = 0;
         this.netForce.set(0,0);
         this.com.set(0,0);
         this.netTorque = 0;

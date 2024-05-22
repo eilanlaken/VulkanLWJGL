@@ -82,10 +82,10 @@ public class Physics2DWorld {
             if (body.off) continue;
             if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
                 body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
-                body.omega += body.netTorque * (body.inertiaInv) * delta;
+                body.omegaDeg += body.netTorque * (body.inertiaInv) * delta * MathUtils.degreesToRadians;
             }
             if (body.motionType != Physics2DBody.MotionType.STATIC) {
-                body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omega);
+                body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omegaDeg);
             }
             body.shape.update();
             body.netForce.set(0, 0);

@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.shape.Shape2D;
 
@@ -58,14 +59,14 @@ public class Physics2DCollisionResolver {
         }
 
         for (int i = 0; i < manifold.contacts; i++) {
-            ra_list.get(i).set(contacts.get(i).x - body_a.getCenterOfMass().x, contacts.get(i).y - body_a.getCenterOfMass().y);
-            rb_list.get(i).set(contacts.get(i).x - body_b.getCenterOfMass().x, contacts.get(i).y - body_b.getCenterOfMass().y);
+            ra_list.get(i).set(contacts.get(i).x - body_a.shape.x(), contacts.get(i).y - body_a.shape.y());
+            rb_list.get(i).set(contacts.get(i).x - body_b.shape.x(), contacts.get(i).y - body_b.shape.y());
 
             MathVector2 raRot90 = new MathVector2(ra_list.get(i)).rotate90(1);
             MathVector2 rbRot90 = new MathVector2(rb_list.get(i)).rotate90(1);
 
-            MathVector2 angularLinearVelA = new MathVector2(raRot90).scl(body_a.omega);
-            MathVector2 angularLinearVelB = new MathVector2(rbRot90).scl(body_b.omega);
+            MathVector2 angularLinearVelA = new MathVector2(raRot90).scl(body_a.omegaDeg);
+            MathVector2 angularLinearVelB = new MathVector2(rbRot90).scl(body_b.omegaDeg);
 
             MathVector2 relativeVelocity  = new MathVector2();
             relativeVelocity.add(body_b.velocity);
@@ -99,11 +100,10 @@ public class Physics2DCollisionResolver {
             MathVector2 deltaVelA = new MathVector2(impulse).scl(aMassInv);
             MathVector2 deltaVelB = new MathVector2(impulse).scl(bMassInv);
 
-
             body_a.velocity.sub(deltaVelA);
             body_b.velocity.add(deltaVelB);
-            body_a.omega += -MathVector2.crs(ra, impulse) * aInertiaInv;
-            body_b.omega +=  MathVector2.crs(rb, impulse) * bInertiaInv;
+            body_a.omegaDeg += -MathVector2.crs(ra, impulse) * aInertiaInv * MathUtils.radiansToDegrees;
+            body_b.omegaDeg +=  MathVector2.crs(rb, impulse) * bInertiaInv * MathUtils.radiansToDegrees;
         }
 
     }
