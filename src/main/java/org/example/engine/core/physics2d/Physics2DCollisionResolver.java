@@ -65,8 +65,8 @@ public class Physics2DCollisionResolver {
             MathVector2 raRot90 = new MathVector2(ra_list.get(i)).rotate90(1);
             MathVector2 rbRot90 = new MathVector2(rb_list.get(i)).rotate90(1);
 
-            MathVector2 angularLinearVelA = new MathVector2(raRot90).scl(body_a.omegaDeg);
-            MathVector2 angularLinearVelB = new MathVector2(rbRot90).scl(body_b.omegaDeg);
+            MathVector2 angularLinearVelA = new MathVector2(raRot90).scl(body_a.omegaDeg * MathUtils.degreesToRadians);
+            MathVector2 angularLinearVelB = new MathVector2(rbRot90).scl(body_b.omegaDeg * MathUtils.degreesToRadians);
 
             MathVector2 relativeVelocity  = new MathVector2();
             relativeVelocity.add(body_b.velocity);

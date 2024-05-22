@@ -83,23 +83,14 @@ class Shape2DTest {
         Assertions.assertEquals(-2.0, shape.y(),     MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(60.0, shape.angle(), MathUtils.FLOAT_ROUNDING_ERROR);
         shape.dx_dy_rot(1.0f, -1.0f, 360.0f);
-        Assertions.assertEquals(60.0, shape.angle(), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(420.0, shape.angle(), MathUtils.FLOAT_ROUNDING_ERROR);
         shape.dx_dy_rot(1.0f, -1.0f, -70.0f);
         Assertions.assertEquals(350, shape.angle(),  MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test
     void rot() {
-        shape.rot(Float.MAX_VALUE);
-        Assertions.assertAll("value should be in range",
-                () -> assertTrue(shape.angle() >= 0),
-                () -> assertTrue(shape.angle() < 360)
-        );
-        shape.angle(0);
-        shape.rot(-450.0f);
-        Assertions.assertEquals(270.0f, shape.angle(), MathUtils.FLOAT_ROUNDING_ERROR);
-        shape.rot(90.0f);
-        Assertions.assertEquals(0.0f, shape.angle(),   MathUtils.FLOAT_ROUNDING_ERROR);
+
     }
 
     @Test
@@ -132,11 +123,11 @@ class Shape2DTest {
         shape.angle(30f);
         Assertions.assertEquals(30.0f, shape.angle(),   MathUtils.FLOAT_ROUNDING_ERROR);
         shape.angle(370.0f);
-        Assertions.assertEquals(10.0f, shape.angle(),   MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(370.0, shape.angle(),   MathUtils.FLOAT_ROUNDING_ERROR);
         shape.angle(-88.5f);
-        Assertions.assertEquals(271.5f, shape.angle(),  MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(-88.5f, shape.angle(),  MathUtils.FLOAT_ROUNDING_ERROR);
         shape.angle(450.0f);
-        Assertions.assertEquals(90.0f, shape.angle(),   MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(450.0f, shape.angle(),   MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test

@@ -119,12 +119,11 @@ public abstract class Shape2D {
         this.x += dx;
         this.y += dy;
         angle += da;
-        angle = MathUtils.normalizeAngleDeg(angle);
         updated = false;
     }
 
     public final void rot(float da) {
-        angle = MathUtils.normalizeAngleDeg(angle + da);
+        angle += da;
         updated = false;
     }
 
@@ -145,7 +144,7 @@ public abstract class Shape2D {
     }
 
     public final void angle(float angle) {
-        this.angle = MathUtils.normalizeAngleDeg(angle);
+        this.angle = angle;
         updated = false;
     }
 
@@ -174,14 +173,14 @@ public abstract class Shape2D {
     public final void setTransform(float x, float y, float angleDeg) {
         this.x = x;
         this.y = y;
-        this.angle = MathUtils.normalizeAngleDeg(angleDeg);
+        this.angle = angleDeg;
         updated = false;
     }
 
     public final void setTransform(float x, float y, float angleDeg, float scaleX, float scaleY) {
         this.x = x;
         this.y = y;
-        this.angle = MathUtils.normalizeAngleDeg(angleDeg);
+        this.angle = angleDeg;
         this.scaleX = scaleX;
         this.scaleY = scaleY;
         boundingRadiusUpdated = false;
