@@ -46,8 +46,9 @@ public class Shape2DPolygon extends Shape2D {
      * @param holes is an array of hole indices if any (e.g. [5, 8] for a 12-vertex input would mean one hole with vertices 5-7 and another with 8-11).
      */
     public Shape2DPolygon(float[] vertices, int[] holes) {
-        if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
-        if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
+        if (vertices.length < 6)      throw new ShapeException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
+        if (vertices.length % 2 != 0) throw new ShapeException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
+
         if (holes != null && !CollectionsUtils.isSorted(holes, true)) Arrays.sort(holes);
         this.vertexCount = vertices.length / 2;
         this.vertices = vertices;
@@ -55,7 +56,11 @@ public class Shape2DPolygon extends Shape2D {
         for (int i = 0; i < vertexCount; i++) {
             this.worldVertices.add(new MathVector2());
         }
-        this.indices = ShapeUtils.triangulatePolygon(this.vertices, holes, 2);
+        try {
+            this.indices = ShapeUtils.triangulatePolygon(this.vertices, holes, 2);
+        } catch (Exception e) {
+            throw new ShapeException("Failed to triangulate polygon: polygon either contains collinear or intersecting edges");
+        }
         this.holes = holes;
         this.loops = ShapeUtils.getLoops(holes, vertexCount);
         this.hasHoles = holes != null && holes.length != 0;
@@ -141,8 +146,7 @@ public class Shape2DPolygon extends Shape2D {
         return worldVertices;
     }
 
-    // TODO: write unit tests for that. By the way, in its previous form, it was at the very least
-    // TODO: incorrect for polygons with holes.
+    // TODO: write unit tests
     @Override
     protected boolean containsPoint(float x, float y) {
         boolean inside = false;

@@ -44,6 +44,13 @@ class Shape2DPolygonTest {
 
     @Test
     void contains() {
+        Shape2DPolygon p1 = new Shape2DPolygon(new float[] {-1,1,-1,-1,1,-1,1,1});
+        Assertions.assertTrue(p1.contains(0,0));
+        Assertions.assertTrue(p1.contains(0.5f,0.5f));
+        Assertions.assertTrue(p1.contains(0.5f,-0.5f));
+        Assertions.assertTrue(p1.contains(-0.5f,0.5f));
+        Assertions.assertTrue(p1.contains(-0.5f,-0.5f));
+        Assertions.assertFalse(p1.contains(1,1.5f));
     }
 
     @Test
