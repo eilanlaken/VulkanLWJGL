@@ -237,6 +237,10 @@ public class MathVector2 {
         return new MathVector2(-s * a.y, s * a.x);
     }
 
+    public static float crs(MathVector2 a, MathVector2 b) {
+        return a.x * b.y - a.y * b.x;
+    }
+
     public float angleDeg() {
         float angle = (float)Math.atan2(y, x) * MathUtils.radiansToDegrees;
         if (angle < 0) angle += 360;

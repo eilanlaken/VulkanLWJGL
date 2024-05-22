@@ -15,6 +15,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public    Shape2D     shape      = null;
     public    MotionType  motionType = null;
     public    MathVector2 velocity   = new MathVector2();
+    public    MathVector2 com        = new MathVector2();
     public    float       omega      = 0;
     public    MathVector2 netForce   = new MathVector2();
     public    float       netTorque  = 0;
@@ -35,6 +36,11 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
 
     public Physics2DBody() {
 
+    }
+
+    // TODO: FIXME
+    public MathVector2 getCenterOfMass() {
+        return shape.geometryCenter();
     }
 
     public void setPosition(float x, float y) {
@@ -98,6 +104,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         this.velocity.set(0, 0);
         this.omega = 0;
         this.netForce.set(0,0);
+        this.com.set(0,0);
         this.netTorque = 0;
         this.massInv = 0;
         this.inertiaInv = 0;
