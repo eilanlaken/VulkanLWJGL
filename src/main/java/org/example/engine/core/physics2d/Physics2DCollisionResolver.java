@@ -86,7 +86,6 @@ public class Physics2DCollisionResolver {
                     (rbRot90DotN * rbRot90DotN) * bInertiaInv;
 
             float j = -(1f + e) * contactVelocityMag / (d * manifold.contacts);
-            if (j != 0) System.out.println("j : " + j);
 
             impulses.get(i).set(manifold.normal).scl(j);
         }
