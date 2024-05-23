@@ -29,11 +29,14 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
         camera.update();
 
         world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
-                2, -3,0,
+                2, 8,0,
                 0f,0f,0,
                 1, 1, 1, false, 1,
                 1, 1f, 0, 0, 0);
 
+        world.createForceField((body, force) -> {
+            force.set(0, -9.8f / body.massInv);
+        });
     }
 
 
@@ -50,6 +53,8 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
                     10, 1, 1, false, 1,
                     1, 1f, 0, 0, 0);
         }
+
+
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,1);

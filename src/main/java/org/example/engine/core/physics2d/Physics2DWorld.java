@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
@@ -20,31 +22,40 @@ import java.util.Set;
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
 public class Physics2DWorld {
 
-    // bodies, joints, constraints and manifolds
+    // memory pools
     public MemoryPool<Physics2DBody>        bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
     public MemoryPool<CollisionManifold>    manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
     private final MemoryPool<CollisionPair> pairMemoryPool     = new MemoryPool<>(CollisionPair.class, 5);
+    private final MemoryPool<Cell>          cellMemoryPool     = new MemoryPool<>(Cell.class,1024);
 
-    public CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
-    public CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
-    public CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
+    // bodies
+    private int                             bodiesCreated      = 0;
+    public  CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
+    public  CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
+    public  CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
 
-    protected final CollectionsArray<Cell> spacePartition = new CollectionsArray<>(false, 1024);
-    protected final CollectionsArray<Cell> activeCells    = new CollectionsArray<>();
-    private   final MemoryPool<Cell>       cellMemoryPool = new MemoryPool<>(Cell.class,1024);
-    protected int   bodiesCreated = 0;
+    // forces
+    public CollectionsArray<Physics2DForceField> allForceFields      = new CollectionsArray<>(false, 4);
+    public CollectionsArray<Physics2DForceField> forceFieldsToAdd    = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DForceField> forceFieldsToRemove = new CollectionsArray<>(false, 2);
 
-    protected final Set<CollisionPair>                  collisionCandidates = new HashSet<>();
-    private   final Physics2DCollisionDetection         collisionDetection  = new Physics2DCollisionDetection(this);
-    protected final Physics2DWorldRenderer              debugRenderer       = new Physics2DWorldRenderer(this);
-    protected final CollectionsArray<CollisionManifold> manifolds           = new CollectionsArray<>(false, 20);
-    protected       Physics2DCollisionResolver          collisionResolver;
+
+    // collision detection
+    private CollectionsArray<Cell>      spacePartition      = new CollectionsArray<>(false, 1024);
+    private CollectionsArray<Cell>      activeCells         = new CollectionsArray<>();
+    private Set<CollisionPair>          collisionCandidates = new HashSet<>();
+    private Physics2DCollisionDetection collisionDetection  = new Physics2DCollisionDetection(this);
+
+    // collision resolution
+    private CollectionsArray<CollisionManifold> manifolds = new CollectionsArray<>(false, 20);
+    private Physics2DCollisionResolver          collisionResolver;
 
     // debugger options
-    public boolean renderContacts   = true;
-    public boolean renderVelocities = false;
-    public boolean renderBodies     = true;
-    public boolean renderJoints     = true;
+    protected Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
+    public    boolean                renderContacts   = true;
+    public    boolean                renderVelocities = false;
+    public    boolean                renderBodies     = true;
+    public    boolean                renderJoints     = true;
 
     public Physics2DWorld(Physics2DCollisionResolver collisionResolver) {
         this.collisionResolver = collisionResolver != null ? collisionResolver : new Physics2DCollisionResolver() {};
@@ -70,6 +81,17 @@ public class Physics2DWorld {
         bodiesToRemove.clear();
         bodiesToAdd.clear();
 
+        /* preparation: add and remove force fields */
+
+        for (Physics2DForceField forceField : forceFieldsToRemove) {
+            allForceFields.removeValue(forceField, true);
+        }
+        for (Physics2DForceField forceField : forceFieldsToAdd) {
+            allForceFields.add(forceField);
+        }
+        forceFieldsToRemove.clear();
+        forceFieldsToAdd.clear();
+
         /* integration: update velocities, clear forces and move bodies. */
 
         float worldMinX = Float.POSITIVE_INFINITY;
@@ -81,6 +103,11 @@ public class Physics2DWorld {
         for (Physics2DBody body : allBodies) {
             if (body.off) continue;
             if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
+                for (Physics2DForceField field : allForceFields) {
+                    MathVector2 force = new MathVector2();
+                    field.calcForce(body, force);
+                    body.netForce.add(force);
+                }
                 body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
                 body.omegaDeg += body.netTorque * (body.inertiaInv) * delta * MathUtils.degreesToRadians;
             }
@@ -334,6 +361,18 @@ public class Physics2DWorld {
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
         bodiesToAdd.add(body);
         return body;
+    }
+
+    @Contract(pure = true)
+    @NotNull public Physics2DForceField createForceField(BiConsumer<Physics2DBody, MathVector2> forceFunction) {
+        Physics2DForceField forceField = new Physics2DForceField(this) {
+            @Override
+            public void calcForce(Physics2DBody body, MathVector2 out) {
+                forceFunction.accept(body, out);
+            }
+        };
+        forceFieldsToAdd.add(forceField);
+        return forceField;
     }
 
     public static float calculateMomentOfInertia(final Shape2D shape, float density) {
