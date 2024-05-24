@@ -5,6 +5,7 @@ import org.example.engine.core.graphics.GraphicsCamera;
 import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.input.InputMouse;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector3;
 import org.example.engine.core.physics2d.Physics2DBody;
 import org.example.engine.core.physics2d.Physics2DWorld;
@@ -30,7 +31,7 @@ public class ScenePhysics2D_4 extends ApplicationScreen {
         world.createBodyRectangle(null, Physics2DBody.MotionType.STATIC,
                 0, -5,0,
                 0f,0f,0,
-                1, 1, 1, false, 1,
+                1000, 1, 0.2f, false, 1,
                 10, 1.5f, 0, 0, 0);
 
         world.createForceField((body, force) -> { force.set(0, -9.8f / body.massInv); });
@@ -43,15 +44,21 @@ public class ScenePhysics2D_4 extends ApplicationScreen {
         MathVector3 screen = new MathVector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
         camera.lens.unproject(screen);
 
-        if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
-            world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
+        if (InputMouse.isButtonPressed(InputMouse.Button.LEFT)) {
+            world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
                     screen.x,screen.y,0,
                     0f,0f,0,
-                    1, 1, 1, false, 1,
-                    1, 1f, 0, 0, 0);
+                    1, 1, 0.2f, false, 1,
+                    0.5f);
         }
 
-
+        if (InputMouse.isButtonPressed(InputMouse.Button.RIGHT)) {
+            world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
+                    screen.x,screen.y,MathUtils.random() * 360,
+                    0f,0f,0,
+                    1, 1, 0.2f, false, 1,
+                    1, 1f, 0, 0, 0);
+        }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0,0,0,1);
@@ -59,6 +66,9 @@ public class ScenePhysics2D_4 extends ApplicationScreen {
         renderer2D.begin(camera);
         world.render(renderer2D);
         renderer2D.end();
+
+        System.out.println("bodies: " + world.allBodies.size);
+        System.out.println("fps: " + GraphicsUtils.getFps());
     }
 
     @Override

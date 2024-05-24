@@ -303,7 +303,7 @@ public class Physics2DWorld {
         body.massInv = 1.0f / (body.shape.getArea() * density);
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
         body.staticFriction = friction;
-        body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
+        body.restitution = MathUtils.clampFloat(restitution,0.0f, 1.0f);
         body.ghost = ghost;
         body.bitmask = bitmask;
         body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
