@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class ScreenLoading extends ApplicationScreen {
 
-    private ApplicationScreen screen = new ScenePhysics2D_1();
+    private ApplicationScreen screen = new ScenePhysics2D_2();
     //private ApplicationScreen screen = new SceneRendering2D_3();
     //private WindowScreen screen = new SceneRendering2D_8();
 
