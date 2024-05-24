@@ -29,10 +29,22 @@ public class ScenePhysics2D_2 extends ApplicationScreen {
         camera.update();
 
         world.createBodyRectangle(null, Physics2DBody.MotionType.STATIC,
-                0, -5,-30,
+                -2.5f, 4,-30,
                 0f,0f,0,
                 1000, 1, 1, 0.8f, false, 1,
-                10, 1.5f, 0, 0, 0);
+                5, 0.5f, 0, 0, 0);
+
+        world.createBodyRectangle(null, Physics2DBody.MotionType.STATIC,
+                2.5f, 0f,30,
+                0f,0f,0,
+                1000, 1, 1, 0.8f, false, 1,
+                5, 0.5f, 0, 0, 0);
+
+        world.createBodyRectangle(null, Physics2DBody.MotionType.STATIC,
+                0, -5,0,
+                0f,0f,0,
+                1000, 1, 1, 0.8f, false, 1,
+                10, 0.5f, 0, 0, 0);
 
         world.createForceField((body, force) -> { force.set(0, -9.8f / body.massInv); });
     }
@@ -48,7 +60,7 @@ public class ScenePhysics2D_2 extends ApplicationScreen {
             world.createBodyCircle(null, Physics2DBody.MotionType.NEWTONIAN,
                     screen.x, screen.y, 0,
                     0f, 0f, 0,
-                    1, 1, 1,0f, false, 1,
+                    1, 1, 1,0.2f, false, 1,
                     0.5f);
         }
 
@@ -56,7 +68,7 @@ public class ScenePhysics2D_2 extends ApplicationScreen {
             world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
                     screen.x, screen.y, -30,
                     0f, 0f, 0,
-                    1, 1, 1, 0f, false, 1,
+                    1, 1, 1, 0.2f, false, 1,
                     1, 1f, 0, 0, 0);
         }
 
@@ -66,9 +78,6 @@ public class ScenePhysics2D_2 extends ApplicationScreen {
         renderer2D.begin(camera);
         world.render(renderer2D);
         renderer2D.end();
-
-        System.out.println("bodies: " + world.allBodies.size);
-        System.out.println("fps: " + GraphicsUtils.getFps());
     }
 
     @Override
