@@ -303,7 +303,7 @@ public class Physics2DCollisionDetection {
             manifold.contactPoint1.set(p0.px, p0.py);
             manifold.contacts = 1;
         }
-        if (p0 != null && p1 != null && MathUtils.floatsEqual(p0.dst, p1.dst)) {
+        if (p0 != null && p1 != null && MathUtils.floatsEqual(p0.dst, p1.dst, 0.001f)) {
             manifold.contactPoint2.set(p1.px, p1.py);
             manifold.contacts = 2;
         }

@@ -33,9 +33,7 @@ public class ScenePhysics2D_4 extends ApplicationScreen {
                 1, 1, 1, false, 1,
                 10, 1.5f, 0, 0, 0);
 
-        world.createForceField((body, force) -> {
-            force.set(0, -9.8f / body.massInv);
-        });
+        world.createForceField((body, force) -> { force.set(0, -9.8f / body.massInv); });
     }
 
 
@@ -48,7 +46,7 @@ public class ScenePhysics2D_4 extends ApplicationScreen {
         if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
             world.createBodyRectangle(null, Physics2DBody.MotionType.NEWTONIAN,
                     screen.x,screen.y,0,
-                    0f,-4f,0,
+                    0f,0f,0,
                     1, 1, 1, false, 1,
                     1, 1f, 0, 0, 0);
         }
