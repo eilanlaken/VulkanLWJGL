@@ -184,7 +184,6 @@ public class Physics2DWorld {
             }
         }
 
-
         /* collision detection - narrow phase */
         manifoldMemoryPool.freeAll(manifolds);
         manifolds.clear();
@@ -216,7 +215,7 @@ public class Physics2DWorld {
                                             Physics2DBody.MotionType motionType,
                                             float x, float y, float angle,
                                             float velX, float velY, float velAngleDeg,
-                                            float density, float friction, float restitution,
+                                            float density, float staticFriction, float dynamicFriction, float restitution,
                                             boolean ghost, int bitmask,
                                             float radius) {
         Physics2DBody body = bodyMemoryPool.allocate();
@@ -227,7 +226,8 @@ public class Physics2DWorld {
         body.shape = new Shape2DCircle(radius);
         body.massInv = 1.0f / (body.shape.getArea() * density);
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
-        body.staticFriction = friction;
+        body.staticFriction  = staticFriction;
+        body.dynamicFriction = dynamicFriction;
         body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
         body.ghost = ghost;
         body.bitmask = bitmask;
@@ -241,7 +241,7 @@ public class Physics2DWorld {
                                             Physics2DBody.MotionType motionType,
                                             float x, float y, float angleDeg,
                                             float velX, float velY, float velAngleDeg,
-                                            float density, float friction, float restitution,
+                                            float density, float staticFriction, float dynamicFriction, float restitution,
                                             boolean ghost, int bitmask,
                                             float radius, float offsetX, float offsetY) {
         Physics2DBody body = bodyMemoryPool.allocate();
@@ -252,7 +252,8 @@ public class Physics2DWorld {
         body.shape = new Shape2DCircle(radius, offsetX, offsetY);
         body.massInv = 1.0f / (body.shape.getArea() * density);
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
-        body.staticFriction = friction;
+        body.staticFriction  = staticFriction;
+        body.dynamicFriction = dynamicFriction;
         body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
         body.ghost = ghost;
         body.bitmask = bitmask;
@@ -266,7 +267,7 @@ public class Physics2DWorld {
                                                Physics2DBody.MotionType motionType,
                                                float x, float y, float angleDeg,
                                                float velX, float velY, float velAngleDeg,
-                                               float density, float friction, float restitution,
+                                               float density, float staticFriction, float dynamicFriction, float restitution,
                                                boolean ghost, int bitmask,
                                                float width, float height, float rot) {
         Physics2DBody body = bodyMemoryPool.allocate();
@@ -277,7 +278,8 @@ public class Physics2DWorld {
         body.shape = new Shape2DRectangle(width, height, rot);
         body.massInv = 1.0f / (body.shape.getArea() * density);
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
-        body.staticFriction = friction;
+        body.staticFriction  = staticFriction;
+        body.dynamicFriction = dynamicFriction;
         body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
         body.ghost = ghost;
         body.bitmask = bitmask;
@@ -291,7 +293,7 @@ public class Physics2DWorld {
                                                Physics2DBody.MotionType motionType,
                                                float x, float y, float angleDeg,
                                                float velX, float velY, float velAngleDeg,
-                                               float density, float friction, float restitution,
+                                               float density, float staticFriction, float dynamicFriction, float restitution,
                                                boolean ghost, int bitmask,
                                                float width, float height, float offsetX, float offsetY, float rot) {
         Physics2DBody body = bodyMemoryPool.allocate();
@@ -302,7 +304,8 @@ public class Physics2DWorld {
         body.shape = new Shape2DRectangle(offsetX, offsetY, width, height, rot);
         body.massInv = 1.0f / (body.shape.getArea() * density);
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
-        body.staticFriction = friction;
+        body.staticFriction  = staticFriction;
+        body.dynamicFriction = dynamicFriction;
         body.restitution = MathUtils.clampFloat(restitution,0.0f, 1.0f);
         body.ghost = ghost;
         body.bitmask = bitmask;
@@ -311,12 +314,13 @@ public class Physics2DWorld {
         return body;
     }
 
+    // TODO
     @Contract(pure = true)
     @NotNull public Physics2DBody createBodyPolygon(Object owner,
                                              Physics2DBody.MotionType motionType,
                                              float x, float y, float angleDeg,
                                              float velX, float velY, float velAngleDeg,
-                                             float density, float friction, float restitution,
+                                             float density, float staticFriction, float dynamicFriction, float restitution,
                                              boolean ghost, int bitmask,
                                              float[] vertices) {
         Physics2DBody body = bodyMemoryPool.allocate();
@@ -331,11 +335,11 @@ public class Physics2DWorld {
         } else {
             // TODO: create union of triangles.
         }
-        //body.shape = new Shape2DRectangle(width, height, angle);
 
         body.massInv = 1.0f / (body.shape.getArea() * density);
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
-        body.staticFriction = friction;
+        body.staticFriction  = staticFriction;
+        body.dynamicFriction = dynamicFriction;
         body.restitution = MathUtils.clampFloat(restitution, 0, 1.0f);
         body.ghost = ghost;
         body.bitmask = bitmask;
@@ -354,12 +358,6 @@ public class Physics2DWorld {
                                            boolean ghost, int bitmask,
                                            Shape2D... shapes) {
         Physics2DBody body = bodyMemoryPool.allocate();
-        body.owner = owner;
-        body.off = sleeping;
-        body.motionType = motionType;
-
-        body.setMotionState(x, y, angleDeg, velX, velY, velAngleDeg);
-        bodiesToAdd.add(body);
         return body;
     }
 
