@@ -402,6 +402,10 @@ public class MathVector2 {
         return true;
     }
 
+    public static boolean nearlyEqual(MathVector2 a, MathVector2 b, float tolerance) {
+        return MathVector2.dst2(a, b) < tolerance * tolerance;
+    }
+
     @Override
     public String toString () {
         return "(" + x + "," + y + ")";
