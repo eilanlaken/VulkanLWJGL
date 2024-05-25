@@ -23,22 +23,26 @@ import java.util.function.Function;
 public class Physics2DWorld {
 
     // memory pools
-    public MemoryPool<Physics2DBody>        bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
-    public MemoryPool<CollisionManifold>    manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
-    private final MemoryPool<CollisionPair> pairMemoryPool     = new MemoryPool<>(CollisionPair.class, 5);
-    private final MemoryPool<Cell>          cellMemoryPool     = new MemoryPool<>(Cell.class,1024);
+    protected final MemoryPool<Physics2DBody>     bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
+    protected final MemoryPool<CollisionManifold> manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
+    private   final MemoryPool<CollisionPair>     pairMemoryPool     = new MemoryPool<>(CollisionPair.class, 5);
+    private   final MemoryPool<Cell>              cellMemoryPool     = new MemoryPool<>(Cell.class,1024);
 
     // bodies
-    private int                             bodiesCreated      = 0;
-    public  CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
-    public  CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
-    public  CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
+    private int                             bodiesCreated  = 0;
+    public  CollectionsArray<Physics2DBody> allBodies      = new CollectionsArray<>(false, 500);
+    public  CollectionsArray<Physics2DBody> bodiesToAdd    = new CollectionsArray<>(false, 100);
+    public  CollectionsArray<Physics2DBody> bodiesToRemove = new CollectionsArray<>(false, 500);
 
     // forces
     public CollectionsArray<Physics2DForceField> allForceFields      = new CollectionsArray<>(false, 4);
     public CollectionsArray<Physics2DForceField> forceFieldsToAdd    = new CollectionsArray<>(false, 2);
     public CollectionsArray<Physics2DForceField> forceFieldsToRemove = new CollectionsArray<>(false, 2);
 
+    // joints
+
+    // ray casting
+    private CollectionsArray<Ray> raysToCast = new CollectionsArray<>(4);
 
     // collision detection
     private CollectionsArray<Cell>      spacePartition      = new CollectionsArray<>(false, 1024);
@@ -51,11 +55,11 @@ public class Physics2DWorld {
     private Physics2DCollisionResolver          collisionResolver;
 
     // debugger options
-    protected Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
-    public    boolean                renderContacts   = true;
-    public    boolean                renderVelocities = false;
-    public    boolean                renderBodies     = true;
-    public    boolean                renderJoints     = true;
+    private Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
+    public  boolean                renderContacts   = true;
+    public  boolean                renderVelocities = false;
+    public  boolean                renderBodies     = true;
+    public  boolean                renderJoints     = true;
 
     public Physics2DWorld(Physics2DCollisionResolver collisionResolver) {
         this.collisionResolver = collisionResolver != null ? collisionResolver : new Physics2DCollisionResolver() {};
@@ -389,7 +393,7 @@ public class Physics2DWorld {
 
     }
 
-    public void castRay() {
+    public void castRay(MathVector2 from, MathVector2 to) {
 
     }
 
@@ -462,6 +466,35 @@ public class Physics2DWorld {
         @Override
         public void reset() {}
 
+    }
+
+    public static class Ray implements MemoryPool.Reset {
+
+        public float from_x, from_y;
+        public float to_x, to_y;
+
+        public Ray() {}
+
+        @Override
+        public void reset() {
+
+        }
+
+    }
+
+    public static class RayCastResult implements MemoryPool.Reset {
+
+        public Physics2DBody body    = null;
+        public MathVector2   contact = new MathVector2();
+        public MathVector2   normal  = new MathVector2();
+
+        public RayCastResult() {}
+
+        @Override
+        public void reset() {
+            body = null;
+
+        }
     }
 
 }
