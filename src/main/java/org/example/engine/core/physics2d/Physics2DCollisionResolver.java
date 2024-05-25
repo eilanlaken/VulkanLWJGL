@@ -80,18 +80,15 @@ public class Physics2DCollisionResolver {
             relativeVelocity.sub(body_a.velocity).sub(angularLinearVelA);
 
             float contactVelocityMag = MathVector2.dot(relativeVelocity, manifold.normal);
-            if (contactVelocityMag >= 0) continue;
 
             if (contactVelocityMag < 0) {
                 float raRot90DotN = MathVector2.dot(raRot90, manifold.normal);
                 float rbRot90DotN = MathVector2.dot(rbRot90, manifold.normal);
                 float d = invMassSum + (raRot90DotN * raRot90DotN) * aInertiaInv + (rbRot90DotN * rbRot90DotN) * bInertiaInv;
-
                 float j = -(1f + e) * contactVelocityMag / (d * manifold.contacts);
                 j_list.set(i, j);
                 impulses.get(i).set(manifold.normal).scl(j);
             }
-
 
             MathVector2 tangent = new MathVector2(relativeVelocity); // tangent = v_rel - <v_rel, normal> * normal
             MathVector2 v = new MathVector2(manifold.normal).scl(MathVector2.dot(relativeVelocity, manifold.normal));
@@ -107,15 +104,10 @@ public class Physics2DCollisionResolver {
                 jt /= (float) manifold.contacts;
                 MathVector2 frictionImpulse = new MathVector2(tangent);
                 float j = j_list.get(i);
-
-                if (Math.abs(jt) <= j * sf) {
-                    frictionImpulse.scl(jt);
-                } else {
-                    frictionImpulse.scl(-j * df);
-                }
+                if (Math.abs(jt) <= j * sf) frictionImpulse.scl(jt);
+                else frictionImpulse.scl(-j * df);
                 frictions.get(i).set(frictionImpulse);
             }
-
         }
 
         for (int i = 0; i < manifold.contacts; i++) {
@@ -149,68 +141,6 @@ public class Physics2DCollisionResolver {
             body_b.omegaDeg +=  MathVector2.crs(rb, impulse) * bInertiaInv * MathUtils.radiansToDegrees;
         }
 
-        if (true) return;
-        ////////////////////// friction
-
-        for (int i = 0; i < manifold.contacts; i++) {
-            ra_list.get(i).set(contacts.get(i).x - body_a.shape.x(), contacts.get(i).y - body_a.shape.y());
-            rb_list.get(i).set(contacts.get(i).x - body_b.shape.x(), contacts.get(i).y - body_b.shape.y());
-
-            MathVector2 raRot90 = new MathVector2(ra_list.get(i)).rotate90(1);
-            MathVector2 rbRot90 = new MathVector2(rb_list.get(i)).rotate90(1);
-
-            MathVector2 angularLinearVelA = new MathVector2(raRot90).scl(body_a.omegaDeg * MathUtils.degreesToRadians);
-            MathVector2 angularLinearVelB = new MathVector2(rbRot90).scl(body_b.omegaDeg * MathUtils.degreesToRadians);
-
-            MathVector2 relativeVelocity = new MathVector2();
-            relativeVelocity.add(body_b.velocity).add(angularLinearVelB);
-            relativeVelocity.sub(body_a.velocity).sub(angularLinearVelA);
-
-            MathVector2 tangent = new MathVector2(relativeVelocity); // tangent = v_rel - <v_rel, normal> * normal
-            MathVector2 v = new MathVector2(manifold.normal).scl(MathVector2.dot(relativeVelocity, manifold.normal));
-            tangent.sub(v);
-
-            if (MathVector2.nearlyEqual(tangent, MathVector2.Zero, 0.0005f)) continue;
-
-            tangent.nor();
-
-            float raRot90DotT = MathVector2.dot(raRot90, tangent);
-            float rbRot90DotT = MathVector2.dot(rbRot90, tangent);
-
-            float d = body_a.massInv + body_b.massInv +
-                    (raRot90DotT * raRot90DotT) * body_a.inertiaInv +
-                    (rbRot90DotT * rbRot90DotT) * body_b.inertiaInv;
-
-            float jt = -MathVector2.dot(relativeVelocity, tangent);
-            jt /= d;
-            jt /= (float) manifold.contacts;
-
-            MathVector2 frictionImpulse = new MathVector2(tangent);
-            float j = j_list.get(i);
-
-            if (Math.abs(jt) <= j * sf) {
-                frictionImpulse.scl(jt);
-            } else {
-                frictionImpulse.scl(-j * df);
-            }
-
-            frictions.get(i).set(frictionImpulse);
-        }
-
-        for (int i = 0; i < manifold.contacts; i++) {
-            MathVector2 impulse = frictions.get(i);
-            MathVector2 ra = ra_list.get(i);
-            MathVector2 rb = rb_list.get(i);
-
-            MathVector2 deltaVelA = new MathVector2(impulse).scl(aMassInv);
-            MathVector2 deltaVelB = new MathVector2(impulse).scl(bMassInv);
-
-            body_a.velocity.sub(deltaVelA);
-            body_b.velocity.add(deltaVelB);
-            body_a.omegaDeg += -MathVector2.crs(ra, impulse) * aInertiaInv * MathUtils.radiansToDegrees;
-            body_b.omegaDeg +=  MathVector2.crs(rb, impulse) * bInertiaInv * MathUtils.radiansToDegrees;
-        }
-
     }
 
     protected void endContact(Physics2DWorld.CollisionManifold manifold) {
@@ -222,30 +152,62 @@ public class Physics2DCollisionResolver {
 /**
  *
 
- // collision response
- int contactCount = manifold.contacts;
- float e = Math.min(body_a.restitution, body_b.restitution);
- CollectionsArray<MathVector2> contacts = new CollectionsArray<>();
- if (contactCount == 1) {
- contacts.add(manifold.contactPoint1);
- } else if (contactCount == 2) {
- contacts.add(manifold.contactPoint1);
- contacts.add(manifold.contactPoint2);
+ for (int i = 0; i < manifold.contacts; i++) {
+ ra_list.get(i).set(contacts.get(i).x - body_a.shape.x(), contacts.get(i).y - body_a.shape.y());
+ rb_list.get(i).set(contacts.get(i).x - body_b.shape.x(), contacts.get(i).y - body_b.shape.y());
+
+ MathVector2 raRot90 = new MathVector2(ra_list.get(i)).rotate90(1);
+ MathVector2 rbRot90 = new MathVector2(rb_list.get(i)).rotate90(1);
+
+ MathVector2 angularLinearVelA = new MathVector2(raRot90).scl(body_a.omegaDeg * MathUtils.degreesToRadians);
+ MathVector2 angularLinearVelB = new MathVector2(rbRot90).scl(body_b.omegaDeg * MathUtils.degreesToRadians);
+
+ MathVector2 relativeVelocity = new MathVector2();
+ relativeVelocity.add(body_b.velocity).add(angularLinearVelB);
+ relativeVelocity.sub(body_a.velocity).sub(angularLinearVelA);
+
+ MathVector2 tangent = new MathVector2(relativeVelocity); // tangent = v_rel - <v_rel, normal> * normal
+ MathVector2 v = new MathVector2(manifold.normal).scl(MathVector2.dot(relativeVelocity, manifold.normal));
+ tangent.sub(v);
+
+ if (MathVector2.nearlyEqual(tangent, MathVector2.Zero, 0.0005f)) continue;
+
+ tangent.nor();
+
+ float raRot90DotT = MathVector2.dot(raRot90, tangent);
+ float rbRot90DotT = MathVector2.dot(rbRot90, tangent);
+
+ float d = body_a.massInv + body_b.massInv +
+ (raRot90DotT * raRot90DotT) * body_a.inertiaInv +
+ (rbRot90DotT * rbRot90DotT) * body_b.inertiaInv;
+
+ float jt = -MathVector2.dot(relativeVelocity, tangent);
+ jt /= d;
+ jt /= (float) manifold.contacts;
+
+ MathVector2 frictionImpulse = new MathVector2(tangent);
+ float j = j_list.get(i);
+
+ if (Math.abs(jt) <= j * sf) {
+ frictionImpulse.scl(jt);
+ } else {
+ frictionImpulse.scl(-j * df);
  }
 
+ frictions.get(i).set(frictionImpulse);
+ }
 
- MathVector2 vRel = new MathVector2(body_b.velocity).sub(body_a.velocity);
- float normalVelocity = vRel.dot(manifold.normal);
- if (normalVelocity > 0) return;
+ for (int i = 0; i < manifold.contacts; i++) {
+ MathVector2 impulse = frictions.get(i);
+ MathVector2 ra = ra_list.get(i);
+ MathVector2 rb = rb_list.get(i);
 
-
-
- float j = -(1 + e) * normalVelocity / (aMassInv + bMassInv);
- MathVector2 impulse = new MathVector2(manifold.normal).scl(j);
  MathVector2 deltaVelA = new MathVector2(impulse).scl(aMassInv);
  MathVector2 deltaVelB = new MathVector2(impulse).scl(bMassInv);
+
  body_a.velocity.sub(deltaVelA);
  body_b.velocity.add(deltaVelB);
-
- *
+ body_a.omegaDeg += -MathVector2.crs(ra, impulse) * aInertiaInv * MathUtils.radiansToDegrees;
+ body_b.omegaDeg +=  MathVector2.crs(rb, impulse) * bInertiaInv * MathUtils.radiansToDegrees;
+ }
  */
