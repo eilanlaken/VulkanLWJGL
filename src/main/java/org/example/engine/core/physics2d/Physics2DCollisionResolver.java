@@ -175,34 +175,3 @@ public class Physics2DCollisionResolver {
     }
 
 }
-
-/**
- *
-
- // collision response
- int contactCount = manifold.contacts;
- float e = Math.min(body_a.restitution, body_b.restitution);
- CollectionsArray<MathVector2> contacts = new CollectionsArray<>();
- if (contactCount == 1) {
- contacts.add(manifold.contactPoint1);
- } else if (contactCount == 2) {
- contacts.add(manifold.contactPoint1);
- contacts.add(manifold.contactPoint2);
- }
-
-
- MathVector2 vRel = new MathVector2(body_b.velocity).sub(body_a.velocity);
- float normalVelocity = vRel.dot(manifold.normal);
- if (normalVelocity > 0) return;
-
-
-
- float j = -(1 + e) * normalVelocity / (aMassInv + bMassInv);
- MathVector2 impulse = new MathVector2(manifold.normal).scl(j);
- MathVector2 deltaVelA = new MathVector2(impulse).scl(aMassInv);
- MathVector2 deltaVelB = new MathVector2(impulse).scl(bMassInv);
- body_a.velocity.sub(deltaVelA);
- body_b.velocity.add(deltaVelB);
-
- *
- */
