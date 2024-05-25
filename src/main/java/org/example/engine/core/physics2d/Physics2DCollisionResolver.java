@@ -22,19 +22,19 @@ public class Physics2DCollisionResolver {
         MathVector2 aCenter = shape_a.geometryCenter();
         MathVector2 bCenter = shape_b.geometryCenter();
         MathVector2 a_b     = new MathVector2(bCenter.x - aCenter.x, bCenter.y - aCenter.y);
-        float       dot     = a_b.dot(manifold.normal);
-        if (dot < 0) manifold.normal.flip();
 
-        final float aMassInv    = body_a.motionType == Physics2DBody.MotionType.STATIC ? 0 : body_a.massInv;
-        final float bMassInv    = body_b.motionType == Physics2DBody.MotionType.STATIC ? 0 : body_b.massInv;
-        final float percent     = 0.7f;
-        final float threshold   = 0.001f;
-        final float invMassSum  = aMassInv + bMassInv;
-        final float pushBack    = Math.max(manifold.depth - threshold, 0.0f);
-        MathVector2 correction  = new MathVector2(manifold.normal).scl(pushBack * percent).scl(1 / invMassSum);
+        if (a_b.dot(manifold.normal) < 0) manifold.normal.flip();
 
+        final float aMassInv   = body_a.motionType == Physics2DBody.MotionType.STATIC ? 0 : body_a.massInv;
+        final float bMassInv   = body_b.motionType == Physics2DBody.MotionType.STATIC ? 0 : body_b.massInv;
+        final float percent    = 0.7f;
+        final float threshold  = 0.001f;
+        final float invMassSum = aMassInv + bMassInv;
+        final float pushBack   = Math.max(manifold.depth - threshold, 0.0f);
+
+        MathVector2 correction = new MathVector2(manifold.normal).scl(pushBack * percent).scl(1 / invMassSum);
         shape_a.dx_dy(-aMassInv * correction.x, -aMassInv * correction.y);
-        shape_b.dx_dy(bMassInv * correction.x, bMassInv * correction.y);
+        shape_b.dx_dy(bMassInv  * correction.x, bMassInv  * correction.y);
 
         // collision response
         final float e           = Math.min(body_a.restitution, body_b.restitution);
