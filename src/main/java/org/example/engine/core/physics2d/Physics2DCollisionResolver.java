@@ -115,13 +115,11 @@ public class Physics2DCollisionResolver {
             MathVector2 ra = ra_list.get(i);
             MathVector2 rb = rb_list.get(i);
 
-            MathVector2 deltaVelA   = new MathVector2(impulse).scl(aMassInv);
-            MathVector2 deltaVelB   = new MathVector2(impulse).scl(bMassInv);
+            MathVector2 deltaVelA = new MathVector2(impulse).scl(aMassInv);
+            MathVector2 deltaVelB = new MathVector2(impulse).scl(bMassInv);
 
             body_a.velocity.sub(deltaVelA);
             body_b.velocity.add(deltaVelB);
-            body_a.omegaDeg += -MathVector2.crs(ra, impulse) * aInertiaInv * MathUtils.radiansToDegrees;
-            body_b.omegaDeg +=  MathVector2.crs(rb, impulse) * bInertiaInv * MathUtils.radiansToDegrees;
 
             body_a.omegaDeg += -MathVector2.crs(ra, impulse) * aInertiaInv * MathUtils.radiansToDegrees;
             body_b.omegaDeg +=  MathVector2.crs(rb, impulse) * bInertiaInv * MathUtils.radiansToDegrees;
@@ -137,6 +135,7 @@ public class Physics2DCollisionResolver {
 
             body_a.velocity.sub(deltaVelA);
             body_b.velocity.add(deltaVelB);
+
             body_a.omegaDeg += -MathVector2.crs(ra, impulse) * aInertiaInv * MathUtils.radiansToDegrees;
             body_b.omegaDeg +=  MathVector2.crs(rb, impulse) * bInertiaInv * MathUtils.radiansToDegrees;
         }
