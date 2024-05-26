@@ -9,11 +9,8 @@ import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 // https://github.com/RandyGaul/ImpulseEngine/blob/master/Manifold.h
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
@@ -23,10 +20,11 @@ import java.util.function.Function;
 public class Physics2DWorld {
 
     // memory pools
-    protected final MemoryPool<Physics2DBody>     bodyMemoryPool     = new MemoryPool<>(Physics2DBody.class,     10);
-    protected final MemoryPool<CollisionManifold> manifoldMemoryPool = new MemoryPool<>(CollisionManifold.class, 10);
-    private   final MemoryPool<CollisionPair>     pairMemoryPool     = new MemoryPool<>(CollisionPair.class, 5);
-    private   final MemoryPool<Cell>              cellMemoryPool     = new MemoryPool<>(Cell.class,1024);
+    private final MemoryPool<Physics2DBody>        bodiesPool    = new MemoryPool<>(Physics2DBody.class,     10);
+    private final MemoryPool<CollisionManifold>    manifoldsPool = new MemoryPool<>(CollisionManifold.class, 10);
+    private final MemoryPool<CollisionPair>        pairsPool     = new MemoryPool<>(CollisionPair.class, 5);
+    private final MemoryPool<Cell>                 cellsPool     = new MemoryPool<>(Cell.class,1024);
+    private final MemoryPool<Ray> raysPool      = new MemoryPool<>(Ray.class, 4);
 
     // bodies
     private int                             bodiesCreated  = 0;
@@ -41,18 +39,18 @@ public class Physics2DWorld {
 
     // joints
 
-    // ray casting
-    private CollectionsArray<Ray> raysToCast = new CollectionsArray<>(4);
-
     // collision detection
-    private CollectionsArray<Cell>      spacePartition      = new CollectionsArray<>(false, 1024);
-    private CollectionsArray<Cell>      activeCells         = new CollectionsArray<>();
-    private Set<CollisionPair>          collisionCandidates = new HashSet<>();
-    private Physics2DCollisionDetection collisionDetection  = new Physics2DCollisionDetection(this);
+    private final CollectionsArray<Cell>      spacePartition      = new CollectionsArray<>(false, 1024);
+    private final CollectionsArray<Cell>      activeCells         = new CollectionsArray<>();
+    private final Set<CollisionPair>          collisionCandidates = new HashSet<>();
+    private final Physics2DCollisionDetection collisionDetection  = new Physics2DCollisionDetection(this);
 
     // collision resolution
-    private CollectionsArray<CollisionManifold> manifolds = new CollectionsArray<>(false, 20);
-    private Physics2DCollisionResolver          collisionResolver;
+    private final CollectionsArray<CollisionManifold> manifolds = new CollectionsArray<>(false, 20);
+    private final Physics2DCollisionResolver          collisionResolver;
+
+    // ray casting
+    private HashMap<Ray, Callback> raysToCast = new HashMap<>(4);
 
     // debugger options
     private Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
@@ -60,6 +58,7 @@ public class Physics2DWorld {
     public  boolean                renderVelocities = false;
     public  boolean                renderBodies     = true;
     public  boolean                renderJoints     = true;
+    public  boolean                renderRays       = true;
 
     public Physics2DWorld(Physics2DCollisionResolver collisionResolver) {
         this.collisionResolver = collisionResolver != null ? collisionResolver : new Physics2DCollisionResolver() {};
@@ -69,12 +68,16 @@ public class Physics2DWorld {
         this(null);
     }
 
+    MemoryPool<CollisionManifold> getManifoldsPool() {
+        return manifoldsPool;
+    }
+
     public void update(final float delta) {
         /* preparation: add and remove bodies */
 
         for (Physics2DBody body : bodiesToRemove) {
             allBodies.removeValue(body, true);
-            bodyMemoryPool.free(body);
+            bodiesPool.free(body);
         }
         for (Physics2DBody body : bodiesToAdd) {
             allBodies.add(body);
@@ -139,11 +142,11 @@ public class Physics2DWorld {
         float cellHeight  = worldHeight / rows;
 
         /* collision detection - broad phase */
-        cellMemoryPool.freeAll(spacePartition);
+        cellsPool.freeAll(spacePartition);
         spacePartition.clear();
         activeCells.clear();
         for (int i = 0; i < rows * cols; i++) {
-            spacePartition.add(cellMemoryPool.allocate());
+            spacePartition.add(cellsPool.allocate());
         }
 
         for (Physics2DBody body : allBodies) {
@@ -164,7 +167,7 @@ public class Physics2DWorld {
             }
         }
 
-        pairMemoryPool.freeAll(collisionCandidates);
+        pairsPool.freeAll(collisionCandidates);
         collisionCandidates.clear();
         for (Cell cell : activeCells) {
             for (int i = 0; i < cell.bodies.size - 1; i++) {
@@ -180,7 +183,7 @@ public class Physics2DWorld {
                     boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
                     if (!boundingCirclesCollide) continue;
 
-                    CollisionPair pair = pairMemoryPool.allocate();
+                    CollisionPair pair = pairsPool.allocate();
                     pair.a = body_a;
                     pair.b = body_b;
                     collisionCandidates.add(pair);
@@ -189,7 +192,7 @@ public class Physics2DWorld {
         }
 
         /* collision detection - narrow phase */
-        manifoldMemoryPool.freeAll(manifolds);
+        manifoldsPool.freeAll(manifolds);
         manifolds.clear();
         for (CollisionPair pair : collisionCandidates) {
             Physics2DBody body_a = pair.a;
@@ -212,6 +215,12 @@ public class Physics2DWorld {
             collisionResolver.endContact(manifold);
         }
 
+        /* ray casting */
+        for (Map.Entry<Ray, Callback> rayCallback : raysToCast.entrySet()) {
+            Ray ray = rayCallback.getKey();
+            Callback callback = rayCallback.getValue();
+        }
+
     }
 
     @Contract(pure = true)
@@ -222,7 +231,7 @@ public class Physics2DWorld {
                                             float density, float staticFriction, float dynamicFriction, float restitution,
                                             boolean ghost, int bitmask,
                                             float radius) {
-        Physics2DBody body = bodyMemoryPool.allocate();
+        Physics2DBody body = bodiesPool.allocate();
         body.owner = owner;
         body.off = false;
         body.motionType = motionType;
@@ -248,7 +257,7 @@ public class Physics2DWorld {
                                             float density, float staticFriction, float dynamicFriction, float restitution,
                                             boolean ghost, int bitmask,
                                             float radius, float offsetX, float offsetY) {
-        Physics2DBody body = bodyMemoryPool.allocate();
+        Physics2DBody body = bodiesPool.allocate();
         body.owner = owner;
         body.off = false;
         body.motionType = motionType;
@@ -274,7 +283,7 @@ public class Physics2DWorld {
                                                float density, float staticFriction, float dynamicFriction, float restitution,
                                                boolean ghost, int bitmask,
                                                float width, float height, float rot) {
-        Physics2DBody body = bodyMemoryPool.allocate();
+        Physics2DBody body = bodiesPool.allocate();
         body.owner = owner;
         body.off = false;
         body.motionType = motionType;
@@ -300,7 +309,7 @@ public class Physics2DWorld {
                                                float density, float staticFriction, float dynamicFriction, float restitution,
                                                boolean ghost, int bitmask,
                                                float width, float height, float offsetX, float offsetY, float rot) {
-        Physics2DBody body = bodyMemoryPool.allocate();
+        Physics2DBody body = bodiesPool.allocate();
         body.owner = owner;
         body.off = false;
         body.motionType = motionType;
@@ -327,7 +336,7 @@ public class Physics2DWorld {
                                              float density, float staticFriction, float dynamicFriction, float restitution,
                                              boolean ghost, int bitmask,
                                              float[] vertices) {
-        Physics2DBody body = bodyMemoryPool.allocate();
+        Physics2DBody body = bodiesPool.allocate();
         body.owner = owner;
         body.off = false;
         body.motionType = motionType;
@@ -361,7 +370,7 @@ public class Physics2DWorld {
                                            float massInv, float density, float friction, float restitution,
                                            boolean ghost, int bitmask,
                                            Shape2D... shapes) {
-        Physics2DBody body = bodyMemoryPool.allocate();
+        Physics2DBody body = bodiesPool.allocate();
         return body;
     }
 
@@ -393,12 +402,35 @@ public class Physics2DWorld {
 
     }
 
-    public void castRay(MathVector2 from, MathVector2 to) {
+    /* Ray casting API */
+    public void castRay(@NotNull final Physics2DWorld.Callback callback, float originX, float originY, float dirX, float dirY) {
+        Ray ray = raysPool.allocate();
+        ray.originX = originX;
+        ray.originY = originY;
+        ray.dirX = dirX;
+        ray.dirY = dirY;
+    }
+
+    public void castRay(final Callback callback, float originX, float originY, float dirX, float dirY, float maxDst) {
+
+    }
+
+    public void castRay(final Callback callback, float originX, float originY, float dirX, float dirY, float maxDst, int bitmask) {
+
+    }
+
+    public void castRay(final Callback callback, float originX, float originY, float dirX, float dirY, int bitmask) {
 
     }
 
     public void render(GraphicsRenderer2D renderer) {
         debugRenderer.render(renderer);
+    }
+
+    public interface Callback {
+
+        void callback(final RayCastResult[] results);
+
     }
 
     public static final class CollisionManifold implements MemoryPool.Reset {
@@ -470,14 +502,19 @@ public class Physics2DWorld {
 
     public static class Ray implements MemoryPool.Reset {
 
-        public float from_x, from_y;
-        public float to_x, to_y;
+        public float originX;
+        public float originY;
+        public float dirX;
+        public float dirY;
+        public float dst;
+        public int   bitmask;
 
         public Ray() {}
 
         @Override
         public void reset() {
-
+            dst = 0.0f;
+            bitmask = 0;
         }
 
     }
@@ -493,8 +530,6 @@ public class Physics2DWorld {
         @Override
         public void reset() {
             body = null;
-
         }
     }
-
 }

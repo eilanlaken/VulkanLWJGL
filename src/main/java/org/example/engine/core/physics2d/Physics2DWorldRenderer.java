@@ -33,9 +33,9 @@ public final class Physics2DWorldRenderer {
         if (world.renderBodies) {
             CollectionsArray<Physics2DBody> bodies = world.allBodies;
             for (Physics2DBody body : bodies) {
-                if (body.motionType == Physics2DBody.MotionType.STATIC)       renderer.pushDebugShape(body.shape, TINT_FIXED);
-                if (body.motionType == Physics2DBody.MotionType.KINEMATIC)     renderer.pushDebugShape(body.shape, TINT_LOGICAL);
-                if (body.motionType == Physics2DBody.MotionType.NEWTONIAN)   renderer.pushDebugShape(body.shape, TINT_NEWTONIAN);
+                if (body.motionType == Physics2DBody.MotionType.STATIC)    renderer.pushDebugShape(body.shape, TINT_FIXED);
+                if (body.motionType == Physics2DBody.MotionType.KINEMATIC) renderer.pushDebugShape(body.shape, TINT_LOGICAL);
+                if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) renderer.pushDebugShape(body.shape, TINT_NEWTONIAN);
                 renderer.pushPolygon(polyCircle, new GraphicsColor(1,0,0,1), body.shape.geometryCenter().x, body.shape.geometryCenter().y, 0,0,0, scaleX, scaleY,null,null);
 
             }
@@ -57,6 +57,12 @@ public final class Physics2DWorldRenderer {
         if (world.renderContacts) {
 
         }
+
+        // TODO: render rays and ray casting results
+        if (world.renderRays) {
+
+        }
+
     }
 
 }

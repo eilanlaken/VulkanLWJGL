@@ -11,9 +11,11 @@ public class Physics2DCollisionDetection {
 
     private final MemoryPool<Projection> projectionsPool = new MemoryPool<>(Projection.class, 200);
     private final Physics2DWorld         world;
+    private final MemoryPool<Physics2DWorld.CollisionManifold> manifoldMemoryPool;
 
     Physics2DCollisionDetection(Physics2DWorld world) {
         this.world = world;
+        this.manifoldMemoryPool = world.getManifoldsPool();
     }
 
     Physics2DWorld.CollisionManifold detectCollision(Physics2DBody body_a, Shape2D shape_a, Physics2DBody body_b, Shape2D shape_b) {
@@ -64,7 +66,7 @@ public class Physics2DCollisionDetection {
 
         if (distanceSquared > radiusSum * radiusSum) return null;
 
-        Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
+        Physics2DWorld.CollisionManifold manifold = manifoldMemoryPool.allocate();
         manifold.contacts = 1;
         final float distance = (float) Math.sqrt(distanceSquared);
         if (distance != 0) {
@@ -149,7 +151,7 @@ public class Physics2DCollisionDetection {
             projection = projection4;
         }
 
-        Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
+        Physics2DWorld.CollisionManifold manifold = manifoldMemoryPool.allocate();
         manifold.contacts = 1;
         manifold.contactPoint1.set(projection);
         manifold.shape_a = a;
@@ -270,7 +272,7 @@ public class Physics2DCollisionDetection {
             }
         }
 
-        Physics2DWorld.CollisionManifold manifold = world.manifoldMemoryPool.allocate();
+        Physics2DWorld.CollisionManifold manifold = manifoldMemoryPool.allocate();
         setContactPoints(rect_1.worldVertices(), rect_2.worldVertices(), manifold);
         manifold.normal.set(nx, ny);
         manifold.depth = minOverlap;
