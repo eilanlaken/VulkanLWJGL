@@ -20,11 +20,12 @@ import java.util.function.BiConsumer;
 public class Physics2DWorld {
 
     // memory pools
-    private final MemoryPool<Physics2DBody>        bodiesPool    = new MemoryPool<>(Physics2DBody.class,     10);
-    private final MemoryPool<CollisionManifold>    manifoldsPool = new MemoryPool<>(CollisionManifold.class, 10);
-    private final MemoryPool<CollisionPair>        pairsPool     = new MemoryPool<>(CollisionPair.class, 5);
-    private final MemoryPool<Cell>                 cellsPool     = new MemoryPool<>(Cell.class,1024);
-    private final MemoryPool<Ray> raysPool      = new MemoryPool<>(Ray.class, 4);
+    private final MemoryPool<Physics2DBody>     bodiesPool         = new MemoryPool<>(Physics2DBody.class,     10);
+    private final MemoryPool<CollisionManifold> manifoldsPool      = new MemoryPool<>(CollisionManifold.class, 10);
+    private final MemoryPool<CollisionPair>     pairsPool          = new MemoryPool<>(CollisionPair.class, 5);
+    private final MemoryPool<Cell>              cellsPool          = new MemoryPool<>(Cell.class,1024);
+    private final MemoryPool<Ray>               raysPool           = new MemoryPool<>(Ray.class, 4);
+    private final MemoryPool<RayCastResult>     rayCastResultsPool = new MemoryPool<>(RayCastResult.class, 4);
 
     // bodies
     private int                             bodiesCreated  = 0;
@@ -50,7 +51,8 @@ public class Physics2DWorld {
     private final Physics2DCollisionResolver          collisionResolver;
 
     // ray casting
-    private HashMap<Ray, Callback> raysToCast = new HashMap<>(4);
+    private Physics2DRaycasting          raycasting = new Physics2DRaycasting(this);
+    private HashMap<Ray, RayHitCallback> raysToCast = new HashMap<>(4);
 
     // debugger options
     private Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
@@ -59,6 +61,10 @@ public class Physics2DWorld {
     public  boolean                renderBodies     = true;
     public  boolean                renderJoints     = true;
     public  boolean                renderRays       = true;
+
+    // TODO: debug. Delete those.
+    CollectionsArray<Cell> crossedCells2 = new CollectionsArray<>();
+
 
     public Physics2DWorld(Physics2DCollisionResolver collisionResolver) {
         this.collisionResolver = collisionResolver != null ? collisionResolver : new Physics2DCollisionResolver() {};
@@ -70,6 +76,10 @@ public class Physics2DWorld {
 
     MemoryPool<CollisionManifold> getManifoldsPool() {
         return manifoldsPool;
+    }
+
+    MemoryPool<RayCastResult> getRayCastResultsPool() {
+        return rayCastResultsPool;
     }
 
     public void update(final float delta) {
@@ -216,11 +226,66 @@ public class Physics2DWorld {
         }
 
         /* ray casting */
-        for (Map.Entry<Ray, Callback> rayCallback : raysToCast.entrySet()) {
-            Ray ray = rayCallback.getKey();
-            Callback callback = rayCallback.getValue();
-        }
+        CollectionsArray<RayCastResult> intersections = new CollectionsArray<>(false, 10);
+        for (Map.Entry<Ray, RayHitCallback> rayCallback : raysToCast.entrySet()) {
 
+            Ray ray = rayCallback.getKey();
+            RayHitCallback callback = rayCallback.getValue();
+            CollectionsArray<RayCastResult> results = new CollectionsArray<>();
+
+            final float x1 = ray.originX;
+            final float y1 = ray.originY;
+            final float x2 = ray.originX + ray.dst * ray.dirX;
+            final float y2 = ray.originY + ray.dst * ray.dirY;
+
+            int x1Cell = (int) Math.floor(x1 / cellWidth);
+            int y1Cell = (int) Math.floor(y1 / cellHeight);
+            int x2Cell = (int) Math.floor(x2 / cellWidth);
+            int y2Cell = (int) Math.floor(y2 / cellHeight);
+            int dx = Math.abs(x2Cell - x1Cell);
+            int dy = Math.abs(y2Cell - y1Cell);
+
+            int sx = x1Cell < x2Cell ? 1 : -1;
+            int sy = y1Cell < y2Cell ? 1 : -1;
+
+            int err = dx - dy;
+            int e2;
+
+            int currentX = x1Cell;
+            int currentY = y1Cell;
+
+            // optimization: only crossed cells will be considered
+            CollectionsArray<Cell> crossedCells = new CollectionsArray<>(false, 32);
+
+            while (true) {
+                int col = (int) ((currentX - worldMinX) / cellWidth);
+                int row = (int) ((currentY - worldMinY) / cellHeight);
+                crossedCells.add(spacePartition.get(row * cols + col));
+                crossedCells2.add(spacePartition.get(row * cols + col)); // TODO: delete
+
+                if (currentX == x2Cell && currentY == y2Cell) break;
+
+                e2 = 2 * err;
+                if (e2 > -dy) {
+                    err -= dy;
+                    currentX += sx;
+                }
+                if (e2 < dx) {
+                    err += dx;
+                    currentY += sy;
+                }
+            }
+
+            // perform the ray casting for each cell.
+            for (Cell cell : crossedCells) {
+                raycasting.getIntersections(ray, cell.bodies, intersections);
+            }
+            // TODO: sort intersections based on proximity
+            callback.intersected(intersections);
+            intersections.clear();
+        }
+        raysPool.freeAll(raysToCast.keySet());
+        raysToCast.clear();
     }
 
     @Contract(pure = true)
@@ -392,6 +457,7 @@ public class Physics2DWorld {
 
     public void destroyBody(final Physics2DBody body) {
         bodiesToRemove.add(body);
+        // TODO: remove all body constraints ans joints.
     }
 
     public void createJoint() {
@@ -403,23 +469,30 @@ public class Physics2DWorld {
     }
 
     /* Ray casting API */
-    public void castRay(@NotNull final Physics2DWorld.Callback callback, float originX, float originY, float dirX, float dirY) {
+    public void castRay(@NotNull final Physics2DWorld.RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY) {
         Ray ray = raysPool.allocate();
         ray.originX = originX;
         ray.originY = originY;
         ray.dirX = dirX;
         ray.dirY = dirY;
+        raysToCast.put(ray, rayHitCallback);
     }
 
-    public void castRay(final Callback callback, float originX, float originY, float dirX, float dirY, float maxDst) {
+    public void castRay(final RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY, float maxDst) {
+        Ray ray = raysPool.allocate();
+        ray.originX = originX;
+        ray.originY = originY;
+        ray.dirX = dirX;
+        ray.dirY = dirY;
+        ray.dst = maxDst;
+        raysToCast.put(ray, rayHitCallback);
+    }
+
+    public void castRay(final RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY, float maxDst, int bitmask) {
 
     }
 
-    public void castRay(final Callback callback, float originX, float originY, float dirX, float dirY, float maxDst, int bitmask) {
-
-    }
-
-    public void castRay(final Callback callback, float originX, float originY, float dirX, float dirY, int bitmask) {
+    public void castRay(final RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY, int bitmask) {
 
     }
 
@@ -427,9 +500,9 @@ public class Physics2DWorld {
         debugRenderer.render(renderer);
     }
 
-    public interface Callback {
+    public interface RayHitCallback {
 
-        void callback(final RayCastResult[] results);
+        void intersected(final CollectionsArray<RayCastResult> results);
 
     }
 

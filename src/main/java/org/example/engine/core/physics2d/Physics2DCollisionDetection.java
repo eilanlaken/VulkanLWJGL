@@ -7,7 +7,7 @@ import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.NotNull;
 
-public class Physics2DCollisionDetection {
+public final class Physics2DCollisionDetection {
 
     private final MemoryPool<Projection> projectionsPool = new MemoryPool<>(Projection.class, 200);
     private final Physics2DWorld         world;
