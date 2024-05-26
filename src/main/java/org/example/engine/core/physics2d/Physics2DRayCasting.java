@@ -22,8 +22,43 @@ public final class Physics2DRayCasting {
         for (Physics2DBody body : bodies) {
             Shape2D shape = body.shape;
             if (shape instanceof Shape2DCircle) {
-                rayVsCircle(body, ray, (Shape2DCircle) shape, intersections);
+                rayVsCircle2(body, ray, (Shape2DCircle) shape, intersections);
             }
+        }
+    }
+
+    private void rayVsCircle2(Physics2DBody body, Physics2DWorld.Ray ray, Shape2DCircle circle, @NotNull CollectionsArray<Physics2DWorld.Intersection> intersections) {
+        MathVector2 m = new MathVector2(ray.originX, ray.originY).sub(circle.x(), circle.y());
+
+        float b = 2 * m.dot(ray.dirX, ray.dirY);
+        float c = m.len2() - circle.getWorldRadius() * circle.getWorldRadius();
+
+        float det = b * b - 4 * c;
+
+        System.out.println(m);
+        if (det < 0) return;
+
+        if (MathUtils.isZero(det)) {
+            Physics2DWorld.Intersection result = IntersectionsPool.allocate();
+            result.body = body;
+            float t = -b / 2;
+            result.point.set(ray.originX, ray.originY).add(t * ray.dirX, t * ray.dirY);
+            result.direction.set(result.point).sub(circle.x(), circle.y());
+            intersections.add(result);
+        } else {
+            Physics2DWorld.Intersection result1 = IntersectionsPool.allocate();
+            result1.body = body;
+            float t1 = (-b + (float) Math.sqrt(det)) / 2.0f;
+            result1.point.set(ray.originX, ray.originY).add(t1 * ray.dirX, t1 * ray.dirY);
+            result1.direction.set(result1.point).sub(circle.x(), circle.y());
+            intersections.add(result1);
+
+            Physics2DWorld.Intersection result2 = IntersectionsPool.allocate();
+            result2.body = body;
+            float t2 = (-b - (float) Math.sqrt(det)) / 2.0f;
+            result2.point.set(ray.originX, ray.originY).add(t2 * ray.dirX, t2 * ray.dirY);
+            result2.direction.set(result2.point).sub(circle.x(), circle.y());
+            intersections.add(result2);
         }
     }
 
@@ -32,17 +67,16 @@ public final class Physics2DRayCasting {
         MathVector2 u1 = new MathVector2(ray.dirX, ray.dirY).scl(MathVector2.dot(u.x, u.y, ray.dirX, ray.dirY));
         MathVector2 u2 = new MathVector2(u).sub(u1);
 
-        System.out.println(new MathVector2(ray.dirX, ray.dirY));
 
         float d2 = u2.len2();
         float r2 = circle.getWorldRadius() * circle.getWorldRadius();
 
         System.out.println(d2);
-        System.out.println(r2);
+
+
         if (d2 > r2) return;
 
         float m = (float) Math.sqrt(r2 - d2);
-        System.out.println("m: " + m);
 
         if (MathUtils.isZero(m)) {
             Physics2DWorld.Intersection result = IntersectionsPool.allocate();

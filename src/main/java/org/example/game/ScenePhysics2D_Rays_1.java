@@ -39,7 +39,7 @@ public class ScenePhysics2D_Rays_1 extends ApplicationScreen {
     protected void refresh() {
         world.castRay((intersections) -> {
 
-        }, 0,0, InputMouse.getCursorX(), InputMouse.getCursorY());
+        }, 0,0, 1, 1);
         world.update(GraphicsUtils.getDeltaTime());
 
         MathVector3 screen = new MathVector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
