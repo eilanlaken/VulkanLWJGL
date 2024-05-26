@@ -25,7 +25,7 @@ public class Physics2DWorld {
     private final MemoryPool<CollisionPair>     pairsPool          = new MemoryPool<>(CollisionPair.class, 5);
     private final MemoryPool<Cell>              cellsPool          = new MemoryPool<>(Cell.class,1024);
     private final MemoryPool<Ray>               raysPool           = new MemoryPool<>(Ray.class, 4);
-    private final MemoryPool<RayCastResult>     rayCastResultsPool = new MemoryPool<>(RayCastResult.class, 4);
+    private final MemoryPool<Intersection>      intersectionsPool  = new MemoryPool<>(Intersection.class, 4);
 
     // bodies
     private int                             bodiesCreated  = 0;
@@ -51,8 +51,9 @@ public class Physics2DWorld {
     private final Physics2DCollisionResolver          collisionResolver;
 
     // ray casting
-    private Physics2DRaycasting          raycasting = new Physics2DRaycasting(this);
-    private HashMap<Ray, RayHitCallback> raysToCast = new HashMap<>(4);
+    private Physics2DRayCasting            rayCasting    = new Physics2DRayCasting(this);
+    private HashMap<Ray, RayHitCallback>   raysToCast    = new HashMap<>(4);
+    private CollectionsArray<Intersection> intersections = new CollectionsArray<>(false, 10);
 
     // debugger options
     private Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
@@ -78,8 +79,8 @@ public class Physics2DWorld {
         return manifoldsPool;
     }
 
-    MemoryPool<RayCastResult> getRayCastResultsPool() {
-        return rayCastResultsPool;
+    MemoryPool<Intersection> getIntersectionsPool() {
+        return intersectionsPool;
     }
 
     public void update(final float delta) {
@@ -226,63 +227,17 @@ public class Physics2DWorld {
         }
 
         /* ray casting */
-        CollectionsArray<RayCastResult> intersections = new CollectionsArray<>(false, 10);
+        intersectionsPool.freeAll(intersections);
+        intersections.clear();
         for (Map.Entry<Ray, RayHitCallback> rayCallback : raysToCast.entrySet()) {
-
             Ray ray = rayCallback.getKey();
             RayHitCallback callback = rayCallback.getValue();
-            CollectionsArray<RayCastResult> results = new CollectionsArray<>();
+            CollectionsArray<Intersection> results = new CollectionsArray<>();
 
-            final float x1 = ray.originX;
-            final float y1 = ray.originY;
-            final float x2 = ray.originX + ray.dst * ray.dirX;
-            final float y2 = ray.originY + ray.dst * ray.dirY;
-
-            int x1Cell = (int) Math.floor(x1 / cellWidth);
-            int y1Cell = (int) Math.floor(y1 / cellHeight);
-            int x2Cell = (int) Math.floor(x2 / cellWidth);
-            int y2Cell = (int) Math.floor(y2 / cellHeight);
-            int dx = Math.abs(x2Cell - x1Cell);
-            int dy = Math.abs(y2Cell - y1Cell);
-
-            int sx = x1Cell < x2Cell ? 1 : -1;
-            int sy = y1Cell < y2Cell ? 1 : -1;
-
-            int err = dx - dy;
-            int e2;
-
-            int currentX = x1Cell;
-            int currentY = y1Cell;
-
-            // optimization: only crossed cells will be considered
-            CollectionsArray<Cell> crossedCells = new CollectionsArray<>(false, 32);
-
-            while (true) {
-                int col = (int) ((currentX - worldMinX) / cellWidth);
-                int row = (int) ((currentY - worldMinY) / cellHeight);
-                crossedCells.add(spacePartition.get(row * cols + col));
-                crossedCells2.add(spacePartition.get(row * cols + col)); // TODO: delete
-
-                if (currentX == x2Cell && currentY == y2Cell) break;
-
-                e2 = 2 * err;
-                if (e2 > -dy) {
-                    err -= dy;
-                    currentX += sx;
-                }
-                if (e2 < dx) {
-                    err += dx;
-                    currentY += sy;
-                }
-            }
-
-            // perform the ray casting for each cell.
-            for (Cell cell : crossedCells) {
-                raycasting.getIntersections(ray, cell.bodies, intersections);
-            }
-            // TODO: sort intersections based on proximity
-            callback.intersected(intersections);
-            intersections.clear();
+            rayCasting.calculateIntersections(ray, allBodies, results);
+            intersections.addAll(results);
+            callback.intersected(results);
+            results.clear();
         }
         raysPool.freeAll(raysToCast.keySet());
         raysToCast.clear();
@@ -473,8 +428,9 @@ public class Physics2DWorld {
         Ray ray = raysPool.allocate();
         ray.originX = originX;
         ray.originY = originY;
-        ray.dirX = dirX;
-        ray.dirY = dirY;
+        float len = MathVector2.len(dirX, dirY);
+        ray.dirX = dirX / len;
+        ray.dirY = dirY / len;
         raysToCast.put(ray, rayHitCallback);
     }
 
@@ -482,8 +438,9 @@ public class Physics2DWorld {
         Ray ray = raysPool.allocate();
         ray.originX = originX;
         ray.originY = originY;
-        ray.dirX = dirX;
-        ray.dirY = dirY;
+        float len = MathVector2.len(dirX, dirY);
+        ray.dirX = dirX / len;
+        ray.dirY = dirY / len;
         ray.dst = maxDst;
         raysToCast.put(ray, rayHitCallback);
     }
@@ -502,7 +459,7 @@ public class Physics2DWorld {
 
     public interface RayHitCallback {
 
-        void intersected(final CollectionsArray<RayCastResult> results);
+        void intersected(final CollectionsArray<Intersection> results);
 
     }
 
@@ -592,17 +549,66 @@ public class Physics2DWorld {
 
     }
 
-    public static class RayCastResult implements MemoryPool.Reset {
+    public static class Intersection implements MemoryPool.Reset {
 
-        public Physics2DBody body    = null;
-        public MathVector2   contact = new MathVector2();
-        public MathVector2   normal  = new MathVector2();
+        public Physics2DBody body         = null;
+        public MathVector2   intersection = new MathVector2();
+        public MathVector2   direction    = new MathVector2();
+        public float         fraction     = 0;
 
-        public RayCastResult() {}
+        public Intersection() {}
 
         @Override
         public void reset() {
             body = null;
         }
+
     }
 }
+
+/** TODO: optimized ray casting
+
+ final float x1 = ray.originX;
+ final float y1 = ray.originY;
+ final float x2 = ray.originX + ray.dst * ray.dirX;
+ final float y2 = ray.originY + ray.dst * ray.dirY;
+
+ int x1Cell = (int) Math.floor(x1 / cellWidth);
+ int y1Cell = (int) Math.floor(y1 / cellHeight);
+ int x2Cell = (int) Math.floor(x2 / cellWidth);
+ int y2Cell = (int) Math.floor(y2 / cellHeight);
+ int dx = Math.abs(x2Cell - x1Cell);
+ int dy = Math.abs(y2Cell - y1Cell);
+
+ int sx = x1Cell < x2Cell ? 1 : -1;
+ int sy = y1Cell < y2Cell ? 1 : -1;
+
+ int err = dx - dy;
+ int e2;
+
+ int currentX = x1Cell;
+ int currentY = y1Cell;
+
+ // optimization: only crossed cells will be considered
+ CollectionsArray<Cell> crossedCells = new CollectionsArray<>(false, 32);
+
+ while (true) {
+ int col = (int) ((currentX - worldMinX) / cellWidth);
+ int row = (int) ((currentY - worldMinY) / cellHeight);
+ crossedCells.add(spacePartition.get(row * cols + col));
+ crossedCells2.add(spacePartition.get(row * cols + col)); // TODO: delete
+
+ if (currentX == x2Cell && currentY == y2Cell) break;
+
+ e2 = 2 * err;
+ if (e2 > -dy) {
+ err -= dy;
+ currentX += sx;
+ }
+ if (e2 < dx) {
+ err += dx;
+ currentY += sy;
+ }
+ }
+
+ **/
