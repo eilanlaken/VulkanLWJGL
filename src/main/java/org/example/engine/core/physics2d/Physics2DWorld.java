@@ -51,17 +51,17 @@ public class Physics2DWorld {
     private final Physics2DCollisionResolver          collisionResolver;
 
     // ray casting
-    private Physics2DRayCasting            rayCasting    = new Physics2DRayCasting(this);
-    private HashMap<Ray, RayHitCallback>   raysToCast    = new HashMap<>(4);
-    private CollectionsArray<Intersection> intersections = new CollectionsArray<>(false, 10);
+    private final Physics2DRayCasting            rayCasting    = new Physics2DRayCasting(this);
+    private final HashMap<Ray, RayHitCallback>   raysToCast    = new HashMap<>(4);
+    protected     CollectionsArray<Intersection> intersections = new CollectionsArray<>(false, 10);
 
     // debugger options
-    private Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
-    public  boolean                renderContacts   = true;
-    public  boolean                renderVelocities = false;
-    public  boolean                renderBodies     = true;
-    public  boolean                renderJoints     = true;
-    public  boolean                renderRays       = true;
+    private final Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
+    public        boolean                renderContacts   = true;
+    public        boolean                renderVelocities = false;
+    public        boolean                renderBodies     = true;
+    public        boolean                renderJoints     = true;
+    public        boolean                renderRays       = true;
 
     // TODO: debug. Delete those.
     CollectionsArray<Cell> crossedCells2 = new CollectionsArray<>();
@@ -429,8 +429,9 @@ public class Physics2DWorld {
         ray.originX = originX;
         ray.originY = originY;
         float len = MathVector2.len(dirX, dirY);
-        ray.dirX = dirX / len;
-        ray.dirY = dirY / len;
+        ray.dirX = MathUtils.isZero(len) ? 1 : dirX / len;
+        ray.dirY = MathUtils.isZero(len) ? 0 : dirY / len;
+        ray.dst = Float.POSITIVE_INFINITY;
         raysToCast.put(ray, rayHitCallback);
     }
 
@@ -439,8 +440,8 @@ public class Physics2DWorld {
         ray.originX = originX;
         ray.originY = originY;
         float len = MathVector2.len(dirX, dirY);
-        ray.dirX = dirX / len;
-        ray.dirY = dirY / len;
+        ray.dirX = MathUtils.isZero(len) ? 1 : dirX / len;
+        ray.dirY = MathUtils.isZero(len) ? 0 : dirY / len;
         ray.dst = maxDst;
         raysToCast.put(ray, rayHitCallback);
     }
@@ -552,7 +553,7 @@ public class Physics2DWorld {
     public static class Intersection implements MemoryPool.Reset {
 
         public Physics2DBody body         = null;
-        public MathVector2   intersection = new MathVector2();
+        public MathVector2 point = new MathVector2();
         public MathVector2   direction    = new MathVector2();
         public float         fraction     = 0;
 
