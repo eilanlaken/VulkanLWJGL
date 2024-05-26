@@ -35,7 +35,6 @@ public final class Physics2DRayCasting {
 
         float det = b * b - 4 * c;
 
-        System.out.println(m);
         if (det < 0) return;
 
         if (MathUtils.isZero(det)) {
