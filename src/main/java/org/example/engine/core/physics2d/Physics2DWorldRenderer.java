@@ -67,9 +67,7 @@ public final class Physics2DWorldRenderer {
         // TODO: render rays and ray casting results
         if (world.renderRays) {
             Set<Physics2DWorld.Ray> rays = world.allRays.keySet();
-            System.out.println(rays.size());
             for (Physics2DWorld.Ray ray : rays) {
-                System.out.println("r: " + ray.dst);
                 float scl = ray.dst == Float.POSITIVE_INFINITY || Float.isNaN(ray.dst) ? 100 : ray.dst;
                 renderer.pushLineSegment(ray.originX, ray.originY, ray.originX + scl * ray.dirX, ray.originY + scl * ray.dirY, RAY_TINT);
             }

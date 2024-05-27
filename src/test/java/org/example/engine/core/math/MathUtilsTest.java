@@ -55,6 +55,12 @@ class MathUtilsTest {
 
         float v7 = MathUtils.clampFloat(2.0f, 2.0f, 2.0f);
         Assertions.assertEquals(2.0f, v7, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        float v8 = MathUtils.clampFloat(Float.POSITIVE_INFINITY, -1, 1);
+        Assertions.assertEquals(1.0f, v8, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        float v9 = MathUtils.clampFloat(Float.NEGATIVE_INFINITY, -1, 1);
+        Assertions.assertEquals(-1.0f, v9, MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test

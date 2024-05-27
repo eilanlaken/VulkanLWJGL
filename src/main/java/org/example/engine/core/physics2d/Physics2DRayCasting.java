@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
@@ -10,6 +11,10 @@ import org.example.engine.core.shape.Shape2DRectangle;
 import org.jetbrains.annotations.NotNull;
 
 public final class Physics2DRayCasting {
+
+    private static final int COLLINEAR         = 0;
+    private static final int CLOCKWISE         = 1;
+    private static final int COUNTER_CLOCKWISE = 2;
 
     private final Physics2DWorld world;
     private final MemoryPool<Physics2DWorld.Intersection> IntersectionsPool;
@@ -25,7 +30,9 @@ public final class Physics2DRayCasting {
             if (shape instanceof Shape2DCircle) {
                 rayVsCircle(body, ray, (Shape2DCircle) shape, intersections);
             }
-
+            if (shape instanceof Shape2DRectangle) {
+                rayVsRectangle(body, ray, (Shape2DRectangle) shape, intersections);
+            }
         }
     }
 
@@ -37,9 +44,10 @@ public final class Physics2DRayCasting {
         if (det < 0) return;
 
         if (MathUtils.isZero(det)) {
+            float t = -b / 2.0f;
+            if (t < 0) return;
             Physics2DWorld.Intersection result = IntersectionsPool.allocate();
             result.body = body;
-            float t = -b / 2;
             result.point.set(ray.originX, ray.originY).add(t * ray.dirX, t * ray.dirY);
             result.direction.set(result.point).sub(circle.x(), circle.y());
             intersections.add(result);
@@ -66,15 +74,65 @@ public final class Physics2DRayCasting {
     }
 
     private void rayVsRectangle(Physics2DBody body, Physics2DWorld.Ray ray, Shape2DRectangle rectangle, @NotNull CollectionsArray<Physics2DWorld.Intersection> intersections) {
-        float s1x1 = ray.originX;
-        float s1y1 = ray.originY;
-        float s1x2 = ray.originX + ray.dst * ray.dirX;
-        float s1y2 = ray.originY + ray.dst * ray.dirY;
+        float x1 = ray.originX;
+        float y1 = ray.originY;
+//        float x2 = ray.originX + ray.dst * ray.dirX;
+//        float y2 = ray.originY + ray.dst * ray.dirY;
+
+        //float dst = MathUtils.clampFloat();ray.dst
+
+        float x2 = ray.originX + 100 * ray.dirX;
+        float y2 = ray.originY + 100 * ray.dirY;
 
         MathVector2 c0 = rectangle.c0();
         MathVector2 c1 = rectangle.c1();
         MathVector2 c2 = rectangle.c2();
         MathVector2 c3 = rectangle.c3();
+
+        CollectionsArray<MathVector2> edges = new CollectionsArray<>(true, 4);
+        edges.add(c0, c1, c2, c3);
+
+        for (int i = 0; i < 4; i++) {
+            MathVector2 p = edges.getCyclic(i);
+            float x3 = p.x;
+            float y3 = p.y;
+
+            MathVector2 q = edges.getCyclic(i+1);
+            float x4 = q.x;
+            float y4 = q.y;
+
+            float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+            if (MathUtils.isZero(den)) {
+                continue;
+            }
+
+            float t =  ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+            float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
+
+            if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
+                System.out.println("t: " + t);
+                System.out.println("u: " + u);
+            }
+
+            if (t > 0 && t < 1 && u > 0 && u < 1) {
+                Physics2DWorld.Intersection result = IntersectionsPool.allocate();
+                result.body = body;
+                result.point.set(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+                result.direction.set(x4 - x3, y4 - y3);
+                intersections.add(result);
+            }
+        }
+    }
+
+    private boolean onSegment(float px, float py, float qx, float qy, float rx, float ry) {
+        return qx <= Math.max(px, rx) && qx >= Math.min(px, rx) &&
+                qy <= Math.max(py, ry) && qy >= Math.min(py, ry);
+    }
+
+    private int orientation(float x1, float y1, float x2, float y2, float x3, float y3) {
+        float val = (y2 - y1) * (x3 - x2) - (x2 - x1) * (y3 - y2);
+        if (val == 0) return COLLINEAR;
+        return (val > 0) ? CLOCKWISE : COUNTER_CLOCKWISE;
     }
 
 }

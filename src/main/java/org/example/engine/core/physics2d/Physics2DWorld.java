@@ -53,9 +53,16 @@ public class Physics2DWorld {
     // ray casting
     final Physics2DRayCasting            rayCasting    = new Physics2DRayCasting(this);
     final HashMap<Ray, RayHitCallback>   allRays       = new HashMap<>(4);
-    final HashMap<Ray, RayHitCallback>   raysToAdd = new HashMap<>(4);
-    final HashMap<Ray, RayHitCallback>   raysToRemove = new HashMap<>(4);
+    final HashMap<Ray, RayHitCallback>   raysToAdd     = new HashMap<>(4);
+    final HashMap<Ray, RayHitCallback>   raysToRemove  = new HashMap<>(4);
     final CollectionsArray<Intersection> intersections = new CollectionsArray<>(false, 10);
+
+    // world state
+    float worldMinX = Float.POSITIVE_INFINITY;
+    float worldMaxX = Float.NEGATIVE_INFINITY;
+    float worldMinY = Float.POSITIVE_INFINITY;
+    float worldMaxY = Float.NEGATIVE_INFINITY;
+    float worldMaxR = Float.NEGATIVE_INFINITY;
 
     // debugger options
     private final Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
@@ -109,12 +116,6 @@ public class Physics2DWorld {
         forceFieldsToAdd.clear();
 
         /* integration: update velocities, clear forces and move bodies. */
-
-        float worldMinX = Float.POSITIVE_INFINITY;
-        float worldMaxX = Float.NEGATIVE_INFINITY;
-        float worldMinY = Float.POSITIVE_INFINITY;
-        float worldMaxY = Float.NEGATIVE_INFINITY;
-        float worldMaxR = Float.NEGATIVE_INFINITY;
 
         for (Physics2DBody body : allBodies) {
             if (body.off) continue;
