@@ -51,9 +51,11 @@ public class Physics2DWorld {
     private final Physics2DCollisionResolver          collisionResolver;
 
     // ray casting
-    private final Physics2DRayCasting            rayCasting    = new Physics2DRayCasting(this);
-    private final HashMap<Ray, RayHitCallback>   raysToCast    = new HashMap<>(4);
-    protected     CollectionsArray<Intersection> intersections = new CollectionsArray<>(false, 10);
+    final Physics2DRayCasting            rayCasting    = new Physics2DRayCasting(this);
+    final HashMap<Ray, RayHitCallback>   allRays       = new HashMap<>(4);
+    final HashMap<Ray, RayHitCallback>   raysToAdd = new HashMap<>(4);
+    final HashMap<Ray, RayHitCallback>   raysToRemove = new HashMap<>(4);
+    final CollectionsArray<Intersection> intersections = new CollectionsArray<>(false, 10);
 
     // debugger options
     private final Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
@@ -84,7 +86,7 @@ public class Physics2DWorld {
     }
 
     public void update(final float delta) {
-        /* preparation: add and remove bodies */
+        /* add and remove bodies */
 
         for (Physics2DBody body : bodiesToRemove) {
             allBodies.removeValue(body, true);
@@ -227,20 +229,28 @@ public class Physics2DWorld {
         }
 
         /* ray casting */
+        for (Map.Entry<Ray, RayHitCallback> rayCallback : raysToRemove.entrySet()) {
+            Ray ray = rayCallback.getKey();
+            allRays.remove(ray);
+            raysPool.free(ray);
+        }
+        allRays.putAll(raysToAdd);
+        raysToRemove.clear();
+        raysToAdd.clear();
         intersectionsPool.freeAll(intersections);
         intersections.clear();
-        for (Map.Entry<Ray, RayHitCallback> rayCallback : raysToCast.entrySet()) {
+
+        for (Map.Entry<Ray, RayHitCallback> rayCallback : allRays.entrySet()) {
             Ray ray = rayCallback.getKey();
             RayHitCallback callback = rayCallback.getValue();
             CollectionsArray<Intersection> results = new CollectionsArray<>();
-
+            // TODO: optimize this using the cell grid.
             rayCasting.calculateIntersections(ray, allBodies, results);
             intersections.addAll(results);
-            callback.intersected(results);
+            if (callback != null) callback.intersected(results);
             results.clear();
+            raysToRemove.put(ray, callback);
         }
-        raysPool.freeAll(raysToCast.keySet());
-        raysToCast.clear();
     }
 
     @Contract(pure = true)
@@ -424,7 +434,7 @@ public class Physics2DWorld {
     }
 
     /* Ray casting API */
-    public void castRay(@NotNull final Physics2DWorld.RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY) {
+    public void castRay(final Physics2DWorld.RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY) {
         Ray ray = raysPool.allocate();
         ray.originX = originX;
         ray.originY = originY;
@@ -432,7 +442,7 @@ public class Physics2DWorld {
         ray.dirX = MathUtils.isZero(len) ? 1 : dirX / len;
         ray.dirY = MathUtils.isZero(len) ? 0 : dirY / len;
         ray.dst = Float.POSITIVE_INFINITY;
-        raysToCast.put(ray, rayHitCallback);
+        raysToAdd.put(ray, rayHitCallback);
     }
 
     public void castRay(final RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY, float maxDst) {
@@ -443,7 +453,7 @@ public class Physics2DWorld {
         ray.dirX = MathUtils.isZero(len) ? 1 : dirX / len;
         ray.dirY = MathUtils.isZero(len) ? 0 : dirY / len;
         ray.dst = maxDst;
-        raysToCast.put(ray, rayHitCallback);
+        raysToAdd.put(ray, rayHitCallback);
     }
 
     public void castRay(final RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY, float maxDst, int bitmask) {

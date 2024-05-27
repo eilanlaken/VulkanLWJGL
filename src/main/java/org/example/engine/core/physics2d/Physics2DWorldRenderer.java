@@ -9,11 +9,16 @@ import org.example.engine.core.shape.Shape2DPolygon;
 import org.example.engine.core.shape.Shape2DSegment;
 import org.example.engine.core.shape.ShapeUtils;
 
+import java.util.Set;
+
 public final class Physics2DWorldRenderer {
 
+    // TODO: change renderer to work directly with float bits
     private static final GraphicsColor TINT_FIXED     = new GraphicsColor(1,1,0,1);
     private static final GraphicsColor TINT_LOGICAL   = new GraphicsColor(1,0,1,1);
     private static final GraphicsColor TINT_NEWTONIAN = new GraphicsColor(0,1,1,1);
+
+    private static final float RAY_TINT = new GraphicsColor(0.4f, 0.2f, 0.8f, 1).toFloatBits();
 
     private final Shape2DSegment segment    = new Shape2DSegment(0,0,0,0);
     private final Shape2DPolygon polyCircle = ShapeUtils.createPolygonCircleFilled(1, 10);
@@ -61,6 +66,14 @@ public final class Physics2DWorldRenderer {
 
         // TODO: render rays and ray casting results
         if (world.renderRays) {
+            Set<Physics2DWorld.Ray> rays = world.allRays.keySet();
+            System.out.println(rays.size());
+            for (Physics2DWorld.Ray ray : rays) {
+                System.out.println("r: " + ray.dst);
+                float scl = ray.dst == Float.POSITIVE_INFINITY || Float.isNaN(ray.dst) ? 100 : ray.dst;
+                renderer.pushLineSegment(ray.originX, ray.originY, ray.originX + scl * ray.dirX, ray.originY + scl * ray.dirY, RAY_TINT);
+            }
+
             CollectionsArray<Physics2DWorld.Intersection> intersections = world.intersections;
             for (Physics2DWorld.Intersection intersection : intersections) {
                 MathVector2 point = intersection.point;

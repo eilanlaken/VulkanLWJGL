@@ -273,7 +273,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         if (shape instanceof Shape2DUnion) pushDebugCompoundShape((Shape2DUnion) shape, tintFloatBits);
     }
 
-    private void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
+    public void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 34 * 2 > indicesBuffer.limit() || vertexIndex + 17 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
@@ -316,7 +316,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         vertexIndex += 17 * 5;
     }
 
-    private void pushDebugRectangle(final Shape2DRectangle rectangle, final float tintFloatBits) {
+    public void pushDebugRectangle(final Shape2DRectangle rectangle, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 10 * 2> indicesBuffer.limit() || vertexIndex + 6 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
@@ -364,7 +364,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         vertexIndex += 6 * 5;
     }
 
-    private void pushDebugAABB(final Shape2DAABB aabb, final float tintFloatBits) {
+    public void pushDebugAABB(final Shape2DAABB aabb, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 10 * 2 > indicesBuffer.limit() || vertexIndex + 6 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
@@ -413,7 +413,33 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         vertexIndex += 6 * 5;
     }
 
-    private void pushDebugSegment(final Shape2DSegment segment, final float tintFloatBits) {
+    public void pushLineSegment(float x1, float y1, float x2, float y2, final float tintFloatBits) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 2 * 2 > indicesBuffer.limit() || vertexIndex + 2 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
+
+        useShader(defaultShader);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+        useMode(GL11.GL_LINES);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+        ;
+        triangleIndex += 2;
+
+        verticesBuffer
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // a
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // b
+        ;
+        vertexIndex += 2 * 5;
+    }
+
+    @Deprecated public void pushDebugSegment(final Shape2DSegment segment, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 2 * 2 > indicesBuffer.limit() || vertexIndex + 2 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
@@ -443,7 +469,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         vertexIndex += 2 * 5;
     }
 
-    private void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {
+    public void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + polygon.indices.length * 2 * 2 + 2 > indicesBuffer.limit() || vertexIndex + polygon.vertexCount * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
@@ -477,7 +503,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         vertexIndex += polygon.vertexCount * 5;
     }
 
-    private void pushDebugCompoundShape(final Shape2DUnion compound, final float tintFloatBits) {
+    public void pushDebugCompoundShape(final Shape2DUnion compound, final float tintFloatBits) {
         for (Shape2D island : compound.shapes) {
             pushDebugShape(island, tintFloatBits);
         }
