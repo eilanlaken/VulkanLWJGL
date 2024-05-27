@@ -17,6 +17,8 @@ import java.util.function.BiConsumer;
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-core-engine--gamedev-7493t
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-friction-scene-and-jump-table--gamedev-7756t
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
+
+// TODO: RAY CASTING, optimized: https://theshoemaker.de/posts/ray-casting-in-2d-grids
 public class Physics2DWorld {
 
     // memory pools
