@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public final class Physics2DRayCasting {
 
+    // TODO: see if useful when dealing with polygons.
     private static final int COLLINEAR         = 0;
     private static final int CLOCKWISE         = 1;
     private static final int COUNTER_CLOCKWISE = 2;
@@ -45,7 +46,7 @@ public final class Physics2DRayCasting {
 
         if (MathUtils.isZero(det)) {
             float t = -b / 2.0f;
-            if (t < 0) return;
+            if (t < 0 || t > ray.dst) return;
             Physics2DWorld.Intersection result = IntersectionsPool.allocate();
             result.body = body;
             result.point.set(ray.originX, ray.originY).add(t * ray.dirX, t * ray.dirY);
@@ -55,7 +56,7 @@ public final class Physics2DRayCasting {
         }
 
         float t1 = (-b + (float) Math.sqrt(det)) / 2.0f;
-        if (t1 > 0) {
+        if (t1 > 0 && t1 < ray.dst) {
             Physics2DWorld.Intersection result1 = IntersectionsPool.allocate();
             result1.body = body;
             result1.point.set(ray.originX, ray.originY).add(t1 * ray.dirX, t1 * ray.dirY);
@@ -64,7 +65,7 @@ public final class Physics2DRayCasting {
         }
 
         float t2 = (-b - (float) Math.sqrt(det)) / 2.0f;
-        if (t2 > 0) {
+        if (t2 > 0 && t2 < ray.dst) {
             Physics2DWorld.Intersection result2 = IntersectionsPool.allocate();
             result2.body = body;
             result2.point.set(ray.originX, ray.originY).add(t2 * ray.dirX, t2 * ray.dirY);
@@ -74,15 +75,11 @@ public final class Physics2DRayCasting {
     }
 
     private void rayVsRectangle(Physics2DBody body, Physics2DWorld.Ray ray, Shape2DRectangle rectangle, @NotNull CollectionsArray<Physics2DWorld.Intersection> intersections) {
-        float x1 = ray.originX;
-        float y1 = ray.originY;
-//        float x2 = ray.originX + ray.dst * ray.dirX;
-//        float y2 = ray.originY + ray.dst * ray.dirY;
-
-        //float dst = MathUtils.clampFloat();ray.dst
-
-        float x2 = ray.originX + 100 * ray.dirX;
-        float y2 = ray.originY + 100 * ray.dirY;
+        float dst = ray.dst == Float.POSITIVE_INFINITY ? 1.0f : ray.dst;
+        float x3 = ray.originX;
+        float y3 = ray.originY;
+        float x4 = ray.originX + dst * ray.dirX;
+        float y4 = ray.originY + dst * ray.dirY;
 
         MathVector2 c0 = rectangle.c0();
         MathVector2 c1 = rectangle.c1();
@@ -94,27 +91,28 @@ public final class Physics2DRayCasting {
 
         for (int i = 0; i < 4; i++) {
             MathVector2 p = edges.getCyclic(i);
-            float x3 = p.x;
-            float y3 = p.y;
+            float x1 = p.x;
+            float y1 = p.y;
 
             MathVector2 q = edges.getCyclic(i+1);
-            float x4 = q.x;
-            float y4 = q.y;
+            float x2 = q.x;
+            float y2 = q.y;
 
             float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-            if (MathUtils.isZero(den)) {
-                continue;
-            }
+            if (MathUtils.isZero(den)) continue;
 
             float t =  ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
             float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
 
-            if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
-                System.out.println("t: " + t);
-                System.out.println("u: " + u);
-            }
-
-            if (t > 0 && t < 1 && u > 0 && u < 1) {
+            if (ray.dst == Float.POSITIVE_INFINITY) {
+                if (t > 0 && t < 1 && u > 0) {
+                    Physics2DWorld.Intersection result = IntersectionsPool.allocate();
+                    result.body = body;
+                    result.point.set(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+                    result.direction.set(x4 - x3, y4 - y3);
+                    intersections.add(result);
+                }
+            } else if (t > 0 && t < 1 && u > 0 && u < 1) {
                 Physics2DWorld.Intersection result = IntersectionsPool.allocate();
                 result.body = body;
                 result.point.set(x1 + t * (x2 - x1), y1 + t * (y2 - y1));

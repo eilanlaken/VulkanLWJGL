@@ -46,7 +46,7 @@ public class ScenePhysics2D_Rays_2 extends ApplicationScreen {
         camera.lens.unproject(screen);
         world.castRay((intersections) -> {
 
-        }, 0,0, screen.x, screen.y);
+        }, 0,0, screen.x, screen.y, Float.POSITIVE_INFINITY);
         world.update(GraphicsUtils.getDeltaTime());
 
         if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {

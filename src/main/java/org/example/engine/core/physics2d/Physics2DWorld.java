@@ -57,13 +57,6 @@ public class Physics2DWorld {
     final HashMap<Ray, RayHitCallback>   raysToRemove  = new HashMap<>(4);
     final CollectionsArray<Intersection> intersections = new CollectionsArray<>(false, 10);
 
-    // world state
-    float worldMinX = Float.POSITIVE_INFINITY;
-    float worldMaxX = Float.NEGATIVE_INFINITY;
-    float worldMinY = Float.POSITIVE_INFINITY;
-    float worldMaxY = Float.NEGATIVE_INFINITY;
-    float worldMaxR = Float.NEGATIVE_INFINITY;
-
     // debugger options
     private final Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
     public        boolean                renderContacts   = true;
@@ -116,6 +109,12 @@ public class Physics2DWorld {
         forceFieldsToAdd.clear();
 
         /* integration: update velocities, clear forces and move bodies. */
+
+        float worldMinX = Float.POSITIVE_INFINITY;
+        float worldMaxX = Float.NEGATIVE_INFINITY;
+        float worldMinY = Float.POSITIVE_INFINITY;
+        float worldMaxY = Float.NEGATIVE_INFINITY;
+        float worldMaxR = Float.NEGATIVE_INFINITY;
 
         for (Physics2DBody body : allBodies) {
             if (body.off) continue;
@@ -240,6 +239,10 @@ public class Physics2DWorld {
         for (Map.Entry<Ray, RayHitCallback> rayCallback : allRays.entrySet()) {
             Ray ray = rayCallback.getKey();
             RayHitCallback callback = rayCallback.getValue();
+            // set the distance for the ray based on world's extent
+            if (ray.dst == Float.POSITIVE_INFINITY || Float.isNaN(ray.dst)) {
+
+            }
             CollectionsArray<Intersection> results = new CollectionsArray<>();
             // TODO: optimize this using the cell grid.
             rayCasting.calculateIntersections(ray, allBodies, results);
@@ -436,8 +439,9 @@ public class Physics2DWorld {
         ray.originX = originX;
         ray.originY = originY;
         float len = MathVector2.len(dirX, dirY);
-        ray.dirX = MathUtils.isZero(len) ? 1 : dirX / len;
-        ray.dirY = MathUtils.isZero(len) ? 0 : dirY / len;
+        boolean zero = MathUtils.isZero(len);
+        ray.dirX = zero ? 1 : dirX / len;
+        ray.dirY = zero ? 0 : dirY / len;
         ray.dst = Float.POSITIVE_INFINITY;
         raysToAdd.put(ray, rayHitCallback);
     }
@@ -449,15 +453,11 @@ public class Physics2DWorld {
         float len = MathVector2.len(dirX, dirY);
         ray.dirX = MathUtils.isZero(len) ? 1 : dirX / len;
         ray.dirY = MathUtils.isZero(len) ? 0 : dirY / len;
-        ray.dst = maxDst;
+        ray.dst = Math.abs(maxDst);
         raysToAdd.put(ray, rayHitCallback);
     }
 
     public void castRay(final RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY, float maxDst, int bitmask) {
-
-    }
-
-    public void castRay(final RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY, int bitmask) {
 
     }
 
@@ -551,7 +551,7 @@ public class Physics2DWorld {
 
         @Override
         public void reset() {
-            dst = 0.0f;
+            dst = Float.POSITIVE_INFINITY;
             bitmask = 0;
         }
 

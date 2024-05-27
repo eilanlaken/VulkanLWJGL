@@ -5,6 +5,7 @@ import org.example.engine.core.graphics.GraphicsCamera;
 import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.input.InputMouse;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector3;
 import org.example.engine.core.physics2d.Physics2DBody;
 import org.example.engine.core.physics2d.Physics2DWorld;
@@ -12,13 +13,13 @@ import org.lwjgl.opengl.GL11;
 
 // contact points polygon vs polygon:
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
-public class ScenePhysics2D_Rays_3 extends ApplicationScreen {
+public class ScenePhysics2D_Rays_4 extends ApplicationScreen {
 
     private GraphicsRenderer2D renderer2D;
     private GraphicsCamera camera;
     private Physics2DWorld world = new Physics2DWorld();
 
-    public ScenePhysics2D_Rays_3() {
+    public ScenePhysics2D_Rays_4() {
         renderer2D = new GraphicsRenderer2D();
     }
 
@@ -27,11 +28,21 @@ public class ScenePhysics2D_Rays_3 extends ApplicationScreen {
         camera = new GraphicsCamera(640f/32,480f/32, 1);
         camera.update();
 
-        world.createBodyRectangle(null, Physics2DBody.MotionType.STATIC,
-                5, 5, 0,
-                0f, 0f, 0,
-                1, 1, 1,0.2f, false, 1,
-                3f, 1, 20);
+        for (int i = 0; i < 50; i++) {
+            world.createBodyCircle(null, Physics2DBody.MotionType.STATIC,
+                    20 * MathUtils.random() - 10, 20 * MathUtils.random() - 10, 360 * MathUtils.random(),
+                    0f, 0f, 0,
+                    1, 1, 1, 0.2f, false, 1,
+                    0.5f);
+        }
+
+        for (int i = 0; i < 50; i++) {
+            world.createBodyRectangle(null, Physics2DBody.MotionType.STATIC,
+                    20 * MathUtils.random() - 10, 20 * MathUtils.random() - 10, 360 * MathUtils.random(),
+                    0f, 0f, 0,
+                    1, 1, 1, 0.2f, false, 1,
+                    1 + 2 * MathUtils.random(), 1 + 2 * MathUtils.random(), 360 * MathUtils.random());
+        }
     }
 
 
@@ -43,7 +54,7 @@ public class ScenePhysics2D_Rays_3 extends ApplicationScreen {
         camera.lens.unproject(screen);
         world.castRay((intersections) -> {
 
-        }, 0,0, screen.x, screen.y,6);
+        }, 0,0, screen.x, screen.y, Float.POSITIVE_INFINITY);
         world.update(GraphicsUtils.getDeltaTime());
 
         if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
