@@ -45,19 +45,23 @@ public final class Physics2DRayCasting {
             result.direction.set(result.point).sub(circle.x(), circle.y());
             intersections.add(result);
         } else {
-            Physics2DWorld.Intersection result1 = IntersectionsPool.allocate();
-            result1.body = body;
             float t1 = (-b + (float) Math.sqrt(det)) / 2.0f;
-            result1.point.set(ray.originX, ray.originY).add(t1 * ray.dirX, t1 * ray.dirY);
-            result1.direction.set(result1.point).sub(circle.x(), circle.y());
-            intersections.add(result1);
+            if (t1 > 0) {
+                Physics2DWorld.Intersection result1 = IntersectionsPool.allocate();
+                result1.body = body;
+                result1.point.set(ray.originX, ray.originY).add(t1 * ray.dirX, t1 * ray.dirY);
+                result1.direction.set(result1.point).sub(circle.x(), circle.y());
+                intersections.add(result1);
+            }
 
-            Physics2DWorld.Intersection result2 = IntersectionsPool.allocate();
-            result2.body = body;
             float t2 = (-b - (float) Math.sqrt(det)) / 2.0f;
-            result2.point.set(ray.originX, ray.originY).add(t2 * ray.dirX, t2 * ray.dirY);
-            result2.direction.set(result2.point).sub(circle.x(), circle.y());
-            intersections.add(result2);
+            if (t2 > 0) {
+                Physics2DWorld.Intersection result2 = IntersectionsPool.allocate();
+                result2.body = body;
+                result2.point.set(ray.originX, ray.originY).add(t2 * ray.dirX, t2 * ray.dirY);
+                result2.direction.set(result2.point).sub(circle.x(), circle.y());
+                intersections.add(result2);
+            }
         }
     }
 

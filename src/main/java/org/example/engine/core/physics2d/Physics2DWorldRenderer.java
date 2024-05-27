@@ -77,7 +77,7 @@ public final class Physics2DWorldRenderer {
             CollectionsArray<Physics2DWorld.Intersection> intersections = world.intersections;
             for (Physics2DWorld.Intersection intersection : intersections) {
                 MathVector2 point = intersection.point;
-                renderer.pushPolygon(polyCircle, new GraphicsColor(1,1,0,1), point.x, point.y, 0,0,0, scaleX, scaleY,null,null);
+                renderer.pushPolygon(polyCircle, new GraphicsColor(0.2f,1,1,1), point.x, point.y, 0,0,0, scaleX, scaleY,null,null);
             }
         }
 

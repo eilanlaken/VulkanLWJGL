@@ -65,10 +65,6 @@ public class Physics2DWorld {
     public        boolean                renderJoints     = true;
     public        boolean                renderRays       = true;
 
-    // TODO: debug. Delete those.
-    CollectionsArray<Cell> crossedCells2 = new CollectionsArray<>();
-
-
     public Physics2DWorld(Physics2DCollisionResolver collisionResolver) {
         this.collisionResolver = collisionResolver != null ? collisionResolver : new Physics2DCollisionResolver() {};
     }
