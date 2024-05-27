@@ -451,8 +451,9 @@ public class Physics2DWorld {
         ray.originX = originX;
         ray.originY = originY;
         float len = MathVector2.len(dirX, dirY);
-        ray.dirX = MathUtils.isZero(len) ? 1 : dirX / len;
-        ray.dirY = MathUtils.isZero(len) ? 0 : dirY / len;
+        boolean zero = MathUtils.isZero(len);
+        ray.dirX = zero ? 1 : dirX / len;
+        ray.dirY = zero ? 0 : dirY / len;
         ray.dst = Math.abs(maxDst);
         raysToAdd.put(ray, rayHitCallback);
     }

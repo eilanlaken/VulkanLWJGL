@@ -75,6 +75,15 @@ public final class Physics2DRayCasting {
     }
 
     private void rayVsRectangle(Physics2DBody body, Physics2DWorld.Ray ray, Shape2DRectangle rectangle, @NotNull CollectionsArray<Physics2DWorld.Intersection> intersections) {
+        // broad phase
+        float boundingRadius = rectangle.getBoundingRadius();
+        MathVector2 m = new MathVector2(ray.originX, ray.originY).sub(rectangle.x(), rectangle.y());
+        float b = 2 * m.dot(ray.dirX, ray.dirY);
+        float c = m.len2() - boundingRadius * boundingRadius;
+        float det = b * b - 4 * c;
+        if (det < 0) return;
+
+        // narrow phase
         float dst = ray.dst == Float.POSITIVE_INFINITY ? 1.0f : ray.dst;
         float x3 = ray.originX;
         float y3 = ray.originY;
