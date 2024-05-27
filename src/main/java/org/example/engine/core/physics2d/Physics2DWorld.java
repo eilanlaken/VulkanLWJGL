@@ -439,7 +439,7 @@ public class Physics2DWorld {
         ray.originX = originX;
         ray.originY = originY;
         float len = MathVector2.len(dirX, dirY);
-        boolean zero = MathUtils.isZero(len);
+        boolean zero = MathUtils.isZero(dirX) && MathUtils.isZero(dirY);
         ray.dirX = zero ? 1 : dirX / len;
         ray.dirY = zero ? 0 : dirY / len;
         ray.dst = Float.POSITIVE_INFINITY;
@@ -451,7 +451,7 @@ public class Physics2DWorld {
         ray.originX = originX;
         ray.originY = originY;
         float len = MathVector2.len(dirX, dirY);
-        boolean zero = MathUtils.isZero(len);
+        boolean zero = MathUtils.isZero(dirX) && MathUtils.isZero(dirY);
         ray.dirX = zero ? 1 : dirX / len;
         ray.dirY = zero ? 0 : dirY / len;
         ray.dst = Math.abs(maxDst);
