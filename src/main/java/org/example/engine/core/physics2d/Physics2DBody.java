@@ -6,23 +6,40 @@ import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 import org.jetbrains.annotations.NotNull;
 
+// TODO:
+/*
+Look up: TODO
+https://box2d.org/documentation/b2__body_8h_source.html
+ void ApplyForce(const b2Vec2& force, const b2Vec2& point, bool wake);
+ void ApplyForceToCenter(const b2Vec2& force, bool wake);
+ void ApplyTorque(float torque, bool wake);
+ void ApplyLinearImpulse(const b2Vec2& impulse, const b2Vec2& point, bool wake);
+ void ApplyLinearImpulseToCenter(const b2Vec2& impulse, bool wake);
+ void ApplyAngularImpulse(float impulse, bool wake);
+
+     // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
+
+
+ */
 public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody> {
 
     public    Object      owner      = null;
     protected boolean     created    = false;
     protected int         index      = -1;
-    public    boolean     off        = false;
+    public    boolean     off        = false; // TODO: consider off bodies in update()
     public    Shape2D     shape      = null;
     public    MotionType  motionType = null;
     public    MathVector2 velocity   = new MathVector2();
     public    MathVector2 com        = new MathVector2();
     public    float       omegaDeg   = 0;
+    // TODO: see what's up
     public    MathVector2 netForce   = new MathVector2();
     public    float       netTorque  = 0;
 
-    public CollectionsArray<Physics2DBody> touching      = new CollectionsArray<>(false, 2);
-    public CollectionsArray<Physics2DBody> justCollided  = new CollectionsArray<>(false, 2);
-    public CollectionsArray<Physics2DBody> justSeparated = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DBody>  touching      = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DBody>  justCollided  = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DBody>  justSeparated = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DJoint> joints        = new CollectionsArray<>(false, 2);
 
     // TODO: must set some default values.
     public float   massInv;
@@ -60,26 +77,54 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         this.omegaDeg = omegaDeg;
     }
 
-    public void applyForce(float fx, float fy) {
+    @Deprecated public void applyForce(float fx, float fy) {
         netForce.add(fx, fy);
     }
 
-    public void applyTorque(final float tau) {
+    @Deprecated public void applyTorque(final float tau) {
         netTorque += tau;
+    }
+
+    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
+    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
+    public void applyForce(MathVector2 force, MathVector2 point, boolean wake) {
+
+    }
+
+    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
+    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
+    public void applyForceToCenter(MathVector2 force, boolean wake) {
+
+    }
+
+    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
+    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
+    public void applyTorque(float torque, boolean wake) {
+
+    }
+
+    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
+    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
+    public void applyLinearImpulse(MathVector2 impulse, MathVector2 point, boolean wake) {
+
+    }
+
+    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
+    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
+    public void applyLinearImpulseToCenter(MathVector2 impulse, boolean wake) {
+
+    }
+
+    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
+    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
+    public void applyAngularImpulse(float impulse, boolean wake) {
+
     }
 
     public void setMotionState(float x, float y, float angleDeg, float vx, float vy, float omega) {
         this.shape.setTransform(x, y, angleDeg);
         this.velocity.set(vx, vy);
         this.omegaDeg = omega;
-    }
-
-    public void turnOn() {
-        this.off = false;
-    }
-
-    public void turnOff() {
-        this.off = true;
     }
 
     @Override

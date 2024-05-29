@@ -19,6 +19,18 @@ import java.util.function.BiConsumer;
 // https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
 
 // TODO: RAY CASTING, optimized: https://theshoemaker.de/posts/ray-casting-in-2d-grids
+// TODO:
+/*
+Look up: TODO
+https://box2d.org/documentation/b2__body_8h_source.html
+ void ApplyForce(const b2Vec2& force, const b2Vec2& point, bool wake);
+ void ApplyForceToCenter(const b2Vec2& force, bool wake);
+ void ApplyTorque(float torque, bool wake);
+ void ApplyLinearImpulse(const b2Vec2& impulse, const b2Vec2& point, bool wake);
+ void ApplyLinearImpulseToCenter(const b2Vec2& impulse, bool wake);
+ void ApplyAngularImpulse(float impulse, bool wake);
+
+ */
 public class Physics2DWorld {
 
     // memory pools
@@ -41,6 +53,9 @@ public class Physics2DWorld {
     public CollectionsArray<Physics2DForceField> forceFieldsToRemove = new CollectionsArray<>(false, 2);
 
     // joints
+    public CollectionsArray<Physics2DJoint> allJoints      = new CollectionsArray<>(false, 10);
+    public CollectionsArray<Physics2DJoint> jointsToAdd    = new CollectionsArray<>(false, 5);
+    public CollectionsArray<Physics2DJoint> jointsToRemove = new CollectionsArray<>(false, 5);
 
     // collision detection
     private final CollectionsArray<Cell>      spacePartition      = new CollectionsArray<>(false, 1024);
@@ -109,6 +124,20 @@ public class Physics2DWorld {
         }
         forceFieldsToRemove.clear();
         forceFieldsToAdd.clear();
+
+        /* preparation: add and remove joints */
+        for (Physics2DJoint joint : jointsToAdd) {
+            if (!joint.body_a.created || joint.body_a.off) continue;
+            if (!joint.body_b.created || joint.body_b.off) continue;
+            joint.body_a.joints.add(joint);
+            joint.body_b.joints.add(joint);
+            allJoints.add(joint);
+        }
+        for (Physics2DJoint joint : jointsToRemove) {
+            allJoints.removeValue(joint, true);
+        }
+        jointsToRemove.clear();
+        jointsToAdd.clear();
 
         /* integration: update velocities, clear forces and move bodies. */
 
@@ -427,8 +456,11 @@ public class Physics2DWorld {
         // TODO: remove all body constraints ans joints.
     }
 
-    public void createJoint() {
+    /* joints API */
 
+    public void createDistanceJoint(Physics2DBody body_a, Physics2DBody body_b, float d) {
+        Physics2DJointDistance distanceJoint = new Physics2DJointDistance(body_a, body_b, d);
+        jointsToAdd.add(distanceJoint);
     }
 
     public void destroyJoint() {
@@ -436,6 +468,7 @@ public class Physics2DWorld {
     }
 
     /* Ray casting API */
+
     public void castRay(final Physics2DWorld.RayHitCallback rayHitCallback, float originX, float originY, float dirX, float dirY) {
         Ray ray = raysPool.allocate();
         ray.originX = originX;
