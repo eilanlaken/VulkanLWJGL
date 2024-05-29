@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
@@ -18,6 +19,9 @@ https://box2d.org/documentation/b2__body_8h_source.html
  void ApplyAngularImpulse(float impulse, bool wake);
 
      // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
+
+        // apply forces and torques:
+    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
 
 
  */
@@ -77,48 +81,47 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         this.omegaDeg = omegaDeg;
     }
 
-    @Deprecated public void applyForce(float fx, float fy) {
-        netForce.add(fx, fy);
+    public void applyForce(float force_x, float force_y, float point_x, float point_y) {
+        if (this.off || !this.created || this.motionType != MotionType.NEWTONIAN) return;
+
+        netForce.x += force_x;
+        netForce.y += force_y;
+
+        netTorque += (point_x - shape.x()) * force_y - (point_y - shape.y()) * force_x;
     }
 
-    @Deprecated public void applyTorque(final float tau) {
-        netTorque += tau;
+    public void applyForceToCenter(float force_x, float force_y) {
+        if (this.off || !this.created || this.motionType != MotionType.NEWTONIAN) return;
+
+        netForce.x += force_x;
+        netForce.y += force_y;
     }
 
-    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
-    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
-    public void applyForce(MathVector2 force, MathVector2 point, boolean wake) {
+    public void applyTorque(float torque) {
+        if (this.off || !this.created || this.motionType != MotionType.NEWTONIAN) return;
 
+        netTorque += torque;
     }
 
-    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
-    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
-    public void applyForceToCenter(MathVector2 force, boolean wake) {
+    public void applyLinearImpulse(float impulse_x, float impulse_y, float point_x, float point_y) {
+        if (this.off || !this.created || this.motionType == MotionType.STATIC) return;
 
+        velocity.x += impulse_x * massInv;
+        velocity.y += impulse_y * massInv;
+        omegaDeg += massInv * ((point_x - shape.x()) * impulse_y - (point_y - shape.y()) * impulse_x) * MathUtils.radiansToDegrees;
     }
 
-    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
-    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
-    public void applyTorque(float torque, boolean wake) {
+    public void applyLinearImpulseToCenter(float impulse_x, float impulse_y) {
+        if (this.off || !this.created || this.motionType == MotionType.STATIC) return;
 
+        velocity.x += impulse_x * massInv;
+        velocity.y += impulse_y * massInv;
     }
 
-    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
-    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
-    public void applyLinearImpulse(MathVector2 impulse, MathVector2 point, boolean wake) {
+    public void applyAngularImpulse(float impulse) {
+        if (this.off || !this.created || this.motionType == MotionType.STATIC) return;
 
-    }
-
-    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
-    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
-    public void applyLinearImpulseToCenter(MathVector2 impulse, boolean wake) {
-
-    }
-
-    // TODO https://github.com/ByteArena/box2d/blob/master/DynamicsB2Body.go#L406
-    // TODO https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/Body.java#L483
-    public void applyAngularImpulse(float impulse, boolean wake) {
-
+        omegaDeg += massInv * impulse * MathUtils.radiansToDegrees;
     }
 
     public void setMotionState(float x, float y, float angleDeg, float vx, float vy, float omega) {
