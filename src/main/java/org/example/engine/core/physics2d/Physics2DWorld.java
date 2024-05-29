@@ -604,10 +604,10 @@ public class Physics2DWorld {
 
     public static class Intersection implements MemoryPool.Reset {
 
-        public Physics2DBody body         = null;
-        public MathVector2 point = new MathVector2();
-        public MathVector2   direction    = new MathVector2();
-        public float         fraction     = 0;
+        public Physics2DBody body      = null;
+        public MathVector2   point     = new MathVector2();
+        public MathVector2   direction = new MathVector2();
+        public float         dst2      = 0;
 
         public Intersection() {}
 
