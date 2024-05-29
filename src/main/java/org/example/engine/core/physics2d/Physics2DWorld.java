@@ -42,10 +42,12 @@ public class Physics2DWorld {
     private final MemoryPool<Intersection>      intersectionsPool  = new MemoryPool<>(Intersection.class, 4);
 
     // bodies
-    private int                             bodiesCreated  = 0;
-    public  CollectionsArray<Physics2DBody> allBodies      = new CollectionsArray<>(false, 500);
-    public  CollectionsArray<Physics2DBody> bodiesToAdd    = new CollectionsArray<>(false, 100);
-    public  CollectionsArray<Physics2DBody> bodiesToRemove = new CollectionsArray<>(false, 500);
+    private int                             bodiesCreated      = 0;
+    public  int                             positionIterations = 2;
+    public  int                             velocityIterations = 6;
+    public  CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
+    public  CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
+    public  CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
 
     // forces
     public CollectionsArray<Physics2DForceField> allForceFields      = new CollectionsArray<>(false, 4);
@@ -98,7 +100,7 @@ public class Physics2DWorld {
         return intersectionsPool;
     }
 
-    public void update(final float delta) {
+    public void update(float delta) {
         /* add and remove bodies */
 
         for (Physics2DBody body : bodiesToRemove) {
@@ -141,118 +143,125 @@ public class Physics2DWorld {
 
         /* integration: update velocities, clear forces and move bodies. */
 
-        float worldMinX = Float.POSITIVE_INFINITY;
-        float worldMaxX = Float.NEGATIVE_INFINITY;
-        float worldMinY = Float.POSITIVE_INFINITY;
-        float worldMaxY = Float.NEGATIVE_INFINITY;
-        float worldMaxR = Float.NEGATIVE_INFINITY;
+        // TODO: see what is up with accuracy iterations
+        delta /= positionIterations;
 
-        for (Physics2DBody body : allBodies) {
-            if (body.off) continue;
-            if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
-                for (Physics2DForceField field : allForceFields) {
-                    MathVector2 force = new MathVector2();
-                    field.calcForce(body, force);
-                    body.netForce.add(force);
+        for (int itr = 0; itr < positionIterations; itr++) {
+
+            float worldMinX = Float.POSITIVE_INFINITY;
+            float worldMaxX = Float.NEGATIVE_INFINITY;
+            float worldMinY = Float.POSITIVE_INFINITY;
+            float worldMaxY = Float.NEGATIVE_INFINITY;
+            float worldMaxR = Float.NEGATIVE_INFINITY;
+
+            for (Physics2DBody body : allBodies) {
+                if (body.off) continue;
+                if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
+                    for (Physics2DForceField field : allForceFields) {
+                        MathVector2 force = new MathVector2();
+                        field.calcForce(body, force);
+                        body.netForce.add(force);
+                    }
+                    body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
+                    body.omegaDeg += body.netTorque * (body.inertiaInv) * delta * MathUtils.degreesToRadians;
                 }
-                body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
-                body.omegaDeg += body.netTorque * (body.inertiaInv) * delta * MathUtils.degreesToRadians;
+                if (body.motionType != Physics2DBody.MotionType.STATIC) {
+                    body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omegaDeg);
+                }
+                body.shape.update();
+                body.netForce.set(0, 0);
+                body.netTorque = 0;
+                body.touching.clear();
+
+                worldMinX = Math.min(worldMinX, body.shape.getMinExtentX());
+                worldMaxX = Math.max(worldMaxX, body.shape.getMaxExtentX());
+                worldMinY = Math.min(worldMinY, body.shape.getMinExtentY());
+                worldMaxY = Math.max(worldMaxY, body.shape.getMaxExtentY());
+                worldMaxR = Math.max(worldMaxR, body.shape.getBoundingRadius());
             }
-            if (body.motionType != Physics2DBody.MotionType.STATIC) {
-                body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omegaDeg);
+
+            float maxDiameter = 2 * worldMaxR;
+            float worldWidth = Math.abs(worldMaxX - worldMinX);
+            float worldHeight = Math.abs(worldMaxY - worldMinY);
+            int rows = Math.min((int) Math.ceil(worldHeight / maxDiameter), 32);
+            int cols = Math.min((int) Math.ceil(worldWidth / maxDiameter), 32);
+            float cellWidth = worldWidth / cols;
+            float cellHeight = worldHeight / rows;
+
+            /* collision detection - broad phase */
+            cellsPool.freeAll(spacePartition);
+            spacePartition.clear();
+            activeCells.clear();
+            for (int i = 0; i < rows * cols; i++) {
+                spacePartition.add(cellsPool.allocate());
             }
-            body.shape.update();
-            body.netForce.set(0, 0);
-            body.netTorque = 0;
-            body.touching.clear();
 
-            worldMinX = Math.min(worldMinX, body.shape.getMinExtentX());
-            worldMaxX = Math.max(worldMaxX, body.shape.getMaxExtentX());
-            worldMinY = Math.min(worldMinY, body.shape.getMinExtentY());
-            worldMaxY = Math.max(worldMaxY, body.shape.getMaxExtentY());
-            worldMaxR = Math.max(worldMaxR, body.shape.getBoundingRadius());
-        }
+            for (Physics2DBody body : allBodies) {
+                int startCol = Math.max(0, (int) ((body.shape.getMinExtentX() - worldMinX) / cellWidth));
+                int endCol = Math.min(cols - 1, (int) ((body.shape.getMaxExtentX() - worldMinX) / cellWidth));
+                int startRow = Math.max(0, (int) ((body.shape.getMinExtentY() - worldMinY) / cellHeight));
+                int endRow = Math.min(rows - 1, (int) ((body.shape.getMaxExtentY() - worldMinY) / cellHeight));
 
-        float maxDiameter = 2 * worldMaxR;
-        float worldWidth  = Math.abs(worldMaxX - worldMinX);
-        float worldHeight = Math.abs(worldMaxY - worldMinY);
-        int   rows        = Math.min((int) Math.ceil(worldHeight / maxDiameter), 32);
-        int   cols        = Math.min((int) Math.ceil(worldWidth  / maxDiameter), 32);
-        float cellWidth   = worldWidth  / cols;
-        float cellHeight  = worldHeight / rows;
-
-        /* collision detection - broad phase */
-        cellsPool.freeAll(spacePartition);
-        spacePartition.clear();
-        activeCells.clear();
-        for (int i = 0; i < rows * cols; i++) {
-            spacePartition.add(cellsPool.allocate());
-        }
-
-        for (Physics2DBody body : allBodies) {
-            int startCol = Math.max(0, (int) ((body.shape.getMinExtentX() - worldMinX) / cellWidth));
-            int endCol   = Math.min(cols - 1, (int) ((body.shape.getMaxExtentX() - worldMinX) / cellWidth));
-            int startRow = Math.max(0, (int) ((body.shape.getMinExtentY() - worldMinY) / cellHeight));
-            int endRow   = Math.min(rows - 1, (int) ((body.shape.getMaxExtentY() - worldMinY) / cellHeight));
-
-            for (int row = startRow; row <= endRow; row++) {
-                for (int col = startCol; col <= endCol; col++) {
-                    Cell cell = spacePartition.get(row * cols + col);
-                    cell.bodies.add(body);
-                    if (!cell.active) {
-                        cell.active = true;
-                        activeCells.add(cell);
+                for (int row = startRow; row <= endRow; row++) {
+                    for (int col = startCol; col <= endCol; col++) {
+                        Cell cell = spacePartition.get(row * cols + col);
+                        cell.bodies.add(body);
+                        if (!cell.active) {
+                            cell.active = true;
+                            activeCells.add(cell);
+                        }
                     }
                 }
             }
-        }
 
-        pairsPool.freeAll(collisionCandidates);
-        collisionCandidates.clear();
-        for (Cell cell : activeCells) {
-            for (int i = 0; i < cell.bodies.size - 1; i++) {
-                for (int j = i + 1; j < cell.bodies.size; j++) {
-                    Physics2DBody body_a = cell.bodies.get(i);
-                    Physics2DBody body_b = cell.bodies.get(j);
-                    if (body_a.off) continue;
-                    if (body_b.off) continue;
-                    if (body_a.motionType == Physics2DBody.MotionType.STATIC && body_b.motionType == Physics2DBody.MotionType.STATIC) continue;
-                    final float dx  = body_b.shape.x() - body_a.shape.x();
-                    final float dy  = body_b.shape.y() - body_a.shape.y();
-                    final float sum = body_a.shape.getBoundingRadius() + body_b.shape.getBoundingRadius();
-                    boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
-                    if (!boundingCirclesCollide) continue;
+            pairsPool.freeAll(collisionCandidates);
+            collisionCandidates.clear();
+            for (Cell cell : activeCells) {
+                for (int i = 0; i < cell.bodies.size - 1; i++) {
+                    for (int j = i + 1; j < cell.bodies.size; j++) {
+                        Physics2DBody body_a = cell.bodies.get(i);
+                        Physics2DBody body_b = cell.bodies.get(j);
+                        if (body_a.off) continue;
+                        if (body_b.off) continue;
+                        if (body_a.motionType == Physics2DBody.MotionType.STATIC && body_b.motionType == Physics2DBody.MotionType.STATIC)
+                            continue;
+                        final float dx = body_b.shape.x() - body_a.shape.x();
+                        final float dy = body_b.shape.y() - body_a.shape.y();
+                        final float sum = body_a.shape.getBoundingRadius() + body_b.shape.getBoundingRadius();
+                        boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
+                        if (!boundingCirclesCollide) continue;
 
-                    CollisionPair pair = pairsPool.allocate();
-                    pair.a = body_a;
-                    pair.b = body_b;
-                    collisionCandidates.add(pair);
+                        CollisionPair pair = pairsPool.allocate();
+                        pair.a = body_a;
+                        pair.b = body_b;
+                        collisionCandidates.add(pair);
+                    }
                 }
             }
-        }
 
-        /* collision detection - narrow phase */
-        manifoldsPool.freeAll(manifolds);
-        manifolds.clear();
-        for (CollisionPair pair : collisionCandidates) {
-            Physics2DBody body_a = pair.a;
-            Physics2DBody body_b = pair.b;
-            CollisionManifold manifold = collisionDetection.detectCollision(body_a, body_a.shape, body_b, body_b.shape);
-            if (manifold == null) continue;
-            manifolds.add(manifold);
-        }
+            /* collision detection - narrow phase */
+            manifoldsPool.freeAll(manifolds);
+            manifolds.clear();
+            for (CollisionPair pair : collisionCandidates) {
+                Physics2DBody body_a = pair.a;
+                Physics2DBody body_b = pair.b;
+                CollisionManifold manifold = collisionDetection.detectCollision(body_a, body_a.shape, body_b, body_b.shape);
+                if (manifold == null) continue;
+                manifolds.add(manifold);
+            }
 
-        /* collision resolution */
-        // TODO: need to figure out how to properly set the Body's: justCollided, touching, justSeparated.
-        for (CollisionManifold manifold : manifolds) {
-            Physics2DBody body_a = manifold.body_a;
-            Physics2DBody body_b = manifold.body_b;
+            /* collision resolution */
+            // TODO: need to figure out how to properly set the Body's: justCollided, touching, justSeparated.
+            for (CollisionManifold manifold : manifolds) {
+                Physics2DBody body_a = manifold.body_a;
+                Physics2DBody body_b = manifold.body_b;
 
-            body_a.touching.add(body_b);
-            body_b.touching.add(body_a);
-            collisionResolver.beginContact(manifold);
-            collisionResolver.resolve(manifold);
-            collisionResolver.endContact(manifold);
+                body_a.touching.add(body_b);
+                body_b.touching.add(body_a);
+                collisionResolver.beginContact(manifold);
+                collisionResolver.resolve(manifold);
+                collisionResolver.endContact(manifold);
+            }
         }
 
         /* ray casting */
