@@ -28,9 +28,9 @@ https://box2d.org/documentation/b2__body_8h_source.html
 public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody> {
 
     public    Object      owner      = null;
-    protected boolean     created    = false;
+    protected boolean     inserted   = false; // if the body is currently in the world
     protected int         index      = -1;
-    public    boolean     off        = false; // TODO: consider off bodies in update()
+    public    boolean     off        = false; // bodies can be turned on / off
     public    Shape2D     shape      = null;
     public    MotionType  motionType = null;
     public    MathVector2 velocity   = new MathVector2();
@@ -43,7 +43,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public CollectionsArray<Physics2DBody>  touching      = new CollectionsArray<>(false, 2);
     public CollectionsArray<Physics2DBody>  justCollided  = new CollectionsArray<>(false, 2);
     public CollectionsArray<Physics2DBody>  justSeparated = new CollectionsArray<>(false, 2);
-    public CollectionsArray<Physics2DConstraint> joints        = new CollectionsArray<>(false, 2);
+    public CollectionsArray<Physics2DConstraint> constraints = new CollectionsArray<>(false, 2);
 
     // TODO: must set some default values.
     public float   massInv;
@@ -82,7 +82,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     }
 
     public void applyForce(float force_x, float force_y, float point_x, float point_y) {
-        if (this.off || !this.created || this.motionType != MotionType.NEWTONIAN) return;
+        if (this.off || !this.inserted || this.motionType != MotionType.NEWTONIAN) return;
 
         netForce.x += force_x;
         netForce.y += force_y;
@@ -91,20 +91,20 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     }
 
     public void applyForceToCenter(float force_x, float force_y) {
-        if (this.off || !this.created || this.motionType != MotionType.NEWTONIAN) return;
+        if (this.off || !this.inserted || this.motionType != MotionType.NEWTONIAN) return;
 
         netForce.x += force_x;
         netForce.y += force_y;
     }
 
     public void applyTorque(float torque) {
-        if (this.off || !this.created || this.motionType != MotionType.NEWTONIAN) return;
+        if (this.off || !this.inserted || this.motionType != MotionType.NEWTONIAN) return;
 
         netTorque += torque;
     }
 
     public void applyLinearImpulse(float impulse_x, float impulse_y, float point_x, float point_y) {
-        if (this.off || !this.created || this.motionType == MotionType.STATIC) return;
+        if (this.off || !this.inserted || this.motionType == MotionType.STATIC) return;
 
         velocity.x += impulse_x * massInv;
         velocity.y += impulse_y * massInv;
@@ -112,14 +112,14 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     }
 
     public void applyLinearImpulseToCenter(float impulse_x, float impulse_y) {
-        if (this.off || !this.created || this.motionType == MotionType.STATIC) return;
+        if (this.off || !this.inserted || this.motionType == MotionType.STATIC) return;
 
         velocity.x += impulse_x * massInv;
         velocity.y += impulse_y * massInv;
     }
 
     public void applyAngularImpulse(float impulse) {
-        if (this.off || !this.created || this.motionType == MotionType.STATIC) return;
+        if (this.off || !this.inserted || this.motionType == MotionType.STATIC) return;
 
         omegaDeg += massInv * impulse * MathUtils.radiansToDegrees;
     }
@@ -145,7 +145,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     @Override
     public void reset() {
         this.owner = null;
-        this.created = false;
+        this.inserted = false;
         this.index = -1;
         this.off = false;
         this.motionType = null;
@@ -163,6 +163,10 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         this.restitution = 0;
         this.ghost = false;
         this.bitmask = 0;
+        constraints.clear();
+        touching.clear();
+        justCollided.clear();
+        justSeparated.clear();
     }
 
     @Override

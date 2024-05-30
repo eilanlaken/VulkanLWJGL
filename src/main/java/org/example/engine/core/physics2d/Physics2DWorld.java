@@ -104,12 +104,15 @@ public class Physics2DWorld {
         /* add and remove bodies */
 
         for (Physics2DBody body : bodiesToRemove) {
+            for (Physics2DConstraint constraint : body.constraints) {
+                destroyConstraint(constraint);
+            }
             allBodies.removeValue(body, true);
             bodiesPool.free(body);
         }
         for (Physics2DBody body : bodiesToAdd) {
             allBodies.add(body);
-            body.created = true;
+            body.inserted = true;
             body.index = bodiesCreated;
             bodiesCreated++;
         }
@@ -128,21 +131,22 @@ public class Physics2DWorld {
         forceFieldsToAdd.clear();
 
         /* preparation: add and remove joints */
+
         CollectionsArray<Physics2DBody> constraintBodies = new CollectionsArray<>();
-        for (Physics2DConstraint joint : constraintsToAdd) {
-            joint.getBodies(constraintBodies);
+        for (Physics2DConstraint constraint : constraintsToAdd) {
+            constraint.getBodies(constraintBodies);
             boolean ready = true;
             for (Physics2DBody body : constraintBodies) {
-                if (!body.created || body.off) {
+                if (!body.inserted || body.off) {
                     ready = false;
                     break;
                 }
             }
             if (!ready) continue;
             for (Physics2DBody body : constraintBodies) {
-                body.joints.add(joint);
+                body.constraints.add(constraint);
             }
-            allConstraints.add(joint);
+            allConstraints.add(constraint);
         }
         for (Physics2DConstraint joint : constraintsToRemove) {
             allConstraints.removeValue(joint, true);
@@ -167,7 +171,7 @@ public class Physics2DWorld {
                 if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
                     for (Physics2DForceField field : allForceFields) {
                         MathVector2 force = new MathVector2();
-                        field.calcForce(body, force);
+                        field.calculateForce(body, force);
                         body.netForce.add(force);
                     }
                     body.velocity.add(body.massInv * dtp * body.netForce.x, body.massInv * dtp * body.netForce.y);
@@ -464,7 +468,7 @@ public class Physics2DWorld {
     @NotNull public Physics2DForceField createForceField(BiConsumer<Physics2DBody, MathVector2> forceFunction) {
         Physics2DForceField forceField = new Physics2DForceField(this) {
             @Override
-            public void calcForce(Physics2DBody body, MathVector2 out) {
+            public void calculateForce(Physics2DBody body, MathVector2 out) {
                 forceFunction.accept(body, out);
             }
         };
@@ -489,8 +493,8 @@ public class Physics2DWorld {
         return weld;
     }
 
-    public void destroyJoint() {
-
+    public void destroyConstraint(Physics2DConstraint constraint) {
+        constraintsToRemove.add(constraint);
     }
 
     /* Ray casting API */
