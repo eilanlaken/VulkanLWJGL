@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 // contact points polygon vs polygon:
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
-public class ScenePhysics2D_3 extends ApplicationScreen {
+public class ScenePhysics2D_Constraints_2 extends ApplicationScreen {
 
     private GraphicsRenderer2D renderer2D;
     private GraphicsCamera camera;
@@ -22,7 +22,7 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
     private Physics2DBody body_a;
     private Physics2DBody body_b;
 
-    public ScenePhysics2D_3() {
+    public ScenePhysics2D_Constraints_2() {
         renderer2D = new GraphicsRenderer2D();
     }
 
@@ -30,18 +30,6 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
     public void show() {
         camera = new GraphicsCamera(640f/32,480f/32, 1);
         camera.update();
-
-        world.createBodyRectangle(null, Physics2DBody.MotionType.STATIC,
-                -2.5f, 4,-30,
-                0f,0f,0,
-                1000, 1, 1, 0.8f, false, 1,
-                5, 0.5f, 0, 0, 0);
-
-        world.createBodyRectangle(null, Physics2DBody.MotionType.STATIC,
-                2.5f, 0f,30,
-                0f,0f,0,
-                1000, 1, 1, 0.8f, false, 1,
-                5, 0.5f, 0, 0, 0);
 
         world.createBodyRectangle(null, Physics2DBody.MotionType.STATIC,
                 0, -5,0,

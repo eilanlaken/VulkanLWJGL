@@ -77,12 +77,12 @@ public class Physics2DWorld {
     final CollectionsArray<Intersection> intersections = new CollectionsArray<>(false, 10);
 
     // debugger options
-    private final Physics2DWorldRenderer debugRenderer    = new Physics2DWorldRenderer(this);
-    public        boolean                renderContacts   = true;
-    public        boolean                renderVelocities = false;
-    public        boolean                renderBodies     = true;
-    public        boolean                renderJoints     = true;
-    public        boolean                renderRays       = true;
+    private final Physics2DWorldRenderer debugRenderer     = new Physics2DWorldRenderer(this);
+    public        boolean                renderBodies      = true;
+    public        boolean                renderVelocities  = false;
+    public        boolean                renderConstraints = true;
+    public        boolean                renderRays        = true;
+    public        boolean                renderContacts    = true;
 
     public Physics2DWorld(Physics2DCollisionResolver collisionResolver) {
         this.collisionResolver = collisionResolver != null ? collisionResolver : new Physics2DCollisionResolver() {};
@@ -491,6 +491,7 @@ public class Physics2DWorld {
     /* Constraints API */
 
     public Physics2DConstraintWeld createConstraintWeld(Physics2DBody body_a, Physics2DBody body_b) {
+        if (body_a == body_b) throw new Physics2DException("Cannot weld object to itself.");
         Physics2DConstraintWeld weld = new Physics2DConstraintWeld(body_a, body_b);
         constraintsToAdd.add(weld);
         return weld;

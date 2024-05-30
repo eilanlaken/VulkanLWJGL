@@ -18,6 +18,8 @@ public final class Physics2DWorldRenderer {
     private static final GraphicsColor TINT_LOGICAL   = new GraphicsColor(1,0,1,1);
     private static final GraphicsColor TINT_NEWTONIAN = new GraphicsColor(0,1,1,1);
 
+    private static final float CONSTRAINT_TINT = new GraphicsColor(0.9f, 0.1f, 0.3f, 1).toFloatBits();
+
     private static final float RAY_TINT = new GraphicsColor(0.4f, 0.2f, 0.8f, 1).toFloatBits();
 
     private final Shape2DSegment segment    = new Shape2DSegment(0,0,0,0);
@@ -55,8 +57,13 @@ public final class Physics2DWorldRenderer {
         }
 
         // TODO: render joints
-        if (world.renderJoints) {
-
+        if (world.renderConstraints) {
+            for (Physics2DConstraint constraint : world.allConstraints) {
+                if (constraint instanceof Physics2DConstraintWeld) {
+                    Physics2DConstraintWeld weld = (Physics2DConstraintWeld) constraint;
+                    renderer.pushThinLineSegment(weld.body_a.shape.x(), weld.body_a.shape.y(), weld.body_b.shape.x(), weld.body_b.shape.y(), CONSTRAINT_TINT);
+                }
+            }
         }
 
         // TODO: render contact points
@@ -69,7 +76,7 @@ public final class Physics2DWorldRenderer {
             Set<Physics2DWorld.Ray> rays = world.allRays.keySet();
             for (Physics2DWorld.Ray ray : rays) {
                 float scl = ray.dst == Float.POSITIVE_INFINITY || Float.isNaN(ray.dst) ? 100 : ray.dst;
-                renderer.pushLineSegment(ray.originX, ray.originY, ray.originX + scl * ray.dirX, ray.originY + scl * ray.dirY, RAY_TINT);
+                renderer.pushThinLineSegment(ray.originX, ray.originY, ray.originX + scl * ray.dirX, ray.originY + scl * ray.dirY, RAY_TINT);
             }
 
             CollectionsArray<Physics2DWorld.Intersection> intersections = world.intersections;

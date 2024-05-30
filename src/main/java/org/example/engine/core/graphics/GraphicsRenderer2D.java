@@ -413,7 +413,7 @@ public class GraphicsRenderer2D implements MemoryResourceHolder {
         vertexIndex += 6 * 5;
     }
 
-    public void pushLineSegment(float x1, float y1, float x2, float y2, final float tintFloatBits) {
+    public void pushThinLineSegment(float x1, float y1, float x2, float y2, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 2 * 2 > indicesBuffer.limit() || vertexIndex + 2 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
