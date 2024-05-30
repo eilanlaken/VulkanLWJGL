@@ -1,7 +1,15 @@
 package org.example.engine.core.physics2d;
 
-public abstract class Physics2DConstraint {
+import org.example.engine.core.collections.CollectionsArray;
 
-    public Physics2DBody body;
+// TODO:
+/*
+read
+https://box2d.org/files/ErinCatto_UnderstandingConstraints_GDC2014.pdf
+ */
+public interface Physics2DConstraint {
+
+    void getBodies(CollectionsArray<Physics2DBody> out);
+    void update(float delta);
 
 }

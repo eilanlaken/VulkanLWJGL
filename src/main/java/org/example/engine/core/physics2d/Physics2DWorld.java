@@ -44,7 +44,6 @@ public class Physics2DWorld {
     // bodies
     private int                             bodiesCreated      = 0;
     public  int                             positionIterations = 2;
-    public  int                             velocityIterations = 6;
     public  CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
     public  CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
     public  CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
@@ -54,10 +53,11 @@ public class Physics2DWorld {
     public CollectionsArray<Physics2DForceField> forceFieldsToAdd    = new CollectionsArray<>(false, 2);
     public CollectionsArray<Physics2DForceField> forceFieldsToRemove = new CollectionsArray<>(false, 2);
 
-    // joints
-    public CollectionsArray<Physics2DJoint> allJoints      = new CollectionsArray<>(false, 10);
-    public CollectionsArray<Physics2DJoint> jointsToAdd    = new CollectionsArray<>(false, 5);
-    public CollectionsArray<Physics2DJoint> jointsToRemove = new CollectionsArray<>(false, 5);
+    // constraints
+    public int                                   velocityIterations  = 6;
+    public CollectionsArray<Physics2DConstraint> allConstraints      = new CollectionsArray<>(false, 10);
+    public CollectionsArray<Physics2DConstraint> constraintsToAdd    = new CollectionsArray<>(false, 5);
+    public CollectionsArray<Physics2DConstraint> constraintsToRemove = new CollectionsArray<>(false, 5);
 
     // collision detection
     private final CollectionsArray<Cell>      spacePartition      = new CollectionsArray<>(false, 1024);
@@ -128,24 +128,32 @@ public class Physics2DWorld {
         forceFieldsToAdd.clear();
 
         /* preparation: add and remove joints */
-        for (Physics2DJoint joint : jointsToAdd) {
-            if (!joint.body_a.created || joint.body_a.off) continue;
-            if (!joint.body_b.created || joint.body_b.off) continue;
-            joint.body_a.joints.add(joint);
-            joint.body_b.joints.add(joint);
-            allJoints.add(joint);
+        CollectionsArray<Physics2DBody> constraintBodies = new CollectionsArray<>();
+        for (Physics2DConstraint joint : constraintsToAdd) {
+            joint.getBodies(constraintBodies);
+            boolean ready = true;
+            for (Physics2DBody body : constraintBodies) {
+                if (!body.created || body.off) {
+                    ready = false;
+                    break;
+                }
+            }
+            if (!ready) continue;
+            for (Physics2DBody body : constraintBodies) {
+                body.joints.add(joint);
+            }
+            allConstraints.add(joint);
         }
-        for (Physics2DJoint joint : jointsToRemove) {
-            allJoints.removeValue(joint, true);
+        for (Physics2DConstraint joint : constraintsToRemove) {
+            allConstraints.removeValue(joint, true);
         }
-        jointsToRemove.clear();
-        jointsToAdd.clear();
+        constraintsToRemove.clear();
+        constraintsToAdd.clear();
 
         /* integration: update velocities, clear forces and move bodies. */
 
         // TODO: see what is up with accuracy iterations
-        delta /= positionIterations;
-
+        float dtp = delta / positionIterations;
         for (int itr = 0; itr < positionIterations; itr++) {
 
             float worldMinX = Float.POSITIVE_INFINITY;
@@ -162,11 +170,11 @@ public class Physics2DWorld {
                         field.calcForce(body, force);
                         body.netForce.add(force);
                     }
-                    body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
-                    body.omegaDeg += body.netTorque * (body.inertiaInv) * delta * MathUtils.degreesToRadians;
+                    body.velocity.add(body.massInv * dtp * body.netForce.x, body.massInv * dtp * body.netForce.y);
+                    body.omegaDeg += body.netTorque * (body.inertiaInv) * dtp * MathUtils.degreesToRadians;
                 }
                 if (body.motionType != Physics2DBody.MotionType.STATIC) {
-                    body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omegaDeg);
+                    body.shape.dx_dy_rot(dtp * body.velocity.x, dtp * body.velocity.y, dtp * body.omegaDeg);
                 }
                 body.shape.update();
                 body.netForce.set(0, 0);
@@ -261,6 +269,14 @@ public class Physics2DWorld {
                 collisionResolver.beginContact(manifold);
                 collisionResolver.resolve(manifold);
                 collisionResolver.endContact(manifold);
+            }
+        }
+
+        /* joints */
+        float dtv = delta / velocityIterations;
+        for (int itr = 0; itr < velocityIterations; itr++) {
+            for (Physics2DConstraint constraint : allConstraints) {
+                constraint.update(dtv);
             }
         }
 
@@ -465,11 +481,12 @@ public class Physics2DWorld {
         // TODO: remove all body constraints ans joints.
     }
 
-    /* joints API */
+    /* Constraints API */
 
-    public void createDistanceJoint(Physics2DBody body_a, Physics2DBody body_b, float d) {
-        Physics2DJointDistance distanceJoint = new Physics2DJointDistance(body_a, body_b, d);
-        jointsToAdd.add(distanceJoint);
+    public Physics2DConstraintWeld createConstraintWeld(Physics2DBody body_a, Physics2DBody body_b) {
+        Physics2DConstraintWeld weld = new Physics2DConstraintWeld(body_a, body_b);
+        constraintsToAdd.add(weld);
+        return weld;
     }
 
     public void destroyJoint() {
