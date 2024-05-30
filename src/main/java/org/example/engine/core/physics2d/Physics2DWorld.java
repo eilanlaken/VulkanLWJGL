@@ -156,7 +156,6 @@ public class Physics2DWorld {
 
         /* integration: update velocities, clear forces and move bodies. */
 
-        // TODO: see what is up with accuracy iterations
         float dtp = delta / positionIterations;
         for (int itr = 0; itr < positionIterations; itr++) {
 
@@ -252,6 +251,7 @@ public class Physics2DWorld {
             }
 
             /* collision detection - narrow phase */
+
             manifoldsPool.freeAll(manifolds);
             manifolds.clear();
             for (CollisionPair pair : collisionCandidates) {
@@ -263,6 +263,7 @@ public class Physics2DWorld {
             }
 
             /* collision resolution */
+
             // TODO: need to figure out how to properly set the Body's: justCollided, touching, justSeparated.
             for (CollisionManifold manifold : manifolds) {
                 Physics2DBody body_a = manifold.body_a;
@@ -276,7 +277,8 @@ public class Physics2DWorld {
             }
         }
 
-        /* joints */
+        /* constraints */
+
         float dtv = delta / velocityIterations;
         for (int itr = 0; itr < velocityIterations; itr++) {
             for (Physics2DConstraint constraint : allConstraints) {
@@ -285,6 +287,7 @@ public class Physics2DWorld {
         }
 
         /* ray casting */
+
         for (Map.Entry<Ray, RayHitCallback> rayCallback : raysToRemove.entrySet()) {
             Ray ray = rayCallback.getKey();
             allRays.remove(ray);
