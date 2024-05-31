@@ -5,6 +5,9 @@ import org.example.engine.core.collections.CollectionsArray;
 // TODO:
 /*
 read
+https://github.com/acrlw/Physics2D/blob/master/Physics2D/include/physics2d_joint.h
+https://github.com/acrlw/Physics2D/blob/master/Physics2D/include/physics2d_weld_joint.h
+
 https://box2d.org/files/ErinCatto_UnderstandingConstraints_GDC2014.pdf
  */
 public interface Physics2DConstraint {

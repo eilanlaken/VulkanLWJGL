@@ -21,6 +21,10 @@ import java.util.function.BiConsumer;
 // TODO: RAY CASTING, optimized: https://theshoemaker.de/posts/ray-casting-in-2d-grids
 // TODO:
 /*
+
+useful reference
+https://github.com/acrlw/Physics2D/blob/master/Physics2D/source/dynamics/physics2d_system.cpp
+
 Look up: TODO
 https://box2d.org/documentation/b2__body_8h_source.html
  void ApplyForce(const b2Vec2& force, const b2Vec2& point, bool wake);
