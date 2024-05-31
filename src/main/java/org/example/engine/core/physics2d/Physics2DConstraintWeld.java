@@ -36,17 +36,17 @@ public class Physics2DConstraintWeld extends Physics2DConstraint {
     }
 
     @Override
-    public void initVelocityConstraints(SolverData data) {
+    public void initVelocityConstraints(float delta) {
 
     }
 
     @Override
-    public void solveVelocityConstraints(SolverData data) {
+    public void solveVelocityConstraints(float delta) {
 
     }
 
     @Override
-    public boolean solvePositionConstraints(SolverData data) {
+    public boolean solvePositionConstraints(float delta) {
         return false;
     }
 

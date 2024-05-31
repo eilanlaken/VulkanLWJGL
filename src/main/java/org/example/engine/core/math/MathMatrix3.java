@@ -595,6 +595,7 @@ public class MathMatrix3 implements MemoryPool.Reset {
     @Override
     public void reset() {
         this.idt();
+        tmp[M22] = 1;
     }
 
 }

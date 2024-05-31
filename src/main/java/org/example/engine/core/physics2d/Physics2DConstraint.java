@@ -44,9 +44,9 @@ public abstract class Physics2DConstraint {
         if (body_b != null) out.add(body_b);
     }
 
-    public abstract void initVelocityConstraints(SolverData data);
-    public abstract void solveVelocityConstraints(SolverData data);
-    public abstract boolean solvePositionConstraints(SolverData data);
+    public abstract void initVelocityConstraints(float delta);
+    public abstract void solveVelocityConstraints(float delta);
+    public abstract boolean solvePositionConstraints(float delta);
 
     public abstract void getAnchorA(MathVector2 out);
     public abstract void getAnchorB(MathVector2 out);

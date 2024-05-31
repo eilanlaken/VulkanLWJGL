@@ -153,6 +153,7 @@ public class Physics2DWorld {
             for (Physics2DBody body : constraintBodies) {
                 body.constraints.add(constraint);
             }
+            constraint.initVelocityConstraints(delta);
             allConstraints.add(constraint);
         }
         for (Physics2DConstraint joint : constraintsToRemove) {
