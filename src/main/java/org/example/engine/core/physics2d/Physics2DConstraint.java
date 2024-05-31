@@ -66,38 +66,4 @@ public abstract class Physics2DConstraint {
         }
     }
 
-    public class SolverData {
-        public TimeStep step;
-        public Position[] positions;
-        public Velocity[] velocities;
-    }
-
-    public class TimeStep {
-
-        /** time step */
-        public float dt;
-
-        /** inverse time step (0 if dt == 0). */
-        public float inv_dt;
-
-        /** dt * inv_dt0 */
-        public float dtRatio;
-
-        public int velocityIterations;
-
-        public int positionIterations;
-
-        public boolean warmStarting;
-    }
-
-    @Deprecated public static class Velocity {
-        public final MathVector2 v = new MathVector2();
-        public float w;
-    }
-
-    @Deprecated public static class Position {
-        public final MathVector2 c = new MathVector2();
-        public float a;
-    }
-
 }

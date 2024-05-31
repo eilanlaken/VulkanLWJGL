@@ -47,6 +47,16 @@ public class MathMatrix2 implements MemoryPool.Reset {
         return this;
     }
 
+    public MathVector2 mul(MathVector2 v) {
+        MathVector2 result = new MathVector2();
+        result.set(val[M00] * v.x + val[M01] * v.y, val[M10] * v.x + val[M11] * v.y);
+        return result;
+    }
+
+    public void mul(MathVector2 v, MathVector2 out) {
+        out.set(val[M00] * v.x + val[M01] * v.y, val[M10] * v.x + val[M11] * v.y);
+    }
+
     /** Postmultiplies this matrix with the provided matrix and stores the result in this matrix. For example:
      *
      * <pre>

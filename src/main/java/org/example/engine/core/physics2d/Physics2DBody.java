@@ -105,12 +105,14 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         netTorque += torque;
     }
 
-    public void applyLinearImpulse(float impulse_x, float impulse_y, float point_x, float point_y) {
-        if (this.off || !this.inserted || this.motionType == MotionType.STATIC) return;
+    public void applyImpulse(MathVector2 impulse, MathVector2 r) {
+        velocity.add(massInv * impulse.x, massInv * impulse.y);
+        omegaDeg += inertiaInv * r.crs(impulse) * MathUtils.radiansToDegrees;
+    }
 
-        velocity.x += impulse_x * massInv;
-        velocity.y += impulse_y * massInv;
-        omegaDeg += massInv * ((point_x - shape.x()) * impulse_y - (point_y - shape.y()) * impulse_x) * MathUtils.radiansToDegrees;
+    public void applyImpulse(float impulse_x, float impulse_y, float rx, float ry) {
+        velocity.add(massInv * impulse_x, massInv * impulse_y);
+        omegaDeg += inertiaInv * (rx * impulse_y - ry * impulse_x) * MathUtils.radiansToDegrees;  // invI * cross(r,imp) * rad2Deg
     }
 
     public void applyLinearImpulseToCenter(float impulse_x, float impulse_y) {

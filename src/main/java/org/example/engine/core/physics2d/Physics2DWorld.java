@@ -137,7 +137,7 @@ public class Physics2DWorld {
         forceFieldsToRemove.clear();
         forceFieldsToAdd.clear();
 
-        /* preparation: add and remove joints */
+        /* preparation: add and remove constraints */
 
         CollectionsArray<Physics2DBody> constraintBodies = new CollectionsArray<>();
         for (Physics2DConstraint constraint : constraintsToAdd) {
@@ -286,11 +286,14 @@ public class Physics2DWorld {
         }
 
         /* constraints */
+        for (Physics2DConstraint constraint : allConstraints) {
+            //constraint.initVelocityConstraints(delta);
+        }
 
         float dtv = delta / velocityIterations;
         for (int itr = 0; itr < velocityIterations; itr++) {
             for (Physics2DConstraint constraint : allConstraints) {
-
+                constraint.solveVelocityConstraints(dtv);
             }
         }
 

@@ -82,6 +82,12 @@ public class MathVector2 implements MemoryPool.Reset {
         return this;
     }
 
+    public MathVector2 negate() {
+        this.x = -this.x;
+        this.y = -this.y;
+        return this;
+    }
+
     public MathVector2 add(MathVector2 v) {
         x += v.x;
         y += v.y;
