@@ -28,8 +28,46 @@ https://github.com/acrlw/Physics2D/blob/master/Physics2D/include/physics2d_weld_
  */
 
 // https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/joints/WeldJoint.java
-public class Physics2DConstraintWeld {
+public class Physics2DConstraintWeld extends Physics2DConstraint {
 
+    public Physics2DConstraintWeld(final Physics2DBody body_a, final Physics2DBody body_b) {
+        super(body_a, body_b);
+        if (body_b == null) throw new Physics2DException("Weld joint must connect 2 non-null bodies. Got : " + body_a + ", " + null);
+    }
 
+    @Override
+    public void initVelocityConstraints(SolverData data) {
+
+    }
+
+    @Override
+    public void solveVelocityConstraints(SolverData data) {
+
+    }
+
+    @Override
+    public boolean solvePositionConstraints(SolverData data) {
+        return false;
+    }
+
+    @Override
+    public void getAnchorA(MathVector2 out) {
+
+    }
+
+    @Override
+    public void getAnchorB(MathVector2 out) {
+
+    }
+
+    @Override
+    public void getReactionForce(float inv_dt, MathVector2 out) {
+
+    }
+
+    @Override
+    public float getReactionTorque(float inv_dt) {
+        return 0;
+    }
 
 }

@@ -44,11 +44,14 @@ public abstract class Physics2DConstraint {
         if (body_b != null) out.add(body_b);
     }
 
-    public abstract void initializeConstraints(TimeStep step);
-    public abstract void solveVelocityConstraints(TimeStep step);
-    public abstract boolean solvePositionConstraints(TimeStep step);
-    public abstract MathVector2 getReactionForce(float invdt);
-    public abstract float getReactionTorque(float invdt);
+    public abstract void initVelocityConstraints(SolverData data);
+    public abstract void solveVelocityConstraints(SolverData data);
+    public abstract boolean solvePositionConstraints(SolverData data);
+
+    public abstract void getAnchorA(MathVector2 out);
+    public abstract void getAnchorB(MathVector2 out);
+    public abstract void getReactionForce(float inv_dt, MathVector2 out);
+    public abstract float getReactionTorque(float inv_dt);
 
     protected static float calculateReducedMass(final Physics2DBody body_a, final Physics2DBody body_b) {
         float m1 = body_a.mass;
@@ -63,49 +66,38 @@ public abstract class Physics2DConstraint {
         }
     }
 
-    public static class TimeStep {
-        /** The last elapsed time */
-        protected float dt0;
+    public class SolverData {
+        public TimeStep step;
+        public Position[] positions;
+        public Velocity[] velocities;
+    }
 
-        /** The last inverse elapsed time */
-        protected float invdt0;
+    public class TimeStep {
 
-        /** The elapsed time */
-        protected float dt;
+        /** time step */
+        public float dt;
 
-        /** The inverse elapsed time */
-        protected float invdt;
+        /** inverse time step (0 if dt == 0). */
+        public float inv_dt;
 
-        /** The elapsed time ratio from the last to the current */
-        protected float dtRatio;
+        /** dt * inv_dt0 */
+        public float dtRatio;
 
-        /**
-         * Default constructor.
-         * @param dt the initial delta time in seconds; must be greater than zero
-         * @throws IllegalArgumentException if dt is less than or equal to zero
-         */
-        public TimeStep(float dt) {
-            if (dt <= 0.0f) throw new Physics2DException("dt must be > 0.0; Got: " + dt);
+        public int velocityIterations;
 
-            this.dt = dt;
-            this.invdt = 1.0f / dt;
-            this.dt0 = this.dt;
-            this.invdt0 = this.invdt;
-            this.dtRatio = 1.0f;
-        }
+        public int positionIterations;
 
-        public void update(float dt) {
-            if (dt <= 0.0f) throw new Physics2DException("dt must be > 0.0; Got: " + dt);
+        public boolean warmStarting;
+    }
 
-            this.dt0 = this.dt;
-            this.invdt0 = this.invdt;
-            this.dt = dt;
-            this.invdt = 1.0f / dt;
-            this.dtRatio = this.invdt0 * dt;
-        }
+    @Deprecated public static class Velocity {
+        public final MathVector2 v = new MathVector2();
+        public float w;
+    }
 
-
-
+    @Deprecated public static class Position {
+        public final MathVector2 c = new MathVector2();
+        public float a;
     }
 
 }

@@ -504,8 +504,8 @@ public class Physics2DWorld {
 
     public Physics2DConstraintWeld createConstraintWeld(Physics2DBody body_a, Physics2DBody body_b) {
         if (body_a == body_b) throw new Physics2DException("Cannot weld object to itself.");
-        //Physics2DConstraintWeld weld = new Physics2DConstraintWeld(body_a, body_b);
-        //constraintsToAdd.add(weld);
+        Physics2DConstraintWeld weld = new Physics2DConstraintWeld(body_a, body_b);
+        constraintsToAdd.add(weld);
         return null;
     }
 
