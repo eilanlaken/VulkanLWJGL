@@ -88,6 +88,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         netForce.y += force_y;
 
         netTorque += (point_x - shape.x()) * force_y - (point_y - shape.y()) * force_x;
+        System.out.println(netTorque);
     }
 
     public void applyForceToCenter(float force_x, float force_y) {

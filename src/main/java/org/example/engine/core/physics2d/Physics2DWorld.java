@@ -174,7 +174,7 @@ public class Physics2DWorld {
                         body.netForce.add(force);
                     }
                     body.velocity.add(body.massInv * dtp * body.netForce.x, body.massInv * dtp * body.netForce.y);
-                    body.omegaDeg += body.netTorque * (body.inertiaInv) * dtp * MathUtils.degreesToRadians;
+                    body.omegaDeg += body.netTorque * (body.inertiaInv) * dtp * MathUtils.radiansToDegrees;
                 }
                 if (body.motionType != Physics2DBody.MotionType.STATIC) {
                     body.shape.dx_dy_rot(dtp * body.velocity.x, dtp * body.velocity.y, dtp * body.omegaDeg);

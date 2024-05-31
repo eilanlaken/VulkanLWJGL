@@ -37,7 +37,7 @@ public class ScenePhysics2D_Constraints_2 extends ApplicationScreen {
                 1000, 1, 1, 0.8f, false, 1,
                 10, 0.5f, 0, 0, 0);
 
-        world.createForceField((body, force) -> { force.set(0, -9.8f / body.massInv); });
+        //world.createForceField((body, force) -> { force.set(0, -9.8f / body.massInv); });
     }
 
 
