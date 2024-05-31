@@ -14,7 +14,7 @@ https://box2d.org/files/ErinCatto_UnderstandingConstraints_GDC2014.pdf
 https://dyn4j.org/tags#constrained-dynamics
 https://dyn4j.org/2010/07/equality-constraints/
  */
-public abstract class Physics2DConstraint {
+public abstract class Physics2DConstraintPin {
 
     public static final int   SPRING_MODE_FREQUENCY               = 1;
     public static final int   SPRING_MODE_STIFFNESS               = 2;
@@ -24,14 +24,14 @@ public abstract class Physics2DConstraint {
     public final Physics2DBody body_a;
     public final Physics2DBody body_b;
 
-    Physics2DConstraint(Physics2DBody body_a, Physics2DBody body_b) {
+    Physics2DConstraintPin(Physics2DBody body_a, Physics2DBody body_b) {
         if (body_a == null) throw new Physics2DException("Constraint must have at least 1 body.");
         if (body_a == body_b) throw new Physics2DException("body_a cannot be equal to body_b");
         this.body_a = body_a;
         this.body_b = body_b;
     }
 
-    Physics2DConstraint(Physics2DBody body_a) {
+    Physics2DConstraintPin(Physics2DBody body_a) {
         if (body_a == null) throw new Physics2DException("Constraint must have at least 1 body.");
         this.body_a = body_a;
         this.body_b = null;

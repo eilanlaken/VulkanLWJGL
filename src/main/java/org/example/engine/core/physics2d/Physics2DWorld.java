@@ -37,6 +37,9 @@ https://box2d.org/documentation/b2__body_8h_source.html
  */
 public class Physics2DWorld {
 
+    public static final int DEFAULT_VELOCITY_CONSTRAINT_SOLVER_ITERATIONS = 6;
+    public static final int DEFAULT_POSITION_CONSTRAINT_SOLVER_ITERATIONS = 2;
+
     // memory pools
     private final MemoryPool<Physics2DBody>     bodiesPool         = new MemoryPool<>(Physics2DBody.class,     10);
     private final MemoryPool<CollisionManifold> manifoldsPool      = new MemoryPool<>(CollisionManifold.class, 10);
@@ -286,7 +289,7 @@ public class Physics2DWorld {
         float dtv = delta / velocityIterations;
         for (int itr = 0; itr < velocityIterations; itr++) {
             for (Physics2DConstraint constraint : allConstraints) {
-                constraint.update(dtv);
+
             }
         }
 
@@ -334,7 +337,8 @@ public class Physics2DWorld {
         body.motionType = motionType;
         body.density = density;
         body.shape = new Shape2DCircle(radius);
-        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.mass = (body.shape.getArea() * density);
+        body.massInv = 1.0f / body.mass;
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
         body.staticFriction  = staticFriction;
         body.dynamicFriction = dynamicFriction;
@@ -360,7 +364,8 @@ public class Physics2DWorld {
         body.motionType = motionType;
         body.density = density;
         body.shape = new Shape2DCircle(radius, offsetX, offsetY);
-        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.mass = (body.shape.getArea() * density);
+        body.massInv = 1.0f / body.mass;
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
         body.staticFriction  = staticFriction;
         body.dynamicFriction = dynamicFriction;
@@ -386,7 +391,8 @@ public class Physics2DWorld {
         body.motionType = motionType;
         body.density = density;
         body.shape = new Shape2DRectangle(width, height, rot);
-        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.mass = (body.shape.getArea() * density);
+        body.massInv = 1.0f / body.mass;
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
         body.staticFriction  = staticFriction;
         body.dynamicFriction = dynamicFriction;
@@ -412,7 +418,8 @@ public class Physics2DWorld {
         body.motionType = motionType;
         body.density = density;
         body.shape = new Shape2DRectangle(offsetX, offsetY, width, height, rot);
-        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.mass = (body.shape.getArea() * density);
+        body.massInv = 1.0f / body.mass;
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
         body.staticFriction  = staticFriction;
         body.dynamicFriction = dynamicFriction;
@@ -446,7 +453,8 @@ public class Physics2DWorld {
             // TODO: create union of triangles.
         }
 
-        body.massInv = 1.0f / (body.shape.getArea() * density);
+        body.mass = (body.shape.getArea() * density);
+        body.massInv = 1.0f / body.mass;
         body.inertiaInv = 1.0f / calculateMomentOfInertia(body.shape, density);
         body.staticFriction  = staticFriction;
         body.dynamicFriction = dynamicFriction;
@@ -496,9 +504,9 @@ public class Physics2DWorld {
 
     public Physics2DConstraintWeld createConstraintWeld(Physics2DBody body_a, Physics2DBody body_b) {
         if (body_a == body_b) throw new Physics2DException("Cannot weld object to itself.");
-        Physics2DConstraintWeld weld = new Physics2DConstraintWeld(body_a, body_b);
-        constraintsToAdd.add(weld);
-        return weld;
+        //Physics2DConstraintWeld weld = new Physics2DConstraintWeld(body_a, body_b);
+        //constraintsToAdd.add(weld);
+        return null;
     }
 
     public void destroyConstraint(Physics2DConstraint constraint) {

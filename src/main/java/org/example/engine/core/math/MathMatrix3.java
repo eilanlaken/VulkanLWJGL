@@ -1,6 +1,8 @@
 package org.example.engine.core.math;
 
-public class MathMatrix3 {
+import org.example.engine.core.memory.MemoryPool;
+
+public class MathMatrix3 implements MemoryPool.Reset {
 
     public static final int M00 = 0;
     public static final int M01 = 3;
@@ -588,6 +590,11 @@ public class MathMatrix3 {
         mata[M02] = v02;
         mata[M12] = v12;
         mata[M22] = v22;
+    }
+
+    @Override
+    public void reset() {
+        this.idt();
     }
 
 }

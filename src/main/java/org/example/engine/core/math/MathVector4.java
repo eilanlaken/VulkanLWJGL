@@ -1,6 +1,8 @@
 package org.example.engine.core.math;
 
-public class MathVector4 {
+import org.example.engine.core.memory.MemoryPool;
+
+public class MathVector4 implements MemoryPool.Reset {
 
     public static final MathVector4 X_UNIT = new MathVector4(1, 0, 0, 0);
     public static final MathVector4 Y_UNIT = new MathVector4(0, 1, 0, 0);
@@ -468,6 +470,14 @@ public class MathVector4 {
         z += alpha * (target.z - z);
         w += alpha * (target.w - w);
         return this;
+    }
+
+    @Override
+    public void reset() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.w = 0;
     }
 
     /** Converts this {@code Vector4} to a string in the format {@code (x,y,z,w)}. Strings with this exact format can be parsed

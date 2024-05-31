@@ -59,10 +59,10 @@ public final class Physics2DWorldRenderer {
         // TODO: render joints
         if (world.renderConstraints) {
             for (Physics2DConstraint constraint : world.allConstraints) {
-                if (constraint instanceof Physics2DConstraintWeld) {
-                    Physics2DConstraintWeld weld = (Physics2DConstraintWeld) constraint;
-                    renderer.pushThinLineSegment(weld.body_a.shape.x(), weld.body_a.shape.y(), weld.body_b.shape.x(), weld.body_b.shape.y(), CONSTRAINT_TINT);
-                }
+//                if (constraint instanceof Physics2DConstraintWeld) {
+////                    Physics2DConstraintWeld weld = (Physics2DConstraintWeld) constraint;
+////                    renderer.pushThinLineSegment(weld.body_a.shape.x(), weld.body_a.shape.y(), weld.body_b.shape.x(), weld.body_b.shape.y(), CONSTRAINT_TINT);
+//                }
             }
         }
 

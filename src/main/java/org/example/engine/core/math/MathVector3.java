@@ -1,6 +1,8 @@
 package org.example.engine.core.math;
 
-public class MathVector3 {
+import org.example.engine.core.memory.MemoryPool;
+
+public class MathVector3 implements MemoryPool.Reset {
 
     public static final MathVector3 X_UNIT = new MathVector3(1, 0, 0);
     public static final MathVector3 Y_UNIT = new MathVector3(0, 1, 0);
@@ -596,7 +598,7 @@ public class MathVector3 {
         return (oldLen2 == 0 || oldLen2 == len2) ? this : scl((float)Math.sqrt(len2 / oldLen2));
     }
 
-    public MathVector3 clamp (float min, float max) {
+    public MathVector3 clamp(float min, float max) {
         final float len2 = len2();
         if (len2 == 0f) return this;
         float max2 = max * max;
@@ -604,6 +606,13 @@ public class MathVector3 {
         float min2 = min * min;
         if (len2 < min2) return scl((float)Math.sqrt(min2 / len2));
         return this;
+    }
+
+    @Override
+    public void reset() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
     }
 
     @Override

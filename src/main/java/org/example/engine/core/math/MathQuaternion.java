@@ -1,7 +1,9 @@
 package org.example.engine.core.math;
 
+import org.example.engine.core.memory.MemoryPool;
+
 // TODO: complete and test
-public class MathQuaternion {
+public class MathQuaternion implements MemoryPool.Reset {
 
     private static final long serialVersionUID = -7661875440774897168L;
     private static MathQuaternion tmp1 = new MathQuaternion(0, 0, 0, 0);
@@ -846,6 +848,8 @@ public class MathQuaternion {
         return getAngleAround(axis.x, axis.y, axis.z);
     }
 
-
-
+    @Override
+    public void reset() {
+        this.idt();
+    }
 }

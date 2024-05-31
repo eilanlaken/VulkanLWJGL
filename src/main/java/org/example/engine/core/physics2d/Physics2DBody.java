@@ -46,6 +46,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public CollectionsArray<Physics2DConstraint> constraints = new CollectionsArray<>(false, 2);
 
     // TODO: must set some default values.
+    public float   mass;
     public float   massInv;
     public float   inertiaInv;
     public float   density;
@@ -156,6 +157,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         this.netForce.set(0,0);
         this.com.set(0,0);
         this.netTorque = 0;
+        this.mass = 0;
         this.massInv = 0;
         this.inertiaInv = 0;
         this.density = 0;

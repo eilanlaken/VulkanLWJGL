@@ -12,7 +12,9 @@ package org.example.engine.core.math;
 </pre>
 */
 
-public class MathMatrix4 {
+import org.example.engine.core.memory.MemoryPool;
+
+public class MathMatrix4 implements MemoryPool.Reset {
 
     /** XX: Typically the unrotated X component for scaling, also the cosine of the angle when rotated on the Y and/or Z axis. On
      * Vector3 multiplication this value is multiplied with the source X component and added to the target X component. */
@@ -1427,8 +1429,6 @@ public class MathMatrix4 {
         return rotateSelfAxis(quat.setFromCross(v1, v2));
     }
 
-
-
     /** Post-multiplies this matrix by a rotation toward a direction.
      * @param direction direction to rotate toward
      * @param up up vector
@@ -1519,6 +1519,12 @@ public class MathMatrix4 {
 //                && MathUtils.isZero(val[M01]) && MathUtils.isZero(val[M02]) && MathUtils.isZero(val[M10]) && MathUtils.isZero(val[M12])
 //                && MathUtils.isZero(val[M20]) && MathUtils.isZero(val[M21]));
 //    }
+
+
+    @Override
+    public void reset() {
+        this.idt();
+    }
 
     @Override
     public boolean equals(Object obj) {

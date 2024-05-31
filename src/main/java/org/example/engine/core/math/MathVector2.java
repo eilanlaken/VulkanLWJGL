@@ -1,6 +1,8 @@
 package org.example.engine.core.math;
 
-public class MathVector2 {
+import org.example.engine.core.memory.MemoryPool;
+
+public class MathVector2 implements MemoryPool.Reset {
 
     public final static MathVector2 X_UNIT = new MathVector2(1, 0);
     public final static MathVector2 Y_UNIT = new MathVector2(0, 1);
@@ -392,6 +394,12 @@ public class MathVector2 {
     }
 
     @Override
+    public void reset() {
+        this.x = 0;
+        this.y = 0;
+    }
+
+    @Override
     public boolean equals (Object obj) {
         if (this == obj) return true;
         if (obj == null) return false;
@@ -402,13 +410,13 @@ public class MathVector2 {
         return true;
     }
 
-    public static boolean nearlyEqual(MathVector2 a, MathVector2 b, float tolerance) {
-        return MathVector2.dst2(a, b) < tolerance * tolerance;
-    }
-
     @Override
     public String toString () {
         return "(" + x + "," + y + ")";
+    }
+
+    public static boolean nearlyEqual(MathVector2 a, MathVector2 b, float tolerance) {
+        return MathVector2.dst2(a, b) < tolerance * tolerance;
     }
 
     public static float dst(float x1, float y1, float x2, float y2) {
