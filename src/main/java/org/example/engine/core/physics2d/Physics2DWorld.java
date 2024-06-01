@@ -164,14 +164,9 @@ public class Physics2DWorld {
             constraintsToAdd.clear();
         }
 
-        /* integration: update velocities, clear forces and move bodies. */
+        // TODO: apply damping (linear, angular)
+        /* integrate velocities */
         {
-            float worldMinX = Float.POSITIVE_INFINITY;
-            float worldMaxX = Float.NEGATIVE_INFINITY;
-            float worldMinY = Float.POSITIVE_INFINITY;
-            float worldMaxY = Float.NEGATIVE_INFINITY;
-            float worldMaxR = Float.NEGATIVE_INFINITY;
-
             for (Physics2DBody body : allBodies) {
                 if (body.off) continue;
                 if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
@@ -183,14 +178,21 @@ public class Physics2DWorld {
                     body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
                     body.omegaDeg += body.netTorque * (body.inertiaInv) * delta * MathUtils.radiansToDegrees;
                 }
-                if (body.motionType != Physics2DBody.MotionType.STATIC) {
-                    body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omegaDeg);
-                }
-                body.shape.update();
                 body.netForce.set(0, 0);
                 body.netTorque = 0;
                 body.touching.clear();
+            }
+        }
 
+        /* collision detection: broad phase */
+        {
+            float worldMinX = Float.POSITIVE_INFINITY;
+            float worldMaxX = Float.NEGATIVE_INFINITY;
+            float worldMinY = Float.POSITIVE_INFINITY;
+            float worldMaxY = Float.NEGATIVE_INFINITY;
+            float worldMaxR = Float.NEGATIVE_INFINITY;
+
+            for (Physics2DBody body : allBodies) {
                 worldMinX = Math.min(worldMinX, body.shape.getMinExtentX());
                 worldMaxX = Math.max(worldMaxX, body.shape.getMaxExtentX());
                 worldMinY = Math.min(worldMinY, body.shape.getMinExtentY());
@@ -256,9 +258,10 @@ public class Physics2DWorld {
                     }
                 }
             }
+        }
 
-            /* collision detection - narrow phase */
-
+        /* collision detection - narrow phase */
+        {
             manifoldsPool.freeAll(manifolds);
             manifolds.clear();
             for (CollisionPair pair : collisionCandidates) {
@@ -268,9 +271,32 @@ public class Physics2DWorld {
                 if (manifold == null) continue;
                 manifolds.add(manifold);
             }
+        }
 
-            /* collision resolution */
+        /* solve velocity constraints */
+        {
+            for (Physics2DConstraint constraint : allConstraints) {
+                //constraint.initVelocityConstraints(delta);
+            }
 
+            for (int i = 0; i < velocityIterations; i++) {
+                for (Physics2DConstraint constraint : allConstraints) {
+                    constraint.updateVelocity(delta);
+                }
+            }
+        }
+
+        /* solve position constraints */
+        {
+            for (int i = 0; i < positionIterations; i++) {
+                for (Physics2DConstraint constraint : allConstraints) {
+                    constraint.updatePosition(delta);
+                }
+            }
+        }
+
+        /* collision resolution */
+        {
             // TODO: need to figure out how to properly set the Body's: justCollided, touching, justSeparated.
             for (CollisionManifold manifold : manifolds) {
                 Physics2DBody body_a = manifold.body_a;
@@ -284,15 +310,13 @@ public class Physics2DWorld {
             }
         }
 
-        /* constraints */
-        for (Physics2DConstraint constraint : allConstraints) {
-            //constraint.initVelocityConstraints(delta);
-        }
-
-        float dtv = delta / velocityIterations;
-        for (int itr = 0; itr < velocityIterations; itr++) {
-            for (Physics2DConstraint constraint : allConstraints) {
-                constraint.updateVelocity(dtv);
+        /* position integration */
+        {
+            for (Physics2DBody body : allBodies) {
+                if (body.motionType != Physics2DBody.MotionType.STATIC) {
+                    body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omegaDeg);
+                }
+                body.shape.update();
             }
         }
 
