@@ -1,7 +1,6 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.math.MathVector2;
 
 // TODO:
 /*
@@ -46,9 +45,9 @@ public abstract class Physics2DConstraint {
         if (body_b != null) out.add(body_b);
     }
 
-    public abstract void init(float delta);
-    public abstract void updateVelocity(float delta);
-    public abstract boolean updatePosition(float delta);
+    abstract void prepare(float delta);
+    abstract void updateVelocity(float delta);
+    abstract boolean updatePosition(float delta);
 
     protected static float calculateReducedMass(final Physics2DBody body_a, final Physics2DBody body_b) {
         float m1 = body_a.mass;

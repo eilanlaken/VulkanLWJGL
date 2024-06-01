@@ -47,7 +47,7 @@ public class Physics2DConstraintWeld extends Physics2DConstraint {
     }
 
     @Override
-    public void init(float delta) {
+    public void prepare(float delta) {
 
     }
 

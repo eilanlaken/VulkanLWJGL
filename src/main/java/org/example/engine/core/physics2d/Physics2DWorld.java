@@ -165,7 +165,7 @@ public class Physics2DWorld {
         }
 
         // TODO: apply damping (linear, angular)
-        /* integrate velocities */
+        /* Euler integration: velocities and positions */
         {
             for (Physics2DBody body : allBodies) {
                 if (body.off) continue;
@@ -175,9 +175,14 @@ public class Physics2DWorld {
                         field.calculateForce(body, force);
                         body.netForce.add(force);
                     }
-                    body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
-                    body.omegaDeg += body.netTorque * (body.inertiaInv) * delta * MathUtils.radiansToDegrees;
+                    body.velocity.x += body.massInv * delta * body.netForce.x;
+                    body.velocity.y += body.massInv * delta * body.netForce.y;
+                    body.omegaDeg   += body.netTorque * (body.inertiaInv) * delta * MathUtils.radiansToDegrees;
                 }
+                if (body.motionType != Physics2DBody.MotionType.STATIC) {
+                    body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omegaDeg);
+                }
+                body.shape.update();
                 body.netForce.set(0, 0);
                 body.netTorque = 0;
                 body.touching.clear();
@@ -276,7 +281,7 @@ public class Physics2DWorld {
         /* solve velocity constraints */
         {
             for (Physics2DConstraint constraint : allConstraints) {
-                //constraint.initVelocityConstraints(delta);
+                constraint.prepare(delta);
             }
 
             for (int i = 0; i < velocityIterations; i++) {
@@ -310,14 +315,15 @@ public class Physics2DWorld {
             }
         }
 
+        // TODO: remove
         /* position integration */
         {
-            for (Physics2DBody body : allBodies) {
-                if (body.motionType != Physics2DBody.MotionType.STATIC) {
-                    body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omegaDeg);
-                }
-                body.shape.update();
-            }
+//            for (Physics2DBody body : allBodies) {
+//                if (body.motionType != Physics2DBody.MotionType.STATIC) {
+//                    body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omegaDeg);
+//                }
+//                body.shape.update();
+//            }
         }
 
         /* ray casting */
