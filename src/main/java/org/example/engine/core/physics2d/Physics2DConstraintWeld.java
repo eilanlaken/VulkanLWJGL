@@ -13,6 +13,7 @@ TODO:
 
 read here
 https://github.com/acrlw/Physics2D/blob/master/Physics2D/include/physics2d_weld_joint.h
+https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc09/slides/04-GDC09_Catto_Erin_Solver.pdf
  */
 
 /**
@@ -47,51 +48,12 @@ public class Physics2DConstraintWeld extends Physics2DConstraint {
 
     @Override
     public void init(float delta) {
-        if (body_a.off || body_b.off)
-            return;
 
-        float m_a = body_a.mass;
-        float im_a = body_a.massInv;
-        float ii_a = body_a.inertiaInv;
-
-        float m_b = body_b.mass;
-        float im_b = body_b.massInv;
-        float ii_b = body_b.inertiaInv;
-
-        MathVector2 ra = new MathVector2(localPointA).rotateDeg(-body_a.shape.angle()).add(body_a.shape.x(), body_a.shape.y());
-        //MathVector2 ra = pa.sub(body_a.shape.x(), body_a.shape.y());
-        MathVector2 rb = new MathVector2(localPointB).rotateDeg(-body_b.shape.angle()).add(body_b.shape.x(), body_b.shape.y());
-        //MathVector2 rb = pb.sub(body_b.shape.x(), body_b.shape.y());
-
-        MathMatrix2 k = new MathMatrix2();
-        k.val[M00] = im_a + ra.y * ra.y * ii_a + im_b + rb.y * rb.y * ii_b;
-        k.val[M01] = -ra.x * ra.y * ii_a - rb.x * rb.y * ii_b;
-        k.val[M10] = k.val[M01];
-        k.val[M11] = im_a + ra.x * ra.x * ii_a + im_b + rb.x * rb.x * ii_b;
-
-        effectiveMass = k.inv();
-        body_a.applyImpulse(accumulatedImpulse.x * delta, accumulatedImpulse.y * delta, ra.x, ra.y);
-        body_b.applyImpulse(-accumulatedImpulse.x * delta, -accumulatedImpulse.y * delta, rb.x, rb.y);
     }
 
     @Override
     public void updateVelocity(float delta) {
-        MathVector2 ra = new MathVector2(localPointA).rotateDeg(-body_a.shape.angle()).sub(body_a.shape.x(), body_a.shape.y());
-        MathVector2 va = new MathVector2(body_a.velocity).add(-body_a.omegaDeg * MathUtils.degreesToRadians * ra.y, body_a.omegaDeg * MathUtils.degreesToRadians * ra.x);
-        MathVector2 rb = new MathVector2(localPointB).rotateDeg(-body_b.shape.angle()).sub(body_b.shape.x(), body_b.shape.y());
-        MathVector2 vb = new MathVector2(body_b.velocity).add(-body_b.omegaDeg * MathUtils.degreesToRadians * rb.y, body_b.omegaDeg * MathUtils.degreesToRadians * rb.x);
 
-        MathVector2 jvb = new MathVector2(va.x-vb.x, va.y-vb.y);
-        jvb.negate();
-        MathVector2 J = new MathVector2();
-        effectiveMass.mul(jvb, J);
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.Q)) System.out.println(effectiveMass);
-        MathVector2 oldImpulse = new MathVector2(accumulatedImpulse);
-        accumulatedImpulse.add(J);
-
-        J.set(accumulatedImpulse).sub(oldImpulse);
-        body_a.applyImpulse(accumulatedImpulse.x * delta, accumulatedImpulse.y * delta, ra.x, ra.y);
-        body_b.applyImpulse(-accumulatedImpulse.x * delta, -accumulatedImpulse.y * delta, rb.x, rb.y);
     }
 
     @Override

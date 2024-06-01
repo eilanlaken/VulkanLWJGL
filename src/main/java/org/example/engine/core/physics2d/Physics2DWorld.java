@@ -109,64 +109,63 @@ public class Physics2DWorld {
 
     public void update(float delta) {
         /* add and remove bodies */
-
-        for (Physics2DBody body : bodiesToRemove) {
-            for (Physics2DConstraint constraint : body.constraints) {
-                destroyConstraint(constraint);
+        {
+            for (Physics2DBody body : bodiesToRemove) {
+                for (Physics2DConstraint constraint : body.constraints) {
+                    destroyConstraint(constraint);
+                }
+                allBodies.removeValue(body, true);
+                bodiesPool.free(body);
             }
-            allBodies.removeValue(body, true);
-            bodiesPool.free(body);
+            for (Physics2DBody body : bodiesToAdd) {
+                allBodies.add(body);
+                body.inserted = true;
+                body.index = bodiesCreated;
+                bodiesCreated++;
+            }
+            bodiesToRemove.clear();
+            bodiesToAdd.clear();
         }
-        for (Physics2DBody body : bodiesToAdd) {
-            allBodies.add(body);
-            body.inserted = true;
-            body.index = bodiesCreated;
-            bodiesCreated++;
-        }
-        bodiesToRemove.clear();
-        bodiesToAdd.clear();
 
         /* preparation: add and remove force fields */
-
-        for (Physics2DForceField forceField : forceFieldsToRemove) {
-            allForceFields.removeValue(forceField, true);
+        {
+            for (Physics2DForceField forceField : forceFieldsToRemove) {
+                allForceFields.removeValue(forceField, true);
+            }
+            for (Physics2DForceField forceField : forceFieldsToAdd) {
+                allForceFields.add(forceField);
+            }
+            forceFieldsToRemove.clear();
+            forceFieldsToAdd.clear();
         }
-        for (Physics2DForceField forceField : forceFieldsToAdd) {
-            allForceFields.add(forceField);
-        }
-        forceFieldsToRemove.clear();
-        forceFieldsToAdd.clear();
 
         /* preparation: add and remove constraints */
-
-        CollectionsArray<Physics2DBody> constraintBodies = new CollectionsArray<>();
-        for (Physics2DConstraint constraint : constraintsToAdd) {
-            constraint.getBodies(constraintBodies);
-            boolean ready = true;
-            for (Physics2DBody body : constraintBodies) {
-                if (!body.inserted || body.off) {
-                    ready = false;
-                    break;
+        {
+            CollectionsArray<Physics2DBody> constraintBodies = new CollectionsArray<>();
+            for (Physics2DConstraint constraint : constraintsToAdd) {
+                constraint.getBodies(constraintBodies);
+                boolean ready = true;
+                for (Physics2DBody body : constraintBodies) {
+                    if (!body.inserted || body.off) {
+                        ready = false;
+                        break;
+                    }
                 }
+                if (!ready) continue;
+                for (Physics2DBody body : constraintBodies) {
+                    body.constraints.add(constraint);
+                }
+                allConstraints.add(constraint);
             }
-            if (!ready) continue;
-            for (Physics2DBody body : constraintBodies) {
-                body.constraints.add(constraint);
+            for (Physics2DConstraint joint : constraintsToRemove) {
+                allConstraints.removeValue(joint, true);
             }
-            constraint.init(delta);
-            allConstraints.add(constraint);
+            constraintsToRemove.clear();
+            constraintsToAdd.clear();
         }
-        for (Physics2DConstraint joint : constraintsToRemove) {
-            allConstraints.removeValue(joint, true);
-        }
-        constraintsToRemove.clear();
-        constraintsToAdd.clear();
 
         /* integration: update velocities, clear forces and move bodies. */
-
-        float dtp = delta / positionIterations;
-        for (int itr = 0; itr < positionIterations; itr++) {
-
+        {
             float worldMinX = Float.POSITIVE_INFINITY;
             float worldMaxX = Float.NEGATIVE_INFINITY;
             float worldMinY = Float.POSITIVE_INFINITY;
@@ -181,11 +180,11 @@ public class Physics2DWorld {
                         field.calculateForce(body, force);
                         body.netForce.add(force);
                     }
-                    body.velocity.add(body.massInv * dtp * body.netForce.x, body.massInv * dtp * body.netForce.y);
-                    body.omegaDeg += body.netTorque * (body.inertiaInv) * dtp * MathUtils.radiansToDegrees;
+                    body.velocity.add(body.massInv * delta * body.netForce.x, body.massInv * delta * body.netForce.y);
+                    body.omegaDeg += body.netTorque * (body.inertiaInv) * delta * MathUtils.radiansToDegrees;
                 }
                 if (body.motionType != Physics2DBody.MotionType.STATIC) {
-                    body.shape.dx_dy_rot(dtp * body.velocity.x, dtp * body.velocity.y, dtp * body.omegaDeg);
+                    body.shape.dx_dy_rot(delta * body.velocity.x, delta * body.velocity.y, delta * body.omegaDeg);
                 }
                 body.shape.update();
                 body.netForce.set(0, 0);
@@ -298,32 +297,33 @@ public class Physics2DWorld {
         }
 
         /* ray casting */
-
-        for (Map.Entry<Ray, RayHitCallback> rayCallback : raysToRemove.entrySet()) {
-            Ray ray = rayCallback.getKey();
-            allRays.remove(ray);
-            raysPool.free(ray);
-        }
-        allRays.putAll(raysToAdd);
-        raysToRemove.clear();
-        raysToAdd.clear();
-        intersectionsPool.freeAll(intersections);
-        intersections.clear();
-
-        for (Map.Entry<Ray, RayHitCallback> rayCallback : allRays.entrySet()) {
-            Ray ray = rayCallback.getKey();
-            RayHitCallback callback = rayCallback.getValue();
-            // set the distance for the ray based on world's extent
-            if (ray.dst == Float.POSITIVE_INFINITY || Float.isNaN(ray.dst)) {
-
+        {
+            for (Map.Entry<Ray, RayHitCallback> rayCallback : raysToRemove.entrySet()) {
+                Ray ray = rayCallback.getKey();
+                allRays.remove(ray);
+                raysPool.free(ray);
             }
-            CollectionsArray<Intersection> results = new CollectionsArray<>();
-            // TODO: optimize this using the cell grid.
-            rayCasting.calculateIntersections(ray, allBodies, results);
-            intersections.addAll(results);
-            if (callback != null) callback.intersected(results);
-            results.clear();
-            raysToRemove.put(ray, callback);
+            allRays.putAll(raysToAdd);
+            raysToRemove.clear();
+            raysToAdd.clear();
+            intersectionsPool.freeAll(intersections);
+            intersections.clear();
+
+            for (Map.Entry<Ray, RayHitCallback> rayCallback : allRays.entrySet()) {
+                Ray ray = rayCallback.getKey();
+                RayHitCallback callback = rayCallback.getValue();
+                // set the distance for the ray based on world's extent
+                if (ray.dst == Float.POSITIVE_INFINITY || Float.isNaN(ray.dst)) {
+
+                }
+                CollectionsArray<Intersection> results = new CollectionsArray<>();
+                // TODO: optimize this using the cell grid.
+                rayCasting.calculateIntersections(ray, allBodies, results);
+                intersections.addAll(results);
+                if (callback != null) callback.intersected(results);
+                results.clear();
+                raysToRemove.put(ray, callback);
+            }
         }
     }
 
