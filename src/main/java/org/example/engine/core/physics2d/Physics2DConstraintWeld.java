@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.math.MathMatrix2;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
@@ -45,7 +46,7 @@ public class Physics2DConstraintWeld extends Physics2DConstraint {
     }
 
     @Override
-    public void initVelocityConstraints(float delta) {
+    public void init(float delta) {
         if (body_a.off || body_b.off)
             return;
 
@@ -57,10 +58,10 @@ public class Physics2DConstraintWeld extends Physics2DConstraint {
         float im_b = body_b.massInv;
         float ii_b = body_b.inertiaInv;
 
-        MathVector2 pa = new MathVector2(localPointA).rotateDeg(body_a.shape.angle()).add(body_a.shape.x(), body_a.shape.y());
-        MathVector2 ra = pa.sub(body_a.shape.x(), body_a.shape.y());
-        MathVector2 pb = new MathVector2(localPointB).rotateDeg(body_b.shape.angle()).add(body_b.shape.x(), body_b.shape.y());
-        MathVector2 rb = pb.sub(body_b.shape.x(), body_b.shape.y());
+        MathVector2 ra = new MathVector2(localPointA).rotateDeg(-body_a.shape.angle()).add(body_a.shape.x(), body_a.shape.y());
+        //MathVector2 ra = pa.sub(body_a.shape.x(), body_a.shape.y());
+        MathVector2 rb = new MathVector2(localPointB).rotateDeg(-body_b.shape.angle()).add(body_b.shape.x(), body_b.shape.y());
+        //MathVector2 rb = pb.sub(body_b.shape.x(), body_b.shape.y());
 
         MathMatrix2 k = new MathMatrix2();
         k.val[M00] = im_a + ra.y * ra.y * ii_a + im_b + rb.y * rb.y * ii_b;
@@ -74,16 +75,17 @@ public class Physics2DConstraintWeld extends Physics2DConstraint {
     }
 
     @Override
-    public void solveVelocityConstraints(float delta) {
-        MathVector2 ra = new MathVector2(localPointA).rotateDeg(body_a.shape.angle());
-        MathVector2 va = new MathVector2(body_a.velocity).add(MathVector2.crs(body_a.omegaDeg * MathUtils.degreesToRadians, ra));
-        MathVector2 rb = new MathVector2(localPointB).rotateDeg(body_b.shape.angle());
-        MathVector2 vb = new MathVector2(body_b.velocity).add(MathVector2.crs(body_b.omegaDeg * MathUtils.degreesToRadians, rb));
+    public void updateVelocity(float delta) {
+        MathVector2 ra = new MathVector2(localPointA).rotateDeg(-body_a.shape.angle()).sub(body_a.shape.x(), body_a.shape.y());
+        MathVector2 va = new MathVector2(body_a.velocity).add(-body_a.omegaDeg * MathUtils.degreesToRadians * ra.y, body_a.omegaDeg * MathUtils.degreesToRadians * ra.x);
+        MathVector2 rb = new MathVector2(localPointB).rotateDeg(-body_b.shape.angle()).sub(body_b.shape.x(), body_b.shape.y());
+        MathVector2 vb = new MathVector2(body_b.velocity).add(-body_b.omegaDeg * MathUtils.degreesToRadians * rb.y, body_b.omegaDeg * MathUtils.degreesToRadians * rb.x);
 
         MathVector2 jvb = new MathVector2(va.x-vb.x, va.y-vb.y);
         jvb.negate();
         MathVector2 J = new MathVector2();
         effectiveMass.mul(jvb, J);
+        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.Q)) System.out.println(effectiveMass);
         MathVector2 oldImpulse = new MathVector2(accumulatedImpulse);
         accumulatedImpulse.add(J);
 
@@ -93,28 +95,9 @@ public class Physics2DConstraintWeld extends Physics2DConstraint {
     }
 
     @Override
-    public boolean solvePositionConstraints(float delta) {
+    public boolean updatePosition(float delta) {
         return false;
     }
 
-    @Override
-    public void getAnchorA(MathVector2 out) {
-
-    }
-
-    @Override
-    public void getAnchorB(MathVector2 out) {
-
-    }
-
-    @Override
-    public void getReactionForce(float inv_dt, MathVector2 out) {
-
-    }
-
-    @Override
-    public float getReactionTorque(float inv_dt) {
-        return 0;
-    }
 
 }

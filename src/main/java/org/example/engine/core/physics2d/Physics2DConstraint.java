@@ -44,14 +44,9 @@ public abstract class Physics2DConstraint {
         if (body_b != null) out.add(body_b);
     }
 
-    public abstract void initVelocityConstraints(float delta);
-    public abstract void solveVelocityConstraints(float delta);
-    public abstract boolean solvePositionConstraints(float delta);
-
-    public abstract void getAnchorA(MathVector2 out);
-    public abstract void getAnchorB(MathVector2 out);
-    public abstract void getReactionForce(float inv_dt, MathVector2 out);
-    public abstract float getReactionTorque(float inv_dt);
+    public abstract void init(float delta);
+    public abstract void updateVelocity(float delta);
+    public abstract boolean updatePosition(float delta);
 
     protected static float calculateReducedMass(final Physics2DBody body_a, final Physics2DBody body_b) {
         float m1 = body_a.mass;

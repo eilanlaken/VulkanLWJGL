@@ -153,7 +153,7 @@ public class Physics2DWorld {
             for (Physics2DBody body : constraintBodies) {
                 body.constraints.add(constraint);
             }
-            constraint.initVelocityConstraints(delta);
+            constraint.init(delta);
             allConstraints.add(constraint);
         }
         for (Physics2DConstraint joint : constraintsToRemove) {
@@ -293,7 +293,7 @@ public class Physics2DWorld {
         float dtv = delta / velocityIterations;
         for (int itr = 0; itr < velocityIterations; itr++) {
             for (Physics2DConstraint constraint : allConstraints) {
-                constraint.solveVelocityConstraints(dtv);
+                constraint.updateVelocity(dtv);
             }
         }
 
