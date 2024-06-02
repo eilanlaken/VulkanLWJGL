@@ -6,6 +6,7 @@ import org.example.engine.core.graphics.GraphicsRenderer2D;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
+import org.example.engine.core.math.MathVector2;
 import org.example.engine.core.math.MathVector3;
 import org.example.engine.core.physics2d.Physics2DBody;
 import org.example.engine.core.physics2d.Physics2DWorld;
@@ -80,7 +81,7 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
         }
 
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.SPACE)) {
-            world.createConstraintWeld(body_a, body_b);
+            world.createConstraintWeld(body_a, body_b, new MathVector2(1,0));
         }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);

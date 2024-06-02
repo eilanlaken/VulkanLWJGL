@@ -61,7 +61,7 @@ public final class Physics2DWorldRenderer {
             for (Physics2DConstraint constraint : world.allConstraints) {
                 if (constraint instanceof Physics2DConstraintWeld) {
                     Physics2DConstraintWeld weld = (Physics2DConstraintWeld) constraint;
-                    renderer.pushThinLineSegment(weld.body_a.shape.x(), weld.body_a.shape.y(), weld.body_b.shape.x(), weld.body_b.shape.y(), CONSTRAINT_TINT);
+                    renderer.pushThinLineSegment(weld.body1.shape.x(), weld.body1.shape.y(), weld.body2.shape.x(), weld.body2.shape.y(), CONSTRAINT_TINT);
                 }
             }
         }

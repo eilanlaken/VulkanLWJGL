@@ -1,12 +1,12 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.math.MathMatrix3;
-import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
-import org.example.engine.core.math.MathVector3;
-import org.example.engine.core.shape.ShapeUtils;
+import org.example.engine.core.math.*;
 
 import static org.example.engine.core.math.MathMatrix3.*;
+import static org.example.engine.core.math.MathMatrix3.M00;
+import static org.example.engine.core.math.MathMatrix3.M01;
+import static org.example.engine.core.math.MathMatrix3.M10;
+import static org.example.engine.core.math.MathMatrix3.M11;
 
 /*
 TODO:
@@ -34,23 +34,27 @@ https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc09/slides/04-GDC09_Catto_Erin
  */
 
 // https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/joints/WeldJoint.java
-public class Physics2DConstraintWeld extends Physics2DConstraint {
+@Deprecated public class Physics2DConstraintWeld_old extends Physics2DConstraint {
 
-    protected MathVector2 referenceVector;
-    protected float referenceAngleRad; // in rad
+    protected MathVector2 localAnchor1;
+    protected MathVector2 localAnchor2;
+    protected float referenceAngle; // in rad
     private MathVector2 r1;
     private MathVector2 r2;
     private MathMatrix3 K;
     private MathVector3 impulse;
 
-    public Physics2DConstraintWeld(final Physics2DBody body1, final Physics2DBody body2) {
+    public Physics2DConstraintWeld_old(final Physics2DBody body1, final Physics2DBody body2, MathVector2 anchor) {
         super(body1, body2);
         if (body2 == null) throw new Physics2DException("Weld joint must connect 2 non-null bodies. Got : " + body1 + ", " + null);
+        if (anchor == null) throw new Physics2DException("anchor must not be null");
 
         // set the anchor points
-        this.referenceVector = new MathVector2(body2.x() - body1.x(), body2.y() - body1.y());
+        this.localAnchor1 = Physics2DUtils.getInverseTransform(body1, anchor);
+        this.localAnchor2 = Physics2DUtils.getInverseTransform(body2, anchor);
         // set the reference angle
-        this.referenceAngleRad = ShapeUtils.getRelativeRotationDeg(body1.shape, body2.shape);
+        this.referenceAngle = body1.angle() - body2.angle();
+        this.referenceAngle *= MathUtils.degreesToRadians;
 
         // initialize
         this.K = new MathMatrix3();
@@ -66,8 +70,8 @@ public class Physics2DConstraintWeld extends Physics2DConstraint {
         float invI1 = body1.inertiaInv;
         float invI2 = body2.inertiaInv;
 
-        //this.r1.set(localAnchor1).sub(this.body1.getCenterOfMass()).rotateDeg(body1.angle());
-        //this.r2.set(localAnchor2).sub(this.body2.getCenterOfMass()).rotateDeg(body2.angle());
+        this.r1.set(localAnchor1).sub(this.body1.getCenterOfMass()).rotateDeg(body1.angle());
+        this.r2.set(localAnchor2).sub(this.body2.getCenterOfMass()).rotateDeg(body2.angle());
 
 
         // compute the K inverse matrix
@@ -106,10 +110,9 @@ public class Physics2DConstraintWeld extends Physics2DConstraint {
 
         MathVector3 stepImpulse = new MathVector3();
         if (this.K.val[M22] > 0.0f) {
-            // TODO: write unit tests for solve33
             MathUtils.solve33(K, C.negate(), stepImpulse);
         } else {
-            // TODO: write unit tests for solve22
+
             MathVector2 solution = new MathVector2();
             MathUtils.solve22(K, relv, solution);
             solution.negate();
@@ -119,6 +122,7 @@ public class Physics2DConstraintWeld extends Physics2DConstraint {
 
         // apply the impulse
         MathVector2 imp = new MathVector2(stepImpulse.x, stepImpulse.y);
+        System.out.println(imp);
         this.body1.velocity.add(imp.x * invM1, imp.y * invM1);
         //this.body1.omegaDeg += invI1 * (this.r1.crs(imp) + stepImpulse.z) * MathUtils.radiansToDegrees;
         this.body2.velocity.add(imp.x * invM2, imp.y * invM2);

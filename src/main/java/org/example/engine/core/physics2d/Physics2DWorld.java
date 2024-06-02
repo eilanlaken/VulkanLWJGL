@@ -278,25 +278,30 @@ public class Physics2DWorld {
             }
         }
 
-        /* solve velocity constraints */
+        /* solve constraints */
         {
             for (Physics2DConstraint constraint : allConstraints) {
                 constraint.prepare(delta);
             }
 
-            for (int i = 0; i < velocityIterations; i++) {
+            // TODO: for (int i = 0; i < velocityIterations; i++) {
+            for (int i = 0; i < 1; i++) {
                 for (Physics2DConstraint constraint : allConstraints) {
-                    constraint.updateVelocity(delta);
+                    constraint.solveVelocity(delta);
                 }
             }
-        }
 
-        /* solve position constraints */
-        {
+            boolean positionConstraintsSolved = false;
+            // TODO: for (int i = 0; i < positionIterations; i++) {
             for (int i = 0; i < positionIterations; i++) {
+
+                // solve the joint position constraints
+                boolean allSolved = true;
                 for (Physics2DConstraint constraint : allConstraints) {
-                    constraint.updatePosition(delta);
+                    boolean solved = constraint.solvePosition(delta);
+                    allSolved = allSolved && solved;
                 }
+                if (allSolved) break;
             }
         }
 
@@ -536,7 +541,14 @@ public class Physics2DWorld {
 
     /* Constraints API */
 
-    public Physics2DConstraintWeld createConstraintWeld(Physics2DBody body_a, Physics2DBody body_b) {
+    @Deprecated public Physics2DConstraintWeld_old createConstraintWeld(Physics2DBody body_a, Physics2DBody body_b, MathVector2 anchor) {
+        if (body_a == body_b) throw new Physics2DException("Cannot weld object to itself.");
+        Physics2DConstraintWeld_old weld = new Physics2DConstraintWeld_old(body_a, body_b, anchor);
+        constraintsToAdd.add(weld);
+        return null;
+    }
+
+    public Physics2DConstraintWeld createConstraintWeld_new(Physics2DBody body_a, Physics2DBody body_b) {
         if (body_a == body_b) throw new Physics2DException("Cannot weld object to itself.");
         Physics2DConstraintWeld weld = new Physics2DConstraintWeld(body_a, body_b);
         constraintsToAdd.add(weld);

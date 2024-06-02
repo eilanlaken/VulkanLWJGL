@@ -22,32 +22,32 @@ public abstract class Physics2DConstraint {
     public static final float DEFAULT_MAXIMUM_WARM_START_DISTANCE = 1.0e-2f;
     public static final float DEFAULT_BAUMGARTE                   = 0.2f;
 
-    public final Physics2DBody body_a;
-    public final Physics2DBody body_b;
+    public final Physics2DBody body1;
+    public final Physics2DBody body2;
 
-    Physics2DConstraint(Physics2DBody body_a, Physics2DBody body_b) {
-        if (body_a == null) throw new Physics2DException("Constraint must have at least 1 body.");
-        if (body_a == body_b) throw new Physics2DException("body_a cannot be equal to body_b");
-        this.body_a = body_a;
-        this.body_b = body_b;
+    Physics2DConstraint(Physics2DBody body1, Physics2DBody body2) {
+        if (body1 == null) throw new Physics2DException("Constraint must have at least 1 body.");
+        if (body1 == body2) throw new Physics2DException("body_a cannot be equal to body_b");
+        this.body1 = body1;
+        this.body2 = body2;
     }
 
-    Physics2DConstraint(Physics2DBody body_a) {
-        if (body_a == null) throw new Physics2DException("Constraint must have at least 1 body.");
-        this.body_a = body_a;
-        this.body_b = null;
+    Physics2DConstraint(Physics2DBody body1) {
+        if (body1 == null) throw new Physics2DException("Constraint must have at least 1 body.");
+        this.body1 = body1;
+        this.body2 = null;
     }
 
 
     public final void getBodies(CollectionsArray<Physics2DBody> out) {
         out.clear();
-        out.add(body_a);
-        if (body_b != null) out.add(body_b);
+        out.add(body1);
+        if (body2 != null) out.add(body2);
     }
 
     abstract void prepare(float delta);
-    abstract void updateVelocity(float delta);
-    abstract boolean updatePosition(float delta);
+    abstract void solveVelocity(float delta);
+    abstract boolean solvePosition(float delta);
 
     protected static float calculateReducedMass(final Physics2DBody body_a, final Physics2DBody body_b) {
         float m1 = body_a.mass;
