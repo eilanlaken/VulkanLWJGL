@@ -2,6 +2,8 @@ package org.example.engine.core.math;
 
 import java.util.Random;
 
+import static org.example.engine.core.math.MathMatrix3.*;
+
 // TODO: implement init() block that will take care of configuration.
 public final class MathUtils {
 
@@ -265,6 +267,63 @@ public final class MathUtils {
 
     public static boolean floatsEqual(float a, float b, float tolerance) {
         return Math.abs(a - b) <= tolerance;
+    }
+
+    /**
+     * Solves the system of linear equations:
+     * <p style="white-space: pre;"> Ax = B
+     * Multiply by A<sup>-1</sup> on both sides
+     * x = A<sup>-1</sup>B</p>
+     * @param B the B {@link MathVector3}
+     * @return {@link MathVector3} the x vector
+     */
+    public static void solve33(MathMatrix3 A, MathVector3 B, MathVector3 out) {
+        // get the determinant
+        float detInv = A.det();
+        // check for zero determinant
+        if (Math.abs(detInv) > FLOAT_ROUNDING_ERROR) {
+            detInv = 1.0f / detInv;
+        } else {
+            detInv = 0.0f;
+        }
+
+        float m00 =  A.val[M11] * A.val[M22] - A.val[M12] * A.val[M21];
+        float m01 = -A.val[M01] * A.val[M22] + A.val[M21] * A.val[M02];
+        float m02 =  A.val[M01] * A.val[M12] - A.val[M11] * A.val[M02];
+
+        float m10 = -A.val[M10] * A.val[M22] + A.val[M20] * A.val[M12];
+        float m11 =  A.val[M00] * A.val[M22] - A.val[M20] * A.val[M02];
+        float m12 = -A.val[M00] * A.val[M12] + A.val[M10] * A.val[M02];
+
+        float m20 =  A.val[M10] * A.val[M21] - A.val[M20] * A.val[M11];
+        float m21 = -A.val[M00] * A.val[M21] + A.val[M20] * A.val[M01];
+        float m22 =  A.val[M00] * A.val[M11] - A.val[M10] * A.val[M01];
+
+        out.x = detInv * (m00 * B.x + m01 * B.y + m02 * B.z);
+        out.y = detInv * (m10 * B.x + m11 * B.y + m12 * B.z);
+        out.z = detInv * (m20 * B.x + m21 * B.y + m22 * B.z);
+    }
+
+    /**
+     * Solves the system of linear equations:
+     * <p style="white-space: pre;"> Ax = b
+     * Multiply by A<sup>-1</sup> on both sides
+     * x = A<sup>-1</sup>b</p>
+     * @param b the b {@link MathVector2}
+     * @return {@link MathVector2} the x vector
+     */
+    public static void solve22(MathMatrix3 A, MathVector2 b, MathVector2 out) {
+        // get the 2D determinant
+        float det = A.val[M00] * A.val[M11] - A.val[M01] * A.val[M10];
+        // check for zero determinant
+        if (Math.abs(det) > FLOAT_ROUNDING_ERROR) {
+            det = 1.0f / det;
+        } else {
+            det = 0.0f;
+        }
+
+        out.x = det * (A.val[M11] * b.x - A.val[M01] * b.y);
+        out.y = det * (A.val[M00] * b.y - A.val[M10] * b.x);
     }
 
     /** @return the logarithm of value with base a */

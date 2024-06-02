@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL11;
 
 // contact points polygon vs polygon:
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
-public class ScenePhysics2D_Constraints_2 extends ApplicationScreen {
+public class ScenePhysics2D_Constraints_3 extends ApplicationScreen {
 
     private GraphicsRenderer2D renderer2D;
     private GraphicsCamera camera;
@@ -23,7 +23,7 @@ public class ScenePhysics2D_Constraints_2 extends ApplicationScreen {
     private Physics2DBody body_a;
     private Physics2DBody body_b;
 
-    public ScenePhysics2D_Constraints_2() {
+    public ScenePhysics2D_Constraints_3() {
         renderer2D = new GraphicsRenderer2D();
     }
 
@@ -38,7 +38,7 @@ public class ScenePhysics2D_Constraints_2 extends ApplicationScreen {
                 1000, 1, 1, 0.8f, false, 1,
                 10, 0.5f, 0, 0, 0);
 
-        world.createForceField((body, force) -> { force.set(0, -9.8f / body.massInv); });
+        world.createForceField((body, force) -> { force.set(0, -0.2f / body.massInv); });
     }
 
 
@@ -69,7 +69,7 @@ public class ScenePhysics2D_Constraints_2 extends ApplicationScreen {
         }
 
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.SPACE)) {
-            world.createConstraintWeld(body_a, body_b, new MathVector2(1,0));
+            world.createConstraintWeld_new(body_a, body_b);
         }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);

@@ -3,6 +3,7 @@ package org.example.engine.core.shape;
 import org.example.engine.core.collections.*;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.physics2d.Physics2DBody;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -300,6 +301,28 @@ public final class ShapeUtils {
     public CollectionsArray<Shape2D> fracture(Shape2D shape, int n) {
         // generate an array of n random control points, contained in shape.
         return null;
+    }
+
+    /**
+     * Returns the relative angle between the two bodies given the reference angle.
+     * @return double
+     */
+    public static float getRelativeRotationRad(final Shape2D shape_1, final Shape2D shape_2) {
+        float rr = (shape_1.angle() - shape_2.angle()) * MathUtils.degreesToRadians;
+        if (rr < -MathUtils.PI) rr += MathUtils.PI2;
+        if (rr >  MathUtils.PI) rr -= MathUtils.PI2;
+        return rr;
+    }
+
+    /**
+     * Returns the relative angle between the two bodies given the reference angle.
+     * @return double
+     */
+    public static float getRelativeRotationDeg(final Shape2D shape_1, final Shape2D shape_2) {
+        float rr = shape_1.angle() - shape_2.angle();
+        if (rr < -180) rr += 360;
+        if (rr >  180) rr -= 360;
+        return rr;
     }
 
     /**

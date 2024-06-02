@@ -191,6 +191,13 @@ public class MathVector3 implements MemoryPool.Reset {
         return (float)Math.sqrt(x * x + y * y + z * z);
     }
 
+    public MathVector3 negate() {
+        this.x = -this.x;
+        this.y = -this.y;
+        this.z = -this.z;
+        return this;
+    }
+
     public float len () {
         return (float)Math.sqrt(x * x + y * y + z * z);
     }

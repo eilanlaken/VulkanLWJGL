@@ -60,10 +60,23 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
 
     }
 
-    // TODO: FIXME
-    public MathVector2 getCenterOfMass(MathVector2 out) {
-        return out.set(shape.x(), shape.y());
-        //return shape.geometryCenter();
+    // TODO: revise. currently works for symmetrical shapes only.
+    // FIXME
+    public MathVector2 getCenterOfMass() {
+        com.set(this.x(), this.y());
+        return com;
+    }
+
+    public final float x() {
+        return shape.x();
+    }
+
+    public final float y() {
+        return shape.y();
+    }
+
+    public final float angle() {
+        return shape.angle();
     }
 
     public void setPosition(float x, float y) {

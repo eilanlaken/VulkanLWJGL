@@ -235,14 +235,26 @@ public class MathVector2 implements MemoryPool.Reset {
         return this.x * y - this.y * x;
     }
 
-    // TODO: move to physics
-    public static MathVector2 crs(final MathVector2 a, float s) {
-        return new MathVector2(s * a.y, -s * a.x);
-    }
-
-    // TODO: move to physics
     public static MathVector2 crs(float s, final MathVector2 a) {
         return new MathVector2(-s * a.y, s * a.x);
+    }
+
+    /**
+     * Returns the cross product of this {@link MathVector2} and the z value of the right {@link MathVector2}.
+     * @param z the z component of the {@link MathVector2}
+     * @return {@link MathVector2}
+     */
+    public static MathVector2 crs(MathVector2 v, float z) {
+        return new MathVector2(-v.y * z, v.x * z);
+    }
+
+    /**
+     * Returns the cross product of this {@link MathVector2} and the z value of the right {@link MathVector2}.
+     * @param z the z component of the {@link MathVector2}
+     * @return {@link MathVector2}
+     */
+    public static void crs(MathVector2 v, float z, MathVector2 out) {
+        out.set(-v.y * z, v.x * z);
     }
 
     public static float crs(MathVector2 a, MathVector2 b) {
