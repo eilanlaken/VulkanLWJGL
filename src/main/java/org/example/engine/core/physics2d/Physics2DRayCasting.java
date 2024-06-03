@@ -1,9 +1,8 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.input.InputMouse;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 import org.example.engine.core.shape.Shape2DCircle;
@@ -25,7 +24,7 @@ public final class Physics2DRayCasting {
         this.IntersectionsPool = world.getIntersectionsPool();
     }
 
-    void calculateIntersections(Physics2DWorld.Ray ray, CollectionsArray<Physics2DBody> bodies, @NotNull CollectionsArray<Physics2DWorld.Intersection> intersections) {
+    void calculateIntersections(Physics2DWorld.Ray ray, Array<Physics2DBody> bodies, @NotNull Array<Physics2DWorld.Intersection> intersections) {
         for (Physics2DBody body : bodies) {
             Shape2D shape = body.shape;
             if (shape instanceof Shape2DCircle) {
@@ -37,8 +36,8 @@ public final class Physics2DRayCasting {
         }
     }
 
-    private void rayVsCircle(Physics2DBody body, Physics2DWorld.Ray ray, Shape2DCircle circle, @NotNull CollectionsArray<Physics2DWorld.Intersection> intersections) {
-        MathVector2 m = new MathVector2(ray.originX, ray.originY).sub(circle.x(), circle.y());
+    private void rayVsCircle(Physics2DBody body, Physics2DWorld.Ray ray, Shape2DCircle circle, @NotNull Array<Physics2DWorld.Intersection> intersections) {
+        Vector2 m = new Vector2(ray.originX, ray.originY).sub(circle.x(), circle.y());
         float b = 2 * m.dot(ray.dirX, ray.dirY);
         float c = m.len2() - circle.getWorldRadius() * circle.getWorldRadius();
         float det = b * b - 4 * c;
@@ -74,10 +73,10 @@ public final class Physics2DRayCasting {
         }
     }
 
-    private void rayVsRectangle(Physics2DBody body, Physics2DWorld.Ray ray, Shape2DRectangle rectangle, @NotNull CollectionsArray<Physics2DWorld.Intersection> intersections) {
+    private void rayVsRectangle(Physics2DBody body, Physics2DWorld.Ray ray, Shape2DRectangle rectangle, @NotNull Array<Physics2DWorld.Intersection> intersections) {
         // broad phase
         float boundingRadius = rectangle.getBoundingRadius();
-        MathVector2 m = new MathVector2(ray.originX, ray.originY).sub(rectangle.x(), rectangle.y());
+        Vector2 m = new Vector2(ray.originX, ray.originY).sub(rectangle.x(), rectangle.y());
         float b = 2 * m.dot(ray.dirX, ray.dirY);
         float c = m.len2() - boundingRadius * boundingRadius;
         float det = b * b - 4 * c;
@@ -90,20 +89,20 @@ public final class Physics2DRayCasting {
         float x4 = ray.originX + dst * ray.dirX;
         float y4 = ray.originY + dst * ray.dirY;
 
-        MathVector2 c0 = rectangle.c0();
-        MathVector2 c1 = rectangle.c1();
-        MathVector2 c2 = rectangle.c2();
-        MathVector2 c3 = rectangle.c3();
+        Vector2 c0 = rectangle.c0();
+        Vector2 c1 = rectangle.c1();
+        Vector2 c2 = rectangle.c2();
+        Vector2 c3 = rectangle.c3();
 
-        CollectionsArray<MathVector2> edges = new CollectionsArray<>(true, 4);
+        Array<Vector2> edges = new Array<>(true, 4);
         edges.add(c0, c1, c2, c3);
 
         for (int i = 0; i < 4; i++) {
-            MathVector2 p = edges.getCyclic(i);
+            Vector2 p = edges.getCyclic(i);
             float x1 = p.x;
             float y1 = p.y;
 
-            MathVector2 q = edges.getCyclic(i+1);
+            Vector2 q = edges.getCyclic(i+1);
             float x2 = q.x;
             float y2 = q.y;
 

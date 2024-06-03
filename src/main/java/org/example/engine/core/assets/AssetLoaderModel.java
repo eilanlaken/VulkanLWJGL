@@ -1,10 +1,10 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.collections.CollectionsArrayInt;
-import org.example.engine.core.collections.CollectionsMapObjectInt;
+import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.ArrayInt;
+import org.example.engine.core.collections.MapObjectInt;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.math.MathVector3;
+import org.example.engine.core.math.Vector3;
 import org.example.engine.core.memory.MemoryUtils;
 import org.example.engine.core.shape.Shape3DSphere;
 import org.lwjgl.PointerBuffer;
@@ -22,13 +22,13 @@ import java.util.Map;
 
 // TODO: recreate interleaved model building to minimize vbo count;
 // TODO: move stuff to model builder;
-public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
+public class AssetLoaderModel implements AssetLoader<Model> {
 
-    private static final CollectionsMapObjectInt<String> namedTextureTypes;
+    private static final MapObjectInt<String> namedTextureTypes;
     private static final Map<String, String> namedColorParams;
     private static final Map<String, String> namedProps;
     static {
-        namedTextureTypes = new CollectionsMapObjectInt<>();
+        namedTextureTypes = new MapObjectInt<>();
         namedTextureTypes.put("textureBaseColor", Assimp.aiTextureType_BASE_COLOR);
         namedTextureTypes.put("textureNormal", Assimp.aiTextureType_NORMALS);
         namedTextureTypes.put("textureDiffuse", Assimp.aiTextureType_DIFFUSE);
@@ -78,13 +78,13 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
     private ModelArmatureData armatureData;
 
     @Override
-    public CollectionsArray<AssetDescriptor> getDependencies() {
+    public Array<AssetDescriptor> getDependencies() {
         // TODO: see if the path is relative etc.
-        CollectionsArray<AssetDescriptor> dependencies = new CollectionsArray<>();
+        Array<AssetDescriptor> dependencies = new Array<>();
         for (ModelPartMaterialData materialData : materialsData) {
             Map<String, Object> attributesData = materialData.attributesData;
             for (Map.Entry<String, Object> entry : attributesData.entrySet()) {
-                if (entry instanceof TextureParameters) dependencies.add(new AssetDescriptor(GraphicsTexture.class, ((TextureParameters) entry).path));
+                if (entry instanceof TextureParameters) dependencies.add(new AssetDescriptor(Texture.class, ((TextureParameters) entry).path));
             }
         }
         return dependencies;
@@ -93,8 +93,8 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
     // TODO: use ModelBuilder for this part.
     // TODO: use interleaved vertices.
     @Override
-    public GraphicsModel create() {
-        GraphicsModelPart[] parts = new GraphicsModelPart[partsData.length];
+    public Model create() {
+        ModelPart[] parts = new ModelPart[partsData.length];
         for (int i = 0; i < parts.length; i++) {
             // create material
             ModelPartData partData = partsData[i];
@@ -104,23 +104,23 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
             for (Map.Entry<String, Object> materialDataEntry : materialData.attributesData.entrySet()) {
                 final String uniform = materialDataEntry.getKey();
                 final Object dataValue = materialDataEntry.getValue();
-                if (dataValue instanceof GraphicsColor) {
-                    GraphicsColor color = (GraphicsColor) dataValue;
-                    materialAttributes.put(uniform, new GraphicsColor(color.r, color.g, color.b, color.a));
+                if (dataValue instanceof Color) {
+                    Color color = (Color) dataValue;
+                    materialAttributes.put(uniform, new Color(color.r, color.g, color.b, color.a));
                 } else if (dataValue instanceof TextureParameters) {
                     TextureParameters params = (TextureParameters) dataValue;
-                    GraphicsTexture texture = AssetStore.get(params.path);
+                    Texture texture = AssetStore.get(params.path);
                     materialAttributes.put(uniform, texture);
                 } else if (dataValue instanceof Float) {
                     materialAttributes.put(uniform, dataValue);
                 }
             }
-            GraphicsModelPartMaterial material = new GraphicsModelPartMaterial(materialAttributes);
-            GraphicsModelPartMesh mesh = create(meshData);
-            parts[i] = new GraphicsModelPart(mesh, material, null);
+            ModelPartMaterial material = new ModelPartMaterial(materialAttributes);
+            ModelPartMesh mesh = create(meshData);
+            parts[i] = new ModelPart(mesh, material, null);
         }
-        final GraphicsModelArmature armature = new GraphicsModelArmature();
-        return new GraphicsModel(parts, armature);
+        final ModelArmature armature = new ModelArmature();
+        return new Model(parts, armature);
     }
 
     @Override
@@ -168,7 +168,7 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
                 modelPartMaterialData.name = name.dataString();
             }
 
-            for (CollectionsMapObjectInt.Entry<String> entry : namedTextureTypes) {
+            for (MapObjectInt.Entry<String> entry : namedTextureTypes) {
                 final String uniform = entry.key;
                 AIString path = AIString.calloc();
                 IntBuffer mapping = stack.mallocInt(1);
@@ -193,7 +193,7 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
             for (Map.Entry<String, String> colorEntry : namedColorParams.entrySet()) {
                 int result = Assimp.aiGetMaterialColor(aiMaterial, colorEntry.getValue(), Assimp.aiTextureType_NONE, 0, colour);
                 if (result == Assimp.aiReturn_SUCCESS) {
-                    modelPartMaterialData.attributesData.put(colorEntry.getKey(), new GraphicsColor(colour.r(), colour.g(), colour.b(), colour.a()));
+                    modelPartMaterialData.attributesData.put(colorEntry.getKey(), new Color(colour.r(), colour.g(), colour.b(), colour.a()));
                 }
             }
 
@@ -217,13 +217,13 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
 
     private ModelPartMeshData processMesh(final AIMesh aiMesh) {
         ModelPartMeshData meshData = new ModelPartMeshData();
-        meshData.vertexBuffers.put(GraphicsModelVertexAttribute.POSITION, getPositions(aiMesh));
-        meshData.vertexBuffers.put(GraphicsModelVertexAttribute.COLOR, getColors(aiMesh)); // TODO: change to color packed.
-        meshData.vertexBuffers.put(GraphicsModelVertexAttribute.TEXTURE_COORDINATES0, getTextureCoords0(aiMesh));
-        meshData.vertexBuffers.put(GraphicsModelVertexAttribute.TEXTURE_COORDINATES1, getTextureCoords1(aiMesh));
-        meshData.vertexBuffers.put(GraphicsModelVertexAttribute.NORMAL, getNormals(aiMesh));
-        meshData.vertexBuffers.put(GraphicsModelVertexAttribute.TANGENT, getTangents(aiMesh));
-        meshData.vertexBuffers.put(GraphicsModelVertexAttribute.BI_NORMAL, getBiNormals(aiMesh));
+        meshData.vertexBuffers.put(ModelVertexAttribute.POSITION, getPositions(aiMesh));
+        meshData.vertexBuffers.put(ModelVertexAttribute.COLOR, getColors(aiMesh)); // TODO: change to color packed.
+        meshData.vertexBuffers.put(ModelVertexAttribute.TEXTURE_COORDINATES0, getTextureCoords0(aiMesh));
+        meshData.vertexBuffers.put(ModelVertexAttribute.TEXTURE_COORDINATES1, getTextureCoords1(aiMesh));
+        meshData.vertexBuffers.put(ModelVertexAttribute.NORMAL, getNormals(aiMesh));
+        meshData.vertexBuffers.put(ModelVertexAttribute.TANGENT, getTangents(aiMesh));
+        meshData.vertexBuffers.put(ModelVertexAttribute.BI_NORMAL, getBiNormals(aiMesh));
         meshData.indices = getIndices(aiMesh);
         meshData.materialIndex = aiMesh.mMaterialIndex();
         meshData.vertexCount = getVertexCount(aiMesh);
@@ -236,11 +236,11 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
         AIVector3D min = aiAABB.mMin();
         AIVector3D max = aiAABB.mMax();
 
-        MathVector3 center = new MathVector3();
+        Vector3 center = new Vector3();
         center.add(min.x(), min.y(), min.z());
         center.add(max.x(), max.y(), max.z());
         center.scl(0.5f);
-        float radius = MathVector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+        float radius = Vector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
         return new Shape3DSphere(center, radius);
     }
 
@@ -248,11 +248,11 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
         AIAABB aiAABB = aiMesh.mAABB();
         AIVector3D min = aiAABB.mMin();
         AIVector3D max = aiAABB.mMax();
-        MathVector3 center = new MathVector3();
+        Vector3 center = new Vector3();
         center.add(min.x(), min.y(), min.z());
         center.add(max.x(), max.y(), max.z());
         center.scl(0.5f);
-        float radius = MathVector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+        float radius = Vector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
         return new Shape3DSphere(center, radius);
     }
 
@@ -367,34 +367,34 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
         return indices;
     }
 
-    private GraphicsModelPartMesh create(final ModelPartMeshData meshData) {
-        CollectionsArray<GraphicsModelVertexAttribute> attributesCollector = new CollectionsArray<>();
-        CollectionsArrayInt vbosCollector = new CollectionsArrayInt();
+    private ModelPartMesh create(final ModelPartMeshData meshData) {
+        Array<ModelVertexAttribute> attributesCollector = new Array<>();
+        ArrayInt vbosCollector = new ArrayInt();
         int vaoId = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vaoId);
         {
             storeIndicesBuffer(meshData.indices, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.POSITION, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.COLOR, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.TEXTURE_COORDINATES0, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.TEXTURE_COORDINATES1, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.NORMAL, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.TANGENT, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.BI_NORMAL, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.BONE_WEIGHT0, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.BONE_WEIGHT1, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.BONE_WEIGHT2, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.BONE_WEIGHT3, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.BONE_WEIGHT4, meshData, attributesCollector, vbosCollector);
-            storeDataInAttributeList(GraphicsModelVertexAttribute.BONE_WEIGHT5, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.POSITION, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.COLOR, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.TEXTURE_COORDINATES0, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.TEXTURE_COORDINATES1, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.NORMAL, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.TANGENT, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.BI_NORMAL, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT0, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT1, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT2, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT3, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT4, meshData, attributesCollector, vbosCollector);
+            storeDataInAttributeList(ModelVertexAttribute.BONE_WEIGHT5, meshData, attributesCollector, vbosCollector);
         }
         GL30.glBindVertexArray(0);
         final short bitmask = generateBitmask(attributesCollector);
         final int[] vbos = vbosCollector.pack().items;
-        return new GraphicsModelPartMesh(vaoId, meshData.vertexCount, bitmask,meshData.indices != null, meshData.boundingSphere, vbos);
+        return new ModelPartMesh(vaoId, meshData.vertexCount, bitmask,meshData.indices != null, meshData.boundingSphere, vbos);
     }
 
-    private void storeIndicesBuffer(int[] indices, CollectionsArrayInt vbosCollector) {
+    private void storeIndicesBuffer(int[] indices, ArrayInt vbosCollector) {
         if (indices == null) return;
         int vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vbo);
@@ -403,7 +403,7 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
         vbosCollector.add(vbo);
     }
 
-    private void storeDataInAttributeList(final GraphicsModelVertexAttribute attribute, final ModelPartMeshData meshData, CollectionsArray<GraphicsModelVertexAttribute> attributesCollector, CollectionsArrayInt vbosCollector) {
+    private void storeDataInAttributeList(final ModelVertexAttribute attribute, final ModelPartMeshData meshData, Array<ModelVertexAttribute> attributesCollector, ArrayInt vbosCollector) {
         final float[] data = (float[]) meshData.vertexBuffers.get(attribute);
         if (data == null) return;
         final int attributeNumber = attribute.ordinal();
@@ -418,9 +418,9 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
         vbosCollector.add(vbo);
     }
 
-    private short generateBitmask(final CollectionsArray<GraphicsModelVertexAttribute> attributes) {
+    private short generateBitmask(final Array<ModelVertexAttribute> attributes) {
         short bitmask = 0b0000;
-        for (final GraphicsModelVertexAttribute attribute : attributes) {
+        for (final ModelVertexAttribute attribute : attributes) {
             bitmask |= attribute.bitmask;
         }
         return bitmask;
@@ -428,7 +428,7 @@ public class AssetLoaderModel implements AssetLoader<GraphicsModel> {
 
     private static class ModelPartMeshData {
         public int vertexCount;
-        public Map<GraphicsModelVertexAttribute, Object> vertexBuffers = new HashMap<>();
+        public Map<ModelVertexAttribute, Object> vertexBuffers = new HashMap<>();
         public int materialIndex;
         public int[] indices;
         public Shape3DSphere boundingSphere;

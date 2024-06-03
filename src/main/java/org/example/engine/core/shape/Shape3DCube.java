@@ -1,35 +1,35 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.math.MathMatrix4;
-import org.example.engine.core.math.MathVector3;
+import org.example.engine.core.math.Matrix4x4;
+import org.example.engine.core.math.Vector3;
 
 // TODO: redo entire Shape2D
 public class Shape3DCube implements Shape3D_old {
 
     // for the purpose of intermediate computations
-    private static final MathVector3 vector = new MathVector3();
-    private static final MathMatrix4 mtx4 = new MathMatrix4();
+    private static final Vector3 vector = new Vector3();
+    private static final Matrix4x4 mtx4 = new Matrix4x4();
 
-    public MathMatrix4 transform;
-    private final MathVector3[] vertices;
+    public Matrix4x4 transform;
+    private final Vector3[] vertices;
 
     public Shape3DCube(float x, float y, float z,
                        float qx, float qy, float qz, float qw,
                        float sizeX, float sizeY, float sizeZ) {
-        this.transform = new MathMatrix4();
+        this.transform = new Matrix4x4();
         this.transform.setToTranslationRotationScale(x, y, z, qx, qy, qz, qw, sizeX, sizeY, sizeZ);
-        this.vertices = new MathVector3[8];
-        vertices[0] = new MathVector3(0.5f,0.5f,0.5f);
-        vertices[1] = new MathVector3(-0.5f,0.5f,0.5f);
-        vertices[2] = new MathVector3(-0.5f,-0.5f,0.5f);
-        vertices[3] = new MathVector3(0.5f,-0.5f,0.5f);
-        vertices[4] = new MathVector3(0.5f,0.5f,-0.5f);
-        vertices[5] = new MathVector3(-0.5f,0.5f,-0.5f);
-        vertices[6] = new MathVector3(-0.5f,-0.5f,-0.5f);
-        vertices[7] = new MathVector3(0.5f,-0.5f,-0.5f);
+        this.vertices = new Vector3[8];
+        vertices[0] = new Vector3(0.5f,0.5f,0.5f);
+        vertices[1] = new Vector3(-0.5f,0.5f,0.5f);
+        vertices[2] = new Vector3(-0.5f,-0.5f,0.5f);
+        vertices[3] = new Vector3(0.5f,-0.5f,0.5f);
+        vertices[4] = new Vector3(0.5f,0.5f,-0.5f);
+        vertices[5] = new Vector3(-0.5f,0.5f,-0.5f);
+        vertices[6] = new Vector3(-0.5f,-0.5f,-0.5f);
+        vertices[7] = new Vector3(0.5f,-0.5f,-0.5f);
     }
 
-    public MathVector3 computeCorner(int i, MathVector3 result) {
+    public Vector3 computeCorner(int i, Vector3 result) {
         if (i < 0 || i >= 8) throw new IllegalArgumentException("3D Cube only has 8 corners, index should be between 0 and 7. Provided: " + i);
         result.set(vertices[i]);
         return result.mul(transform);
@@ -57,7 +57,7 @@ public class Shape3DCube implements Shape3D_old {
     }
 
     @Override
-    public void update(MathMatrix4 m) {
+    public void update(Matrix4x4 m) {
 
     }
 }

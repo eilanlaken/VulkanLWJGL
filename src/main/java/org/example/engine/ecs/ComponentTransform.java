@@ -1,7 +1,7 @@
 package org.example.engine.ecs;
 
-import org.example.engine.core.math.MathMatrix4;
-import org.example.engine.core.math.MathQuaternion;
+import org.example.engine.core.math.Matrix4x4;
+import org.example.engine.core.math.Quaternion;
 
 public class ComponentTransform extends Component {
 
@@ -13,8 +13,8 @@ public class ComponentTransform extends Component {
     public float scaleX, scaleY, scaleZ;
 
     // TODO: maybe this does not belong here.
-    public MathMatrix4 local;
-    public MathMatrix4 world;
+    public Matrix4x4 local;
+    public Matrix4x4 world;
 
     public ComponentTransform(boolean isStatic, float x, float y, float z, float angleX, float angleY, float angleZ, float scaleX, float scaleY, float scaleZ) {
         super(CATEGORY);
@@ -30,12 +30,12 @@ public class ComponentTransform extends Component {
         this.scaleZ = scaleZ;
 
         // TODO: maybe remove
-        this.local = new MathMatrix4();
+        this.local = new Matrix4x4();
         computeMatrix();
     }
 
-    public MathMatrix4 computeMatrix() {
-        MathQuaternion r = new MathQuaternion();
+    public Matrix4x4 computeMatrix() {
+        Quaternion r = new Quaternion();
         r.setEulerAnglesRad(angleX, angleY, angleZ);
         return local.setToTranslationRotationScale(x,y,z,r.x,r.y,r.z,r.w,scaleX,scaleY,scaleZ);
     }

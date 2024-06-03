@@ -1,6 +1,6 @@
 package org.example.engine.core.memory;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,7 +51,7 @@ class MemoryPoolTest {
     @Test
     void freeAll() {
         MemoryPool<ClassA> aMemoryPool = new MemoryPool<>(ClassA.class, 20);
-        CollectionsArray<ClassA> array = new CollectionsArray<>(true, 5);
+        Array<ClassA> array = new Array<>(true, 5);
         for (int i = 0; i < 5; i++) {
             ClassA a = aMemoryPool.allocate();
             a.x = MathUtils.random(100);

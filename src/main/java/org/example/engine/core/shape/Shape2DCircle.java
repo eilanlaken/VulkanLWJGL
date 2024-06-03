@@ -1,21 +1,21 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 
 public class Shape2DCircle extends Shape2D {
 
-    public  final MathVector2 localCenter;
+    public  final Vector2 localCenter;
     public  final float       localRadius;
-    private final MathVector2 worldCenter;
+    private final Vector2 worldCenter;
     private float             worldRadius;
 
     public Shape2DCircle(float r, float x, float y) {
         if (r < 0) throw new ShapeException("Radius must be positive. Got: " + r);
-        this.localCenter = new MathVector2(x, y);
+        this.localCenter = new Vector2(x, y);
         this.localRadius = r;
-        this.worldCenter = new MathVector2(localCenter);
+        this.worldCenter = new Vector2(localCenter);
         this.worldRadius = r;
     }
 
@@ -34,7 +34,7 @@ public class Shape2DCircle extends Shape2D {
     }
 
     @Override
-    protected MathVector2 calculateLocalGeometryCenter() {
+    protected Vector2 calculateLocalGeometryCenter() {
         return localCenter;
     }
 
@@ -53,11 +53,11 @@ public class Shape2DCircle extends Shape2D {
         return MathUtils.PI * localRadius * localRadius;
     }
 
-    public MathVector2 getLocalCenter() {
+    public Vector2 getLocalCenter() {
         return localCenter;
     }
 
-    public MathVector2 getWorldCenter() {
+    public Vector2 getWorldCenter() {
         if (!updated) update();
         return worldCenter;
     }
@@ -72,8 +72,8 @@ public class Shape2DCircle extends Shape2D {
     }
 
     @Override
-    protected CollectionsArray<MathVector2> getWorldVertices() {
-        throw new ShapeException("Cannot get a world vertices list for " + Shape2DCircle.class.getSimpleName() + ": operation not supported. A circle: " + Shape2DCircle.class.getSimpleName() + " is only represented using a center: " + MathVector2.class.getSimpleName() + " and a radius: float.");
+    protected Array<Vector2> getWorldVertices() {
+        throw new ShapeException("Cannot get a world vertices list for " + Shape2DCircle.class.getSimpleName() + ": operation not supported. A circle: " + Shape2DCircle.class.getSimpleName() + " is only represented using a center: " + Vector2.class.getSimpleName() + " and a radius: float.");
     }
 
     @Override

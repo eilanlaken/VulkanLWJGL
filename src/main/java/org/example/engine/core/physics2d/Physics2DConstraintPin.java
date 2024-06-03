@@ -1,7 +1,7 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.collections.Array;
+import org.example.engine.core.math.Vector2;
 
 // TODO:
 /*
@@ -38,7 +38,7 @@ public abstract class Physics2DConstraintPin {
     }
 
 
-    public final void getBodies(CollectionsArray<Physics2DBody> out) {
+    public final void getBodies(Array<Physics2DBody> out) {
         out.clear();
         out.add(body_a);
         if (body_b != null) out.add(body_b);
@@ -47,7 +47,7 @@ public abstract class Physics2DConstraintPin {
     public abstract void initializeConstraints(TimeStep step);
     public abstract void solveVelocityConstraints(TimeStep step);
     public abstract boolean solvePositionConstraints(TimeStep step);
-    public abstract MathVector2 getReactionForce(float invdt);
+    public abstract Vector2 getReactionForce(float invdt);
     public abstract float getReactionTorque(float invdt);
 
     protected static float calculateReducedMass(final Physics2DBody body_a, final Physics2DBody body_b) {

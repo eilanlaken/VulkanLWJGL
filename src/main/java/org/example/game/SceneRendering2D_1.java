@@ -13,24 +13,24 @@ import java.util.Map;
 
 public class SceneRendering2D_1 extends ApplicationScreen {
 
-    private GraphicsRenderer2D renderer2D;
-    private GraphicsTexture texture0;
-    private GraphicsTextureRegion region;
-    private GraphicsCamera camera;
+    private Renderer2D renderer2D;
+    private Texture texture0;
+    private TextureRegion region;
+    private Camera camera;
 
     private ComponentGraphics2DShape shape;
     private ComponentGraphics2DShape shape2;
 
 
     public SceneRendering2D_1() {
-        renderer2D = new GraphicsRenderer2D();
+        renderer2D = new Renderer2D();
     }
 
     @Override
     public Map<String, Class<? extends MemoryResource>> getRequiredAssets() {
         Map<String, Class<? extends MemoryResource>> requiredAssets = new HashMap<>();
 
-        requiredAssets.put("assets/atlases/pack2_0.png", GraphicsTexture.class);
+        requiredAssets.put("assets/atlases/pack2_0.png", Texture.class);
 
         return requiredAssets;
     }
@@ -38,7 +38,7 @@ public class SceneRendering2D_1 extends ApplicationScreen {
     @Override
     public void show() {
         texture0 = AssetStore.get("assets/atlases/pack2_0.png");
-        region = new GraphicsTextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
+        region = new TextureRegion(texture0, 331, 25, 207, 236, 126,126, 400,400);
 
         // TODO: bug here: something is not right with the renderer: buffer limits etc.
         //shape = FactoryComponent.createShapeCircleHollow(200, 501, 30, new Color(1,0,1,1), null, null);
@@ -46,10 +46,10 @@ public class SceneRendering2D_1 extends ApplicationScreen {
         //shape = FactoryComponent.createShapeLine(0, 0, 100, 0, 2, new Color(1,0,1,1), null, null);
         //shape = FactoryComponent.createShapeRectangleFilled(100, 30, new Color(1,0,1,1), null, null);
 
-        shape = Component.createShapeCircleFilled(30, 1500, new GraphicsColor(0,0.5f,1,1), null, null);
-        shape2 = Component.createShapeCircleFilled(30, 501, new GraphicsColor(0,0.5f,1,1), null, null);
+        shape = Component.createShapeCircleFilled(30, 1500, new Color(0,0.5f,1,1), null, null);
+        shape2 = Component.createShapeCircleFilled(30, 501, new Color(0,0.5f,1,1), null, null);
 
-        camera = new GraphicsCamera(640*2,480*2, 1);
+        camera = new Camera(640*2,480*2, 1);
         camera.update();
     }
 
@@ -66,7 +66,7 @@ public class SceneRendering2D_1 extends ApplicationScreen {
         //renderer2D.pushTexture(texture0, new Color(1,1,1,1f), 0,0,1,1,0,0,256,256,256,256,0,0,0, 1, 1,null,null);
         for (int i = 0; i < 100; i++) {
             for (int j = 0; j < 100; j++) {
-                renderer2D.pushTextureRegion(region, new GraphicsColor(1,1,1,1),-350 + i*10,350 - j*10,0,0,0,0.2f,0.2f,null,null);
+                renderer2D.pushTextureRegion(region, new Color(1,1,1,1),-350 + i*10,350 - j*10,0,0,0,0.2f,0.2f,null,null);
             }
         }
         renderer2D.pushPolygon(shape.polygon, shape.tint, 0,0,0,0,0,1,1,null,null);

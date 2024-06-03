@@ -1,8 +1,8 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,10 +35,10 @@ class Shape2DTest {
             }
 
             @Override
-            protected MathVector2 calculateLocalGeometryCenter() { return null; }
+            protected Vector2 calculateLocalGeometryCenter() { return null; }
 
             @Override
-            protected CollectionsArray<MathVector2> getWorldVertices() {
+            protected Array<Vector2> getWorldVertices() {
                 return null;
             }
         };

@@ -1,11 +1,11 @@
 package org.example.engine.core.async;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.memory.MemoryPool;
 
 public abstract class AsyncTask implements MemoryPool.Reset {
 
-    protected CollectionsArray<AsyncTask> prerequisites = new CollectionsArray<>();
+    protected Array<AsyncTask> prerequisites = new Array<>();
     protected volatile boolean            inProgress    = false;
     protected volatile boolean            complete      = false;
 

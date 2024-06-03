@@ -1,30 +1,30 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 
 public class Shape2DSegment extends Shape2D {
 
-    private final MathVector2 localA;
-    private final MathVector2 localB;
-    private final MathVector2 worldA;
-    private final MathVector2 worldB;
+    private final Vector2 localA;
+    private final Vector2 localB;
+    private final Vector2 worldA;
+    private final Vector2 worldB;
 
-    private final CollectionsArray<MathVector2> worldVertices;
+    private final Array<Vector2> worldVertices;
 
     public Shape2DSegment(float x1, float y1, float x2, float y2) {
-        this.localA = new MathVector2(x1, y1);
-        this.localB = new MathVector2(x2, y2);
-        this.worldA = new MathVector2(localA);
-        this.worldB = new MathVector2(localB);
-        this.worldVertices = new CollectionsArray<>(true, 2);
+        this.localA = new Vector2(x1, y1);
+        this.localB = new Vector2(x2, y2);
+        this.worldA = new Vector2(localA);
+        this.worldB = new Vector2(localB);
+        this.worldVertices = new Array<>(true, 2);
         this.worldVertices.addAll(worldA, worldB);
     }
 
     @Override
-    protected MathVector2 calculateLocalGeometryCenter() {
-        MathVector2 center = new MathVector2();
+    protected Vector2 calculateLocalGeometryCenter() {
+        Vector2 center = new Vector2();
         center.add(localB).scl(0.5f);
         center.add(localA);
         return center;
@@ -34,8 +34,8 @@ public class Shape2DSegment extends Shape2D {
     protected float calculateUnscaledBoundingRadius() {
         float  centerX = (localA.x + localB.x) * 0.5f;
         float  centerY = (localA.y + localB.y) * 0.5f;
-        float  halfDiagonal = MathVector2.dst(localA, localB) * 0.5f;
-        return MathVector2.len(centerX, centerY) + halfDiagonal;
+        float  halfDiagonal = Vector2.dst(localA, localB) * 0.5f;
+        return Vector2.len(centerX, centerY) + halfDiagonal;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class Shape2DSegment extends Shape2D {
 
     @Override
     protected boolean containsPoint(float x, float y) {
-        return MathUtils.floatsEqual(MathVector2.dst(worldA.x, worldA.y, x, y) + MathVector2.dst(x, y, worldB.x, worldB.y), MathVector2.dst(worldA, worldB));
+        return MathUtils.floatsEqual(Vector2.dst(worldA.x, worldA.y, x, y) + Vector2.dst(x, y, worldB.x, worldB.y), Vector2.dst(worldA, worldB));
     }
 
     @Override
@@ -72,26 +72,26 @@ public class Shape2DSegment extends Shape2D {
         updated = false;
     }
 
-    public MathVector2 localA() {
+    public Vector2 localA() {
         return localA;
     }
 
-    public MathVector2 localB() {
+    public Vector2 localB() {
         return localB;
     }
 
-    public MathVector2 worldA() {
+    public Vector2 worldA() {
         if (!updated) update();
         return worldA;
     }
 
-    public MathVector2 worldB() {
+    public Vector2 worldB() {
         if (!updated) update();
         return worldB;
     }
 
     @Override
-    protected CollectionsArray<MathVector2> getWorldVertices() {
+    protected Array<Vector2> getWorldVertices() {
         return worldVertices;
     }
 

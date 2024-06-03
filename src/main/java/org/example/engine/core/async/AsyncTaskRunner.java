@@ -1,6 +1,6 @@
 package org.example.engine.core.async;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.physics2d.Physics2DException;
 
 import java.util.*;
@@ -8,7 +8,7 @@ import java.util.*;
 public class AsyncTaskRunner {
 
     public static <T extends AsyncTask> Thread[] async(T ...tasks) {
-        CollectionsArray<Thread> tThreads = new CollectionsArray<>();
+        Array<Thread> tThreads = new Array<>();
         for (T task : tasks) {
             tThreads.add(async(task));
         }
@@ -16,7 +16,7 @@ public class AsyncTaskRunner {
     }
 
     public static <T extends AsyncTask> Thread[] async(Iterable<T> tasks) {
-        CollectionsArray<Thread> tThreads = new CollectionsArray<>();
+        Array<Thread> tThreads = new Array<>();
         for (AsyncTask task : tasks) {
             tThreads.add(async(task));
         }

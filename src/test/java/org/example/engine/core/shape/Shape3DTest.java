@@ -1,8 +1,8 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector3;
+import org.example.engine.core.math.Vector3;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ class Shape3DTest {
             }
 
             @Override
-            protected CollectionsArray<MathVector3> getWorldVertices() {
+            protected Array<Vector3> getWorldVertices() {
                 return null;
             }
 

@@ -1,8 +1,8 @@
 package org.example.engine.core.async;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.collections.CollectionsArrayFloat;
-import org.example.engine.core.collections.CollectionsArrayFloatConcurrent;
+import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.ArrayFloat;
+import org.example.engine.core.collections.ArrayFloatConcurrent;
 import org.example.engine.core.math.MathUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 
 class AsyncTaskRunnerTest {
 
-    private static CollectionsArrayFloat           arrayFloat  = new CollectionsArrayFloat();
-    private static CollectionsArrayFloat           arrayFloat2 = new CollectionsArrayFloat();
-    private static CollectionsArrayFloatConcurrent arrayFloat3 = new CollectionsArrayFloatConcurrent();
+    private static ArrayFloat arrayFloat  = new ArrayFloat();
+    private static ArrayFloat arrayFloat2 = new ArrayFloat();
+    private static ArrayFloatConcurrent arrayFloat3 = new ArrayFloatConcurrent();
 
     @BeforeEach
     private void setup() {
@@ -280,7 +280,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        CollectionsArray<AsyncTask> tasks = new CollectionsArray<>();
+        Array<AsyncTask> tasks = new Array<>();
         tasks.addAll(a1, a2, a3);
         AsyncTaskRunner.execute(tasks);
 
@@ -318,7 +318,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        CollectionsArray<AsyncTask> tasks = new CollectionsArray<>();
+        Array<AsyncTask> tasks = new Array<>();
         tasks.addAll(a1, a2, a3);
         AsyncTaskRunner.execute(tasks);
 
@@ -356,7 +356,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        CollectionsArray<AsyncTask> tasks = new CollectionsArray<>();
+        Array<AsyncTask> tasks = new Array<>();
         tasks.addAll(a1, a2, a3);
         AsyncTaskRunner.execute(tasks);
 
@@ -394,7 +394,7 @@ class AsyncTaskRunnerTest {
             }
         };
 
-        CollectionsArray<AsyncTask> tasks = new CollectionsArray<>();
+        Array<AsyncTask> tasks = new Array<>();
         tasks.addAll(a2, a3);
         AsyncTaskRunner.execute(tasks);
 

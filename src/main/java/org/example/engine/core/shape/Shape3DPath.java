@@ -1,6 +1,6 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.math.MathMatrix4;
+import org.example.engine.core.math.Matrix4x4;
 
 // TODO: redo entire Shape2D
 public class Shape3DPath implements Shape3D_old {
@@ -21,7 +21,7 @@ public class Shape3DPath implements Shape3D_old {
     }
 
     @Override
-    public void update(MathMatrix4 m) {
+    public void update(Matrix4x4 m) {
 
     }
 }

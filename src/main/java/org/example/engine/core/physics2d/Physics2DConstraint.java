@@ -1,6 +1,6 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 
 // TODO:
 /*
@@ -39,7 +39,7 @@ public abstract class Physics2DConstraint {
     }
 
 
-    public final void getBodies(CollectionsArray<Physics2DBody> out) {
+    public final void getBodies(Array<Physics2DBody> out) {
         out.clear();
         out.add(body1);
         if (body2 != null) out.add(body2);

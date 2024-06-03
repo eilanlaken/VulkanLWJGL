@@ -1,8 +1,8 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.NotNull;
@@ -56,8 +56,8 @@ public final class Physics2DCollisionDetection {
         final Shape2DCircle c1 = (Shape2DCircle) a;
         final Shape2DCircle c2 = (Shape2DCircle) b;
 
-        MathVector2 c2Center = c2.geometryCenter();
-        MathVector2 c1Center = c1.geometryCenter();
+        Vector2 c2Center = c2.geometryCenter();
+        Vector2 c1Center = c1.geometryCenter();
         final float dx = c2Center.x - c1Center.x;
         final float dy = c2Center.y - c1Center.y;
 
@@ -88,38 +88,38 @@ public final class Physics2DCollisionDetection {
         Shape2DCircle    circle = (Shape2DCircle)    a;
         Shape2DRectangle rect   = (Shape2DRectangle) b;
 
-        MathVector2 circleWorldCenter = circle.getWorldCenter();
-        MathVector2 c1 = rect.c0();
-        MathVector2 c2 = rect.c1();
-        MathVector2 c3 = rect.c2();
-        MathVector2 c4 = rect.c3();
+        Vector2 circleWorldCenter = circle.getWorldCenter();
+        Vector2 c1 = rect.c0();
+        Vector2 c2 = rect.c1();
+        Vector2 c3 = rect.c2();
+        Vector2 c4 = rect.c3();
 
         float dx1 = c2.x - c1.x;
         float dy1 = c2.y - c1.y;
         if (MathUtils.isZero(dx1) && MathUtils.isZero(dy1)) return null;
-        float scale1 = MathVector2.dot(circleWorldCenter.x - c1.x, circleWorldCenter.y - c1.y, dx1, dy1) / MathVector2.len2(dx1, dy1);
-        MathVector2 projection1 = new MathVector2(dx1, dy1).scl(scale1).add(c1);
+        float scale1 = Vector2.dot(circleWorldCenter.x - c1.x, circleWorldCenter.y - c1.y, dx1, dy1) / Vector2.len2(dx1, dy1);
+        Vector2 projection1 = new Vector2(dx1, dy1).scl(scale1).add(c1);
         projection1.clamp(c1, c2);
 
         float dx2 = c3.x - c2.x;
         float dy2 = c3.y - c2.y;
         if (MathUtils.isZero(dx2) && MathUtils.isZero(dy2)) return null;
-        float scale2 = MathVector2.dot(circleWorldCenter.x - c2.x, circleWorldCenter.y - c2.y, dx2, dy2) / MathVector2.len2(dx2, dy2);
-        MathVector2 projection2 = new MathVector2(dx2, dy2).scl(scale2).add(c2);
+        float scale2 = Vector2.dot(circleWorldCenter.x - c2.x, circleWorldCenter.y - c2.y, dx2, dy2) / Vector2.len2(dx2, dy2);
+        Vector2 projection2 = new Vector2(dx2, dy2).scl(scale2).add(c2);
         projection2.clamp(c2, c3);
 
         float dx3 = c4.x - c3.x;
         float dy3 = c4.y - c3.y;
         if (MathUtils.isZero(dx3) && MathUtils.isZero(dy3)) return null;
-        float scale3 = MathVector2.dot(circleWorldCenter.x - c3.x, circleWorldCenter.y - c3.y, dx3, dy3) / MathVector2.len2(dx3, dy3);
-        MathVector2 projection3 = new MathVector2(dx3, dy3).scl(scale3).add(c3);
+        float scale3 = Vector2.dot(circleWorldCenter.x - c3.x, circleWorldCenter.y - c3.y, dx3, dy3) / Vector2.len2(dx3, dy3);
+        Vector2 projection3 = new Vector2(dx3, dy3).scl(scale3).add(c3);
         projection3.clamp(c3, c4);
 
         float dx4 = c1.x - c4.x;
         float dy4 = c1.y - c4.y;
         if (MathUtils.isZero(dx4) && MathUtils.isZero(dy4)) return null;
-        float scale4 = MathVector2.dot(circleWorldCenter.x - c4.x, circleWorldCenter.y - c4.y, dx4, dy4) / MathVector2.len2(dx4, dy4);
-        MathVector2 projection4 = new MathVector2(dx4, dy4).scl(scale4).add(c4);
+        float scale4 = Vector2.dot(circleWorldCenter.x - c4.x, circleWorldCenter.y - c4.y, dx4, dy4) / Vector2.len2(dx4, dy4);
+        Vector2 projection4 = new Vector2(dx4, dy4).scl(scale4).add(c4);
         projection4.clamp(c4, c1);
 
         final boolean rectContainsCenter = rect.contains(circleWorldCenter);
@@ -133,14 +133,14 @@ public final class Physics2DCollisionDetection {
         if (!collide) return null;
 
         // create manifold
-        final float dstEdge1Squared = MathVector2.dst2(circleWorldCenter, projection1);
-        final float dstEdge2Squared = MathVector2.dst2(circleWorldCenter, projection2);
-        final float dstEdge3Squared = MathVector2.dst2(circleWorldCenter, projection3);
-        final float dstEdge4Squared = MathVector2.dst2(circleWorldCenter, projection4);
+        final float dstEdge1Squared = Vector2.dst2(circleWorldCenter, projection1);
+        final float dstEdge2Squared = Vector2.dst2(circleWorldCenter, projection2);
+        final float dstEdge3Squared = Vector2.dst2(circleWorldCenter, projection3);
+        final float dstEdge4Squared = Vector2.dst2(circleWorldCenter, projection4);
 
         final float minDstEdgeSquared = MathUtils.min(dstEdge1Squared, dstEdge2Squared, dstEdge3Squared, dstEdge4Squared);
 
-        MathVector2 projection;
+        Vector2 projection;
         if (MathUtils.floatsEqual(minDstEdgeSquared, dstEdge1Squared)) {
             projection = projection1;
         } else if (MathUtils.floatsEqual(minDstEdgeSquared, dstEdge2Squared)) {
@@ -189,17 +189,17 @@ public final class Physics2DCollisionDetection {
         Shape2DRectangle rect_1 = (Shape2DRectangle) a;
         Shape2DRectangle rect_2 = (Shape2DRectangle) b;
 
-        MathVector2 T = new MathVector2(rect_2.x() - rect_1.x(),rect_2.y() - rect_1.y());
+        Vector2 T = new Vector2(rect_2.x() - rect_1.x(),rect_2.y() - rect_1.y());
         float wa = rect_1.getWidth() * 0.5f;
         float ha = rect_1.getHeight() * 0.5f;
         float wb = rect_2.getWidth() * 0.5f;
         float hb = rect_2.getHeight() * 0.5f;
 
-        MathVector2 L  = new MathVector2();
-        MathVector2 Ax = new MathVector2(rect_1.c2()).sub(rect_1.c1()).nor();
-        MathVector2 Ay = new MathVector2(rect_1.c3()).sub(rect_1.c2()).nor();
-        MathVector2 Bx = new MathVector2(rect_2.c2()).sub(rect_2.c1()).nor();
-        MathVector2 By = new MathVector2(rect_2.c3()).sub(rect_2.c2()).nor();
+        Vector2 L  = new Vector2();
+        Vector2 Ax = new Vector2(rect_1.c2()).sub(rect_1.c1()).nor();
+        Vector2 Ay = new Vector2(rect_1.c3()).sub(rect_1.c2()).nor();
+        Vector2 Bx = new Vector2(rect_2.c2()).sub(rect_2.c1()).nor();
+        Vector2 By = new Vector2(rect_2.c3()).sub(rect_2.c2()).nor();
 
         float minOverlap = Float.POSITIVE_INFINITY;
         float nx = 0, ny = 0;
@@ -283,17 +283,17 @@ public final class Physics2DCollisionDetection {
         return manifold;
     }
 
-    private void setContactPoints(CollectionsArray<MathVector2> verticesA, CollectionsArray<MathVector2> verticesB, Physics2DWorld.CollisionManifold manifold) {
-        CollectionsArray<Projection> projections = new CollectionsArray<>();
+    private void setContactPoints(Array<Vector2> verticesA, Array<Vector2> verticesB, Physics2DWorld.CollisionManifold manifold) {
+        Array<Projection> projections = new Array<>();
 
         // first polygon vs second
-        for (MathVector2 point : verticesA) {
+        for (Vector2 point : verticesA) {
             Projection p = getClosestProjection(point, verticesB);
             projections.add(p);
         }
 
         // second polygon vs first
-        for (MathVector2 point : verticesB) {
+        for (Vector2 point : verticesB) {
             Projection p = getClosestProjection(point, verticesA);
             projections.add(p);
         }
@@ -314,20 +314,20 @@ public final class Physics2DCollisionDetection {
         projectionsPool.freeAll(projections);
     }
 
-    private Projection getClosestProjection(MathVector2 point, CollectionsArray<MathVector2> vertices) {
+    private Projection getClosestProjection(Vector2 point, Array<Vector2> vertices) {
         float minDst2 = Float.MAX_VALUE;
         float px = Float.NaN;
         float py = Float.NaN;
         for (int i = 0; i < vertices.size; i++) {
-            MathVector2 tail = vertices.getCyclic(i);
-            MathVector2 head = vertices.getCyclic(i + 1);
+            Vector2 tail = vertices.getCyclic(i);
+            Vector2 head = vertices.getCyclic(i + 1);
             float dx = head.x - tail.x;
             float dy = head.y - tail.y;
             if (MathUtils.isZero(dx) && MathUtils.isZero(dy)) continue;
-            float scale = MathVector2.dot(point.x - tail.x, point.y - tail.y, dx, dy) / MathVector2.len2(dx, dy);
-            MathVector2 projectedPoint = new MathVector2(dx, dy).scl(scale).add(tail);
+            float scale = Vector2.dot(point.x - tail.x, point.y - tail.y, dx, dy) / Vector2.len2(dx, dy);
+            Vector2 projectedPoint = new Vector2(dx, dy).scl(scale).add(tail);
             projectedPoint.clamp(tail, head);
-            float dst2 = MathVector2.dst2(point, projectedPoint);
+            float dst2 = Vector2.dst2(point, projectedPoint);
             if (dst2 <= minDst2) {
                 minDst2 = dst2;
                 px = projectedPoint.x;

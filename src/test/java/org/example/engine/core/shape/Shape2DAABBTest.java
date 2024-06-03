@@ -1,7 +1,5 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArrayFloat;
-import org.example.engine.core.collections.CollectionsArrayFloatConcurrent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

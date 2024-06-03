@@ -1,9 +1,9 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.graphics.GraphicsShaderProgram;
+import org.example.engine.core.collections.Array;
+import org.example.engine.core.graphics.ShaderProgram;
 
-public class AssetLoaderShaderProgram implements AssetLoader<GraphicsShaderProgram> {
+public class AssetLoaderShaderProgram implements AssetLoader<ShaderProgram> {
 
     private String vertexShaderSrc;
     private String fragmentShaderSrc;
@@ -15,12 +15,12 @@ public class AssetLoaderShaderProgram implements AssetLoader<GraphicsShaderProgr
     }
 
     @Override
-    public GraphicsShaderProgram create() {
-        return new GraphicsShaderProgram(vertexShaderSrc, fragmentShaderSrc);
+    public ShaderProgram create() {
+        return new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
     }
 
     @Override
-    public CollectionsArray<AssetDescriptor> getDependencies() {
+    public Array<AssetDescriptor> getDependencies() {
         return null;
     }
 

@@ -1,10 +1,10 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.collections.CollectionsTuple2;
+import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.Tuple2;
 import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -18,17 +18,17 @@ public class Shape2DPolygon extends Shape2D {
     public  final int[]   holes;
     public  final boolean hasHoles;
 
-    private final CollectionsArray<CollectionsTuple2<Integer, Integer>> loops;
-    private final CollectionsArray<MathVector2>                         worldVertices;
+    private final Array<Tuple2<Integer, Integer>> loops;
+    private final Array<Vector2> worldVertices;
 
     Shape2DPolygon(int[] indices, float[] vertices) {
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
         this.vertexCount = vertices.length / 2;
         this.vertices = vertices;
-        this.worldVertices = new CollectionsArray<>(true, vertexCount);
+        this.worldVertices = new Array<>(true, vertexCount);
         for (int i = 0; i < vertexCount; i++) {
-            this.worldVertices.add(new MathVector2());
+            this.worldVertices.add(new Vector2());
         }
         this.indices = indices;
         this.isConvex = ShapeUtils.isPolygonConvex(vertices);
@@ -52,9 +52,9 @@ public class Shape2DPolygon extends Shape2D {
         if (holes != null && !CollectionsUtils.isSorted(holes, true)) Arrays.sort(holes);
         this.vertexCount = vertices.length / 2;
         this.vertices = vertices;
-        this.worldVertices = new CollectionsArray<>(true, vertexCount);
+        this.worldVertices = new Array<>(true, vertexCount);
         for (int i = 0; i < vertexCount; i++) {
-            this.worldVertices.add(new MathVector2());
+            this.worldVertices.add(new Vector2());
         }
         try {
             this.indices = ShapeUtils.triangulatePolygon(this.vertices, holes, 2);
@@ -68,8 +68,8 @@ public class Shape2DPolygon extends Shape2D {
     }
 
     @Override
-    protected MathVector2 calculateLocalGeometryCenter() {
-        MathVector2 center = new MathVector2();
+    protected Vector2 calculateLocalGeometryCenter() {
+        Vector2 center = new Vector2();
         if (!hasHoles) {
             for (int i = 0; i < vertices.length - 1; i += 2) {
                 center.add(vertices[i], vertices[i + 1]);
@@ -89,7 +89,7 @@ public class Shape2DPolygon extends Shape2D {
                 float x3 = vertices[v3];
                 float y3 = vertices[v3 + 1];
 
-                MathVector2 triangleCenter = new MathVector2((x1 + x2 + x3) / 3, (y1 + y2 + y3) / 3);
+                Vector2 triangleCenter = new Vector2((x1 + x2 + x3) / 3, (y1 + y2 + y3) / 3);
                 center.add(triangleCenter);
             }
             center.scl(1f / (indices.length - 2));
@@ -142,7 +142,7 @@ public class Shape2DPolygon extends Shape2D {
     }
 
     @Override
-    protected CollectionsArray<MathVector2> getWorldVertices() {
+    protected Array<Vector2> getWorldVertices() {
         return worldVertices;
     }
 
@@ -150,8 +150,8 @@ public class Shape2DPolygon extends Shape2D {
     @Override
     protected boolean containsPoint(float x, float y) {
         boolean inside = false;
-        MathVector2 tail = new MathVector2();
-        MathVector2 head = new MathVector2();
+        Vector2 tail = new Vector2();
+        Vector2 head = new Vector2();
         for (int i = 0; i < worldVertices.size; i++) {
             getWorldEdge(i, tail, head);
             float x1 = tail.x;
@@ -164,11 +164,11 @@ public class Shape2DPolygon extends Shape2D {
         return inside;
     }
 
-    public void getWorldEdge(int index, @NotNull MathVector2 tail, @NotNull MathVector2 head) {
+    public void getWorldEdge(int index, @NotNull Vector2 tail, @NotNull Vector2 head) {
         if (!updated) update();
         int next = (index + 1) % vertexCount;
         if (hasHoles) {
-            for (CollectionsTuple2<Integer, Integer> loop : loops) {
+            for (Tuple2<Integer, Integer> loop : loops) {
                 if (index == loop.t2) next = loop.t1;
             }
         }

@@ -1,9 +1,9 @@
 package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
-import org.example.engine.core.graphics.GraphicsCamera;
-import org.example.engine.core.graphics.GraphicsColor;
-import org.example.engine.core.graphics.GraphicsRenderer2D;
+import org.example.engine.core.graphics.Camera;
+import org.example.engine.core.graphics.Color;
+import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.ecs.Component;
@@ -15,8 +15,8 @@ import java.util.Map;
 
 public class SceneRendering2D_8 extends ApplicationScreen {
 
-    private GraphicsRenderer2D renderer2D;
-    private GraphicsCamera camera;
+    private Renderer2D renderer2D;
+    private Camera camera;
 
     private ComponentGraphics2DShape shape;
     private ComponentGraphics2DShape shape2;
@@ -24,7 +24,7 @@ public class SceneRendering2D_8 extends ApplicationScreen {
 
 
     public SceneRendering2D_8() {
-        renderer2D = new GraphicsRenderer2D();
+        renderer2D = new Renderer2D();
     }
 
     @Override
@@ -37,11 +37,11 @@ public class SceneRendering2D_8 extends ApplicationScreen {
     @Override
     public void show() {
 
-        shape = Component.createShapeCircleFilled(30, 400, 0,90, new GraphicsColor(0,0.5f,1,1), null, null);
-        shape2 = Component.createShapeCircleHollow(300, 50, 4,0, 30, new GraphicsColor(0,0.5f,1,1), null, null);
-        shape3 = Component.createShapeCurve(-300, 300, 20,100, x -> 400 * MathUtils.sinDeg(x), new GraphicsColor(0,0.5f,1,1), null, null);
+        shape = Component.createShapeCircleFilled(30, 400, 0,90, new Color(0,0.5f,1,1), null, null);
+        shape2 = Component.createShapeCircleHollow(300, 50, 4,0, 30, new Color(0,0.5f,1,1), null, null);
+        shape3 = Component.createShapeCurve(-300, 300, 20,100, x -> 400 * MathUtils.sinDeg(x), new Color(0,0.5f,1,1), null, null);
 
-        camera = new GraphicsCamera(640*2,480*2, 1);
+        camera = new Camera(640*2,480*2, 1);
         camera.update();
     }
 

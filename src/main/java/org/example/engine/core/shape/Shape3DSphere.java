@@ -1,25 +1,25 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.math.MathMatrix4;
-import org.example.engine.core.math.MathVector3;
+import org.example.engine.core.math.Matrix4x4;
+import org.example.engine.core.math.Vector3;
 
 // TODO: redo entire Shape2D
 public class Shape3DSphere implements Shape3D_old {
 
-    public final MathVector3 center;
+    public final Vector3 center;
     public final float radius;
-    public MathVector3 translatedCenter;
+    public Vector3 translatedCenter;
     public float scaledRadius;
 
-    public Shape3DSphere(MathVector3 center, float radius) {
-        this.center = new MathVector3(center);
+    public Shape3DSphere(Vector3 center, float radius) {
+        this.center = new Vector3(center);
         this.radius = radius;
-        this.translatedCenter = new MathVector3(this.center);
+        this.translatedCenter = new Vector3(this.center);
         this.scaledRadius = radius;
     }
 
     public Shape3DSphere(float x, float y, float z, float radius) {
-        this.center = new MathVector3(x,y,z);
+        this.center = new Vector3(x,y,z);
         this.radius = radius;
     }
 
@@ -48,7 +48,7 @@ public class Shape3DSphere implements Shape3D_old {
     }
 
     @Override
-    public void update(MathMatrix4 m) {
+    public void update(Matrix4x4 m) {
 
     }
 }

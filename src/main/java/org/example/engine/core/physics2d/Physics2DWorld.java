@@ -1,9 +1,9 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.graphics.GraphicsRenderer2D;
+import org.example.engine.core.collections.Array;
+import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.*;
 import org.jetbrains.annotations.Contract;
@@ -51,29 +51,29 @@ public class Physics2DWorld {
     // bodies
     private int                             bodiesCreated      = 0;
     public  int                             positionIterations = 2;
-    public  CollectionsArray<Physics2DBody> allBodies          = new CollectionsArray<>(false, 500);
-    public  CollectionsArray<Physics2DBody> bodiesToAdd        = new CollectionsArray<>(false, 100);
-    public  CollectionsArray<Physics2DBody> bodiesToRemove     = new CollectionsArray<>(false, 500);
+    public Array<Physics2DBody> allBodies          = new Array<>(false, 500);
+    public Array<Physics2DBody> bodiesToAdd        = new Array<>(false, 100);
+    public Array<Physics2DBody> bodiesToRemove     = new Array<>(false, 500);
 
     // forces
-    public CollectionsArray<Physics2DForceField> allForceFields      = new CollectionsArray<>(false, 4);
-    public CollectionsArray<Physics2DForceField> forceFieldsToAdd    = new CollectionsArray<>(false, 2);
-    public CollectionsArray<Physics2DForceField> forceFieldsToRemove = new CollectionsArray<>(false, 2);
+    public Array<Physics2DForceField> allForceFields      = new Array<>(false, 4);
+    public Array<Physics2DForceField> forceFieldsToAdd    = new Array<>(false, 2);
+    public Array<Physics2DForceField> forceFieldsToRemove = new Array<>(false, 2);
 
     // constraints
     public int                                   velocityIterations  = 6;
-    public CollectionsArray<Physics2DConstraint> allConstraints      = new CollectionsArray<>(false, 10);
-    public CollectionsArray<Physics2DConstraint> constraintsToAdd    = new CollectionsArray<>(false, 5);
-    public CollectionsArray<Physics2DConstraint> constraintsToRemove = new CollectionsArray<>(false, 5);
+    public Array<Physics2DConstraint> allConstraints      = new Array<>(false, 10);
+    public Array<Physics2DConstraint> constraintsToAdd    = new Array<>(false, 5);
+    public Array<Physics2DConstraint> constraintsToRemove = new Array<>(false, 5);
 
     // collision detection
-    private final CollectionsArray<Cell>      spacePartition      = new CollectionsArray<>(false, 1024);
-    private final CollectionsArray<Cell>      activeCells         = new CollectionsArray<>();
+    private final Array<Cell> spacePartition      = new Array<>(false, 1024);
+    private final Array<Cell> activeCells         = new Array<>();
     private final Set<CollisionPair>          collisionCandidates = new HashSet<>();
     private final Physics2DCollisionDetection collisionDetection  = new Physics2DCollisionDetection(this);
 
     // collision resolution
-    private final CollectionsArray<CollisionManifold> manifolds = new CollectionsArray<>(false, 20);
+    private final Array<CollisionManifold> manifolds = new Array<>(false, 20);
     private final Physics2DCollisionResolver          collisionResolver;
 
     // ray casting
@@ -81,7 +81,7 @@ public class Physics2DWorld {
     final HashMap<Ray, RayHitCallback>   allRays       = new HashMap<>(4);
     final HashMap<Ray, RayHitCallback>   raysToAdd     = new HashMap<>(4);
     final HashMap<Ray, RayHitCallback>   raysToRemove  = new HashMap<>(4);
-    final CollectionsArray<Intersection> intersections = new CollectionsArray<>(false, 10);
+    final Array<Intersection> intersections = new Array<>(false, 10);
 
     // debugger options
     private final Physics2DWorldRenderer debugRenderer     = new Physics2DWorldRenderer(this);
@@ -141,7 +141,7 @@ public class Physics2DWorld {
 
         /* preparation: add and remove constraints */
         {
-            CollectionsArray<Physics2DBody> constraintBodies = new CollectionsArray<>();
+            Array<Physics2DBody> constraintBodies = new Array<>();
             for (Physics2DConstraint constraint : constraintsToAdd) {
                 constraint.getBodies(constraintBodies);
                 boolean ready = true;
@@ -171,7 +171,7 @@ public class Physics2DWorld {
                 if (body.off) continue;
                 if (body.motionType == Physics2DBody.MotionType.NEWTONIAN) {
                     for (Physics2DForceField field : allForceFields) {
-                        MathVector2 force = new MathVector2();
+                        Vector2 force = new Vector2();
                         field.calculateForce(body, force);
                         body.netForce.add(force);
                     }
@@ -351,7 +351,7 @@ public class Physics2DWorld {
                 if (ray.dst == Float.POSITIVE_INFINITY || Float.isNaN(ray.dst)) {
 
                 }
-                CollectionsArray<Intersection> results = new CollectionsArray<>();
+                Array<Intersection> results = new Array<>();
                 // TODO: optimize this using the cell grid.
                 rayCasting.calculateIntersections(ray, allBodies, results);
                 intersections.addAll(results);
@@ -519,10 +519,10 @@ public class Physics2DWorld {
     }
 
     @Contract(pure = true)
-    @NotNull public Physics2DForceField createForceField(BiConsumer<Physics2DBody, MathVector2> forceFunction) {
+    @NotNull public Physics2DForceField createForceField(BiConsumer<Physics2DBody, Vector2> forceFunction) {
         Physics2DForceField forceField = new Physics2DForceField(this) {
             @Override
-            public void calculateForce(Physics2DBody body, MathVector2 out) {
+            public void calculateForce(Physics2DBody body, Vector2 out) {
                 forceFunction.accept(body, out);
             }
         };
@@ -541,7 +541,7 @@ public class Physics2DWorld {
 
     /* Constraints API */
 
-    @Deprecated public Physics2DConstraintWeld_old createConstraintWeld(Physics2DBody body_a, Physics2DBody body_b, MathVector2 anchor) {
+    @Deprecated public Physics2DConstraintWeld_old createConstraintWeld(Physics2DBody body_a, Physics2DBody body_b, Vector2 anchor) {
         if (body_a == body_b) throw new Physics2DException("Cannot weld object to itself.");
         Physics2DConstraintWeld_old weld = new Physics2DConstraintWeld_old(body_a, body_b, anchor);
         constraintsToAdd.add(weld);
@@ -565,7 +565,7 @@ public class Physics2DWorld {
         Ray ray = raysPool.allocate();
         ray.originX = originX;
         ray.originY = originY;
-        float len = MathVector2.len(dirX, dirY);
+        float len = Vector2.len(dirX, dirY);
         boolean zero = MathUtils.isZero(dirX) && MathUtils.isZero(dirY);
         ray.dirX = zero ? 1 : dirX / len;
         ray.dirY = zero ? 0 : dirY / len;
@@ -577,7 +577,7 @@ public class Physics2DWorld {
         Ray ray = raysPool.allocate();
         ray.originX = originX;
         ray.originY = originY;
-        float len = MathVector2.len(dirX, dirY);
+        float len = Vector2.len(dirX, dirY);
         boolean zero = MathUtils.isZero(dirX) && MathUtils.isZero(dirY);
         ray.dirX = zero ? 1 : dirX / len;
         ray.dirY = zero ? 0 : dirY / len;
@@ -589,13 +589,13 @@ public class Physics2DWorld {
 
     }
 
-    public void render(GraphicsRenderer2D renderer) {
+    public void render(Renderer2D renderer) {
         debugRenderer.render(renderer);
     }
 
     public interface RayHitCallback {
 
-        void intersected(final CollectionsArray<Intersection> results);
+        void intersected(final Array<Intersection> results);
 
     }
 
@@ -607,9 +607,9 @@ public class Physics2DWorld {
         public Shape2D       shape_b       = null;
         public int           contacts      = 0;
         public float         depth         = 0;
-        public MathVector2   normal        = new MathVector2();
-        public MathVector2   contactPoint1 = new MathVector2();
-        public MathVector2   contactPoint2 = new MathVector2();
+        public Vector2 normal        = new Vector2();
+        public Vector2 contactPoint1 = new Vector2();
+        public Vector2 contactPoint2 = new Vector2();
 
         @Override
         public void reset() {
@@ -620,7 +620,7 @@ public class Physics2DWorld {
 
     public static final class Cell implements MemoryPool.Reset {
 
-        private final CollectionsArray<Physics2DBody> bodies = new CollectionsArray<>(false, 2);
+        private final Array<Physics2DBody> bodies = new Array<>(false, 2);
 
         private boolean active = false;
 
@@ -688,8 +688,8 @@ public class Physics2DWorld {
     public static class Intersection implements MemoryPool.Reset {
 
         public Physics2DBody body      = null;
-        public MathVector2   point     = new MathVector2();
-        public MathVector2   direction = new MathVector2();
+        public Vector2 point     = new Vector2();
+        public Vector2 direction = new Vector2();
         public float         dst2      = 0;
 
         public Intersection() {}

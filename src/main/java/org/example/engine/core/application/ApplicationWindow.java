@@ -1,6 +1,6 @@
 package org.example.engine.core.application;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.BufferUtils;
@@ -28,7 +28,7 @@ public class ApplicationWindow implements MemoryResource {
     public ApplicationWindowAttributes attributes;
 
     private boolean focused = false;
-    private CollectionsArray<String> filesDraggedAndDropped = new CollectionsArray<>();
+    private Array<String> filesDraggedAndDropped = new Array<>();
     private int latestFilesDraggedAndDroppedCount = 0;
     private volatile int backBufferWidth;
     private volatile int backBufferHeight;
@@ -36,7 +36,7 @@ public class ApplicationWindow implements MemoryResource {
     private volatile int logicalHeight;
 
     // state management
-    private CollectionsArray<Runnable> tasks = new CollectionsArray<>();
+    private Array<Runnable> tasks = new Array<>();
     private boolean requestRendering = false;
     private ApplicationScreen screen;
 
@@ -298,7 +298,7 @@ public class ApplicationWindow implements MemoryResource {
         return focused;
     }
 
-    public CollectionsArray<String> getFilesDraggedAndDropped() {
+    public Array<String> getFilesDraggedAndDropped() {
         return filesDraggedAndDropped;
     }
 

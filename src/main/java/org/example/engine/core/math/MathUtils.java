@@ -2,7 +2,7 @@ package org.example.engine.core.math;
 
 import java.util.Random;
 
-import static org.example.engine.core.math.MathMatrix3.*;
+import static org.example.engine.core.math.Matrix3x3.*;
 
 // TODO: implement init() block that will take care of configuration.
 public final class MathUtils {
@@ -274,10 +274,10 @@ public final class MathUtils {
      * <p style="white-space: pre;"> Ax = B
      * Multiply by A<sup>-1</sup> on both sides
      * x = A<sup>-1</sup>B</p>
-     * @param B the B {@link MathVector3}
-     * @return {@link MathVector3} the x vector
+     * @param B the B {@link Vector3}
+     * @return {@link Vector3} the x vector
      */
-    public static void solve33(MathMatrix3 A, MathVector3 B, MathVector3 out) {
+    public static void solve33(Matrix3x3 A, Vector3 B, Vector3 out) {
         // get the determinant
         float detInv = A.det();
         // check for zero determinant
@@ -309,10 +309,10 @@ public final class MathUtils {
      * <p style="white-space: pre;"> Ax = b
      * Multiply by A<sup>-1</sup> on both sides
      * x = A<sup>-1</sup>b</p>
-     * @param b the b {@link MathVector2}
-     * @return {@link MathVector2} the x vector
+     * @param b the b {@link Vector2}
+     * @return {@link Vector2} the x vector
      */
-    public static void solve22(MathMatrix3 A, MathVector2 b, MathVector2 out) {
+    public static void solve22(Matrix3x3 A, Vector2 b, Vector2 out) {
         // get the 2D determinant
         float det = A.val[M00] * A.val[M11] - A.val[M01] * A.val[M10];
         // check for zero determinant

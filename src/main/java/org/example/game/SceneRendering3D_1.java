@@ -5,7 +5,7 @@ import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
-import org.example.engine.core.math.MathMatrix4;
+import org.example.engine.core.math.Matrix4x4;
 import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.ecs.Component;
 import org.example.engine.ecs.ComponentTransform;
@@ -16,22 +16,22 @@ import java.util.Map;
 
 public class SceneRendering3D_1 extends ApplicationScreen {
 
-    private GraphicsRenderer3D renderer3DOld;
-    private GraphicsModel model;
-    private GraphicsShaderProgram shader;
+    private Renderer3D renderer3DOld;
+    private Model model;
+    private ShaderProgram shader;
     private ComponentTransform transform;
-    private GraphicsCamera camera;
+    private Camera camera;
 
 
     public SceneRendering3D_1() {
-        this.renderer3DOld = new GraphicsRenderer3D();
+        this.renderer3DOld = new Renderer3D();
 
         final String vertexShaderSrc = AssetUtils.getFileContent("assets/shaders/default.vert");
         final String fragmentShaderSrc = AssetUtils.getFileContent("assets/shaders/default.frag");
-        this.shader = new GraphicsShaderProgram(vertexShaderSrc, fragmentShaderSrc);
+        this.shader = new ShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
 
-        this.camera = new GraphicsCamera(100, 100, 1, 0.1f, 100, 70);
+        this.camera = new Camera(100, 100, 1, 0.1f, 100, 70);
 
     }
 
@@ -39,7 +39,7 @@ public class SceneRendering3D_1 extends ApplicationScreen {
     public Map<String, Class<? extends MemoryResource>> getRequiredAssets() {
         Map<String, Class<? extends MemoryResource>> requiredAssets = new HashMap<>();
 
-        requiredAssets.put("assets/models/cube-blue.fbx", GraphicsModel.class);
+        requiredAssets.put("assets/models/cube-blue.fbx", Model.class);
 
         return requiredAssets;
     }
@@ -60,7 +60,7 @@ public class SceneRendering3D_1 extends ApplicationScreen {
         float delta = GraphicsUtils.getDeltaTime();
         float angularSpeed = 200; // degrees per second
 
-        MathMatrix4 m = transform.computeMatrix();
+        Matrix4x4 m = transform.computeMatrix();
         // rotate
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
             transform.angleX += 0.01f;

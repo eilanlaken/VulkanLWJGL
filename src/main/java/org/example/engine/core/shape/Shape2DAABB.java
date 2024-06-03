@@ -1,30 +1,30 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 
 // AABB = axis aligned bonding box
 public class Shape2DAABB extends Shape2D {
 
-    private final MathVector2 localMin;
-    private final MathVector2 localMax;
-    private final MathVector2 worldMin;
-    private final MathVector2 worldMax;
+    private final Vector2 localMin;
+    private final Vector2 localMax;
+    private final Vector2 worldMin;
+    private final Vector2 worldMax;
 
-    private CollectionsArray<MathVector2> worldVertices;
+    private Array<Vector2> worldVertices;
 
     public Shape2DAABB(float x1, float y1, float x2, float y2) {
         float xMin = Math.min(x1, x2);
         float xMax = Math.max(x1, x2);
         float yMin = Math.min(y1, y2);
         float yMax = Math.max(y1, y2);
-        this.localMin = new MathVector2(xMin, yMin);
-        this.localMax = new MathVector2(xMax, yMax);
-        this.worldMin = new MathVector2(localMin);
-        this.worldMax = new MathVector2(localMax);
-        this.worldVertices = new CollectionsArray<>(true, 4);
-        this.worldVertices.addAll(new MathVector2(), new MathVector2(), new MathVector2(), new MathVector2());
+        this.localMin = new Vector2(xMin, yMin);
+        this.localMax = new Vector2(xMax, yMax);
+        this.worldMin = new Vector2(localMin);
+        this.worldMax = new Vector2(localMax);
+        this.worldVertices = new Array<>(true, 4);
+        this.worldVertices.addAll(new Vector2(), new Vector2(), new Vector2(), new Vector2());
     }
 
     public Shape2DAABB(float width, float height) {
@@ -37,8 +37,8 @@ public class Shape2DAABB extends Shape2D {
     }
 
     @Override
-    protected MathVector2 calculateLocalGeometryCenter() {
-        MathVector2 center = new MathVector2();
+    protected Vector2 calculateLocalGeometryCenter() {
+        Vector2 center = new Vector2();
         center.add(localMin).add(localMax).scl(0.5f);
         return center;
     }
@@ -47,8 +47,8 @@ public class Shape2DAABB extends Shape2D {
     protected float calculateUnscaledBoundingRadius() {
         float centerX = (localMin.x + localMax.x) * 0.5f;
         float centerY = (localMin.y + localMax.y) * 0.5f;
-        float halfDiagonal = MathVector2.dst(localMin, localMax) * 0.5f;
-        return MathVector2.len(centerX, centerY) + halfDiagonal;
+        float halfDiagonal = Vector2.dst(localMin, localMax) * 0.5f;
+        return Vector2.len(centerX, centerY) + halfDiagonal;
     }
 
     @Override
@@ -70,18 +70,18 @@ public class Shape2DAABB extends Shape2D {
         this.worldMax.set(localMax).scl(absScaleX, absScaleY).add(x, y);
     }
 
-    public MathVector2 getWorldMin() {
+    public Vector2 getWorldMin() {
         if (!updated) update();
         return worldMin;
     }
 
-    public MathVector2 getWorldMax() {
+    public Vector2 getWorldMax() {
         if (!updated) update();
         return worldMax;
     }
 
     @Override
-    protected CollectionsArray<MathVector2> getWorldVertices() {
+    protected Array<Vector2> getWorldVertices() {
         worldVertices.get(0).set(worldMin.x, worldMax.y);
         worldVertices.get(1).set(worldMin);
         worldVertices.get(2).set(worldMax.x, worldMin.y);

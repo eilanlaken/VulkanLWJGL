@@ -2,11 +2,11 @@ package org.example.engine.core.physics2d;
 
 import org.example.engine.core.math.*;
 
-import static org.example.engine.core.math.MathMatrix3.*;
-import static org.example.engine.core.math.MathMatrix3.M00;
-import static org.example.engine.core.math.MathMatrix3.M01;
-import static org.example.engine.core.math.MathMatrix3.M10;
-import static org.example.engine.core.math.MathMatrix3.M11;
+import static org.example.engine.core.math.Matrix3x3.*;
+import static org.example.engine.core.math.Matrix3x3.M00;
+import static org.example.engine.core.math.Matrix3x3.M01;
+import static org.example.engine.core.math.Matrix3x3.M10;
+import static org.example.engine.core.math.Matrix3x3.M11;
 
 /*
 TODO:
@@ -36,15 +36,15 @@ https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc09/slides/04-GDC09_Catto_Erin
 // https://github.com/jbox2d/jbox2d/blob/master/jbox2d-library/src/main/java/org/jbox2d/dynamics/joints/WeldJoint.java
 @Deprecated public class Physics2DConstraintWeld_old extends Physics2DConstraint {
 
-    protected MathVector2 localAnchor1;
-    protected MathVector2 localAnchor2;
+    protected Vector2 localAnchor1;
+    protected Vector2 localAnchor2;
     protected float referenceAngle; // in rad
-    private MathVector2 r1;
-    private MathVector2 r2;
-    private MathMatrix3 K;
-    private MathVector3 impulse;
+    private Vector2 r1;
+    private Vector2 r2;
+    private Matrix3x3 K;
+    private Vector3 impulse;
 
-    public Physics2DConstraintWeld_old(final Physics2DBody body1, final Physics2DBody body2, MathVector2 anchor) {
+    public Physics2DConstraintWeld_old(final Physics2DBody body1, final Physics2DBody body2, Vector2 anchor) {
         super(body1, body2);
         if (body2 == null) throw new Physics2DException("Weld joint must connect 2 non-null bodies. Got : " + body1 + ", " + null);
         if (anchor == null) throw new Physics2DException("anchor must not be null");
@@ -57,10 +57,10 @@ https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc09/slides/04-GDC09_Catto_Erin
         this.referenceAngle *= MathUtils.degreesToRadians;
 
         // initialize
-        this.K = new MathMatrix3();
-        this.r1 = new MathVector2();
-        this.r2 = new MathVector2();
-        this.impulse = new MathVector3();
+        this.K = new Matrix3x3();
+        this.r1 = new Vector2();
+        this.r2 = new Vector2();
+        this.impulse = new Vector3();
     }
 
     @Override
@@ -95,25 +95,25 @@ https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc09/slides/04-GDC09_Catto_Erin
         float invI1 = body1.inertiaInv;
         float invI2 = body2.inertiaInv;
 
-        MathVector2 r1XOmega = new MathVector2();
-        MathVector2.crs(this.r1, this.body1.omegaDeg * MathUtils.degreesToRadians, r1XOmega);
-        MathVector2 v1 = new MathVector2(this.body1.velocity).add(r1XOmega);
+        Vector2 r1XOmega = new Vector2();
+        Vector2.crs(this.r1, this.body1.omegaDeg * MathUtils.degreesToRadians, r1XOmega);
+        Vector2 v1 = new Vector2(this.body1.velocity).add(r1XOmega);
 
-        MathVector2 r2XOmega = new MathVector2();
-        MathVector2.crs(this.r2, this.body2.omegaDeg * MathUtils.degreesToRadians, r2XOmega);
-        MathVector2 v2 = new MathVector2(this.body2.velocity).add(r2XOmega);
+        Vector2 r2XOmega = new Vector2();
+        Vector2.crs(this.r2, this.body2.omegaDeg * MathUtils.degreesToRadians, r2XOmega);
+        Vector2 v2 = new Vector2(this.body2.velocity).add(r2XOmega);
 
-        MathVector2 relv = v1.sub(v2);
+        Vector2 relv = v1.sub(v2);
 
         float relativeOmegaRad = (this.body1.omegaDeg - this.body2.omegaDeg) * MathUtils.degreesToRadians;
-        MathVector3 C = new MathVector3(relv.x, relv.y, relativeOmegaRad);
+        Vector3 C = new Vector3(relv.x, relv.y, relativeOmegaRad);
 
-        MathVector3 stepImpulse = new MathVector3();
+        Vector3 stepImpulse = new Vector3();
         if (this.K.val[M22] > 0.0f) {
             MathUtils.solve33(K, C.negate(), stepImpulse);
         } else {
 
-            MathVector2 solution = new MathVector2();
+            Vector2 solution = new Vector2();
             MathUtils.solve22(K, relv, solution);
             solution.negate();
             stepImpulse.set(solution.x, solution.y, 0);
@@ -121,7 +121,7 @@ https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc09/slides/04-GDC09_Catto_Erin
         this.impulse.add(stepImpulse);
 
         // apply the impulse
-        MathVector2 imp = new MathVector2(stepImpulse.x, stepImpulse.y);
+        Vector2 imp = new Vector2(stepImpulse.x, stepImpulse.y);
         System.out.println(imp);
         this.body1.velocity.add(imp.x * invM1, imp.y * invM1);
         //this.body1.omegaDeg += invI1 * (this.r1.crs(imp) + stepImpulse.z) * MathUtils.radiansToDegrees;

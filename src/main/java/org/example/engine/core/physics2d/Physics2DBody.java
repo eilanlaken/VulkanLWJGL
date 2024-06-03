@@ -1,8 +1,8 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 import org.jetbrains.annotations.NotNull;
@@ -33,17 +33,17 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
     public    boolean     off        = false; // bodies can be turned on / off
     public    Shape2D     shape      = null;
     public    MotionType  motionType = null;
-    public    MathVector2 velocity   = new MathVector2();
-    public    MathVector2 com        = new MathVector2();
+    public Vector2 velocity   = new Vector2();
+    public Vector2 com        = new Vector2();
     public    float       omegaDeg   = 0;
     // TODO: see what's up
-    public    MathVector2 netForce   = new MathVector2();
+    public Vector2 netForce   = new Vector2();
     public    float       netTorque  = 0;
 
-    public CollectionsArray<Physics2DBody>  touching      = new CollectionsArray<>(false, 2);
-    public CollectionsArray<Physics2DBody>  justCollided  = new CollectionsArray<>(false, 2);
-    public CollectionsArray<Physics2DBody>  justSeparated = new CollectionsArray<>(false, 2);
-    public CollectionsArray<Physics2DConstraint> constraints = new CollectionsArray<>(false, 2);
+    public Array<Physics2DBody> touching      = new Array<>(false, 2);
+    public Array<Physics2DBody> justCollided  = new Array<>(false, 2);
+    public Array<Physics2DBody> justSeparated = new Array<>(false, 2);
+    public Array<Physics2DConstraint> constraints = new Array<>(false, 2);
 
     // TODO: must set some default values.
     public float   mass;
@@ -62,7 +62,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
 
     // TODO: revise. currently works for symmetrical shapes only.
     // FIXME
-    public MathVector2 getCenterOfMass() {
+    public Vector2 getCenterOfMass() {
         com.set(this.x(), this.y());
         return com;
     }
@@ -118,7 +118,7 @@ public class Physics2DBody implements MemoryPool.Reset, Comparable<Physics2DBody
         netTorque += torque;
     }
 
-    public void applyImpulse(MathVector2 impulse, MathVector2 r) {
+    public void applyImpulse(Vector2 impulse, Vector2 r) {
         velocity.add(massInv * impulse.x, massInv * impulse.y);
         omegaDeg += inertiaInv * r.crs(impulse) * MathUtils.radiansToDegrees;
     }

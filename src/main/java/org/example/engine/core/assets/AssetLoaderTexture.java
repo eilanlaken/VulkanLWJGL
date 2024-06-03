@@ -1,9 +1,9 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.graphics.GraphicsTexture;
-import org.example.engine.core.graphics.GraphicsTextureBinder;
+import org.example.engine.core.graphics.Texture;
+import org.example.engine.core.graphics.TextureBinder;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.stb.STBImage;
@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 // TODO: use TextureBuilder instead
-public class AssetLoaderTexture implements AssetLoader<GraphicsTexture> {
+public class AssetLoaderTexture implements AssetLoader<Texture> {
 
     public static final int maxTextureSize = GraphicsUtils.getMaxTextureSize();
 
@@ -40,14 +40,14 @@ public class AssetLoaderTexture implements AssetLoader<GraphicsTexture> {
 
     // TODO: use Texture Builder
     @Override
-    public GraphicsTexture create() {
+    public Texture create() {
         int glHandle = GL11.glGenTextures();
-        GraphicsTexture texture = new GraphicsTexture(glHandle,
+        Texture texture = new Texture(glHandle,
                 width, height,
-                GraphicsTexture.Filter.MIP_MAP_NEAREST_NEAREST, GraphicsTexture.Filter.MIP_MAP_NEAREST_NEAREST,
-                GraphicsTexture.Wrap.CLAMP_TO_EDGE, GraphicsTexture.Wrap.CLAMP_TO_EDGE
+                Texture.Filter.MIP_MAP_NEAREST_NEAREST, Texture.Filter.MIP_MAP_NEAREST_NEAREST,
+                Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE
         );
-        GraphicsTextureBinder.bind(texture);
+        TextureBinder.bind(texture);
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
         // TODO: here we need to see if we want to: generate mipmaps, use anisotropic filtering, what level of anisotropy etc
         // TODO: For a raw Texture with no TextureMap, use defaults.
@@ -59,7 +59,7 @@ public class AssetLoaderTexture implements AssetLoader<GraphicsTexture> {
     }
 
     @Override
-    public CollectionsArray<AssetDescriptor> getDependencies() {
+    public Array<AssetDescriptor> getDependencies() {
         return null;
     }
 

@@ -1,7 +1,6 @@
 package org.example.engine.core.shape2d;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 
 public abstract class Shape2D {
 
@@ -9,9 +8,9 @@ public abstract class Shape2D {
     private   float       boundingRadius             = 0;
     private   float       boundingRadiusSquared      = 0;
     private   boolean     calcLocalGeometryCenter    = false;
-    protected MathVector2 geometryCenter             = new MathVector2();
+    protected Vector2 geometryCenter             = new Vector2();
 
-    public final boolean contains(final MathVector2 point) {
+    public final boolean contains(final Vector2 point) {
         return contains(point.x, point.y);
     }
 

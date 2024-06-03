@@ -1,8 +1,8 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 
 public class Shape2DRectangle extends Shape2D {
 
@@ -10,10 +10,10 @@ public class Shape2DRectangle extends Shape2D {
     public final float unscaledHeight;
 
     // original corners
-    private final MathVector2 c0Local;
-    private final MathVector2 c1Local;
-    private final MathVector2 c2Local;
-    private final MathVector2 c3Local;
+    private final Vector2 c0Local;
+    private final Vector2 c1Local;
+    private final Vector2 c2Local;
+    private final Vector2 c3Local;
 
     // world corners:
     /**
@@ -23,22 +23,22 @@ public class Shape2DRectangle extends Shape2D {
      *  |                 |
      *  c1 --------------c2
      */
-    private final MathVector2 c0 = new MathVector2();
-    private final MathVector2 c1 = new MathVector2();
-    private final MathVector2 c2 = new MathVector2();
-    private final MathVector2 c3 = new MathVector2();
-    private final CollectionsArray<MathVector2> worldVertices;
+    private final Vector2 c0 = new Vector2();
+    private final Vector2 c1 = new Vector2();
+    private final Vector2 c2 = new Vector2();
+    private final Vector2 c3 = new Vector2();
+    private final Array<Vector2> worldVertices;
 
     public Shape2DRectangle(float centerX, float centerY, float width, float height, float rotate) {
         this.unscaledWidth = width;
         this.unscaledHeight = height;
         final float widthHalf = width * 0.5f;
         final float heightHalf = height * 0.5f;
-        this.c0Local = new MathVector2(-widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.c1Local = new MathVector2(-widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.c2Local = new MathVector2(+widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.c3Local = new MathVector2(+widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.worldVertices = new CollectionsArray<>(true, 4);
+        this.c0Local = new Vector2(-widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
+        this.c1Local = new Vector2(-widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
+        this.c2Local = new Vector2(+widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
+        this.c3Local = new Vector2(+widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
+        this.worldVertices = new Array<>(true, 4);
         this.worldVertices.addAll(c0, c1, c2, c3);
     }
 
@@ -47,11 +47,11 @@ public class Shape2DRectangle extends Shape2D {
         this.unscaledHeight = height;
         final float widthHalf = width * 0.5f;
         final float heightHalf = height * 0.5f;
-        this.c0Local = new MathVector2(-widthHalf, +heightHalf);
-        this.c1Local = new MathVector2(-widthHalf, -heightHalf);
-        this.c2Local = new MathVector2(+widthHalf, -heightHalf);
-        this.c3Local = new MathVector2(+widthHalf, +heightHalf);
-        this.worldVertices = new CollectionsArray<>(true, 4);
+        this.c0Local = new Vector2(-widthHalf, +heightHalf);
+        this.c1Local = new Vector2(-widthHalf, -heightHalf);
+        this.c2Local = new Vector2(+widthHalf, -heightHalf);
+        this.c3Local = new Vector2(+widthHalf, +heightHalf);
+        this.worldVertices = new Array<>(true, 4);
         this.worldVertices.addAll(c0, c1, c2, c3);
     }
 
@@ -60,8 +60,8 @@ public class Shape2DRectangle extends Shape2D {
     }
 
     @Override
-    protected MathVector2 calculateLocalGeometryCenter() {
-        MathVector2 center = new MathVector2();
+    protected Vector2 calculateLocalGeometryCenter() {
+        Vector2 center = new Vector2();
         center.add(c0Local);
         center.add(c1Local);
         center.add(c2Local);
@@ -72,8 +72,8 @@ public class Shape2DRectangle extends Shape2D {
 
     @Override
     protected boolean containsPoint(float x, float y) {
-        MathVector2 tmp1 = new MathVector2();
-        MathVector2 tmp2 = new MathVector2();
+        Vector2 tmp1 = new Vector2();
+        Vector2 tmp2 = new Vector2();
 
         tmp1.set(c3).sub(c0);
         tmp2.set(x,y).sub(c0);
@@ -135,22 +135,22 @@ public class Shape2DRectangle extends Shape2D {
         c3.add(x, y);
     }
 
-    public MathVector2 c0() {
+    public Vector2 c0() {
         if (!updated) update();
         return c0;
     }
 
-    public MathVector2 c1() {
+    public Vector2 c1() {
         if (!updated) update();
         return c1;
     }
 
-    public MathVector2 c2() {
+    public Vector2 c2() {
         if (!updated) update();
         return c2;
     }
 
-    public MathVector2 c3() {
+    public Vector2 c3() {
         if (!updated) update();
         return c3;
     }
@@ -163,7 +163,7 @@ public class Shape2DRectangle extends Shape2D {
     }
 
     @Override
-    protected CollectionsArray<MathVector2> getWorldVertices() {
+    protected Array<Vector2> getWorldVertices() {
         return worldVertices;
     }
 

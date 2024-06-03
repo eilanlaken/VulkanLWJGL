@@ -3,7 +3,7 @@ package org.example.engine.core.application;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.async.AsyncUtils;
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
@@ -16,7 +16,7 @@ public class Application {
     private static boolean initialized = false;
     private static boolean debugMode;
     private static ApplicationWindow window;
-    private static CollectionsArray<Runnable> tasks = new CollectionsArray<>();
+    private static Array<Runnable> tasks = new Array<>();
     private static boolean running = false;
     private static GLFWErrorCallback errorCallback;
 

@@ -2,8 +2,7 @@ package org.example.engine.core.shape;
 
 import org.example.engine.core.collections.*;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
-import org.example.engine.core.physics2d.Physics2DBody;
+import org.example.engine.core.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,15 +14,15 @@ import java.util.function.Function;
 public final class ShapeUtils {
 
     private static final int[] rectanglePolygonIndices = new int[] {2, 3, 0, 0, 1, 2};
-    private static final Map<CollectionsTuple3<Float, Float, Float>, int[]> cachedHollowRectangleIndices = new HashMap<>();
-    private static final Map<CollectionsTuple2<Float, Integer>, float[]> cachedFilledCirclesVertices = new HashMap<>();
-    private static final Map<CollectionsTuple4<Float, Integer, Float, Float>, float[]> cachedFilledCircleArcsVertices = new HashMap<>();
-    private static final Map<CollectionsTuple2<Float, Integer>, int[]> cachedFilledCirclesIndices = new HashMap<>();
-    private static final Map<CollectionsTuple4<Float, Integer, Float, Float>, int[]> cachedFilledCircleArcsIndices = new HashMap<>();
-    private static final Map<CollectionsTuple3<Float, Integer, Float>, float[]> cachedHollowCirclesVertices = new HashMap<>();
-    private static final Map<CollectionsTuple5<Float, Integer, Float, Float, Float>, float[]> cachedHollowCircleArcsVertices = new HashMap<>();
-    private static final Map<CollectionsTuple3<Float, Integer, Float>, int[]> cachedHollowCirclesIndices = new HashMap<>();
-    private static final Map<CollectionsTuple5<Float, Integer, Float, Float, Float>, int[]> cachedHollowCircleArcsIndices = new HashMap<>();
+    private static final Map<Tuple3<Float, Float, Float>, int[]> cachedHollowRectangleIndices = new HashMap<>();
+    private static final Map<Tuple2<Float, Integer>, float[]> cachedFilledCirclesVertices = new HashMap<>();
+    private static final Map<Tuple4<Float, Integer, Float, Float>, float[]> cachedFilledCircleArcsVertices = new HashMap<>();
+    private static final Map<Tuple2<Float, Integer>, int[]> cachedFilledCirclesIndices = new HashMap<>();
+    private static final Map<Tuple4<Float, Integer, Float, Float>, int[]> cachedFilledCircleArcsIndices = new HashMap<>();
+    private static final Map<Tuple3<Float, Integer, Float>, float[]> cachedHollowCirclesVertices = new HashMap<>();
+    private static final Map<Tuple5<Float, Integer, Float, Float, Float>, float[]> cachedHollowCircleArcsVertices = new HashMap<>();
+    private static final Map<Tuple3<Float, Integer, Float>, int[]> cachedHollowCirclesIndices = new HashMap<>();
+    private static final Map<Tuple5<Float, Integer, Float, Float, Float>, int[]> cachedHollowCircleArcsIndices = new HashMap<>();
     private static final Map<float[], int[]> cachedFilledPolygonIndices = new HashMap<>();
     private static final Map<float[], float[]> cachedHollowPolygonVertices = new HashMap<>();
     private static final Map<float[], int[]> cachedHollowPolygonIndices = new HashMap<>();
@@ -33,7 +32,7 @@ public final class ShapeUtils {
     public static Shape2DPolygon createPolygonLine(float x1, float y1, float x2, float y2, float stroke) {
         float dx = x2 - x1;
         float dy = y2 - y1;
-        MathVector2 strokeVector = new MathVector2(dx, dy).rotate90(1).nor().scl(stroke * 0.5f, stroke * 0.5f);
+        Vector2 strokeVector = new Vector2(dx, dy).rotate90(1).nor().scl(stroke * 0.5f, stroke * 0.5f);
         float[] vertices = new float[] {x1 + strokeVector.x, y1 + strokeVector.y, x1 - strokeVector.x, y1 - strokeVector.y, x2 - strokeVector.x, y2 - strokeVector.y, x2 + strokeVector.x, y2 + strokeVector.y};
         return new Shape2DPolygon(rectanglePolygonIndices, vertices);
     }
@@ -53,7 +52,7 @@ public final class ShapeUtils {
                 -widthHalf - strokeHalf, heightHalf + strokeHalf, -widthHalf - strokeHalf, -heightHalf - strokeHalf, widthHalf + strokeHalf, -heightHalf - strokeHalf, widthHalf + strokeHalf, heightHalf + strokeHalf,
                 -widthHalf + strokeHalf, heightHalf - strokeHalf, -widthHalf + strokeHalf, -heightHalf + strokeHalf, widthHalf - strokeHalf, -heightHalf + strokeHalf, widthHalf - strokeHalf, heightHalf - strokeHalf
         };
-        final CollectionsTuple3<Float, Float, Float> widthHeightStroke = new CollectionsTuple3<>(width, height, stroke);
+        final Tuple3<Float, Float, Float> widthHeightStroke = new Tuple3<>(width, height, stroke);
         int[] indices = cachedHollowRectangleIndices.get(widthHeightStroke);
         if (indices == null) {
             indices = ShapeUtils.triangulatePolygon(vertices, new int[] { 4 }, 2);
@@ -64,8 +63,8 @@ public final class ShapeUtils {
 
     public static Shape2DPolygon createPolygonCircleFilled(float r, int refinement) {
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
-        final CollectionsTuple2<Float, Integer> radiusRefinement = new CollectionsTuple2<>(r, refinement);
-        float[] vertices = cachedFilledCirclesVertices.get(new CollectionsTuple2<>(r, refinement));
+        final Tuple2<Float, Integer> radiusRefinement = new Tuple2<>(r, refinement);
+        float[] vertices = cachedFilledCirclesVertices.get(new Tuple2<>(r, refinement));
         if (vertices == null) {
             vertices = new float[refinement * 2];
             for (int i = 0; i < refinement * 2; i += 2) {
@@ -89,8 +88,8 @@ public final class ShapeUtils {
         boolean fullRange = MathUtils.floatsEqual(360.0f, range);
         if (fullRange) return createPolygonCircleFilled(r, refinement);
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
-        final CollectionsTuple4<Float, Integer, Float, Float> tuple4 = new CollectionsTuple4<>(r, refinement, degStart, degEnd);
-        float[] vertices = cachedFilledCircleArcsVertices.get(new CollectionsTuple4<>(r, refinement, degStart, degEnd));
+        final Tuple4<Float, Integer, Float, Float> tuple4 = new Tuple4<>(r, refinement, degStart, degEnd);
+        float[] vertices = cachedFilledCircleArcsVertices.get(new Tuple4<>(r, refinement, degStart, degEnd));
         int size = refinement * 2 + 2;
         if (vertices == null) {
             vertices = new float[size]; // add extra vertex for center.
@@ -115,7 +114,7 @@ public final class ShapeUtils {
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
         stroke = Math.abs(stroke);
 
-        final CollectionsTuple3<Float, Integer, Float> radiusRefinementStroke = new CollectionsTuple3<>(r, refinement, stroke);
+        final Tuple3<Float, Integer, Float> radiusRefinementStroke = new Tuple3<>(r, refinement, stroke);
         float[] vertices = cachedHollowCirclesVertices.get(radiusRefinementStroke);
         if (vertices == null) {
             final float outerRadius = r + stroke * 0.5f;
@@ -151,7 +150,7 @@ public final class ShapeUtils {
         if (refinement < 3) throw new IllegalArgumentException("Refinement (the number of edge vertices) must be >= 3. Got: " + refinement);
         stroke = Math.abs(stroke);
 
-        final CollectionsTuple5<Float, Integer, Float, Float, Float> tuple5 = new CollectionsTuple5<>(r, refinement, stroke, degStart, degEnd);
+        final Tuple5<Float, Integer, Float, Float, Float> tuple5 = new Tuple5<>(r, refinement, stroke, degStart, degEnd);
         float[] vertices = cachedHollowCircleArcsVertices.get(tuple5);
         if (vertices == null) {
             final float outerRadius = r + stroke * 0.5f;
@@ -192,8 +191,8 @@ public final class ShapeUtils {
         stroke = Math.abs(stroke);
         float[] expandedVertices = cachedHollowPolygonVertices.get(vertices);
         if (expandedVertices == null) {
-            MathVector2 centerOfGeometry = calculateCenterOfGeometry(vertices);
-            MathVector2 tmp = new MathVector2();
+            Vector2 centerOfGeometry = calculateCenterOfGeometry(vertices);
+            Vector2 tmp = new Vector2();
             expandedVertices = new float[vertices.length * 2];
             final float extrude = stroke * 0.5f;
             for (int i = 0; i < vertices.length; i += 2) {
@@ -241,8 +240,8 @@ public final class ShapeUtils {
 
     public static boolean isPolygonConvex(final float[] vertices) {
         if (vertices.length == 6) return true;
-        MathVector2 tmp1 = new MathVector2();
-        MathVector2 tmp2 = new MathVector2();
+        Vector2 tmp1 = new Vector2();
+        Vector2 tmp2 = new Vector2();
 
         tmp1.set(getVertexX(0, vertices), getVertexY(0, vertices))
                 .sub(getVertexX(-1, vertices), getVertexY(-1, vertices));
@@ -264,27 +263,27 @@ public final class ShapeUtils {
 
     // [5, 8] -> [0,4] [5,7] [8, length - 1] 
     // [4, 8, 11] -> [0,3] [4,7] [8,10] [11, length-1]
-    static CollectionsArray<CollectionsTuple2<Integer, Integer>> getLoops(final int[] holes, int vertexCount) {
-        CollectionsArray<CollectionsTuple2<Integer, Integer>> loops = new CollectionsArray<>();
+    static Array<Tuple2<Integer, Integer>> getLoops(final int[] holes, int vertexCount) {
+        Array<Tuple2<Integer, Integer>> loops = new Array<>();
         if (holes == null || holes.length == 0) {
-            loops.add(new CollectionsTuple2<>(0, vertexCount - 1));
+            loops.add(new Tuple2<>(0, vertexCount - 1));
             return loops;
         }
 
         int start = 0;
         for (int hole : holes) {
             int end = hole - 1;
-            loops.add(new CollectionsTuple2<>(start, end));
+            loops.add(new Tuple2<>(start, end));
             start = hole;
         }
         if (start <= vertexCount - 1) {
-            loops.add(new CollectionsTuple2<>(start, vertexCount - 1));
+            loops.add(new Tuple2<>(start, vertexCount - 1));
         }
         return loops;
     }
 
-    public static MathVector2 calculateCenterOfGeometry(final float[] vertices) {
-        MathVector2 center = new MathVector2();
+    public static Vector2 calculateCenterOfGeometry(final float[] vertices) {
+        Vector2 center = new Vector2();
         for (int i = 0; i < vertices.length - 1; i += 2) {
             center.add(vertices[i], vertices[i+1]);
         }
@@ -292,13 +291,13 @@ public final class ShapeUtils {
     }
 
     // TODO: bonus implement.
-    public CollectionsArray<Shape2D> fracture(Shape2D shape, MathVector2... controlPoints) {
+    public Array<Shape2D> fracture(Shape2D shape, Vector2... controlPoints) {
 
         return null;
     }
 
     // TODO: bonus implement.
-    public CollectionsArray<Shape2D> fracture(Shape2D shape, int n) {
+    public Array<Shape2D> fracture(Shape2D shape, int n) {
         // generate an array of n random control points, contained in shape.
         return null;
     }
@@ -347,7 +346,7 @@ public final class ShapeUtils {
         boolean hasHoles = holeIndices != null && holeIndices.length > 0;
         int outerLen = hasHoles ? holeIndices[0] * dim : data.length;
         Node outerNode = linkedList(data, 0, outerLen, dim, true);
-        CollectionsArrayInt triangles = new CollectionsArrayInt();
+        ArrayInt triangles = new ArrayInt();
 
         if (outerNode == null || outerNode.next == outerNode.prev)
             return triangles.pack().items;
@@ -391,7 +390,7 @@ public final class ShapeUtils {
         return triangles.pack().items;
     }
 
-    private static void triangulateLinked(Node ear, CollectionsArrayInt triangles, int dim, float minX, float minY, float invSize, int pass) {
+    private static void triangulateLinked(Node ear, ArrayInt triangles, int dim, float minX, float minY, float invSize, int pass) {
         if (ear == null)
             return;
 
@@ -434,7 +433,7 @@ public final class ShapeUtils {
         }
     }
 
-    private static void splitPolygon(Node start, CollectionsArrayInt triangles, int dim, float minX, float minY, float size) {
+    private static void splitPolygon(Node start, ArrayInt triangles, int dim, float minX, float minY, float size) {
         // look for a valid diagonal that divides the polygon into two
         Node a = start;
         do {
@@ -513,7 +512,7 @@ public final class ShapeUtils {
         return q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y);
     }
 
-    private static Node cureLocalIntersections(Node start, CollectionsArrayInt triangles, int dim) {
+    private static Node cureLocalIntersections(Node start, ArrayInt triangles, int dim) {
         Node p = start;
         do {
             Node a = p.prev, b = p.next.next;

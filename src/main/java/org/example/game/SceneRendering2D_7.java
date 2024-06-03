@@ -1,10 +1,10 @@
 package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
-import org.example.engine.core.graphics.GraphicsCamera;
-import org.example.engine.core.graphics.GraphicsColor;
-import org.example.engine.core.graphics.GraphicsRenderer2D;
-import org.example.engine.core.graphics.GraphicsTexture;
+import org.example.engine.core.graphics.Camera;
+import org.example.engine.core.graphics.Color;
+import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.Texture;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.core.shape.Shape2D;
@@ -16,21 +16,21 @@ import java.util.Map;
 
 public class SceneRendering2D_7 extends ApplicationScreen {
 
-    private GraphicsRenderer2D renderer2D;
-    private GraphicsCamera camera;
+    private Renderer2D renderer2D;
+    private Camera camera;
 
     private Shape2D first;
     private Shape2D second;
 
     public SceneRendering2D_7() {
-        renderer2D = new GraphicsRenderer2D();
+        renderer2D = new Renderer2D();
     }
 
     @Override
     public Map<String, Class<? extends MemoryResource>> getRequiredAssets() {
         Map<String, Class<? extends MemoryResource>> requiredAssets = new HashMap<>();
 
-        requiredAssets.put("assets/atlases/pack2_0.png", GraphicsTexture.class);
+        requiredAssets.put("assets/atlases/pack2_0.png", Texture.class);
 
         return requiredAssets;
     }
@@ -40,7 +40,7 @@ public class SceneRendering2D_7 extends ApplicationScreen {
         first = new Shape2DCircle(100);
         second = new Shape2DCircle(50);
 
-        camera = new GraphicsCamera(640*2,480*2, 1);
+        camera = new Camera(640*2,480*2, 1);
         camera.update();
     }
 
@@ -85,7 +85,7 @@ public class SceneRendering2D_7 extends ApplicationScreen {
     private void renderBounds(Shape2D shape2D) {
         float r = shape2D.getBoundingRadius();
         Shape2DCircle bounds = new Shape2DCircle(r, shape2D.x(), shape2D.y());
-        renderer2D.pushDebugShape(bounds,new GraphicsColor(1,1,0,1));
+        renderer2D.pushDebugShape(bounds,new Color(1,1,0,1));
     }
 
     @Override

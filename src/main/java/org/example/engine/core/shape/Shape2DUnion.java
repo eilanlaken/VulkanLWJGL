@@ -1,16 +1,16 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.collections.Array;
+import org.example.engine.core.math.Vector2;
 
 // TODO: write unit tests.
 public class Shape2DUnion extends Shape2D {
 
-    public final CollectionsArray<Shape2D> shapes;
+    public final Array<Shape2D> shapes;
 
     public Shape2DUnion(Shape2D ...shapes) {
         if (shapes == null || shapes.length == 0) throw new IllegalArgumentException("Union must have at least one shape.");
-        this.shapes = new CollectionsArray<>(true, shapes.length);
+        this.shapes = new Array<>(true, shapes.length);
         for (Shape2D shape : shapes) {
             if (shape instanceof Shape2DUnion) this.shapes.addAll(((Shape2DUnion) shape).shapes);
             else if (shape != null) this.shapes.add(shape);
@@ -20,8 +20,8 @@ public class Shape2DUnion extends Shape2D {
 
     // TODO: test
     @Override
-    protected MathVector2 calculateLocalGeometryCenter() {
-        MathVector2 center = new MathVector2();
+    protected Vector2 calculateLocalGeometryCenter() {
+        Vector2 center = new Vector2();
         float totalArea = 0;
         for (Shape2D shape : shapes) {
             center.add(shape.geometryCenter());
@@ -58,7 +58,7 @@ public class Shape2DUnion extends Shape2D {
     }
 
     @Override
-    protected CollectionsArray<MathVector2> getWorldVertices() {
+    protected Array<Vector2> getWorldVertices() {
         throw new UnsupportedOperationException("Cannot get a world vertices list for " + Shape2DUnion.class.getSimpleName() + ": operation not strictly defined.");
     }
 

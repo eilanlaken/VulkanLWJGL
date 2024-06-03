@@ -1,8 +1,8 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector3;
+import org.example.engine.core.math.Vector3;
 
 public abstract class Shape3D {
 
@@ -27,7 +27,7 @@ public abstract class Shape3D {
     private boolean   areaUpdated                = false;
     private boolean   boundingRadiusUpdated      = false;
 
-    public final boolean contains(final MathVector3 point) {
+    public final boolean contains(final Vector3 point) {
         return contains(point.x, point.y, point.z);
     }
 
@@ -36,7 +36,7 @@ public abstract class Shape3D {
         return containsPoint(x, y, z);
     }
 
-    public final CollectionsArray<MathVector3> worldVertices() {
+    public final Array<Vector3> worldVertices() {
         if (!updated) update();
         return getWorldVertices();
     }
@@ -230,7 +230,7 @@ public abstract class Shape3D {
 
     protected abstract boolean                       containsPoint(float x, float y, float z);
     protected abstract void                          updateWorldCoordinates();
-    protected abstract CollectionsArray<MathVector3> getWorldVertices();
+    protected abstract Array<Vector3> getWorldVertices();
     protected abstract float                         calculateUnscaledBoundingRadius();
     protected abstract float                         calculateUnscaledVolume();
 

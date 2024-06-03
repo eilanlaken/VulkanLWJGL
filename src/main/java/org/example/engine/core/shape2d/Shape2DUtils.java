@@ -2,15 +2,11 @@ package org.example.engine.core.shape2d;
 
 import org.example.engine.core.collections.*;
 import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 import org.example.engine.core.shape.Shape2D;
-import org.example.engine.core.shape.Shape2DPolygon;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 //https://github.com/earcut4j/earcut4j/blob/master/src/test/java/earcut4j/Test01.java
 public final class Shape2DUtils {
@@ -19,27 +15,27 @@ public final class Shape2DUtils {
 
     // [5, 8] -> [0,4] [5,7] [8, length - 1]
     // [4, 8, 11] -> [0,3] [4,7] [8,10] [11, length-1]
-    static CollectionsArray<CollectionsTuple2<Integer, Integer>> getLoops(final int[] holes, int vertexCount) {
-        CollectionsArray<CollectionsTuple2<Integer, Integer>> loops = new CollectionsArray<>();
+    static Array<Tuple2<Integer, Integer>> getLoops(final int[] holes, int vertexCount) {
+        Array<Tuple2<Integer, Integer>> loops = new Array<>();
         if (holes == null || holes.length == 0) {
-            loops.add(new CollectionsTuple2<>(0, vertexCount - 1));
+            loops.add(new Tuple2<>(0, vertexCount - 1));
             return loops;
         }
 
         int start = 0;
         for (int hole : holes) {
             int end = hole - 1;
-            loops.add(new CollectionsTuple2<>(start, end));
+            loops.add(new Tuple2<>(start, end));
             start = hole;
         }
         if (start <= vertexCount - 1) {
-            loops.add(new CollectionsTuple2<>(start, vertexCount - 1));
+            loops.add(new Tuple2<>(start, vertexCount - 1));
         }
         return loops;
     }
 
-    public static MathVector2 calculateCenterOfGeometry(final float[] vertices) {
-        MathVector2 center = new MathVector2();
+    public static Vector2 calculateCenterOfGeometry(final float[] vertices) {
+        Vector2 center = new Vector2();
         for (int i = 0; i < vertices.length - 1; i += 2) {
             center.add(vertices[i], vertices[i+1]);
         }
@@ -90,7 +86,7 @@ public final class Shape2DUtils {
         boolean hasHoles = holeIndices != null && holeIndices.length > 0;
         int outerLen = hasHoles ? holeIndices[0] * dim : data.length;
         Node outerNode = linkedList(data, 0, outerLen, dim, true);
-        CollectionsArrayInt triangles = new CollectionsArrayInt();
+        ArrayInt triangles = new ArrayInt();
 
         if (outerNode == null || outerNode.next == outerNode.prev)
             return triangles.pack().items;
@@ -134,7 +130,7 @@ public final class Shape2DUtils {
         return triangles.pack().items;
     }
 
-    private static void triangulateLinked(Node ear, CollectionsArrayInt triangles, int dim, float minX, float minY, float invSize, int pass) {
+    private static void triangulateLinked(Node ear, ArrayInt triangles, int dim, float minX, float minY, float invSize, int pass) {
         if (ear == null)
             return;
 
@@ -177,7 +173,7 @@ public final class Shape2DUtils {
         }
     }
 
-    private static void splitPolygon(Node start, CollectionsArrayInt triangles, int dim, float minX, float minY, float size) {
+    private static void splitPolygon(Node start, ArrayInt triangles, int dim, float minX, float minY, float size) {
         // look for a valid diagonal that divides the polygon into two
         Node a = start;
         do {
@@ -256,7 +252,7 @@ public final class Shape2DUtils {
         return q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y);
     }
 
-    private static Node cureLocalIntersections(Node start, CollectionsArrayInt triangles, int dim) {
+    private static Node cureLocalIntersections(Node start, ArrayInt triangles, int dim) {
         Node p = start;
         do {
             Node a = p.prev, b = p.next.next;

@@ -2,7 +2,7 @@ package org.example.engine.core.assets;
 
 import com.google.gson.Gson;
 import org.example.engine.core.application.ApplicationWindow;
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.Property;
@@ -61,19 +61,19 @@ public final class AssetUtils {
         return builder.toString();
     }
 
-    public static CollectionsArray<String> getLastDroppedFilePaths() {
+    public static Array<String> getLastDroppedFilePaths() {
         int count = window.getLatestFilesDraggedAndDroppedCount();
-        CollectionsArray<String> allFileDraggedAndDroppedPaths = window.getFilesDraggedAndDropped();
-        CollectionsArray<String> lastDroppedFilePaths = new CollectionsArray<>(5);
+        Array<String> allFileDraggedAndDroppedPaths = window.getFilesDraggedAndDropped();
+        Array<String> lastDroppedFilePaths = new Array<>(5);
         for (int i = 0; i < count; i++) {
             lastDroppedFilePaths.add(allFileDraggedAndDroppedPaths.get(allFileDraggedAndDroppedPaths.size - 1 - i));
         }
         return lastDroppedFilePaths;
     }
 
-    public static CollectionsArray<String> getDroppedFilesHistory() {
-        CollectionsArray<String> allFileDraggedAndDroppedPaths = window.getFilesDraggedAndDropped();
-        CollectionsArray<String> droppedFilesHistory = new CollectionsArray<>(20);
+    public static Array<String> getDroppedFilesHistory() {
+        Array<String> allFileDraggedAndDroppedPaths = window.getFilesDraggedAndDropped();
+        Array<String> droppedFilesHistory = new Array<>(20);
         for (int i = 0; i < allFileDraggedAndDroppedPaths.size; i++) {
             droppedFilesHistory.add(allFileDraggedAndDroppedPaths.get(i));
         }
@@ -114,9 +114,9 @@ public final class AssetUtils {
         return directory.exists() && directory.isDirectory();
     }
 
-    public static synchronized CollectionsArray<String> getDirectoryFiles(final String dirpath, final boolean recursive, final String ...extensions) {
+    public static synchronized Array<String> getDirectoryFiles(final String dirpath, final boolean recursive, final String ...extensions) {
         if (!directoryExists(dirpath)) throw new IllegalArgumentException("Path: " + dirpath + " does not exist or is not a directory.");
-        CollectionsArray<String> paths = new CollectionsArray<>();
+        Array<String> paths = new Array<>();
         File directory = new File(dirpath);
         File[] children = directory.listFiles();
         for (File child : children) {
@@ -126,7 +126,7 @@ public final class AssetUtils {
         return paths;
     }
 
-    private static synchronized void getDirectoryFiles(final String dirpath, final String[] extensions, CollectionsArray<String> collector) {
+    private static synchronized void getDirectoryFiles(final String dirpath, final String[] extensions, Array<String> collector) {
         File directory = new File(dirpath);
         File[] children = directory.listFiles();
         for (File child : children) {

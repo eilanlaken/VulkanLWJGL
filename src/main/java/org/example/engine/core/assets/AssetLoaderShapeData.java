@@ -1,12 +1,12 @@
 package org.example.engine.core.assets;
 
-import org.example.engine.core.collections.CollectionsArray;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.shape.ShapeData;
 
 public class AssetLoaderShapeData implements AssetLoader<ShapeData> {
 
     @Override
-    public CollectionsArray<AssetDescriptor> getDependencies() {
+    public Array<AssetDescriptor> getDependencies() {
         return null;
     }
 

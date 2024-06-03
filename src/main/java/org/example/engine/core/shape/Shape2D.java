@@ -1,8 +1,7 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.collections.Array;
+import org.example.engine.core.math.Vector2;
 
 public abstract class Shape2D {
 
@@ -23,10 +22,10 @@ public abstract class Shape2D {
     protected boolean     updated                    = false;
     private   boolean     areaUpdated                = false;
     private   boolean     boundingRadiusUpdated      = false;
-    protected MathVector2 localGeometryCenter        = new MathVector2();
-    protected MathVector2 geometryCenter             = new MathVector2();
+    protected Vector2 localGeometryCenter        = new Vector2();
+    protected Vector2 geometryCenter             = new Vector2();
 
-    public final boolean contains(final MathVector2 point) {
+    public final boolean contains(final Vector2 point) {
         return contains(point.x, point.y);
     }
 
@@ -35,12 +34,12 @@ public abstract class Shape2D {
         return containsPoint(x, y);
     }
 
-    public final CollectionsArray<MathVector2> worldVertices() {
+    public final Array<Vector2> worldVertices() {
         if (!updated) update();
         return getWorldVertices();
     }
 
-    public final MathVector2 geometryCenter() {
+    public final Vector2 geometryCenter() {
         if (!calcLocalGeometryCenter) {
             localGeometryCenter.set(calculateLocalGeometryCenter());
             calcLocalGeometryCenter = true;
@@ -222,9 +221,9 @@ public abstract class Shape2D {
 
     protected abstract boolean                       containsPoint(float x, float y);
     protected abstract void                          updateWorldCoordinates();
-    protected abstract CollectionsArray<MathVector2> getWorldVertices();
+    protected abstract Array<Vector2> getWorldVertices();
     protected abstract float                         calculateUnscaledBoundingRadius();
     protected abstract float                         calculateUnscaledArea();
-    protected abstract MathVector2                   calculateLocalGeometryCenter();
+    protected abstract Vector2 calculateLocalGeometryCenter();
 
 }

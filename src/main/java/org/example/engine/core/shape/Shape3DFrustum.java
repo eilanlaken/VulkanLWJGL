@@ -1,7 +1,7 @@
 package org.example.engine.core.shape;
 
-import org.example.engine.core.math.MathMatrix4;
-import org.example.engine.core.math.MathVector3;
+import org.example.engine.core.math.Matrix4x4;
+import org.example.engine.core.math.Vector3;
 
 /**
  * A pyramid with its top sliced off. Used by a camera.
@@ -14,28 +14,28 @@ import org.example.engine.core.math.MathVector3;
 // TODO: redo entire Shape3D
 public class Shape3DFrustum implements Shape3D_old {
 
-    public static final MathVector3[] canonicalCubeCorners = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
-            new MathVector3(-1, -1, -1), new MathVector3(1, -1, -1), new MathVector3(1, 1, -1), new MathVector3(-1, 1, -1), // near clipping plane corners
-            new MathVector3(-1, -1, 1), new MathVector3(1, -1, 1), new MathVector3(1, 1, 1), new MathVector3(-1, 1, 1), // far clipping plane corners
+    public static final Vector3[] canonicalCubeCorners = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
+            new Vector3(-1, -1, -1), new Vector3(1, -1, -1), new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clipping plane corners
+            new Vector3(-1, -1, 1), new Vector3(1, -1, 1), new Vector3(1, 1, 1), new Vector3(-1, 1, 1), // far clipping plane corners
     };
 
     // for the purpose of intermediate computations
-    private final MathVector3 vector = new MathVector3();
+    private final Vector3 vector = new Vector3();
     public Shape3DPlane[] planes; // the 6 clipping planes: near, far, left, right, top, bottom
-    private final MathVector3[] frustumCorners = {
-            new MathVector3(), new MathVector3(), new MathVector3(), new MathVector3(), // near frustum plane corners
-            new MathVector3(), new MathVector3(), new MathVector3(), new MathVector3(), // far frustum plane corners
+    private final Vector3[] frustumCorners = {
+            new Vector3(), new Vector3(), new Vector3(), new Vector3(), // near frustum plane corners
+            new Vector3(), new Vector3(), new Vector3(), new Vector3(), // far frustum plane corners
     };
 
     public Shape3DFrustum() {
         this.planes = new Shape3DPlane[6];
         for (int i = 0; i < 6; i++) {
-            this.planes[i] = new Shape3DPlane(new MathVector3(), 0);
+            this.planes[i] = new Shape3DPlane(new Vector3(), 0);
         }
     }
 
     @Override
-    public void update(final MathMatrix4 invPrjView) {
+    public void update(final Matrix4x4 invPrjView) {
         for (int i = 0; i < 8; i++) frustumCorners[i].set(canonicalCubeCorners[i]).prj(invPrjView);
         planes[0].set(frustumCorners[1], frustumCorners[0], frustumCorners[2]); // near
         planes[1].set(frustumCorners[4], frustumCorners[5], frustumCorners[7]); // far

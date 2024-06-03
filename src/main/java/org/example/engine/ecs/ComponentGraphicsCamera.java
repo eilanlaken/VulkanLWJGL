@@ -1,13 +1,13 @@
 package org.example.engine.ecs;
 
-import org.example.engine.core.graphics.GraphicsCamera;
+import org.example.engine.core.graphics.Camera;
 
 public class ComponentGraphicsCamera {
 
-    public GraphicsCamera camera;
+    public Camera camera;
 
     // single all args constructor
-    protected ComponentGraphicsCamera(GraphicsCamera camera) {
+    protected ComponentGraphicsCamera(Camera camera) {
         this.camera = camera;
     }
 

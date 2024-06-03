@@ -1,7 +1,6 @@
 package org.example.engine.core.memory;
 
-import org.example.engine.core.collections.CollectionsArray;
-import org.example.engine.core.collections.CollectionsArrayConcurrent;
+import org.example.engine.core.collections.ArrayConcurrent;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -9,7 +8,7 @@ import java.lang.reflect.Modifier;
 
 public class MemoryPool<T extends MemoryPool.Reset> {
 
-    private final CollectionsArrayConcurrent<T> freeObjects;
+    private final ArrayConcurrent<T> freeObjects;
     private final Constructor<T> constructor;
     private final int initialCapacity;
 
@@ -23,7 +22,7 @@ public class MemoryPool<T extends MemoryPool.Reset> {
         if (Modifier.isAbstract(type.getModifiers()))  throw new IllegalArgumentException("Cannot create " + MemoryPool.class.getSimpleName() + " of an abstract class.");
         if (Modifier.isInterface(type.getModifiers())) throw new IllegalArgumentException("Cannot create " + MemoryPool.class.getSimpleName() + " of an interface.");
         this.initialCapacity = initialCapacity;
-        this.freeObjects = new CollectionsArrayConcurrent<>(initialCapacity);
+        this.freeObjects = new ArrayConcurrent<>(initialCapacity);
         try {
             this.constructor = type.getConstructor();
             for (int i = 0; i < freeObjects.size; i++) {

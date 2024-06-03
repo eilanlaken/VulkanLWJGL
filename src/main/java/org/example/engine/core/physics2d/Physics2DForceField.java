@@ -1,6 +1,6 @@
 package org.example.engine.core.physics2d;
 
-import org.example.engine.core.math.MathVector2;
+import org.example.engine.core.math.Vector2;
 
 public abstract class Physics2DForceField {
 
@@ -10,6 +10,6 @@ public abstract class Physics2DForceField {
         this.world = world;
     }
 
-    public abstract void calculateForce(Physics2DBody body, MathVector2 out);
+    public abstract void calculateForce(Physics2DBody body, Vector2 out);
 
 }

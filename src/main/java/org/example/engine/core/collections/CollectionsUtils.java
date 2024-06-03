@@ -37,7 +37,7 @@ public final class CollectionsUtils {
         return true;
     }
 
-    public static <T extends Comparable> void sort(CollectionsArray<T> a) {
+    public static <T extends Comparable> void sort(Array<T> a) {
         arraySorterComparable.doSort(a.items, 0, a.size);
     }
 
@@ -49,7 +49,7 @@ public final class CollectionsUtils {
         arraySorterComparable.doSort(a, fromIndex, toIndex);
     }
 
-    public static <T> void sort(CollectionsArray<T> a, Comparator<? super T> c) {
+    public static <T> void sort(Array<T> a, Comparator<? super T> c) {
         arraySorter.doSort(a.items, c, 0, a.size);
     }
 
