@@ -33,22 +33,22 @@ public class Renderer2D_new implements MemoryResourceHolder {
 
     // defaults
     private final ShaderProgram defaultShader = createDefaultShaderProgram();
-    private final Texture whitePixel    = createWhiteSinglePixelTexture();
-    private final Camera defaultCamera = createDefaultCamera();
+    private final Texture       whitePixel    = createWhiteSinglePixelTexture();
+    private final Camera        defaultCamera = createDefaultCamera();
 
     // cached colors
     private final float TINT_WHITE = new Color(1,1,1,1).toFloatBits();
     private final float TINT_SHAPE = new Color(0,0,1,1).toFloatBits();
 
     // state
-    private Camera currentCamera = null;
-    private Texture lastTexture   = null;
+    private Camera        currentCamera = null;
+    private Texture       lastTexture   = null;
     private ShaderProgram currentShader = null;
-    private boolean               drawing       = false;
-    private int                   vertexIndex   = 0;
-    private int                   triangleIndex = 0;
-    private int                   mode          = GL11.GL_TRIANGLES;
-    private int                   drawCalls     = 0;
+    private boolean       drawing       = false;
+    private int           vertexIndex   = 0;
+    private int           triangleIndex = 0;
+    private int           mode          = GL11.GL_TRIANGLES;
+    private int           drawCalls     = 0;
 
     // buffers
     private final int vao;

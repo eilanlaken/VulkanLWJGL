@@ -17,18 +17,19 @@ public class ShaderProgram implements MemoryResource {
 
     public final String vertexShaderSource;
     public final String fragmentShaderSource;
-    public final int program;
-    protected final int vertexShaderId;
-    protected final int fragmentShaderId;
-    private String log;
-    private boolean isCompiled;
+
+    public final int    program;
+    public final int    vertexShaderId;
+    public final int    fragmentShaderId;
+
     private final MapObjectInt<String> uniformLocations;
     private final MapObjectInt<String> uniformTypes;
     private final MapObjectInt<String> uniformSizes;
-    private String[] uniformNames;
     private final MapObjectInt<String> attributeLocations;
     private final MapObjectInt<String> attributeTypes;
     private final MapObjectInt<String> attributeSizes;
+
+    private String[] uniformNames;
     private String[] attributeNames;
     private Object[] uniformCache;
 
@@ -363,7 +364,7 @@ public class ShaderProgram implements MemoryResource {
     }
 
     private static class Matrix4Cache {
-        private Matrix4x4 value = new Matrix4x4();
+        private final Matrix4x4 value = new Matrix4x4();
     }
 
 }
