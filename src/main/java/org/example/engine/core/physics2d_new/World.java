@@ -2,6 +2,7 @@ package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.memory.MemoryPool;
+import org.example.engine.core.physics2d.Physics2DWorldRenderer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +31,14 @@ public class World {
     public Array<Constraint> allConstraints      = new Array<>(false, 10);
     public Array<Constraint> constraintsToAdd    = new Array<>(false, 5);
     public Array<Constraint> constraintsToRemove = new Array<>(false, 5);
+
+    // debugger options
+    private final WorldRenderer debugRenderer     = new WorldRenderer(this);
+    public        boolean       renderBodies      = true;
+    public        boolean       renderVelocities  = false;
+    public        boolean       renderConstraints = true;
+    public        boolean       renderRays        = true;
+    public        boolean       renderContacts    = true;
 
     public void update(float delta) {
         /* add and remove bodies */

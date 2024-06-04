@@ -273,7 +273,51 @@ public class Renderer2D_new implements MemoryResourceHolder {
         if (shape instanceof Shape2DUnion) pushDebugCompoundShape((Shape2DUnion) shape, tintFloatBits);
     }
 
-    public void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
+    public void pushThinCircle(final float r, final float centerX, final float centerY, final Color color) {
+        pushThinCircle(r, centerX, centerY, color.toFloatBits());
+    }
+
+    public void pushThinCircle(final float r, final float centerX, final float centerY, final float tintFloatBits) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 34 * 2 > indicesBuffer.limit() || vertexIndex + 17 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
+
+        useShader(defaultShader);
+        useMode(GL11.GL_LINES);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 1; i < 15; i++) {
+            indicesBuffer.put(startVertex + i - 1);
+            indicesBuffer.put(startVertex + i);
+        }
+        indicesBuffer.put(startVertex + 14);
+        indicesBuffer.put(startVertex);
+        indicesBuffer.put(startVertex + 15);
+        indicesBuffer.put(startVertex + 16);
+        triangleIndex += 34;
+
+        float da = 360f / 15;
+        for (int i = 0; i < 15; i++) {
+            verticesBuffer
+                    .put(centerX + r * MathUtils.cosDeg(da * i))
+                    .put(centerY + r * MathUtils.sinDeg(da * i))
+                    .put(tintFloatBits)
+                    .put(0.5f)
+                    .put(0.5f)
+            ;
+        }
+        vertexIndex += 15 * 5;
+        /*
+        verticesBuffer.put(x).put(y).put(tintFloatBits).put(0.5f).put(0.5f);
+        verticesBuffer.put(x + r * MathUtils.cosDeg(circle.angle())).put(y + r * MathUtils.sinDeg(circle.angle())).put(tintFloatBits).put(0.5f).put(0.5f);
+         */
+    }
+
+    @Deprecated public void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
         if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
         if (triangleIndex + 34 * 2 > indicesBuffer.limit() || vertexIndex + 17 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
@@ -411,6 +455,10 @@ public class Renderer2D_new implements MemoryResourceHolder {
         verticesBuffer.put(centerX).put(centerY).put(tintFloatBits).put(0.5f).put(0.5f);
         verticesBuffer.put(lineEndX).put(lineEndY).put(tintFloatBits).put(0.5f).put(0.5f);
         vertexIndex += 6 * 5;
+    }
+
+    public void pushThinLineSegment(float x1, float y1, float x2, float y2, final Color color) {
+        pushThinLineSegment(x1, y1, x2, y2, color.toFloatBits());
     }
 
     public void pushThinLineSegment(float x1, float y1, float x2, float y2, final float tintFloatBits) {
