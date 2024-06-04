@@ -7,12 +7,16 @@ public final class Physics2DUtils {
 
     private Physics2DUtils() {}
 
-    public Vector2 calculateCenterOfMass(final Array<BodyCollider> colliders) {
+    public static float calculateTotalMass(final BodyCollider ...collider) {
+        return 0;
+    }
+
+    public static Vector2 calculateCenterOfMass(final BodyCollider ...colliders) {
 
         return null;
     }
 
-    public float calculateMomentOfInertia(final Array<BodyCollider> colliders) {
+    public static float calculateMomentOfInertia(final BodyCollider ...colliders) {
 
         return -1;
     }

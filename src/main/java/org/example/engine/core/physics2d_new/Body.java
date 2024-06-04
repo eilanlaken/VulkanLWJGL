@@ -2,12 +2,13 @@ package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.memory.MemoryPool;
+import org.jetbrains.annotations.NotNull;
 
-public class Body implements MemoryPool.Reset {
+public class Body implements MemoryPool.Reset, Comparable<Body> {
 
     public Array<BodyCollider> colliders;
 
-    public    Object     data       = null;
+    public    Object     owner      = null;
     protected boolean    inserted   = false; // if the body is currently in the world
     protected int        index      = -1;
     public    boolean    off        = false; // bodies can be turned on / off
@@ -41,9 +42,18 @@ public class Body implements MemoryPool.Reset {
 
     public Body() {}
 
+    public void setMotionState(float x, float y, float angleDeg, float vx, float vy, float angularVelocityDeg) {
+        this.x = x;
+        this.y = y;
+        this.angleDeg = angleDeg;
+        this.vx = vx;
+        this.vy = vy;
+        this.angularVelocityDeg = angularVelocityDeg;
+    }
+
     @Override
     public void reset() {
-        this.data = null;
+        this.owner = null;
         this.inserted = false;
         this.index = -1;
         this.off = false;
@@ -65,6 +75,11 @@ public class Body implements MemoryPool.Reset {
         this.justCollided.clear();
         this.justSeparated.clear();
         this.constraints.clear();
+    }
+
+    @Override
+    public int compareTo(@NotNull Body o) {
+        return Integer.compare(index, o.index);
     }
 
     public enum MotionType {
