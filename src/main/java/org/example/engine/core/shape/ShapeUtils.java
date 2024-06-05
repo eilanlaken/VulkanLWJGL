@@ -76,7 +76,7 @@ public final class ShapeUtils {
         }
         int[] indices = cachedFilledCirclesIndices.get(radiusRefinement);
         if (indices == null) {
-            indices = triangulatePolygon(vertices);
+            indices = triangulate2DPolygon(vertices);
             cachedFilledCirclesIndices.put(radiusRefinement, indices);
         }
         return new Shape2DPolygon(indices, vertices);
@@ -104,7 +104,7 @@ public final class ShapeUtils {
         }
         int[] indices = cachedFilledCircleArcsIndices.get(tuple4);
         if (indices == null) {
-            indices = triangulatePolygon(vertices);
+            indices = triangulate2DPolygon(vertices);
             cachedFilledCircleArcsIndices.put(tuple4, indices);
         }
         return new Shape2DPolygon(indices, vertices);
@@ -172,7 +172,7 @@ public final class ShapeUtils {
 
         int[] indices = cachedHollowCircleArcsIndices.get(tuple5);
         if (indices == null) {
-            indices = triangulatePolygon(vertices);
+            indices = triangulate2DPolygon(vertices);
             cachedHollowCircleArcsIndices.put(tuple5, indices);
         }
         return new Shape2DPolygon(indices, vertices);
@@ -234,7 +234,7 @@ public final class ShapeUtils {
             vertices[vertices.length - i - 2 + 1] = function.apply(x) + halfStroke;
         }
 
-        int[] indices = triangulatePolygon(vertices);
+        int[] indices = triangulate2DPolygon(vertices);
         return new Shape2DPolygon(indices, vertices);
     }
 
@@ -330,7 +330,7 @@ public final class ShapeUtils {
      * @param vertices is a flat array of vertice coordinates like [x0,y0, x1,y1, x2,y2, ...].
      * @return List containing groups of three vertice indices in the resulting array forms a triangle.
      */
-    public static int[] triangulatePolygon(float[] vertices) {
+    public static int[] triangulate2DPolygon(float[] vertices) {
         return triangulatePolygon(vertices, null, 2);
     }
 
