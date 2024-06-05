@@ -21,10 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-// TODO: to make it a standalone, make it initialize the opengl context itself, in case it is not initialized. Maybe.
-// TODO: fix rendering bug.
-// TODO: overhaul, rename some methods, give option to render functions using lines.
-public class Renderer2D implements MemoryResourceHolder {
+@Deprecated public class Renderer2D implements MemoryResourceHolder {
 
     // constants
     private static final int VERTEX_SIZE        = 5;
