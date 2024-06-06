@@ -7,6 +7,6 @@ import org.example.engine.core.shape2d.Shape2D;
 
 import java.util.Objects;
 
-public class Collision {
+public final class Collision {
 
 }

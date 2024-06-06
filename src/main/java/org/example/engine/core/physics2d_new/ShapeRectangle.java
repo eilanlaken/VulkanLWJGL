@@ -4,7 +4,7 @@ import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 
-public class ShapeRectangle extends Shape {
+public final class ShapeRectangle extends Shape {
 
     public final float width;
     public final float height;

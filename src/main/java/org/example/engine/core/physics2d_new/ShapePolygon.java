@@ -12,7 +12,7 @@ Represents a <i>convex</i> polygon.
 Any concave polygons or polygons with holes will be broken down into
 a set of convex polygons.
  */
-public class ShapePolygon extends Shape {
+public final class ShapePolygon extends Shape {
 
     public  final int            vertexCount;
     private final float[]        vertices;

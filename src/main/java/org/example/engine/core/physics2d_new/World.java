@@ -1,6 +1,9 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.Renderer2D_new;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.MemoryPool;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +37,7 @@ public class World {
     // debugger options
     private final WorldRenderer debugRenderer     = new WorldRenderer(this);
     public        boolean       renderBodies      = true;
-    public        boolean       renderVelocities  = false;
+    public        boolean       renderVelocities  = true;
     public        boolean       renderConstraints = true;
     public        boolean       renderRays        = true;
     public        boolean       renderContacts    = true;
@@ -60,12 +63,16 @@ public class World {
         }
     }
 
+    public void render(Renderer2D_new renderer) {
+        debugRenderer.render(renderer);
+    }
+
     // TODO
     @Contract(pure = true)
     @NotNull
     public Body createBodyCircle(Object owner,
                                           Body.MotionType motionType,
-                                          float x, float y, float angle,
+                                          float x, float y, float angleDeg,
                                           float velX, float velY, float velAngleDeg,
                                           float density, float staticFriction, float dynamicFriction, float restitution,
                                           boolean ghost, int bitmask,
@@ -74,13 +81,20 @@ public class World {
         body.owner = owner;
         body.off = false;
         body.motionType = motionType;
+
+        BodyCollider collider = new BodyCollider();
+        collider.shape = new ShapeCircle(radius, 0,0);
+        collider.density = 1;
+        collider.body = body;
+        body.colliders.add(collider);
+
         // TODO
         body.mass = Physics2DUtils.calculateTotalMass(null);
         body.massInv = 1.0f / body.mass;
         // TODO
         body.inertia = Physics2DUtils.calculateMomentOfInertia(null);
         body.inertiaInv = 1.0f / body.inertia;
-        body.setMotionState(x, y, angle, velX, velY, velAngleDeg);
+        body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
         bodiesToAdd.add(body);
         return body;
     }

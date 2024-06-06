@@ -17,12 +17,12 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
     // transform
     protected float x;
     protected float y;
-    protected float angleDeg;
+    protected float angleRad;
 
     // velocity
     protected float vx;
     protected float vy;
-    protected float angularVelocityDeg;
+    protected float angularVelocityRad;
 
     // acceleration
     public float netForceX;
@@ -42,13 +42,13 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
 
     public Body() {}
 
-    public void setMotionState(float x, float y, float angleDeg, float vx, float vy, float angularVelocityDeg) {
+    public void setMotionState(float x, float y, float angleRad, float vx, float vy, float angularVelocityRad) {
         this.x = x;
         this.y = y;
-        this.angleDeg = angleDeg;
+        this.angleRad = angleRad;
         this.vx = vx;
         this.vy = vy;
-        this.angularVelocityDeg = angularVelocityDeg;
+        this.angularVelocityRad = angularVelocityRad;
     }
 
     @Override
@@ -61,11 +61,11 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
 
         this.x = 0;
         this.y = 0;
-        this.angleDeg = 0;
+        this.angleRad = 0;
 
         this.vx = 0;
         this.vy = 0;
-        this.angularVelocityDeg = 0;
+        this.angularVelocityRad = 0;
 
         this.netForceX = 0;
         this.netForceY = 0;

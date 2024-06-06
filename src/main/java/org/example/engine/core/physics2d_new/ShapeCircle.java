@@ -5,7 +5,7 @@ import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.shape.ShapeException;
 
-public class ShapeCircle extends Shape {
+public final class ShapeCircle extends Shape {
 
     public  final Vector2 localCenter;
     public  final float   r;
