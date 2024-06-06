@@ -17,8 +17,8 @@ public abstract class BodyCollider {
     protected float   area        = 0;
     protected boolean calcArea    = false;
     protected boolean calcRadius  = false;
-    protected float   r           = 0; // the bounding radius r
-    protected float   r2          = 0; // r squared
+    protected float   boundingRadius = 0; // the bounding radius r
+    protected float   boundingRadiusSquared = 0; // r squared
     protected boolean updated     = false;
     protected Vector2 localCenter = null;
     protected Vector2 worldCenter = new Vector2();
@@ -42,11 +42,6 @@ public abstract class BodyCollider {
         return containsPoint(x, y);
     }
 
-    public final Array<Vector2> worldVertices() {
-        if (!updated) update();
-        return getWorldVertices();
-    }
-
     public final Vector2 worldCenter() {
         if (localCenter == null) {
             localCenter = calculateLocalCenter();
@@ -64,20 +59,20 @@ public abstract class BodyCollider {
 
     public final float boundingRadius() {
         if (!calcRadius) {
-            r = calculateBoundingRadius();
-            r2 = r * r;
+            boundingRadius = calculateBoundingRadius();
+            boundingRadiusSquared = boundingRadius * boundingRadius;
             calcRadius = true;
         }
-        return r;
+        return boundingRadius;
     }
 
     public final float boundingRadiusSquared() {
         if (!calcRadius) {
-            r = calculateBoundingRadius();
-            r2 = r * r;
+            boundingRadius = calculateBoundingRadius();
+            boundingRadiusSquared = boundingRadius * boundingRadius;
             calcRadius = true;
         }
-        return r2;
+        return boundingRadiusSquared;
     }
 
     public final void update() {
@@ -87,21 +82,20 @@ public abstract class BodyCollider {
     }
 
     public final float getMinExtentX() {
-        return body.x - r;
+        return body.x - boundingRadius;
     }
     public final float getMaxExtentX() {
-        return body.x + r;
+        return body.x + boundingRadius;
     }
     public final float getMinExtentY() {
-        return body.y - r;
+        return body.y - boundingRadius;
     }
     public final float getMaxExtentY() {
-        return body.y + r;
+        return body.y + boundingRadius;
     }
 
     protected abstract boolean        containsPoint(float x, float y);
     protected abstract void           updateWorldCoordinates();
-    protected abstract Array<Vector2> getWorldVertices();
     protected abstract float          calculateBoundingRadius();
     protected abstract float          calculateArea();
     protected abstract Vector2        calculateLocalCenter();

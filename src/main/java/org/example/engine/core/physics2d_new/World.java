@@ -81,11 +81,39 @@ public class World {
         body.off = false;
         body.motionType = motionType;
 
-        z_BodyCollider_old collider = new z_BodyCollider_old();
-        collider.shape = new ShapeCircle(radius, 0,0);
-        collider.density = 1;
-        collider.body = body;
-        body.colliders.add(collider);
+        BodyColliderCircle circleCollider = new BodyColliderCircle(body, density, staticFriction,
+                dynamicFriction, restitution, ghost, bitmask, radius, 0, 0);
+        body.colliders.add(circleCollider);
+
+        // TODO
+        body.mass = Physics2DUtils.calculateTotalMass(null);
+        body.massInv = 1.0f / body.mass;
+        // TODO
+        body.inertia = Physics2DUtils.calculateMomentOfInertia(null);
+        body.inertiaInv = 1.0f / body.inertia;
+        body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
+        bodiesToAdd.add(body);
+        return body;
+    }
+
+    // TODO
+    @Contract(pure = true)
+    @NotNull
+    public Body createBodyRectangle(Object owner,
+                                 Body.MotionType motionType,
+                                 float x, float y, float angleDeg,
+                                 float velX, float velY, float velAngleDeg,
+                                 float density, float staticFriction, float dynamicFriction, float restitution,
+                                 boolean ghost, int bitmask,
+                                 float width, float height) {
+        Body body = bodiesPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+
+        BodyColliderRectangle rectangleCollider = new BodyColliderRectangle(body, density, staticFriction,
+                dynamicFriction, restitution, ghost, bitmask, 0, 0, width, height, 0);
+        body.colliders.add(rectangleCollider);
 
         // TODO
         body.mass = Physics2DUtils.calculateTotalMass(null);

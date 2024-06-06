@@ -37,21 +37,51 @@ public class WorldRenderer {
         if (world.renderBodies) {
             Array<Body> bodies = world.allBodies;
             for (Body body : bodies) {
-                Array<z_BodyCollider_old> colliders = body.colliders;
-                for (z_BodyCollider_old collider : colliders) {
+                Array<BodyCollider> colliders = body.colliders;
+                for (BodyCollider collider : colliders) {
                     /* render a circle */
-                    if (collider.shape instanceof ShapeCircle) {
-                        ShapeCircle circle = (ShapeCircle) collider.shape;
+                    if (collider instanceof BodyColliderCircle) {
+                        BodyColliderCircle circle = (BodyColliderCircle) collider;
                         float tint = body.motionType == Body.MotionType.STATIC ? TINT_STATIC : body.motionType == Body.MotionType.KINEMATIC ? TINT_KINEMATIC : TINT_NEWTONIAN;
                         Vector2 worldCenter = circle.worldCenter();
                         float r = circle.r;
                         float angleRad = body.angleRad;
                         float x1 = worldCenter.x;
                         float y1 = worldCenter.y;
-                        float x2 = r * MathUtils.cosRad(angleRad);
-                        float y2 = r * MathUtils.sinRad(angleRad);
+                        float x2 = x1 + r * MathUtils.cosRad(angleRad);
+                        float y2 = y1 + r * MathUtils.sinRad(angleRad);
                         renderer.pushThinCircle(r, worldCenter.x, worldCenter.y, tint);
                         renderer.pushThinLineSegment(x1,y1,x2,y2,tint);
+                        continue;
+                    }
+
+                    /* render a rectangle */
+                    if (collider instanceof BodyColliderRectangle) {
+                        BodyColliderRectangle rectangle = (BodyColliderRectangle) collider;
+                        float tint = body.motionType == Body.MotionType.STATIC ? TINT_STATIC : body.motionType == Body.MotionType.KINEMATIC ? TINT_KINEMATIC : TINT_NEWTONIAN;
+
+                        float angleRad = body.angleRad;
+                        float x0 = rectangle.c0().x;
+                        float y0 = rectangle.c0().y;
+
+                        float x1 = rectangle.c1().x;
+                        float y1 = rectangle.c1().y;
+
+                        float x2 = rectangle.c2().x;
+                        float y2 = rectangle.c2().y;
+
+                        float x3 = rectangle.c3().x;
+                        float y3 = rectangle.c3().y;
+
+
+                        renderer.pushThinRectangle(x0,y0, x1,y1, x2,y2, x3,y3, tint);
+                        renderer.pushThinLineSegment(
+                                rectangle.worldCenter().x,
+                                rectangle.worldCenter().y,
+                                rectangle.worldCenter().x + 0.5f * rectangle.width * MathUtils.cosRad(angleRad),
+                                rectangle.worldCenter().y + 0.5f * rectangle.width * MathUtils.sinRad(angleRad),
+                                tint);
+                        continue;
                     }
                 }
             }

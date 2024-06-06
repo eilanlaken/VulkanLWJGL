@@ -34,7 +34,8 @@ public class ScenePhysics2D_new_1 extends ApplicationScreen {
         camera = new Camera(640f/32,480f/32, 1);
         camera.update();
 
-        body_a = world.createBodyCircle(null, Body.MotionType.STATIC, 0, 0, 90, 0, 0, 0, 1, 1, 1, 1, false, 1, 1);
+        body_a = world.createBodyCircle(null, Body.MotionType.STATIC, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, false, 1, 1);
+        body_b = world.createBodyRectangle(null, Body.MotionType.STATIC, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, false, 1, 3, 1);
 
     }
 

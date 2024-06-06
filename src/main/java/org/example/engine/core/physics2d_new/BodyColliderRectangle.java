@@ -4,7 +4,17 @@ import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 
-public final class ShapeRectangle extends Shape {
+/**
+Represent a rectangular body collider:
+
+       c0 ---------------c3
+       |                 |
+       |                 |
+       |                 |
+       c1 --------------c2
+
+ **/
+public final class BodyColliderRectangle extends BodyCollider {
 
     public final float width;
     public final float height;
@@ -16,47 +26,22 @@ public final class ShapeRectangle extends Shape {
     private final Vector2 c3Local;
 
     // world corners:
-    /**
-     *  c0 ---------------c3
-     *  |                 |
-     *  |                 |
-     *  |                 |
-     *  c1 --------------c2
-     */
     private final Vector2 c0 = new Vector2();
     private final Vector2 c1 = new Vector2();
     private final Vector2 c2 = new Vector2();
     private final Vector2 c3 = new Vector2();
-    private final Array<Vector2> worldVertices;
 
-    public ShapeRectangle(float centerX, float centerY, float width, float height, float rotate) {
+    public BodyColliderRectangle(Body body, float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
+                                 float centerX, float centerY, float width, float height, float rotateRad) {
+        super(body, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
         this.width = width;
         this.height = height;
         final float widthHalf = width * 0.5f;
         final float heightHalf = height * 0.5f;
-        this.c0Local = new Vector2(-widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.c1Local = new Vector2(-widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.c2Local = new Vector2(+widthHalf, -heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.c3Local = new Vector2(+widthHalf, +heightHalf).rotateDeg(rotate).add(centerX, centerY);
-        this.worldVertices = new Array<>(true, 4);
-        this.worldVertices.addAll(c0, c1, c2, c3);
-    }
-
-    public ShapeRectangle(float width, float height) {
-        this.width = width;
-        this.height = height;
-        final float widthHalf = width * 0.5f;
-        final float heightHalf = height * 0.5f;
-        this.c0Local = new Vector2(-widthHalf, +heightHalf);
-        this.c1Local = new Vector2(-widthHalf, -heightHalf);
-        this.c2Local = new Vector2(+widthHalf, -heightHalf);
-        this.c3Local = new Vector2(+widthHalf, +heightHalf);
-        this.worldVertices = new Array<>(true, 4);
-        this.worldVertices.addAll(c0, c1, c2, c3);
-    }
-
-    public ShapeRectangle(float width, float height, float angle) {
-        this(0,0, width, height, angle);
+        this.c0Local = new Vector2(-widthHalf, +heightHalf).rotateRad(rotateRad).add(centerX, centerY);
+        this.c1Local = new Vector2(-widthHalf, -heightHalf).rotateRad(rotateRad).add(centerX, centerY);
+        this.c2Local = new Vector2(+widthHalf, -heightHalf).rotateRad(rotateRad).add(centerX, centerY);
+        this.c3Local = new Vector2(+widthHalf, +heightHalf).rotateRad(rotateRad).add(centerX, centerY);
     }
 
     @Override
@@ -106,17 +91,18 @@ public final class ShapeRectangle extends Shape {
         c3.set(c3Local);
 
         // rotate
-        if (!MathUtils.isZero(angleRad)) {
-            c0.rotateRad(angleRad);
-            c1.rotateRad(angleRad);
-            c2.rotateRad(angleRad);
-            c3.rotateRad(angleRad);
+        if (!MathUtils.isZero(body.angleRad)) {
+            c0.rotateRad(body.angleRad);
+            c1.rotateRad(body.angleRad);
+            c2.rotateRad(body.angleRad);
+            c3.rotateRad(body.angleRad);
         }
+
         // translate
-        c0.add(x, y);
-        c1.add(x, y);
-        c2.add(x, y);
-        c3.add(x, y);
+        c0.add(body.x, body.y);
+        c1.add(body.x, body.y);
+        c2.add(body.x, body.y);
+        c3.add(body.x, body.y);
     }
 
     public Vector2 c0() {
@@ -137,18 +123,6 @@ public final class ShapeRectangle extends Shape {
     public Vector2 c3() {
         if (!updated) update();
         return c3;
-    }
-
-    public boolean isAxisAligned() {
-        if (!updated) update();
-        if (MathUtils.floatsEqual(c0.x, c1.x) && MathUtils.floatsEqual(c1.y, c2.y)) return true;
-        if (MathUtils.floatsEqual(c0.y, c1.y) && MathUtils.floatsEqual(c1.x, c2.x)) return true;
-        return false;
-    }
-
-    @Override
-    protected Array<Vector2> getWorldVertices() {
-        return worldVertices;
     }
 
     @Override

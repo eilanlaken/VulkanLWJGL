@@ -5,30 +5,28 @@ import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.shape.ShapeException;
 
-public final class BodyColliderCircle extends Shape {
+public final class BodyColliderCircle extends BodyCollider {
 
-    public  final Vector2 localCenter;
-    public  final float   r;
-    public  final float   r2;
-    private final Vector2 worldCenter;
+    public final Vector2 localCenter;
+    public final Vector2 worldCenter;
+    public final float   r;
+    public final float   r2;
 
-    public BodyColliderCircle(float r, float x, float y) {
-        if (r < 0) throw new IllegalArgumentException("Radius must be positive. Got: " + r);
+    public BodyColliderCircle(Body body, float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
+                              float r, float x, float y) {
+        super(body, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
+        if (r <= 0) throw new Physics2DException("Radius of circle collider must be positive. Got: " + r);
         this.localCenter = new Vector2(x, y);
-        this.r = r;
-        this.r2 = r * r;
         this.worldCenter = new Vector2(localCenter);
-    }
-
-    public BodyColliderCircle(float r) {
-        this(r, 0, 0);
+        this.r  = r;
+        this.r2 = r * r;
     }
 
     @Override
     protected void updateWorldCoordinates() {
         worldCenter.set(localCenter);
-        if (!MathUtils.isZero(angleRad)) worldCenter.rotateRad(angleRad);
-        worldCenter.add(x, y);
+        if (!MathUtils.isZero(body.angleRad)) worldCenter.rotateRad(body.angleRad);
+        worldCenter.add(body.x, body.y);
     }
 
     @Override
@@ -48,7 +46,7 @@ public final class BodyColliderCircle extends Shape {
 
     @Override
     protected float calculateArea() {
-        return MathUtils.PI * r * r;
+        return MathUtils.PI * r2;
     }
 
     public Vector2 getLocalCenter() {
@@ -58,15 +56,6 @@ public final class BodyColliderCircle extends Shape {
     public Vector2 getWorldCenter() {
         if (!updated) update();
         return worldCenter;
-    }
-
-    public float getR() {
-        return r;
-    }
-
-    @Override
-    protected Array<Vector2> getWorldVertices() {
-        throw new ShapeException("Cannot get a world vertices list for " + BodyColliderCircle.class.getSimpleName() + ": operation not supported. A circle: " + BodyColliderCircle.class.getSimpleName() + " is only represented using a center: " + Vector2.class.getSimpleName() + " and a radius: float.");
     }
 
     @Override

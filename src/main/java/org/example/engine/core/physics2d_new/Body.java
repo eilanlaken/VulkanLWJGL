@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class Body implements MemoryPool.Reset, Comparable<Body> {
 
-    public Array<z_BodyCollider_old> colliders = new Array<>();
+    public Array<BodyCollider> colliders = new Array<>();
 
     public    Object     owner      = null;
     protected boolean    inserted   = false; // if the body is currently in the world

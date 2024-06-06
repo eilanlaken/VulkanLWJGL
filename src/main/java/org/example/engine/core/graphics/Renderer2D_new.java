@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 // TODO: to make it a standalone, make it initialize the opengl context itself, in case it is not initialized. Maybe.
 // TODO: fix rendering bug.
 // TODO: overhaul, rename some methods, give option to render functions using lines.
+// TODO: instead of taking shaders as arguments, deploy useShader()
 public class Renderer2D_new implements MemoryResourceHolder {
 
     // constants
@@ -272,8 +273,6 @@ public class Renderer2D_new implements MemoryResourceHolder {
     }
 
     @Deprecated public void pushDebugShape(Shape2D shape, final float tintFloatBits) {
-        if (shape instanceof Shape2DCircle) pushDebugCircle((Shape2DCircle) shape, tintFloatBits);
-        if (shape instanceof Shape2DRectangle) pushDebugRectangle((Shape2DRectangle) shape, tintFloatBits);
         if (shape instanceof Shape2DPolygon) pushDebugPolygon((Shape2DPolygon) shape, tintFloatBits);
     }
 
@@ -281,7 +280,43 @@ public class Renderer2D_new implements MemoryResourceHolder {
         pushThinCircle(r, centerX, centerY, color.toFloatBits());
     }
 
+    // TODO: add refinement argument
     public void pushThinCircle(final float r, final float centerX, final float centerY, final float tintFloatBits) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (vertexIndex + 15 * 5 * 2 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
+
+        useShader(defaultShader);
+        useMode(GL11.GL_LINES);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 1; i < 15; i++) {
+            indicesBuffer.put(startVertex + i - 1);
+            indicesBuffer.put(startVertex + i);
+        }
+        indicesBuffer.put(startVertex + 14);
+        indicesBuffer.put(startVertex);
+        indicesBuffer.put(startVertex + 15);
+        indicesBuffer.put(startVertex + 16);
+
+        float da = 360f / 15;
+        for (int i = 0; i < 15; i++) {
+            verticesBuffer
+                    .put(centerX + r * MathUtils.cosDeg(da * i))
+                    .put(centerY + r * MathUtils.sinDeg(da * i))
+                    .put(tintFloatBits)
+                    .put(0.5f)
+                    .put(0.5f)
+            ;
+        }
+        vertexIndex += 15 * 5;
+    }
+
+    public void pushThinCircle(final float r, final float centerX, final float centerY, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, final float tintFloatBits) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (vertexIndex + 15 * 5 * 2 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
             flush();
@@ -318,48 +353,6 @@ public class Renderer2D_new implements MemoryResourceHolder {
         verticesBuffer.put(x).put(y).put(tintFloatBits).put(0.5f).put(0.5f);
         verticesBuffer.put(x + r * MathUtils.cosDeg(circle.angle())).put(y + r * MathUtils.sinDeg(circle.angle())).put(tintFloatBits).put(0.5f).put(0.5f);
          */
-    }
-
-    @Deprecated public void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + 17 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
-            flush();
-        }
-
-        useShader(defaultShader);
-        useMode(GL11.GL_LINES);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-
-        // put indices
-        int startVertex = this.vertexIndex / VERTEX_SIZE;
-        for (int i = 1; i < 15; i++) {
-            indicesBuffer.put(startVertex + i - 1);
-            indicesBuffer.put(startVertex + i);
-        }
-        indicesBuffer.put(startVertex + 14);
-        indicesBuffer.put(startVertex);
-        indicesBuffer.put(startVertex + 15);
-        indicesBuffer.put(startVertex + 16);
-
-        Vector2 worldCenter = circle.getWorldCenter();
-        float worldRadius = circle.getWorldRadius();
-        float x = worldCenter.x;
-        float y = worldCenter.y;
-        float r = worldRadius;
-        float da = 360f / 15;
-        for (int i = 0; i < 15; i++) {
-            verticesBuffer
-                    .put(x + r * MathUtils.cosDeg(da * i))
-                    .put(y + r * MathUtils.sinDeg(da * i))
-                    .put(tintFloatBits)
-                    .put(0.5f)
-                    .put(0.5f)
-            ;
-        }
-        verticesBuffer.put(x).put(y).put(tintFloatBits).put(0.5f).put(0.5f);
-        verticesBuffer.put(x + r * MathUtils.cosDeg(circle.angle())).put(y + r * MathUtils.sinDeg(circle.angle())).put(tintFloatBits).put(0.5f).put(0.5f);
-        vertexIndex += 17 * 5;
     }
 
     public void pushThinRectangle(
@@ -408,60 +401,6 @@ public class Renderer2D_new implements MemoryResourceHolder {
         ;
 
         vertexIndex += 4 * 5;
-
-//        float centerX = (x0 + x1 + x2 + x3) * 0.25f;
-//        float centerY = (y0 + y1 + y2 + y3) * 0.25f;
-//        float lineEndX = (x2 + x3) * 0.5f;
-//        float lineEndY = (y2 + y3) * 0.5f;
-//        verticesBuffer.put(centerX).put(centerY).put(tintFloatBits).put(0.5f).put(0.5f);
-//        verticesBuffer.put(lineEndX).put(lineEndY).put(tintFloatBits).put(0.5f).put(0.5f);
-    }
-
-    @Deprecated public void pushDebugRectangle(final Shape2DRectangle rectangle, final float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + 6 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
-            flush();
-        }
-
-        useShader(defaultShader);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-        useMode(GL11.GL_LINES);
-
-        // put indices
-        int startVertex = this.vertexIndex / VERTEX_SIZE;
-        indicesBuffer
-                .put(startVertex)
-                .put(startVertex + 1)
-                .put(startVertex + 1)
-                .put(startVertex + 2)
-                .put(startVertex + 2)
-                .put(startVertex + 3)
-                .put(startVertex + 3)
-                .put(startVertex)
-        ;
-        indicesBuffer.put(startVertex + 4);
-        indicesBuffer.put(startVertex + 5);
-
-        rectangle.update();
-        float x1 = rectangle.c0().x, y1 = rectangle.c0().y;
-        float x2 = rectangle.c1().x, y2 = rectangle.c1().y;
-        float x3 = rectangle.c2().x, y3 = rectangle.c2().y;
-        float x4 = rectangle.c3().x, y4 = rectangle.c3().y;
-        verticesBuffer
-                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // V1
-                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // V2
-                .put(x3).put(y3).put(tintFloatBits).put(0.5f).put(0.5f) // V3
-                .put(x4).put(y4).put(tintFloatBits).put(0.5f).put(0.5f) // V4
-        ;
-
-        float centerX = (x1 + x2 + x3 + x4) * 0.25f;
-        float centerY = (y1 + y2 + y3 + y4) * 0.25f;
-        float lineEndX = (x3 + x4) * 0.5f;
-        float lineEndY = (y3 + y4) * 0.5f;
-        verticesBuffer.put(centerX).put(centerY).put(tintFloatBits).put(0.5f).put(0.5f);
-        verticesBuffer.put(lineEndX).put(lineEndY).put(tintFloatBits).put(0.5f).put(0.5f);
-        vertexIndex += 6 * 5;
     }
 
     public void pushThinLineSegment(float x1, float y1, float x2, float y2, final Color color) {
@@ -521,7 +460,7 @@ public class Renderer2D_new implements MemoryResourceHolder {
         vertexIndex += 2 * 5;
     }
 
-    public void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {
+    @Deprecated public void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (vertexIndex + polygon.vertexCount * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();

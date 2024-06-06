@@ -3,8 +3,6 @@ package org.example.engine.core.physics2d_new;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
-import org.example.engine.core.shape.ShapeUtils;
-import org.example.engine.core.shape2d.Shape2DException;
 import org.jetbrains.annotations.NotNull;
 
 /*
@@ -12,14 +10,16 @@ Represents a <i>convex</i> polygon.
 Any concave polygons or polygons with holes will be broken down into
 a set of convex polygons.
  */
-public final class ShapePolygon extends Shape {
+public final class BodyColliderPolygon extends BodyCollider {
 
     public  final int            vertexCount;
     private final float[]        vertices;
     public  final int[]          indices;
     private final Array<Vector2> worldVertices;
 
-    ShapePolygon(float[] vertices) throws RuntimeException {
+    BodyColliderPolygon(Body body, float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
+                        float[] vertices) throws RuntimeException {
+        super(body, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
         this.vertexCount = vertices.length / 2;
@@ -74,20 +74,15 @@ public final class ShapePolygon extends Shape {
 
     @Override
     protected void updateWorldCoordinates() {
-        if (MathUtils.isZero(angleRad)) {
+        if (MathUtils.isZero(body.angleRad)) {
             for (int i = 0; i < vertexCount; i++) {
-                worldVertices.get(i).set(vertices[i * 2] + x, vertices[i * 2 + 1] + y);
+                worldVertices.get(i).set(vertices[i * 2] + body.x, vertices[i * 2 + 1] + body.y);
             }
         } else {
             for (int i = 0; i < vertexCount; i++) {
-                worldVertices.get(i).set(vertices[i * 2], vertices[i * 2 + 1]).rotateRad(angleRad).add(x, y);
+                worldVertices.get(i).set(vertices[i * 2], vertices[i * 2 + 1]).rotateRad(body.angleRad).add(body.x, body.y);
             }
         }
-    }
-
-    @Override
-    protected Array<Vector2> getWorldVertices() {
-        return worldVertices;
     }
 
     @Override
