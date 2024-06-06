@@ -4,7 +4,7 @@ import org.example.engine.core.memory.MemoryPool;
 
 import java.util.Objects;
 
-public final class CollisionPair implements MemoryPool.Reset {
+final class CollisionPair implements MemoryPool.Reset {
 
     public Body a;
     public Body b;
