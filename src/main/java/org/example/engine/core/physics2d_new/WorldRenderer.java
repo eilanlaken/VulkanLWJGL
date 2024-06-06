@@ -37,8 +37,8 @@ public class WorldRenderer {
         if (world.renderBodies) {
             Array<Body> bodies = world.allBodies;
             for (Body body : bodies) {
-                Array<BodyCollider> colliders = body.colliders;
-                for (BodyCollider collider : colliders) {
+                Array<z_BodyCollider_old> colliders = body.colliders;
+                for (z_BodyCollider_old collider : colliders) {
                     /* render a circle */
                     if (collider.shape instanceof ShapeCircle) {
                         ShapeCircle circle = (ShapeCircle) collider.shape;

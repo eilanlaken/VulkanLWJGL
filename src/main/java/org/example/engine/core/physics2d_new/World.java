@@ -1,7 +1,6 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.graphics.Renderer2D_new;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.MemoryPool;
@@ -82,7 +81,7 @@ public class World {
         body.off = false;
         body.motionType = motionType;
 
-        BodyCollider collider = new BodyCollider();
+        z_BodyCollider_old collider = new z_BodyCollider_old();
         collider.shape = new ShapeCircle(radius, 0,0);
         collider.density = 1;
         collider.body = body;
