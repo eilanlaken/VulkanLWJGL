@@ -5,8 +5,8 @@ import org.example.engine.core.shape2d.Shape2D;
 
 public class BodyCollider implements MemoryPool.Reset {
 
-    protected Body body;
-    private Shape2D shape;
+    public Body    body;
+    public Shape2D shape;
     public float   density;
     public float   staticFriction;
     public float   dynamicFriction;
@@ -14,9 +14,7 @@ public class BodyCollider implements MemoryPool.Reset {
     public boolean ghost;
     public int     bitmask;
 
-    public BodyCollider(Shape2D shape) {
-        this.shape = shape;
-    }
+    public BodyCollider() {}
 
     @Override
     public void reset() {

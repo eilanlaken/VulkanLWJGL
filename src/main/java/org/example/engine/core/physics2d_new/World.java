@@ -2,7 +2,6 @@ package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.memory.MemoryPool;
-import org.example.engine.core.physics2d.Physics2DWorldRenderer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,12 +11,12 @@ public class World {
     public static final int DEFAULT_POSITION_CONSTRAINT_SOLVER_ITERATIONS = 2;
 
     // memory pools
-    final MemoryPool<Body>                         bodiesPool        = new MemoryPool<>(Body.class,10);
-    final MemoryPool<WorldCollision.Manifold>      manifoldsPool     = new MemoryPool<>(WorldCollision.Manifold.class,10);
-    final MemoryPool<WorldCollision.Pair>          pairsPool         = new MemoryPool<>(WorldCollision.Pair.class,5);
-    final MemoryPool<WorldCollision.Cell>          cellsPool         = new MemoryPool<>(WorldCollision.Cell.class,1024);
-    final MemoryPool<WorldRayCasting.Ray>          raysPool          = new MemoryPool<>(WorldRayCasting.Ray.class,4);
-    final MemoryPool<WorldRayCasting.Intersection> intersectionsPool = new MemoryPool<>(WorldRayCasting.Intersection.class,4);
+    final MemoryPool<Body>                   bodiesPool        = new MemoryPool<>(Body.class,10);
+    final MemoryPool<CollisionManifold>      manifoldsPool     = new MemoryPool<>(CollisionManifold.class,10);
+    final MemoryPool<CollisionPair>          pairsPool         = new MemoryPool<>(CollisionPair.class,5);
+    final MemoryPool<CollisionCell>          cellsPool         = new MemoryPool<>(CollisionCell.class,1024);
+    final MemoryPool<RayCastingRay>          raysPool          = new MemoryPool<>(RayCastingRay.class,4);
+    final MemoryPool<RayCastingIntersection> intersectionsPool = new MemoryPool<>(RayCastingIntersection.class,4);
 
     // bodies
     private int               bodiesCreated  = 0;
