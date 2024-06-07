@@ -326,6 +326,10 @@ public class Vector2 implements MemoryPool.Reset {
         return this.sub(reference).rotateRad(radians).add(reference);
     }
 
+    public Vector2 rotateAroundRad(float refX, float refY, float radians) {
+        return this.sub(refX, refY).rotateRad(radians).add(refX, refY);
+    }
+
     public Vector2 rotate90(int dir) {
         float x = this.x;
         if (dir >= 0) {

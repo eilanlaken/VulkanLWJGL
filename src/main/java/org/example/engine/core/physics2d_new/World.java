@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.Tuple3;
 import org.example.engine.core.graphics.Renderer2D_new;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.MemoryPool;
@@ -53,8 +54,8 @@ public class World {
             }
             for (Body body : bodiesToAdd) {
                 allBodies.add(body);
-                body.inserted = true;
                 body.index = bodiesCreated;
+                body.init();
                 bodiesCreated++;
             }
             bodiesToRemove.clear();
@@ -66,7 +67,6 @@ public class World {
         debugRenderer.render(renderer);
     }
 
-    // TODO
     @Contract(pure = true)
     @NotNull
     public Body createBodyCircle(Object owner,
@@ -84,15 +84,30 @@ public class World {
         BodyColliderCircle circleCollider = new BodyColliderCircle(density, staticFriction,
                 dynamicFriction, restitution, ghost, bitmask, radius, 0, 0);
         circleCollider.body = body;
-
         body.colliders.add(circleCollider);
+        body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
+        bodiesToAdd.add(body);
+        return body;
+    }
 
-        // TODO
-        body.mass = Physics2DUtils.calculateTotalMass(null);
-        body.massInv = 1.0f / body.mass;
-        // TODO
-        body.inertia = Physics2DUtils.calculateMomentOfInertia(null);
-        body.inertiaInv = 1.0f / body.inertia;
+    @Contract(pure = true)
+    @NotNull
+    public Body createBodyCircle(Object owner,
+                                 Body.MotionType motionType,
+                                 float x, float y, float angleDeg,
+                                 float velX, float velY, float velAngleDeg,
+                                 float density, float staticFriction, float dynamicFriction, float restitution,
+                                 boolean ghost, int bitmask,
+                                 float radius, float offsetX, float offsetY) {
+        Body body = bodiesPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+
+        BodyColliderCircle circleCollider = new BodyColliderCircle(density, staticFriction,
+                dynamicFriction, restitution, ghost, bitmask, radius, offsetX, offsetY);
+        circleCollider.body = body;
+        body.colliders.add(circleCollider);
         body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
         bodiesToAdd.add(body);
         return body;
@@ -114,7 +129,38 @@ public class World {
         body.motionType = motionType;
 
         BodyColliderRectangle rectangleCollider = new BodyColliderRectangle(density, staticFriction,
-                dynamicFriction, restitution, ghost, bitmask, 0, 0, width, height, 0);
+                dynamicFriction, restitution, ghost, bitmask, width, height, 0, 0, 0);
+        rectangleCollider.body = body;
+        body.colliders.add(rectangleCollider);
+
+        // TODO
+        body.mass = Physics2DUtils.calculateTotalMass(null);
+        body.massInv = 1.0f / body.mass;
+        // TODO
+        body.inertia = Physics2DUtils.calculateMomentOfInertia(null);
+        body.inertiaInv = 1.0f / body.inertia;
+        body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
+        bodiesToAdd.add(body);
+        return body;
+    }
+
+    // TODO
+    @Contract(pure = true)
+    @NotNull
+    public Body createBodyRectangle(Object owner,
+                                    Body.MotionType motionType,
+                                    float x, float y, float angleDeg,
+                                    float velX, float velY, float velAngleDeg,
+                                    float density, float staticFriction, float dynamicFriction, float restitution,
+                                    boolean ghost, int bitmask,
+                                    float width, float height, float offsetX, float offsetY, float offsetAngleRad) {
+        Body body = bodiesPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+
+        BodyColliderRectangle rectangleCollider = new BodyColliderRectangle(density, staticFriction,
+                dynamicFriction, restitution, ghost, bitmask, width, height, offsetX, offsetY, offsetAngleRad);
         rectangleCollider.body = body;
         body.colliders.add(rectangleCollider);
 
@@ -150,16 +196,9 @@ public class World {
 
         // TODO: see if polygon is concave or with holes. If it is, handle case properly.
         BodyColliderPolygon polygonCollider = new BodyColliderPolygon(density, staticFriction,
-                dynamicFriction, restitution, ghost, bitmask, vertices);
+                dynamicFriction, restitution, ghost, bitmask, vertices,0,0,0);
         polygonCollider.body = body;
         body.colliders.add(polygonCollider);
-
-        // TODO
-        body.mass = Physics2DUtils.calculateTotalMass(null);
-        body.massInv = 1.0f / body.mass;
-        // TODO
-        body.inertia = Physics2DUtils.calculateMomentOfInertia(null);
-        body.inertiaInv = 1.0f / body.inertia;
         body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
         bodiesToAdd.add(body);
         return body;

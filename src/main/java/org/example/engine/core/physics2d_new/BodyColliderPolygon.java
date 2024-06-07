@@ -3,6 +3,7 @@ package org.example.engine.core.physics2d_new;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
+import org.example.engine.core.memory.MemoryUtils;
 import org.jetbrains.annotations.NotNull;
 
 /*
@@ -19,12 +20,12 @@ public final class BodyColliderPolygon extends BodyCollider {
     private final Array<Vector2> worldVertices;
 
     BodyColliderPolygon(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
-                        float[] vertices) throws RuntimeException {
-        super(density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
+                        float[] vertices, float offsetX, float offsetY, float offsetAngleRad) throws RuntimeException {
+        super(offsetX, offsetY, offsetAngleRad, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
         this.vertexCount = vertices.length / 2;
-        this.vertices = vertices;
+        this.vertices = MemoryUtils.copy(vertices);
         this.worldVertices = new Array<>(true, vertexCount);
         for (int i = 0; i < vertexCount; i++) {
             this.worldVertices.add(new Vector2());
@@ -63,15 +64,15 @@ public final class BodyColliderPolygon extends BodyCollider {
         return sum;
     }
 
-    @Override
-    protected Vector2 calculateLocalCenter() {
-        Vector2 center = new Vector2();
-        for (int i = 0; i < vertices.length - 1; i += 2) {
-            center.add(vertices[i], vertices[i + 1]);
-        }
-        center.scl(1.0f / vertexCount);
-        return center;
-    }
+//    @Override
+//    protected Vector2 calculateLocalCenter() {
+//        Vector2 center = new Vector2();
+//        for (int i = 0; i < vertices.length - 1; i += 2) {
+//            center.add(vertices[i], vertices[i + 1]);
+//        }
+//        center.scl(1.0f / vertexCount);
+//        return center;
+//    }
 
     @Override
     protected void updateWorldCoordinates() {
@@ -114,4 +115,13 @@ public final class BodyColliderPolygon extends BodyCollider {
         if (!updated) update();
         return worldVertices;
     }
+
+    @Override
+    void shiftLocalCoordinates(float x, float y) {
+        for (int i = 0; i < vertices.length - 1; i += 2) {
+            //vertices[i] -= x;
+            //vertices[i+1] -= y;
+        }
+    }
+
 }

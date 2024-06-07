@@ -21,12 +21,15 @@ abstract class BodyCollider {
     private float   boundingRadius2 = 0; // r squared
 
     protected boolean updated     = false;
-    protected Vector2 localCenter = null;
+    public Vector2 offset = new Vector2();
+    public float offsetAngleRad = 0;
     protected Vector2 worldCenter = new Vector2();
 
     BodyCollider() {}
 
-    BodyCollider(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask) {
+    BodyCollider(float offsetX, float offsetY, float offsetAngleRad, float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask) {
+        this.offset.set(offsetX, offsetY);
+        this.offsetAngleRad = offsetAngleRad;
         this.density = density;
         this.staticFriction = staticFriction;
         this.dynamicFriction = dynamicFriction;
@@ -44,11 +47,26 @@ abstract class BodyCollider {
         return containsPoint(x, y);
     }
 
-    public final Vector2 worldCenter() {
-        if (localCenter == null) {
-            localCenter = calculateLocalCenter();
+    public final void shiftLocalCenter(final Vector2 v) {
+        shiftLocalCenter(v.x, v.y);
+    }
+
+    public final void shiftLocalCenter(float x, float y) {
+        if (offset == null) {
+            offset = new Vector2();
         }
-        return worldCenter.set(localCenter).rotateRad(body.angleRad).add(body.x,body.y); // scale -> rotate -> translate ("scale" by 1)
+        offset.set(x, y);
+        shiftLocalCoordinates(x, y);
+        update();
+    }
+
+    public final Vector2 offset() {
+        return offset;
+    }
+
+    public final Vector2 worldCenter() {
+        if (body == null) return offset;
+        else return worldCenter.set(offset).rotateRad(body.angleRad).add(body.x,body.y); // "scale" (by 1) -> rotate -> translate
     }
 
     public final float area() {
@@ -96,10 +114,10 @@ abstract class BodyCollider {
         return body.y + boundingRadius;
     }
 
-    protected abstract boolean        containsPoint(float x, float y);
-    protected abstract void           updateWorldCoordinates();
-    protected abstract float          calculateBoundingRadius();
-    protected abstract float          calculateArea();
-    protected abstract Vector2        calculateLocalCenter();
+    abstract boolean containsPoint(float x, float y);
+    abstract void    updateWorldCoordinates();
+    abstract float   calculateBoundingRadius();
+    abstract float   calculateArea();
+    abstract void    shiftLocalCoordinates(float x, float y);
 
 }

@@ -50,4 +50,11 @@ public final class MemoryUtils {
         return newBuffer;
     }
 
+    public static float[] copy(float[] array) {
+        if (array == null) return null;
+        float[] newArray = new float[array.length];
+        System.arraycopy(array, 0, newArray, 0, array.length);
+        return newArray;
+    }
+
 }

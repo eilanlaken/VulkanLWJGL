@@ -6,8 +6,14 @@ public final class Physics2DUtils {
 
     private Physics2DUtils() {}
 
+
+
     public static float calculateTotalMass(final BodyCollider...collider) {
         return 0;
+    }
+
+    public static Vector2 calculateCenterOfMass(final BodyCollider collider) {
+        return collider.worldCenter();
     }
 
     public static Vector2 calculateCenterOfMass(final BodyCollider...colliders) {
@@ -15,7 +21,11 @@ public final class Physics2DUtils {
         return null;
     }
 
-    public static float calculateMomentOfInertia(final BodyCollider...colliders) {
+    public static void setCenterOfMassToOrigin(final Body body) {
+
+    }
+
+    public static float calculateMomentOfInertia(final Body body) {
 
         return -1;
     }

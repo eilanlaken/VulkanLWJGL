@@ -18,9 +18,9 @@ public class WorldRenderer {
     private static final float CONSTRAINT_TINT = new Color(0.9f, 0.1f, 0.3f, 1).toFloatBits();
     private static final float RAY_TINT        = new Color(0.4f, 0.2f, 0.8f, 1).toFloatBits();
 
-    private final Shape2DSegment segment    = new Shape2DSegment(0,0,0,0);
-    private final Shape2DPolygon polyCircle = ShapeUtils.createPolygonCircleFilled(1, 10);
-    private final Shape2DPolygon polyRect   = ShapeUtils.createPolygonRectangleFilled(1, 1);
+    @Deprecated private final Shape2DSegment segment    = new Shape2DSegment(0,0,0,0);
+    @Deprecated private final Shape2DPolygon polyCircle = ShapeUtils.createPolygonCircleFilled(1, 10);
+    @Deprecated private final Shape2DPolygon polyRect   = ShapeUtils.createPolygonRectangleFilled(1, 1);
 
     private final World world;
 
@@ -50,7 +50,7 @@ public class WorldRenderer {
                         float y1 = worldCenter.y;
                         float x2 = x1 + r * MathUtils.cosRad(angleRad);
                         float y2 = y1 + r * MathUtils.sinRad(angleRad);
-                        renderer.pushThinCircle(r, worldCenter.x, worldCenter.y, tint);
+                        renderer.pushThinCircle(r, x1, y1, tint);
                         renderer.pushThinLineSegment(x1,y1,x2,y2,tint);
                         continue;
                     }
@@ -89,6 +89,8 @@ public class WorldRenderer {
                         continue;
                     }
                 }
+                // render point at center.
+                renderer.pushPolygon(polyCircle, new Color(0.2f,1,1,1), body.x, body.y, 0,0,0, scaleX, scaleY,null,null);
             }
         }
 

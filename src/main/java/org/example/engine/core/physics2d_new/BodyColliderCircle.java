@@ -5,31 +5,25 @@ import org.example.engine.core.math.Vector2;
 
 public final class BodyColliderCircle extends BodyCollider {
 
-    public final Vector2 localCenter;
+    //public final Vector2 center;
     public final Vector2 worldCenter;
     public final float   r;
     public final float   r2;
 
     public BodyColliderCircle(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
                               float r, float x, float y) {
-        super(density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
+        super(x, y,0, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
         if (r <= 0) throw new Physics2DException("Radius of circle collider must be positive. Got: " + r);
-        this.localCenter = new Vector2(x, y);
-        this.worldCenter = new Vector2(localCenter);
+        this.worldCenter = new Vector2(offset());
         this.r  = r;
         this.r2 = r * r;
     }
 
     @Override
     protected void updateWorldCoordinates() {
-        worldCenter.set(localCenter);
+        worldCenter.set(offset());
         if (!MathUtils.isZero(body.angleRad)) worldCenter.rotateRad(body.angleRad);
         worldCenter.add(body.x, body.y);
-    }
-
-    @Override
-    protected Vector2 calculateLocalCenter() {
-        return localCenter;
     }
 
     @Override
@@ -39,7 +33,7 @@ public final class BodyColliderCircle extends BodyCollider {
 
     @Override
     protected float calculateBoundingRadius() {
-        return localCenter.len() + r;
+        return offset().len() + r;
     }
 
     @Override
@@ -47,8 +41,9 @@ public final class BodyColliderCircle extends BodyCollider {
         return MathUtils.PI * r * r;
     }
 
-    public Vector2 localCenter() {
-        return localCenter;
+    @Override
+    void shiftLocalCoordinates(float x, float y) {
+
     }
 
     @Override
