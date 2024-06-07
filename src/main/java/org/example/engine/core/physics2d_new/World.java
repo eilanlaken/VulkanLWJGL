@@ -1,7 +1,6 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.collections.Tuple3;
 import org.example.engine.core.graphics.Renderer2D_new;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.MemoryPool;
@@ -72,7 +71,7 @@ public class World {
     public Body createBodyCircle(Object owner,
                                           Body.MotionType motionType,
                                           float x, float y, float angleDeg,
-                                          float velX, float velY, float velAngleDeg,
+                                          float vx, float vy, float velAngleDeg,
                                           float density, float staticFriction, float dynamicFriction, float restitution,
                                           boolean ghost, int bitmask,
                                           float radius) {
@@ -85,7 +84,15 @@ public class World {
                 dynamicFriction, restitution, ghost, bitmask, radius, 0, 0);
         circleCollider.body = body;
         body.colliders.add(circleCollider);
-        body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
+
+        body.x = x;
+        body.y = y;
+        body.aRad = angleDeg * MathUtils.degreesToRadians;
+
+        body.vx = vx;
+        body.vy = vy;
+        body.wRad = velAngleDeg * MathUtils.degreesToRadians;
+
         bodiesToAdd.add(body);
         return body;
     }
@@ -95,7 +102,7 @@ public class World {
     public Body createBodyCircle(Object owner,
                                  Body.MotionType motionType,
                                  float x, float y, float angleDeg,
-                                 float velX, float velY, float velAngleDeg,
+                                 float vx, float vy, float velAngleDeg,
                                  float density, float staticFriction, float dynamicFriction, float restitution,
                                  boolean ghost, int bitmask,
                                  float radius, float offsetX, float offsetY) {
@@ -108,7 +115,15 @@ public class World {
                 dynamicFriction, restitution, ghost, bitmask, radius, offsetX, offsetY);
         circleCollider.body = body;
         body.colliders.add(circleCollider);
-        body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
+
+        body.x = x;
+        body.y = y;
+        body.aRad = angleDeg * MathUtils.degreesToRadians;
+
+        body.vx = vx;
+        body.vy = vy;
+        body.wRad = velAngleDeg * MathUtils.degreesToRadians;
+
         bodiesToAdd.add(body);
         return body;
     }
@@ -119,7 +134,7 @@ public class World {
     public Body createBodyRectangle(Object owner,
                                  Body.MotionType motionType,
                                  float x, float y, float angleDeg,
-                                 float velX, float velY, float velAngleDeg,
+                                 float vx, float vy, float velAngleDeg,
                                  float density, float staticFriction, float dynamicFriction, float restitution,
                                  boolean ghost, int bitmask,
                                  float width, float height) {
@@ -133,13 +148,14 @@ public class World {
         rectangleCollider.body = body;
         body.colliders.add(rectangleCollider);
 
-        // TODO
-        body.mass = Physics2DUtils.calculateTotalMass(null);
-        body.massInv = 1.0f / body.mass;
-        // TODO
-        body.inertia = Physics2DUtils.calculateMomentOfInertia(null);
-        body.inertiaInv = 1.0f / body.inertia;
-        body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
+        body.x = x;
+        body.y = y;
+        body.aRad = angleDeg * MathUtils.degreesToRadians;
+
+        body.vx = vx;
+        body.vy = vy;
+        body.wRad = velAngleDeg * MathUtils.degreesToRadians;
+
         bodiesToAdd.add(body);
         return body;
     }
@@ -150,7 +166,7 @@ public class World {
     public Body createBodyRectangle(Object owner,
                                     Body.MotionType motionType,
                                     float x, float y, float angleDeg,
-                                    float velX, float velY, float velAngleDeg,
+                                    float vx, float vy, float velAngleDeg,
                                     float density, float staticFriction, float dynamicFriction, float restitution,
                                     boolean ghost, int bitmask,
                                     float width, float height, float offsetX, float offsetY, float offsetAngleRad) {
@@ -164,13 +180,14 @@ public class World {
         rectangleCollider.body = body;
         body.colliders.add(rectangleCollider);
 
-        // TODO
-        body.mass = Physics2DUtils.calculateTotalMass(null);
-        body.massInv = 1.0f / body.mass;
-        // TODO
-        body.inertia = Physics2DUtils.calculateMomentOfInertia(null);
-        body.inertiaInv = 1.0f / body.inertia;
-        body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
+        body.x = x;
+        body.y = y;
+        body.aRad = angleDeg * MathUtils.degreesToRadians;
+
+        body.vx = vx;
+        body.vy = vy;
+        body.wRad = velAngleDeg * MathUtils.degreesToRadians;
+
         bodiesToAdd.add(body);
         return body;
     }
@@ -181,7 +198,7 @@ public class World {
     public Body createBodyPolygon(Object owner,
                                     Body.MotionType motionType,
                                     float x, float y, float angleDeg,
-                                    float velX, float velY, float velAngleDeg,
+                                    float vx, float vy, float velAngleDeg,
                                     float density, float staticFriction, float dynamicFriction, float restitution,
                                     boolean ghost, int bitmask,
                                     float[] vertices) {
@@ -196,10 +213,18 @@ public class World {
 
         // TODO: see if polygon is concave or with holes. If it is, handle case properly.
         BodyColliderPolygon polygonCollider = new BodyColliderPolygon(density, staticFriction,
-                dynamicFriction, restitution, ghost, bitmask, vertices,0,0,0);
+                dynamicFriction, restitution, ghost, bitmask, vertices);
         polygonCollider.body = body;
         body.colliders.add(polygonCollider);
-        body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
+
+        body.x = x;
+        body.y = y;
+        body.aRad = angleDeg * MathUtils.degreesToRadians;
+
+        body.vx = vx;
+        body.vy = vy;
+        body.wRad = velAngleDeg * MathUtils.degreesToRadians;
+
         bodiesToAdd.add(body);
         return body;
     }

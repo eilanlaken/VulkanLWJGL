@@ -7,22 +7,24 @@ public final class BodyColliderCircle extends BodyCollider {
 
     //public final Vector2 center;
     public final Vector2 worldCenter;
+    public float angleRad;
     public final float   r;
     public final float   r2;
 
     public BodyColliderCircle(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
-                              float r, float x, float y) {
+                              float r, float x, float y, float angleRad) {
         super(x, y,0, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
         if (r <= 0) throw new Physics2DException("Radius of circle collider must be positive. Got: " + r);
         this.worldCenter = new Vector2(offset());
+        this.angleRad = angleRad;
         this.r  = r;
         this.r2 = r * r;
     }
 
     @Override
-    protected void updateWorldCoordinates() {
-        worldCenter.set(offset());
-        if (!MathUtils.isZero(body.angleRad)) worldCenter.rotateRad(body.angleRad);
+    protected void update() {
+        worldCenter.set(offset);
+        worldCenter.rotateAroundRad(body.lcmX, body.lcmY, body.aRad);
         worldCenter.add(body.x, body.y);
     }
 
@@ -42,8 +44,8 @@ public final class BodyColliderCircle extends BodyCollider {
     }
 
     @Override
-    void shiftLocalCoordinates(float x, float y) {
-
+    Vector2 calculateLocalCenter() {
+        return offset;
     }
 
     @Override

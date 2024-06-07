@@ -16,11 +16,11 @@ abstract class BodyCollider {
 
     private float   area            = 0;
     private boolean calcArea        = false;
-    private boolean calcRadius      = false;
-    private float   boundingRadius  = 0; // the bounding radius r
+    private float   boundingRadius  = 0;
     private float   boundingRadius2 = 0; // r squared
+    private boolean calcRadius      = false;
+    private Vector2 localCenter     = null;
 
-    protected boolean updated     = false;
     public Vector2 offset = new Vector2();
     public float offsetAngleRad = 0;
     protected Vector2 worldCenter = new Vector2();
@@ -43,30 +43,23 @@ abstract class BodyCollider {
     }
 
     public final boolean contains(float x, float y) {
-        if (!updated) update();
         return containsPoint(x, y);
-    }
-
-    public final void shiftLocalCenter(final Vector2 v) {
-        shiftLocalCenter(v.x, v.y);
-    }
-
-    public final void shiftLocalCenter(float x, float y) {
-        if (offset == null) {
-            offset = new Vector2();
-        }
-        offset.set(x, y);
-        shiftLocalCoordinates(x, y);
-        update();
     }
 
     public final Vector2 offset() {
         return offset;
     }
 
+    public final Vector2 localCenter() {
+        if (localCenter == null) {
+            localCenter = calculateLocalCenter();
+        }
+        return localCenter;
+    }
+
     public final Vector2 worldCenter() {
         if (body == null) return offset;
-        else return worldCenter.set(offset).rotateRad(body.angleRad).add(body.x,body.y); // "scale" (by 1) -> rotate -> translate
+        else return worldCenter.set(offset).rotateRad(body.aRad).add(body.x,body.y); // "scale" (by 1) -> rotate -> translate
     }
 
     public final float area() {
@@ -95,12 +88,6 @@ abstract class BodyCollider {
         return boundingRadius2;
     }
 
-    public final void update() {
-        if (updated) return;
-        updateWorldCoordinates();
-        updated = true;
-    }
-
     public final float getMinExtentX() {
         return body.x - boundingRadius;
     }
@@ -115,9 +102,9 @@ abstract class BodyCollider {
     }
 
     abstract boolean containsPoint(float x, float y);
-    abstract void    updateWorldCoordinates();
+    abstract void    update();
     abstract float   calculateBoundingRadius();
     abstract float   calculateArea();
-    abstract void    shiftLocalCoordinates(float x, float y);
+    abstract Vector2 calculateLocalCenter();
 
 }

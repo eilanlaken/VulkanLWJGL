@@ -16,19 +16,21 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
     public    MotionType motionType  = null;
 
     // transform
-    protected float x; // x of the center of mass
-    protected float y; // y in the center of mass
-    protected float angleRad; // the angle around the center of mass
-
+    protected float x      = 0; // x of the origin
+    protected float y      = 0; // y of the origin
+    protected float lcmX   = 0;
+    protected float lcmY   = 0;
+    protected float cmX    = 0;
+    protected float cmY    = 0;
+    protected float aRad   = 0; // the angle around the center of mass
     // velocity
-    protected float vx; // the x speed of the center of mass
-    protected float vy; // the y speed of the center of mass
-    protected float angularVelocityRad; // the change in angleRad
-
+    protected float vx     = 0;
+    protected float vy     = 0;
+    protected float wRad   = 0; // the change in aRad
     // acceleration
-    public float netForceX;
-    public float netForceY;
-    public float netTorque; // the torque about the center of mass
+    public float netForceX = 0;
+    public float netForceY = 0;
+    public float netTorque = 0; // the torque about the center of mass
 
     public Array<Body> touching      = new Array<>(false, 2);
     public Array<Body> justCollided  = new Array<>(false, 2);
@@ -45,46 +47,35 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
 
     /**
      * This method is called whenever a {@link Body} is inserted into the world.
-     * It does 4 very important things:
+     * It does 3 very important things:
      * - calculate the total mass (and its inverse)
-     * - calculate the local center of mass then shifts the colliders frame of reference to the center of mass
-     * - sets the position of the body to the center of mass
+     * - calculate the local center of mass
      * - calculates the moment of inertia relative to the center of mass (and its inverse)
      */
     void init() {
-        float originX = x;
-        float originY = y;
-        float initialAngleRad = angleRad;
         float totalMass = 0;
         Vector2 local_center_of_mass = new Vector2();
         for (BodyCollider collider : colliders) {
             float shapeMass = collider.area() * collider.density;
             totalMass += shapeMass;
-            final Vector2 shapeCenter = collider.offset();
+            final Vector2 shapeCenter = collider.localCenter();
             local_center_of_mass.x += shapeCenter.x * shapeMass;
             local_center_of_mass.y += shapeCenter.y * shapeMass;
         }
         local_center_of_mass.scl(1.0f / totalMass);
-        for (BodyCollider collider : colliders) {
-            collider.shiftLocalCenter(local_center_of_mass);
-        }
         this.mass = totalMass;
         this.massInv = 1.0f / totalMass;
-        local_center_of_mass.rotateRad(initialAngleRad);
-        // set the center of mass to be the origin.
-        this.x = originX + local_center_of_mass.x;
-        this.y = originY + local_center_of_mass.y;
+
 
         this.initialized = true;
     }
 
-    public void setMotionState(float x, float y, float angleRad, float vx, float vy, float angularVelocityRad) {
-        this.x = x;
-        this.y = y;
-        this.angleRad = angleRad;
-        this.vx = vx;
-        this.vy = vy;
-        this.angularVelocityRad = angularVelocityRad;
+    final void updateCollidersWorldCoordinates() {
+        cmX = x + lcmX;
+        cmY = y + lcmY;
+        for (BodyCollider collider : colliders) {
+            collider.update();
+        }
     }
 
     @Override
@@ -97,11 +88,13 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
 
         this.x = 0;
         this.y = 0;
-        this.angleRad = 0;
+        this.lcmX = 0;
+        this.lcmY = 0;
+        this.aRad = 0;
 
         this.vx = 0;
         this.vy = 0;
-        this.angularVelocityRad = 0;
+        this.wRad = 0;
 
         this.netForceX = 0;
         this.netForceY = 0;

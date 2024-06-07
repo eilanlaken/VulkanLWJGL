@@ -306,8 +306,10 @@ public class Vector2 implements MemoryPool.Reset {
     }
 
     public Vector2 rotateRad(float radians) {
-        float cos = (float)Math.cos(radians);
-        float sin = (float)Math.sin(radians);
+        if (MathUtils.isZero(radians)) return this;
+
+        float cos = MathUtils.cosRad(radians);
+        float sin = MathUtils.sinRad(radians);
 
         float newX = this.x * cos - this.y * sin;
         float newY = this.x * sin + this.y * cos;

@@ -20,8 +20,8 @@ public final class BodyColliderPolygon extends BodyCollider {
     private final Array<Vector2> worldVertices;
 
     BodyColliderPolygon(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
-                        float[] vertices, float offsetX, float offsetY, float offsetAngleRad) throws RuntimeException {
-        super(offsetX, offsetY, offsetAngleRad, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
+                        float[] vertices) throws RuntimeException {
+        super(0, 0, 0, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
         this.vertexCount = vertices.length / 2;
@@ -64,26 +64,13 @@ public final class BodyColliderPolygon extends BodyCollider {
         return sum;
     }
 
-//    @Override
-//    protected Vector2 calculateLocalCenter() {
-//        Vector2 center = new Vector2();
-//        for (int i = 0; i < vertices.length - 1; i += 2) {
-//            center.add(vertices[i], vertices[i + 1]);
-//        }
-//        center.scl(1.0f / vertexCount);
-//        return center;
-//    }
-
     @Override
-    protected void updateWorldCoordinates() {
-        if (MathUtils.isZero(body.angleRad)) {
-            for (int i = 0; i < vertexCount; i++) {
-                worldVertices.get(i).set(vertices[i * 2] + body.x, vertices[i * 2 + 1] + body.y);
-            }
-        } else {
-            for (int i = 0; i < vertexCount; i++) {
-                worldVertices.get(i).set(vertices[i * 2], vertices[i * 2 + 1]).rotateRad(body.angleRad).add(body.x, body.y);
-            }
+    protected void update() {
+        for (int i = 0; i < vertexCount; i++) {
+            worldVertices.get(i)
+                    .set(vertices[i * 2], vertices[i * 2 + 1])
+                    .rotateAroundRad(body.lcmX, body.lcmY, body.aRad)
+                    .add(body.x, body.y);
         }
     }
 
@@ -105,23 +92,23 @@ public final class BodyColliderPolygon extends BodyCollider {
     }
 
     public void getWorldEdge(int index, @NotNull Vector2 tail, @NotNull Vector2 head) {
-        if (!updated) update();
         int next = (index + 1) % vertexCount;
         tail.set(worldVertices.getCyclic(index));
         head.set(worldVertices.getCyclic(next));
     }
 
     public Array<Vector2> worldVertices() {
-        if (!updated) update();
         return worldVertices;
     }
 
     @Override
-    void shiftLocalCoordinates(float x, float y) {
+    Vector2 calculateLocalCenter() {
+        Vector2 local_center = new Vector2();
         for (int i = 0; i < vertices.length - 1; i += 2) {
-            //vertices[i] -= x;
-            //vertices[i+1] -= y;
+            local_center.x += vertices[i];
+            local_center.y += vertices[i+1];
         }
+        return local_center.scl(1.0f / vertexCount);
     }
 
 }

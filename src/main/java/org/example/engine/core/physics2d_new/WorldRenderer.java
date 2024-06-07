@@ -45,7 +45,7 @@ public class WorldRenderer {
                         float tint = body.motionType == Body.MotionType.STATIC ? TINT_STATIC : body.motionType == Body.MotionType.KINEMATIC ? TINT_KINEMATIC : TINT_NEWTONIAN;
                         Vector2 worldCenter = circle.worldCenter();
                         float r = circle.r;
-                        float angleRad = body.angleRad;
+                        float angleRad = body.aRad;
                         float x1 = worldCenter.x;
                         float y1 = worldCenter.y;
                         float x2 = x1 + r * MathUtils.cosRad(angleRad);
@@ -60,16 +60,16 @@ public class WorldRenderer {
                         BodyColliderRectangle rectangle = (BodyColliderRectangle) collider;
                         float tint = body.motionType == Body.MotionType.STATIC ? TINT_STATIC : body.motionType == Body.MotionType.KINEMATIC ? TINT_KINEMATIC : TINT_NEWTONIAN;
 
-                        float angleRad = body.angleRad;
+                        float angleRad = body.aRad;
 
-                        float x0 = rectangle.c0().x;
-                        float y0 = rectangle.c0().y;
-                        float x1 = rectangle.c1().x;
-                        float y1 = rectangle.c1().y;
-                        float x2 = rectangle.c2().x;
-                        float y2 = rectangle.c2().y;
-                        float x3 = rectangle.c3().x;
-                        float y3 = rectangle.c3().y;
+                        float x0 = rectangle.c0.x;
+                        float y0 = rectangle.c0.y;
+                        float x1 = rectangle.c1.x;
+                        float y1 = rectangle.c1.y;
+                        float x2 = rectangle.c2.x;
+                        float y2 = rectangle.c2.y;
+                        float x3 = rectangle.c3.x;
+                        float y3 = rectangle.c3.y;
 
                         renderer.pushThinRectangle(x0,y0, x1,y1, x2,y2, x3,y3, tint);
                         renderer.pushThinLineSegment(
