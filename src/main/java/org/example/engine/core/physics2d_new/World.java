@@ -126,6 +126,41 @@ public class World {
         return body;
     }
 
+    // TODO
+    @Contract(pure = true)
+    @NotNull
+    public Body createBodyPolygon(Object owner,
+                                    Body.MotionType motionType,
+                                    float x, float y, float angleDeg,
+                                    float velX, float velY, float velAngleDeg,
+                                    float density, float staticFriction, float dynamicFriction, float restitution,
+                                    boolean ghost, int bitmask,
+                                    float[] vertices) {
+        Body body = bodiesPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+
+        boolean convex = MathUtils.isPolygonConvex(vertices);
+
+        if (!convex) throw new IllegalArgumentException("concave polygons not supported yet.");
+
+        // TODO: see if polygon is concave or with holes. If it is, handle case properly.
+        BodyColliderPolygon polygonCollider = new BodyColliderPolygon(body, density, staticFriction,
+                dynamicFriction, restitution, ghost, bitmask, vertices);
+        body.colliders.add(polygonCollider);
+
+        // TODO
+        body.mass = Physics2DUtils.calculateTotalMass(null);
+        body.massInv = 1.0f / body.mass;
+        // TODO
+        body.inertia = Physics2DUtils.calculateMomentOfInertia(null);
+        body.inertiaInv = 1.0f / body.inertia;
+        body.setMotionState(x, y, angleDeg * MathUtils.degreesToRadians, velX, velY, velAngleDeg * MathUtils.degreesToRadians);
+        bodiesToAdd.add(body);
+        return body;
+    }
+
     public void destroyConstraint(Constraint constraint) {
         constraintsToRemove.add(constraint);
     }

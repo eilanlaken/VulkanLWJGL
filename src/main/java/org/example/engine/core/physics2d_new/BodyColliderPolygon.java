@@ -12,9 +12,10 @@ a set of convex polygons.
  */
 public final class BodyColliderPolygon extends BodyCollider {
 
-    public  final int            vertexCount;
-    private final float[]        vertices;
-    public  final int[]          indices;
+    final int     vertexCount;
+    final float[] vertices;
+    final int[]   indices;
+
     private final Array<Vector2> worldVertices;
 
     BodyColliderPolygon(Body body, float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
@@ -109,4 +110,8 @@ public final class BodyColliderPolygon extends BodyCollider {
         head.set(worldVertices.getCyclic(next));
     }
 
+    public Array<Vector2> worldVertices() {
+        if (!updated) update();
+        return worldVertices;
+    }
 }

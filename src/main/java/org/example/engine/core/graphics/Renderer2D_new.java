@@ -431,9 +431,10 @@ public class Renderer2D_new implements MemoryResourceHolder {
         vertexIndex += 2 * 5;
     }
 
-    @Deprecated public void pushDebugSegment(final Shape2DSegment segment, final float tintFloatBits) {
+    // TODO: with and w/o triangulation + local vertices + transform.
+    public void pushThinPolygon(final Array<Vector2> worldVertices, final int[] indices, final float tintFloatBits) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + 2 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+        if (vertexIndex + worldVertices.size * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 
@@ -444,20 +445,22 @@ public class Renderer2D_new implements MemoryResourceHolder {
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
-        indicesBuffer
-                .put(startVertex)
-                .put(startVertex + 1)
-        ;
+        for (int i = 0; i < indices.length - 2; i += 3) {
+            indicesBuffer.put(startVertex + indices[i]);
+            indicesBuffer.put(startVertex + indices[i + 1]);
 
-        Vector2 worldA = segment.worldA();
-        Vector2 worldB = segment.worldB();
-        float x1 = worldA.x, y1 = worldA.y;
-        float x2 = worldB.x, y2 = worldB.y;
-        verticesBuffer
-                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // a
-                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // b
-        ;
-        vertexIndex += 2 * 5;
+            indicesBuffer.put(startVertex + indices[i + 1]);
+            indicesBuffer.put(startVertex + indices[i + 2]);
+
+            indicesBuffer.put(startVertex + indices[i + 2]);
+            indicesBuffer.put(startVertex + indices[i]);
+        }
+
+        for (Vector2 vertex : worldVertices) {
+            verticesBuffer.put(vertex.x).put(vertex.y).put(tintFloatBits).put(0.5f).put(0.5f);
+        }
+
+        vertexIndex += worldVertices.size * 5;
     }
 
     @Deprecated public void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {

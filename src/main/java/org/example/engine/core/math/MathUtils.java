@@ -375,6 +375,34 @@ public final class MathUtils {
     }
 
     /**
+     * Returns true if the polygon in convex.
+     * @param vertices is a flat array of vertex coordinates: [x0,y0, x1,y1, x2,y2, ...].
+     * @return boolean
+     */
+    public static boolean isPolygonConvex(final float[] vertices) {
+        if (vertices.length == 6) return true;
+        Vector2 tmp1 = new Vector2();
+        Vector2 tmp2 = new Vector2();
+
+        tmp1.set(getVertexX(0, vertices), getVertexY(0, vertices))
+                .sub(getVertexX(-1, vertices), getVertexY(-1, vertices));
+        tmp2.set(getVertexX(+1, vertices), getVertexY(+1, vertices))
+                .sub(getVertexX(0, vertices), getVertexY(0, vertices));
+
+        float crossSign = Math.signum(tmp1.crs(tmp2));
+
+        for (int i = 1; i < vertices.length; i++) {
+            tmp1.set(getVertexX(i, vertices), getVertexY(i, vertices))
+                    .sub(getVertexX(i-1, vertices), getVertexY(i-1, vertices));
+            tmp2.set(getVertexX(i+1, vertices), getVertexY(i+1, vertices))
+                    .sub(getVertexX(i, vertices), getVertexY(i, vertices));
+            float crossSignCurrent = Math.signum(tmp1.crs(tmp2));
+            if (crossSignCurrent != crossSign) return false;
+        }
+        return true;
+    }
+
+    /**
      * Triangulates the given polygon
      *
      * @param vertices is a flat array of vertice coordinates like [x0,y0, x1,y1, x2,y2, ...].
