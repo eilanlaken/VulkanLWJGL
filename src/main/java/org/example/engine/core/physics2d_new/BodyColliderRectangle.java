@@ -31,9 +31,9 @@ public final class BodyColliderRectangle extends BodyCollider {
     private final Vector2 c2 = new Vector2();
     private final Vector2 c3 = new Vector2();
 
-    public BodyColliderRectangle(Body body, float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
+    public BodyColliderRectangle(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
                                  float centerX, float centerY, float width, float height, float rotateRad) {
-        super(body, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
+        super(density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
         this.width = width;
         this.height = height;
         final float widthHalf = width * 0.5f;

@@ -18,9 +18,9 @@ public final class BodyColliderPolygon extends BodyCollider {
 
     private final Array<Vector2> worldVertices;
 
-    BodyColliderPolygon(Body body, float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
+    BodyColliderPolygon(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
                         float[] vertices) throws RuntimeException {
-        super(body, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
+        super(density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
         this.vertexCount = vertices.length / 2;

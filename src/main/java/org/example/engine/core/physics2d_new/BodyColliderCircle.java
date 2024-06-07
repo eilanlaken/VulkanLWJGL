@@ -1,9 +1,7 @@
 package org.example.engine.core.physics2d_new;
 
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
-import org.example.engine.core.shape.ShapeException;
 
 public final class BodyColliderCircle extends BodyCollider {
 
@@ -12,9 +10,9 @@ public final class BodyColliderCircle extends BodyCollider {
     public final float   r;
     public final float   r2;
 
-    public BodyColliderCircle(Body body, float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
+    public BodyColliderCircle(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
                               float r, float x, float y) {
-        super(body, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
+        super(density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
         if (r <= 0) throw new Physics2DException("Radius of circle collider must be positive. Got: " + r);
         this.localCenter = new Vector2(x, y);
         this.worldCenter = new Vector2(localCenter);
@@ -46,16 +44,11 @@ public final class BodyColliderCircle extends BodyCollider {
 
     @Override
     protected float calculateArea() {
-        return MathUtils.PI * r2;
+        return MathUtils.PI * r * r;
     }
 
-    public Vector2 getLocalCenter() {
+    public Vector2 localCenter() {
         return localCenter;
-    }
-
-    public Vector2 getWorldCenter() {
-        if (!updated) update();
-        return worldCenter;
     }
 
     @Override

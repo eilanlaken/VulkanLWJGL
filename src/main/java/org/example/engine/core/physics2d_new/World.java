@@ -81,8 +81,10 @@ public class World {
         body.off = false;
         body.motionType = motionType;
 
-        BodyColliderCircle circleCollider = new BodyColliderCircle(body, density, staticFriction,
+        BodyColliderCircle circleCollider = new BodyColliderCircle(density, staticFriction,
                 dynamicFriction, restitution, ghost, bitmask, radius, 0, 0);
+        circleCollider.body = body;
+
         body.colliders.add(circleCollider);
 
         // TODO
@@ -111,8 +113,9 @@ public class World {
         body.off = false;
         body.motionType = motionType;
 
-        BodyColliderRectangle rectangleCollider = new BodyColliderRectangle(body, density, staticFriction,
+        BodyColliderRectangle rectangleCollider = new BodyColliderRectangle(density, staticFriction,
                 dynamicFriction, restitution, ghost, bitmask, 0, 0, width, height, 0);
+        rectangleCollider.body = body;
         body.colliders.add(rectangleCollider);
 
         // TODO
@@ -146,8 +149,9 @@ public class World {
         if (!convex) throw new IllegalArgumentException("concave polygons not supported yet.");
 
         // TODO: see if polygon is concave or with holes. If it is, handle case properly.
-        BodyColliderPolygon polygonCollider = new BodyColliderPolygon(body, density, staticFriction,
+        BodyColliderPolygon polygonCollider = new BodyColliderPolygon(density, staticFriction,
                 dynamicFriction, restitution, ghost, bitmask, vertices);
+        polygonCollider.body = body;
         body.colliders.add(polygonCollider);
 
         // TODO

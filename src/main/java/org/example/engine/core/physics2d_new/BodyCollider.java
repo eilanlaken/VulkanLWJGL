@@ -1,30 +1,32 @@
 package org.example.engine.core.physics2d_new;
 
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.Vector2;
 
-public abstract class BodyCollider {
+abstract class BodyCollider {
 
-    public final Body body;
+    // TODO: see if possible and better to replace with index or something.
+    public Body body = null;
 
-    public float   density;
-    public float   staticFriction;
-    public float   dynamicFriction;
-    public float   restitution;
-    public boolean ghost;
-    public int     bitmask;
+    public float   density         = 1;
+    public float   staticFriction  = 1;
+    public float   dynamicFriction = 1;
+    public float   restitution     = 1;
+    public boolean ghost           = false;
+    public int     bitmask         = 0; // TODO
 
-    protected float   area        = 0;
-    protected boolean calcArea    = false;
-    protected boolean calcRadius  = false;
-    protected float   boundingRadius = 0; // the bounding radius r
-    protected float   boundingRadiusSquared = 0; // r squared
+    private float   area            = 0;
+    private boolean calcArea        = false;
+    private boolean calcRadius      = false;
+    private float   boundingRadius  = 0; // the bounding radius r
+    private float   boundingRadius2 = 0; // r squared
+
     protected boolean updated     = false;
     protected Vector2 localCenter = null;
     protected Vector2 worldCenter = new Vector2();
 
-    BodyCollider(Body body, float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask) {
-        this.body = body;
+    BodyCollider() {}
+
+    BodyCollider(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask) {
         this.density = density;
         this.staticFriction = staticFriction;
         this.dynamicFriction = dynamicFriction;
@@ -60,7 +62,7 @@ public abstract class BodyCollider {
     public final float boundingRadius() {
         if (!calcRadius) {
             boundingRadius = calculateBoundingRadius();
-            boundingRadiusSquared = boundingRadius * boundingRadius;
+            boundingRadius2 = boundingRadius * boundingRadius;
             calcRadius = true;
         }
         return boundingRadius;
@@ -69,10 +71,10 @@ public abstract class BodyCollider {
     public final float boundingRadiusSquared() {
         if (!calcRadius) {
             boundingRadius = calculateBoundingRadius();
-            boundingRadiusSquared = boundingRadius * boundingRadius;
+            boundingRadius2 = boundingRadius * boundingRadius;
             calcRadius = true;
         }
-        return boundingRadiusSquared;
+        return boundingRadius2;
     }
 
     public final void update() {
