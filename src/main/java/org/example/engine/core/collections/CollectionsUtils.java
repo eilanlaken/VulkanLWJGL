@@ -49,6 +49,15 @@ public final class CollectionsUtils {
         arraySorterComparable.doSort(a, fromIndex, toIndex);
     }
 
+    // TODO: write unit tests.
+    public static float getCyclic(float[] array, int index) {
+        if (array.length == 0) throw new CollectionsException(array.getClass().getSimpleName() + " is empty.");
+        if (index >= array.length) return array[index % array.length];
+        else if (index < 0) return array[index % array.length + array.length];
+        return array[index];
+    }
+
+
     public static <T> void sort(Array<T> a, Comparator<? super T> c) {
         arraySorter.doSort(a.items, c, 0, a.size);
     }

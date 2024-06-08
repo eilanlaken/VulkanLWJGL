@@ -65,9 +65,9 @@ public final class BodyColliderRectangle extends BodyCollider {
     @Override
     protected void update() {
         c0.set(-widthHalf, +heightHalf).rotateRad(offsetAngleRad).add(offset);
-        c0.set(-widthHalf, -heightHalf).rotateRad(offsetAngleRad).add(offset);
-        c0.set(+widthHalf, -heightHalf).rotateRad(offsetAngleRad).add(offset);
-        c0.set(+widthHalf, +heightHalf).rotateRad(offsetAngleRad).add(offset);
+        c1.set(-widthHalf, -heightHalf).rotateRad(offsetAngleRad).add(offset);
+        c2.set(+widthHalf, -heightHalf).rotateRad(offsetAngleRad).add(offset);
+        c3.set(+widthHalf, +heightHalf).rotateRad(offsetAngleRad).add(offset);
 
         c0.rotateAroundRad(body.lcmX, body.lcmY, body.aRad);
         c1.rotateAroundRad(body.lcmX, body.lcmY, body.aRad);

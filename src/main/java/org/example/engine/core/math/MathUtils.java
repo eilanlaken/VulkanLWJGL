@@ -1,6 +1,7 @@
 package org.example.engine.core.math;
 
 import org.example.engine.core.collections.ArrayInt;
+import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.shape.Shape2D;
 import org.example.engine.core.shape.ShapeUtils;
 
@@ -372,6 +373,29 @@ public final class MathUtils {
         if (rr < -180) rr += 360;
         if (rr >  180) rr -= 360;
         return rr;
+    }
+
+    public static float getAreaTriangle(float ax, float ay, float bx, float by, float cx, float cy) {
+        return 0.5f * Math.abs((bx - ax) * (cy - ay) - (by - ay) * (cx - ax));
+    }
+
+    /**
+     * Returns the winding order of a polygon.
+     * @return int 1 if clockwise, -1 if counter-clockwise
+     */
+    public static int polygonWindingOrder(final float[] vertices) {
+        float sum = 0;
+        for (int i = 0; i < vertices.length - 1; i += 2) {
+            float x1 = CollectionsUtils.getCyclic(vertices, i);
+            float y1 = CollectionsUtils.getCyclic(vertices, i+1);
+
+            float x2 = CollectionsUtils.getCyclic(vertices, i+2);
+            float y2 = CollectionsUtils.getCyclic(vertices, i+3);
+
+            sum += (x2 - x1) * (y2 + y1);
+        }
+        if (sum > 0) return 1;
+        return -1;
     }
 
     /**

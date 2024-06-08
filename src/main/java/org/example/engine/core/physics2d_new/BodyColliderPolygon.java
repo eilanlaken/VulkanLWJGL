@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryUtils;
@@ -13,11 +14,10 @@ a set of convex polygons.
  */
 public final class BodyColliderPolygon extends BodyCollider {
 
-    final int     vertexCount;
-    final float[] vertices;
-    final int[]   indices;
-
-    private final Array<Vector2> worldVertices;
+    public final int            vertexCount;
+    public final float[]        vertices;
+    public final int[]          indices;
+    public final Array<Vector2> worldVertices;
 
     BodyColliderPolygon(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
                         float[] vertices) throws RuntimeException {
@@ -25,7 +25,25 @@ public final class BodyColliderPolygon extends BodyCollider {
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
         this.vertexCount = vertices.length / 2;
+        int windingOrder = MathUtils.polygonWindingOrder(vertices);
         this.vertices = MemoryUtils.copy(vertices);
+        if (windingOrder > 0) { // we need to reverse the vertices.
+            // reverse the order
+            int n = vertices.length;
+            for (int i = 0; i < n / 2; i += 2) {
+                int j = n - 2 - i;
+
+                // Swap x coordinates
+                float tempX = this.vertices[i];
+                this.vertices[i] = this.vertices[j];
+                this.vertices[j] = tempX;
+
+                // Swap y coordinates
+                float tempY = this.vertices[i + 1];
+                this.vertices[i + 1] = this.vertices[j + 1];
+                this.vertices[j + 1] = tempY;
+            }
+        }
         this.worldVertices = new Array<>(true, vertexCount);
         for (int i = 0; i < vertexCount; i++) {
             this.worldVertices.add(new Vector2());

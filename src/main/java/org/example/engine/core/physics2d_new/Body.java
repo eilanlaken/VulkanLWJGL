@@ -38,10 +38,10 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
 
     public Array<Constraint> constraints = new Array<>(false, 2);
 
-    public float mass;
-    public float massInv;
-    public float inertia;
-    public float inertiaInv;
+    public float M;
+    public float invM;
+    public float I;
+    public float invI;
 
     public Body() {}
 
@@ -54,23 +54,36 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
      */
     void init() {
         float totalMass = 0;
-        Vector2 local_center_of_mass = new Vector2();
+
         for (BodyCollider collider : colliders) {
             float shapeMass = collider.area() * collider.density;
             totalMass += shapeMass;
             final Vector2 shapeCenter = collider.localCenter();
-            local_center_of_mass.x += shapeCenter.x * shapeMass;
-            local_center_of_mass.y += shapeCenter.y * shapeMass;
+            this.lcmX += shapeCenter.x * shapeMass;
+            this.lcmY += shapeCenter.y * shapeMass;
         }
-        local_center_of_mass.scl(1.0f / totalMass);
-        this.mass = totalMass;
-        this.massInv = 1.0f / totalMass;
+        this.lcmX /= totalMass;
+        this.lcmY /= totalMass;
+        this.M = totalMass;
+        this.invM = 1.0f / totalMass;
 
+        // calculate moment of inertia
+        float totalInertia = 0;
+        for (BodyCollider collider : colliders) {
+            float shapeMass = collider.area() * collider.density;
+            float d2 = Vector2.dst2(collider.localCenter().x, collider.localCenter().y, lcmX, lcmY);
+            float I = Physics2DUtils.calculateMomentOfInertia(collider) + shapeMass * d2;
+            totalInertia += I;
+        }
 
+        this.I = totalInertia;
+        this.invI = 1.0f / totalInertia;
+
+        syncTransform();
         this.initialized = true;
     }
 
-    final void updateCollidersWorldCoordinates() {
+    final void syncTransform() {
         cmX = x + lcmX;
         cmY = y + lcmY;
         for (BodyCollider collider : colliders) {

@@ -21,8 +21,8 @@ abstract class BodyCollider {
     private boolean calcRadius      = false;
     private Vector2 localCenter     = null;
 
-    public Vector2 offset = new Vector2();
-    public float offsetAngleRad = 0;
+    protected Vector2 offset = new Vector2();
+    protected float   offsetAngleRad;
     protected Vector2 worldCenter = new Vector2();
 
     BodyCollider() {}
@@ -59,7 +59,7 @@ abstract class BodyCollider {
 
     public final Vector2 worldCenter() {
         if (body == null) return offset;
-        else return worldCenter.set(offset).rotateRad(body.aRad).add(body.x,body.y); // "scale" (by 1) -> rotate -> translate
+        else return worldCenter.set(offset.x + body.x, offset.y + body.y).rotateAroundRad(body.cmX, body.cmY, body.aRad); // "scale" (by 1) -> rotate -> translate
     }
 
     public final float area() {

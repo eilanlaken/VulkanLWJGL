@@ -81,7 +81,7 @@ public class World {
         body.motionType = motionType;
 
         BodyColliderCircle circleCollider = new BodyColliderCircle(density, staticFriction,
-                dynamicFriction, restitution, ghost, bitmask, radius, 0, 0);
+                dynamicFriction, restitution, ghost, bitmask, radius, 0, 0, 0);
         circleCollider.body = body;
         body.colliders.add(circleCollider);
 
@@ -112,7 +112,7 @@ public class World {
         body.motionType = motionType;
 
         BodyColliderCircle circleCollider = new BodyColliderCircle(density, staticFriction,
-                dynamicFriction, restitution, ghost, bitmask, radius, offsetX, offsetY);
+                dynamicFriction, restitution, ghost, bitmask, radius, offsetX, offsetY, 0);
         circleCollider.body = body;
         body.colliders.add(circleCollider);
 
@@ -157,6 +157,7 @@ public class World {
         body.wRad = velAngleDeg * MathUtils.degreesToRadians;
 
         bodiesToAdd.add(body);
+        System.out.println("hi");
         return body;
     }
 
@@ -169,14 +170,14 @@ public class World {
                                     float vx, float vy, float velAngleDeg,
                                     float density, float staticFriction, float dynamicFriction, float restitution,
                                     boolean ghost, int bitmask,
-                                    float width, float height, float offsetX, float offsetY, float offsetAngleRad) {
+                                    float width, float height, float offsetX, float offsetY, float offsetAngleDeg) {
         Body body = bodiesPool.allocate();
         body.owner = owner;
         body.off = false;
         body.motionType = motionType;
 
         BodyColliderRectangle rectangleCollider = new BodyColliderRectangle(density, staticFriction,
-                dynamicFriction, restitution, ghost, bitmask, width, height, offsetX, offsetY, offsetAngleRad);
+                dynamicFriction, restitution, ghost, bitmask, width, height, offsetX, offsetY, offsetAngleDeg * MathUtils.degreesToRadians);
         rectangleCollider.body = body;
         body.colliders.add(rectangleCollider);
 

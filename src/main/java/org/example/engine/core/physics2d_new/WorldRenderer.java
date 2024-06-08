@@ -37,6 +37,8 @@ public class WorldRenderer {
         if (world.renderBodies) {
             Array<Body> bodies = world.allBodies;
             for (Body body : bodies) {
+                // render center of mass
+
                 Array<BodyCollider> colliders = body.colliders;
                 for (BodyCollider collider : colliders) {
                     /* render a circle */
@@ -59,9 +61,7 @@ public class WorldRenderer {
                     if (collider instanceof BodyColliderRectangle) {
                         BodyColliderRectangle rectangle = (BodyColliderRectangle) collider;
                         float tint = body.motionType == Body.MotionType.STATIC ? TINT_STATIC : body.motionType == Body.MotionType.KINEMATIC ? TINT_KINEMATIC : TINT_NEWTONIAN;
-
                         float angleRad = body.aRad;
-
                         float x0 = rectangle.c0.x;
                         float y0 = rectangle.c0.y;
                         float x1 = rectangle.c1.x;
@@ -75,8 +75,8 @@ public class WorldRenderer {
                         renderer.pushThinLineSegment(
                                 rectangle.worldCenter().x,
                                 rectangle.worldCenter().y,
-                                rectangle.worldCenter().x + 0.5f * rectangle.width * MathUtils.cosRad(angleRad),
-                                rectangle.worldCenter().y + 0.5f * rectangle.width * MathUtils.sinRad(angleRad),
+                                rectangle.worldCenter().x + 0.5f * rectangle.width * MathUtils.cosRad(angleRad + collider.offsetAngleRad),
+                                rectangle.worldCenter().y + 0.5f * rectangle.width * MathUtils.sinRad(angleRad + collider.offsetAngleRad),
                                 tint);
                         continue;
                     }
@@ -89,8 +89,8 @@ public class WorldRenderer {
                         continue;
                     }
                 }
-                // render point at center.
                 renderer.pushPolygon(polyCircle, new Color(0.2f,1,1,1), body.x, body.y, 0,0,0, scaleX, scaleY,null,null);
+                renderer.pushPolygon(polyCircle, new Color(1,0.1f,0.2f,1), body.cmX, body.cmY, 0,0,0, scaleX, scaleY,null,null);
             }
         }
 

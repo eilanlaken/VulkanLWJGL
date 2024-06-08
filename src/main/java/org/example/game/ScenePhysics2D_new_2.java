@@ -7,6 +7,7 @@ import org.example.engine.core.graphics.Renderer2D_new;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.Vector3;
 import org.example.engine.core.physics2d_new.Body;
+import org.example.engine.core.physics2d_new.BodyColliderRectangle;
 import org.example.engine.core.physics2d_new.World;
 import org.lwjgl.opengl.GL11;
 
@@ -29,9 +30,7 @@ public class ScenePhysics2D_new_2 extends ApplicationScreen {
         camera = new Camera(640f/32,480f/32, 1);
         camera.update();
 
-        body_a = world.createBodyRectangle(null, Body.MotionType.STATIC, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, false, 1, 3, 1);
-        body_a = world.createBodyRectangle(null, Body.MotionType.STATIC, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, false, 1, 3, 1);
-
+        body_a = world.createBodyRectangle(null, Body.MotionType.STATIC, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, false, 1, 3, 1, -2,2,30);
 
     }
 
