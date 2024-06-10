@@ -1,7 +1,6 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryUtils;
@@ -19,9 +18,13 @@ public final class BodyColliderPolygon extends BodyCollider {
     public final int[]          indices;
     public final Array<Vector2> worldVertices;
 
-    BodyColliderPolygon(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
+    public BodyColliderPolygon(Data data, float[] vertices) {
+        this(data.density, data.staticFriction, data.dynamicFriction, data.restitution, data.ghost, data.bitmask, vertices);
+    }
+
+    public BodyColliderPolygon(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
                         float[] vertices) throws RuntimeException {
-        super(0, 0, 0, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
+        super(density, staticFriction, dynamicFriction, restitution, ghost, bitmask, 0, 0, 0);
         if (vertices.length < 6) throw new IllegalArgumentException("At least 3 points are needed to construct a polygon; Points array must contain at least 6 values: [x0,y0,x1,y1,x2,y2,...]. Given: " + vertices.length);
         if (vertices.length % 2 != 0) throw new IllegalArgumentException("Point array must be of even length in the format [x0,y0, x1,y1, ...].");
         this.vertexCount = vertices.length / 2;

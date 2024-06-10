@@ -2,7 +2,7 @@ package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.math.Vector2;
 
-abstract class BodyCollider {
+public abstract class BodyCollider {
 
     // TODO: see if possible and better to replace with index or something.
     public Body body = null;
@@ -25,17 +25,39 @@ abstract class BodyCollider {
     protected float   offsetAngleRad;
     protected Vector2 worldCenter = new Vector2();
 
-    BodyCollider() {}
+    BodyCollider(Data data) {
+        this(data.density, data.staticFriction, data.dynamicFriction, data.restitution, data.ghost, data.bitmask, 0, 0, 0);
+    }
 
-    BodyCollider(float offsetX, float offsetY, float offsetAngleRad, float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask) {
-        this.offset.set(offsetX, offsetY);
-        this.offsetAngleRad = offsetAngleRad;
+    BodyCollider(float offsetX, float offsetY, float offsetAngleRad, Data data) {
+        this(data.density, data.staticFriction, data.dynamicFriction, data.restitution, data.ghost, data.bitmask, offsetX, offsetY, offsetAngleRad);
+    }
+
+    BodyCollider(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask) {
+        this(density, staticFriction, dynamicFriction, restitution, ghost, bitmask, 0,0,0);
+    }
+
+    /**
+     * All possible args constructor
+     * @param density
+     * @param staticFriction
+     * @param dynamicFriction
+     * @param restitution
+     * @param ghost
+     * @param bitmask
+     * @param offsetX
+     * @param offsetY
+     * @param offsetAngleRad
+     */
+    BodyCollider(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask, float offsetX, float offsetY, float offsetAngleRad) {
         this.density = density;
         this.staticFriction = staticFriction;
         this.dynamicFriction = dynamicFriction;
         this.restitution = restitution;
         this.ghost = ghost;
         this.bitmask = bitmask;
+        this.offset.set(offsetX, offsetY);
+        this.offsetAngleRad = offsetAngleRad;
     }
 
     public final boolean contains(final Vector2 point) {
@@ -58,7 +80,7 @@ abstract class BodyCollider {
     }
 
     public final Vector2 worldCenter() {
-        if (body == null) return offset;
+        if (body == null) return worldCenter.set(offset.x, offset.y);
         else return worldCenter.set(offset.x + body.x, offset.y + body.y).rotateAroundRad(body.cmX, body.cmY, body.aRad); // "scale" (by 1) -> rotate -> translate
     }
 
@@ -106,5 +128,16 @@ abstract class BodyCollider {
     abstract float   calculateBoundingRadius();
     abstract float   calculateArea();
     abstract Vector2 calculateLocalCenter();
+
+    public static class Data {
+
+        public float   density         = 1;
+        public float   staticFriction  = 1;
+        public float   dynamicFriction = 1;
+        public float   restitution     = 1;
+        public boolean ghost           = false;
+        public int     bitmask         = 0; // TODO
+
+    }
 
 }

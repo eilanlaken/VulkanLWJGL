@@ -11,12 +11,24 @@ public final class BodyColliderCircle extends BodyCollider {
     public final float   r;
     public final float   r2;
 
+    public BodyColliderCircle(Data data, float r, float offsetX, float offsetY, float offsetAngleRad) {
+        this(data.density, data.staticFriction, data.dynamicFriction, data.restitution, data.ghost, data.bitmask, r, offsetX, offsetY, offsetAngleRad);
+    }
+
+    public BodyColliderCircle(Data data, float r) {
+        this(data.density, data.staticFriction, data.dynamicFriction, data.restitution, data.ghost, data.bitmask, r, 0, 0, 0);
+    }
+
+    public BodyColliderCircle(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask, float r) {
+        this(density, staticFriction, dynamicFriction, restitution, ghost, bitmask, r, 0, 0, 0);
+    }
+
     public BodyColliderCircle(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
-                              float r, float x, float y, float angleRad) {
-        super(x, y,0, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
+                              float r, float offsetX, float offsetY, float offsetAngleRad) {
+        super(density, staticFriction, dynamicFriction, restitution, ghost, bitmask, offsetX, offsetY,0);
         if (r <= 0) throw new Physics2DException("Radius of circle collider must be positive. Got: " + r);
         this.worldCenter = new Vector2(offset());
-        this.angleRad = angleRad;
+        this.angleRad = offsetAngleRad;
         this.r  = r;
         this.r2 = r * r;
     }

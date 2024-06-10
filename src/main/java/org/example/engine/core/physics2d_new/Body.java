@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class Body implements MemoryPool.Reset, Comparable<Body> {
 
-    public Array<BodyCollider> colliders = new Array<>();
+    public final Array<BodyCollider> colliders = new Array<>();
 
     public    Object     owner       = null;
     protected boolean    initialized = false; // if the body is currently in the world
@@ -52,7 +52,7 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
      * - calculate the local center of mass
      * - calculates the moment of inertia relative to the center of mass (and its inverse)
      */
-    void init() {
+    final void init() {
         float totalMass = 0;
 
         for (BodyCollider collider : colliders) {
@@ -93,6 +93,8 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
 
     @Override
     public void reset() {
+        this.colliders.clear();
+
         this.owner = null;
         this.initialized = false;
         this.index = -1;

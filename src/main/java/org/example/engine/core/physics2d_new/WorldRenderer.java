@@ -3,6 +3,7 @@ package org.example.engine.core.physics2d_new;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.GraphicsUtils;
+import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.graphics.a_old_Renderer2D_2;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
@@ -28,7 +29,7 @@ public class WorldRenderer {
         this.world = world;
     }
 
-    public void render(a_old_Renderer2D_2 renderer) {
+    public void render(Renderer2D renderer) {
         final float pointPixelRadius = 3;
         float scaleX = renderer.getCurrentCamera().lens.getViewportWidth()  * pointPixelRadius / GraphicsUtils.getWindowWidth();
         float scaleY = renderer.getCurrentCamera().lens.getViewportHeight() * pointPixelRadius / GraphicsUtils.getWindowHeight();

@@ -25,9 +25,22 @@ public final class BodyColliderRectangle extends BodyCollider {
     public final Vector2 c2 = new Vector2();
     public final Vector2 c3 = new Vector2();
 
+    public BodyColliderRectangle(Data data, float width, float height, float offsetX, float offsetY, float offsetAngleRad) {
+        this(data.density, data.staticFriction, data.dynamicFriction, data.restitution, data.ghost, data.bitmask, width, height, offsetX, offsetY, offsetAngleRad);
+    }
+
+    public BodyColliderRectangle(Data data, float width, float height) {
+        this(data.density, data.staticFriction, data.dynamicFriction, data.restitution, data.ghost, data.bitmask, width, height, 0, 0, 0);
+    }
+
+    public BodyColliderRectangle(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
+                                 float width, float height) {
+        this(density, staticFriction, dynamicFriction, restitution, ghost, bitmask, width, height, 0, 0, 0);
+    }
+
     public BodyColliderRectangle(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask,
                                  float width, float height, float offsetX, float offsetY, float offsetAngleRad) {
-        super(offsetX, offsetY, offsetAngleRad, density, staticFriction, dynamicFriction, restitution, ghost, bitmask);
+        super(density, staticFriction, dynamicFriction, restitution, ghost, bitmask, offsetX, offsetY, offsetAngleRad);
         this.width = width;
         this.widthHalf = width * 0.5f;
         this.height = height;

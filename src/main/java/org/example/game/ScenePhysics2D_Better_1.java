@@ -3,25 +3,28 @@ package org.example.game;
 import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.graphics.Camera;
 import org.example.engine.core.graphics.GraphicsUtils;
+import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.graphics.a_old_Renderer2D_2;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.Vector3;
 import org.example.engine.core.physics2d_new.Body;
+import org.example.engine.core.physics2d_new.BodyCollider;
+import org.example.engine.core.physics2d_new.BodyColliderCircle;
 import org.example.engine.core.physics2d_new.World;
 import org.lwjgl.opengl.GL11;
 
 // contact points polygon vs polygon:
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
-public class ScenePhysics2D_new_2 extends ApplicationScreen {
+public class ScenePhysics2D_Better_1 extends ApplicationScreen {
 
-    private a_old_Renderer2D_2 renderer2D;
+    private Renderer2D renderer2D;
     private Camera camera;
     private World world = new World();
 
     private Body body_a;
 
-    public ScenePhysics2D_new_2() {
-        renderer2D = new a_old_Renderer2D_2();
+    public ScenePhysics2D_Better_1() {
+        renderer2D = new Renderer2D();
     }
 
     @Override
@@ -29,8 +32,13 @@ public class ScenePhysics2D_new_2 extends ApplicationScreen {
         camera = new Camera(640f/32,480f/32, 1);
         camera.update();
 
-        body_a = world.createBodyRectangle(null, Body.MotionType.STATIC, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, false, 1, 3, 1, -2,2,30);
+        //body_a = world.createBodyRectangle(null, Body.MotionType.STATIC, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, false, 1, 3, 1, -2,2,30);
 
+        BodyCollider.Data data = new BodyCollider.Data();
+        BodyColliderCircle circle1 = new BodyColliderCircle(data, 1, 1, 0, 0);
+        BodyColliderCircle circle2 = new BodyColliderCircle(data, 1, -2, 0, 0);
+
+        body_a = world.createBody(null, Body.MotionType.STATIC, circle1, circle2);
     }
 
 

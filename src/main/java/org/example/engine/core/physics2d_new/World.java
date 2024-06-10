@@ -1,6 +1,7 @@
 package org.example.engine.core.physics2d_new;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.graphics.a_old_Renderer2D_2;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.MemoryPool;
@@ -62,8 +63,25 @@ public class World {
         }
     }
 
-    public void render(a_old_Renderer2D_2 renderer) {
+    public void render(Renderer2D renderer) {
         debugRenderer.render(renderer);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public Body createBody(Object owner,
+                                 Body.MotionType motionType,
+                                 BodyCollider ...colliders) {
+        Body body = bodiesPool.allocate();
+        body.owner = owner;
+        body.off = false;
+        body.motionType = motionType;
+        for (BodyCollider collider : colliders) {
+            collider.body = body;
+            body.colliders.add(collider);
+        }
+        bodiesToAdd.add(body);
+        return body;
     }
 
     @Contract(pure = true)
@@ -157,7 +175,6 @@ public class World {
         body.wRad = velAngleDeg * MathUtils.degreesToRadians;
 
         bodiesToAdd.add(body);
-        System.out.println("hi");
         return body;
     }
 
