@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 // TODO: fix rendering bug.
 // TODO: overhaul, rename some methods, give option to render functions using lines.
 // TODO: instead of taking shaders as arguments, deploy useShader()
-public class Renderer2D_new implements MemoryResourceHolder {
+@Deprecated public class a_old_Renderer2D_2 implements MemoryResourceHolder {
 
     // constants
     private static final int VERTEX_SIZE        = 5;
@@ -39,7 +39,6 @@ public class Renderer2D_new implements MemoryResourceHolder {
 
     // cached colors
     private final float TINT_WHITE = new Color(1,1,1,1).toFloatBits();
-    private final float TINT_SHAPE = new Color(0,0,1,1).toFloatBits();
 
     // state
     private Camera        currentCamera = null;
@@ -57,7 +56,7 @@ public class Renderer2D_new implements MemoryResourceHolder {
     private final IntBuffer   indicesBuffer  = BufferUtils.createIntBuffer(TRIANGLES_CAPACITY * 3);
     private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * 4 * VERTEX_SIZE);
 
-    public Renderer2D_new() {
+    public a_old_Renderer2D_2() {
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
         {
@@ -92,7 +91,7 @@ public class Renderer2D_new implements MemoryResourceHolder {
     }
 
     public void begin(Camera camera) {
-        if (drawing) throw new GraphicsException("Already in a drawing state; Must call " + Renderer2D_new.class.getSimpleName() + ".end() before calling begin().");
+        if (drawing) throw new GraphicsException("Already in a drawing state; Must call " + a_old_Renderer2D_2.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND); // TODO: make camera attributes, get as additional parameter to begin()
@@ -268,15 +267,6 @@ public class Renderer2D_new implements MemoryResourceHolder {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    @Deprecated public void pushDebugShape(Shape2D shape, final Color tint) {
-        final float tintFloatBits = tint == null ? TINT_SHAPE : tint.toFloatBits();
-        pushDebugShape(shape, tintFloatBits);
-    }
-
-    @Deprecated public void pushDebugShape(Shape2D shape, final float tintFloatBits) {
-        if (shape instanceof Shape2DPolygon) pushDebugPolygon((Shape2DPolygon) shape, tintFloatBits);
-    }
-
     public void pushThinCircle(final float r, final float centerX, final float centerY, final Color color) {
         pushThinCircle(r, centerX, centerY, color.toFloatBits());
     }
@@ -350,10 +340,6 @@ public class Renderer2D_new implements MemoryResourceHolder {
             ;
         }
         vertexIndex += 15 * 5;
-        /*
-        verticesBuffer.put(x).put(y).put(tintFloatBits).put(0.5f).put(0.5f);
-        verticesBuffer.put(x + r * MathUtils.cosDeg(circle.angle())).put(y + r * MathUtils.sinDeg(circle.angle())).put(tintFloatBits).put(0.5f).put(0.5f);
-         */
     }
 
     public void pushThinRectangle(
@@ -464,39 +450,6 @@ public class Renderer2D_new implements MemoryResourceHolder {
         vertexIndex += worldVertices.size * 5;
     }
 
-    @Deprecated public void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + polygon.vertexCount * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
-            flush();
-        }
-
-        useShader(defaultShader);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-        useMode(GL11.GL_LINES);
-
-        // put indices
-        int startVertex = this.vertexIndex / VERTEX_SIZE;
-        for (int i = 0; i < polygon.indices.length - 2; i += 3) {
-            indicesBuffer.put(startVertex + polygon.indices[i]);
-            indicesBuffer.put(startVertex + polygon.indices[i + 1]);
-
-            indicesBuffer.put(startVertex + polygon.indices[i + 1]);
-            indicesBuffer.put(startVertex + polygon.indices[i + 2]);
-
-            indicesBuffer.put(startVertex + polygon.indices[i + 2]);
-            indicesBuffer.put(startVertex + polygon.indices[i]);
-        }
-
-        final Array<Vector2> worldVertices = polygon.worldVertices();
-
-        for (Vector2 vertex : worldVertices) {
-            verticesBuffer.put(vertex.x).put(vertex.y).put(tintFloatBits).put(0.5f).put(0.5f);
-        }
-
-        vertexIndex += polygon.vertexCount * 5;
-    }
-
     /** Swap Operations **/
     private void useShader(ShaderProgram shader) {
         if (shader == null) shader = defaultShader;
@@ -561,7 +514,7 @@ public class Renderer2D_new implements MemoryResourceHolder {
     }
 
     public void end() {
-        if (!drawing) throw new GraphicsException("Called " + Renderer2D_new.class.getSimpleName() + ".end() without calling " + Renderer2D_new.class.getSimpleName() + ".begin() first.");
+        if (!drawing) throw new GraphicsException("Called " + a_old_Renderer2D_2.class.getSimpleName() + ".end() without calling " + a_old_Renderer2D_2.class.getSimpleName() + ".begin() first.");
         flush();
         GL20.glDepthMask(true);
         GL11.glEnable(GL11.GL_CULL_FACE);
@@ -584,9 +537,9 @@ public class Renderer2D_new implements MemoryResourceHolder {
     }
 
     private static ShaderProgram createDefaultShaderProgram() {
-        try (InputStream vertexShaderInputStream = Renderer2D_new.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
+        try (InputStream vertexShaderInputStream = a_old_Renderer2D_2.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
              BufferedReader vertexShaderBufferedReader = new BufferedReader(new InputStreamReader(vertexShaderInputStream, StandardCharsets.UTF_8));
-             InputStream fragmentShaderInputStream = Renderer2D_new.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
+             InputStream fragmentShaderInputStream = a_old_Renderer2D_2.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
              BufferedReader fragmentShaderBufferedReader = new BufferedReader(new InputStreamReader(fragmentShaderInputStream, StandardCharsets.UTF_8))) {
 
             String vertexShader = vertexShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));

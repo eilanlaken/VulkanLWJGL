@@ -1,7 +1,7 @@
 package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.a_old_Renderer2D;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
@@ -589,7 +589,7 @@ public class Physics2DWorld {
 
     }
 
-    public void render(Renderer2D renderer) {
+    public void render(a_old_Renderer2D renderer) {
         debugRenderer.render(renderer);
     }
 

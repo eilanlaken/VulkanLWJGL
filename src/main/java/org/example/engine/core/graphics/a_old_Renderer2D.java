@@ -4,7 +4,7 @@ import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryResourceHolder;
-import org.example.engine.core.shape.Shape2DPolygon;
+import org.example.engine.core.shape.*;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -21,11 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-// TODO: to make it a standalone, make it initialize the opengl context itself, in case it is not initialized. Maybe.
-// TODO: fix rendering bug.
-// TODO: overhaul, rename some methods, give option to render functions using lines.
-// TODO: instead of taking shaders as arguments, deploy useShader()
-public class Renderer2D implements MemoryResourceHolder {
+@Deprecated public class a_old_Renderer2D implements MemoryResourceHolder {
 
     // constants
     private static final int VERTEX_SIZE        = 5;
@@ -34,20 +30,22 @@ public class Renderer2D implements MemoryResourceHolder {
 
     // defaults
     private final ShaderProgram defaultShader = createDefaultShaderProgram();
-    private final Texture       whitePixel    = createWhiteSinglePixelTexture();
-    private final Camera        defaultCamera = createDefaultCamera();
+    private final Texture whitePixel    = createWhiteSinglePixelTexture();
+    private final Camera defaultCamera = createDefaultCamera();
 
     // cached colors
     private final float TINT_WHITE = new Color(1,1,1,1).toFloatBits();
+    private final float TINT_SHAPE = new Color(0,0,1,1).toFloatBits();
 
     // state
-    private Camera        currentCamera = null;
-    private Texture       lastTexture   = null;
+    private Camera currentCamera = null;
+    private Texture lastTexture   = null;
     private ShaderProgram currentShader = null;
-    private boolean       drawing       = false;
-    private int           vertexIndex   = 0;
-    private int           mode          = GL11.GL_TRIANGLES;
-    private int           drawCalls     = 0;
+    private boolean               drawing       = false;
+    private int                   vertexIndex   = 0;
+    private int                   triangleIndex = 0;
+    private int                   mode          = GL11.GL_TRIANGLES;
+    private int                   drawCalls     = 0;
 
     // buffers
     private final int vao;
@@ -56,7 +54,7 @@ public class Renderer2D implements MemoryResourceHolder {
     private final IntBuffer   indicesBuffer  = BufferUtils.createIntBuffer(TRIANGLES_CAPACITY * 3);
     private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(BATCH_SIZE * 4 * VERTEX_SIZE);
 
-    public Renderer2D() {
+    public a_old_Renderer2D() {
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
         {
@@ -91,7 +89,7 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     public void begin(Camera camera) {
-        if (drawing) throw new GraphicsException("Already in a drawing state; Must call " + Renderer2D.class.getSimpleName() + ".end() before calling begin().");
+        if (drawing) throw new IllegalStateException("Already in a drawing state; Must call " + a_old_Renderer2D.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND); // TODO: make camera attributes, get as additional parameter to begin()
@@ -99,24 +97,15 @@ public class Renderer2D implements MemoryResourceHolder {
         this.drawCalls = 0;
         this.currentCamera = camera != null ? camera : defaultCamera.update(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight());
         this.currentShader = null;
-        this.drawing = true;
+        drawing = true;
     }
 
     /** Push primitives: TextureRegion, Shape, Light **/
-
-    public void pushTextureRegion(TextureRegion region, float x, float y, float angleZ, float scaleX, float scaleY) {
-        pushTextureRegion(region, null, x, y, 0, 0, angleZ, scaleX, scaleY, null, null);
-    }
-
-    public void pushTextureRegion(TextureRegion region, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
-        pushTextureRegion(region, null, x, y, angleX, angleY, angleZ, scaleX, scaleY, null, null);
-    }
-
-    // TODO: fix.
-    // TODO: make sure we apply scaling first, then rotation, then translation.
     public void pushTextureRegion(TextureRegion region, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + 20 > BATCH_SIZE * 4) flush();
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 6 > indicesBuffer.limit() || vertexIndex + 20 > BATCH_SIZE * 4) {
+            flush();
+        }
 
         final Texture texture = region.texture;
         final float ui = region.u;
@@ -130,7 +119,6 @@ public class Renderer2D implements MemoryResourceHolder {
         final float originalWidthHalf = region.originalWidthHalf;
         final float originalHeightHalf = region.originalHeightHalf;
 
-        // TODO: make sure we apply scaling first, then rotation, then translation.
         if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
         if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
 
@@ -149,6 +137,7 @@ public class Renderer2D implements MemoryResourceHolder {
                 .put(startVertex + 1)
                 .put(startVertex + 2)
         ;
+        triangleIndex += 6;
 
         // put vertices
         float localX1, localY1;
@@ -229,10 +218,9 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += 20;
     }
 
-    // TODO: delete. Break down the drawing operations to explicit pushCircleFilled, pushCircleHollow, pushRectangleFilled, pushRectangleHollow, pushCurve
-    @Deprecated public void pushPolygon(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + polygon.vertices.length > BATCH_SIZE * 4) {
+    public void pushPolygon(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + polygon.indices.length > indicesBuffer.limit() || vertexIndex + polygon.vertices.length > BATCH_SIZE * 4) {
             flush();
         }
         useShader(shader);
@@ -245,6 +233,7 @@ public class Renderer2D implements MemoryResourceHolder {
         for (int i = 0; i < polygon.indices.length; i++) {
             indicesBuffer.put(startVertex + polygon.indices[i]);
         }
+        triangleIndex += polygon.indices.length;
 
         if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
         if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
@@ -267,14 +256,23 @@ public class Renderer2D implements MemoryResourceHolder {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    public void pushThinCircle(final float r, final float centerX, final float centerY, final Color color) {
-        pushThinCircle(r, centerX, centerY, color.toFloatBits());
+    @Deprecated public void pushDebugShape(Shape2D shape, final Color tint) {
+        final float tintFloatBits = tint == null ? TINT_SHAPE : tint.toFloatBits();
+        pushDebugShape(shape, tintFloatBits);
     }
 
-    // TODO: add refinement argument
-    public void pushThinCircle(final float r, final float centerX, final float centerY, final float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + 15 * 5 * 2 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
+    @Deprecated public void pushDebugShape(Shape2D shape, final float tintFloatBits) {
+        if (shape instanceof Shape2DCircle) pushDebugCircle((Shape2DCircle) shape, tintFloatBits);
+        if (shape instanceof Shape2DRectangle) pushDebugRectangle((Shape2DRectangle) shape, tintFloatBits);
+        if (shape instanceof Shape2DAABB) pushDebugAABB((Shape2DAABB) shape, tintFloatBits);
+        if (shape instanceof Shape2DSegment) pushDebugSegment((Shape2DSegment) shape, tintFloatBits);
+        if (shape instanceof Shape2DPolygon) pushDebugPolygon((Shape2DPolygon) shape, tintFloatBits);
+        if (shape instanceof Shape2DUnion) pushDebugCompoundShape((Shape2DUnion) shape, tintFloatBits);
+    }
+
+    public void pushDebugCircle(final Shape2DCircle circle, final float tintFloatBits) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 34 * 2 > indicesBuffer.limit() || vertexIndex + 17 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 
@@ -293,70 +291,31 @@ public class Renderer2D implements MemoryResourceHolder {
         indicesBuffer.put(startVertex);
         indicesBuffer.put(startVertex + 15);
         indicesBuffer.put(startVertex + 16);
+        triangleIndex += 34;
 
+        Vector2 worldCenter = circle.getWorldCenter();
+        float worldRadius = circle.getWorldRadius();
+        float x = worldCenter.x;
+        float y = worldCenter.y;
+        float r = worldRadius;
         float da = 360f / 15;
         for (int i = 0; i < 15; i++) {
             verticesBuffer
-                    .put(centerX + r * MathUtils.cosDeg(da * i))
-                    .put(centerY + r * MathUtils.sinDeg(da * i))
+                    .put(x + r * MathUtils.cosDeg(da * i))
+                    .put(y + r * MathUtils.sinDeg(da * i))
                     .put(tintFloatBits)
                     .put(0.5f)
                     .put(0.5f)
             ;
         }
-        vertexIndex += 15 * 5;
+        verticesBuffer.put(x).put(y).put(tintFloatBits).put(0.5f).put(0.5f);
+        verticesBuffer.put(x + r * MathUtils.cosDeg(circle.angle())).put(y + r * MathUtils.sinDeg(circle.angle())).put(tintFloatBits).put(0.5f).put(0.5f);
+        vertexIndex += 17 * 5;
     }
 
-    public void pushThinCircle(final float r, final float centerX, final float centerY, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, final float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + 15 * 5 * 2 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
-            flush();
-        }
-
-        useShader(defaultShader);
-        useMode(GL11.GL_LINES);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-
-        // put indices
-        int startVertex = this.vertexIndex / VERTEX_SIZE;
-        for (int i = 1; i < 15; i++) {
-            indicesBuffer.put(startVertex + i - 1);
-            indicesBuffer.put(startVertex + i);
-        }
-        indicesBuffer.put(startVertex + 14);
-        indicesBuffer.put(startVertex);
-        indicesBuffer.put(startVertex + 15);
-        indicesBuffer.put(startVertex + 16);
-
-        float da = 360f / 15;
-        for (int i = 0; i < 15; i++) {
-            verticesBuffer
-                    .put(centerX + r * MathUtils.cosDeg(da * i))
-                    .put(centerY + r * MathUtils.sinDeg(da * i))
-                    .put(tintFloatBits)
-                    .put(0.5f)
-                    .put(0.5f)
-            ;
-        }
-        vertexIndex += 15 * 5;
-    }
-
-    public void pushThinRectangle(
-            float x0, float y0,
-            float x1, float y1,
-            float x2, float y2,
-            float x3, float y3, final Color color) {
-        pushThinRectangle(x0, y0, x1, y1, x2, y2, x3, y3, color.toFloatBits());
-    }
-
-    public void pushThinRectangle(
-            float x0, float y0,
-            float x1, float y1,
-            float x2, float y2,
-            float x3, float y3, final float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + 6 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+    public void pushDebugRectangle(final Shape2DRectangle rectangle, final float tintFloatBits) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 10 * 2> indicesBuffer.limit() || vertexIndex + 6 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 
@@ -379,24 +338,32 @@ public class Renderer2D implements MemoryResourceHolder {
         ;
         indicesBuffer.put(startVertex + 4);
         indicesBuffer.put(startVertex + 5);
+        triangleIndex += 10;
 
+        rectangle.update();
+        float x1 = rectangle.c0().x, y1 = rectangle.c0().y;
+        float x2 = rectangle.c1().x, y2 = rectangle.c1().y;
+        float x3 = rectangle.c2().x, y3 = rectangle.c2().y;
+        float x4 = rectangle.c3().x, y4 = rectangle.c3().y;
         verticesBuffer
-                .put(x0).put(y0).put(tintFloatBits).put(0.5f).put(0.5f) // V1
-                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // V2
-                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // V3
-                .put(x3).put(y3).put(tintFloatBits).put(0.5f).put(0.5f) // V4
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // V1
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // V2
+                .put(x3).put(y3).put(tintFloatBits).put(0.5f).put(0.5f) // V3
+                .put(x4).put(y4).put(tintFloatBits).put(0.5f).put(0.5f) // V4
         ;
 
-        vertexIndex += 4 * 5;
+        float centerX = (x1 + x2 + x3 + x4) * 0.25f;
+        float centerY = (y1 + y2 + y3 + y4) * 0.25f;
+        float lineEndX = (x3 + x4) * 0.5f;
+        float lineEndY = (y3 + y4) * 0.5f;
+        verticesBuffer.put(centerX).put(centerY).put(tintFloatBits).put(0.5f).put(0.5f);
+        verticesBuffer.put(lineEndX).put(lineEndY).put(tintFloatBits).put(0.5f).put(0.5f);
+        vertexIndex += 6 * 5;
     }
 
-    public void pushThinLineSegment(float x1, float y1, float x2, float y2, final Color color) {
-        pushThinLineSegment(x1, y1, x2, y2, color.toFloatBits());
-    }
-
-    public void pushThinLineSegment(float x1, float y1, float x2, float y2, final float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + 2 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+    public void pushDebugAABB(final Shape2DAABB aabb, final float tintFloatBits) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 10 * 2 > indicesBuffer.limit() || vertexIndex + 6 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 
@@ -409,19 +376,43 @@ public class Renderer2D implements MemoryResourceHolder {
         int startVertex = this.vertexIndex / VERTEX_SIZE;
         indicesBuffer
                 .put(startVertex)
-                .put(startVertex + 1);
-
-        verticesBuffer
-                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // a
-                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // b
+                .put(startVertex + 1)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+                .put(startVertex + 2)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex)
         ;
-        vertexIndex += 2 * 5;
+        indicesBuffer.put(startVertex + 4);
+        indicesBuffer.put(startVertex + 5);
+        triangleIndex += 10;
+
+        Vector2 worldMin = aabb.getWorldMin();
+        Vector2 worldMax = aabb.getWorldMax();
+        float x1 = worldMin.x, y1 = worldMax.y;
+        float x2 = worldMin.x, y2 = worldMin.y;
+        float x3 = worldMax.x, y3 = worldMin.y;
+        float x4 = worldMax.x, y4 = worldMax.y;
+        verticesBuffer
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // V1
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // V2
+                .put(x3).put(y3).put(tintFloatBits).put(0.5f).put(0.5f) // V3
+                .put(x4).put(y4).put(tintFloatBits).put(0.5f).put(0.5f) // V4
+        ;
+
+        float centerX = (x1 + x2 + x3 + x4) * 0.25f;
+        float centerY = (y1 + y2 + y3 + y4) * 0.25f;
+        float lineEndX = (x3 + x4) * 0.5f;
+        float lineEndY = (y3 + y4) * 0.5f;
+        verticesBuffer.put(centerX).put(centerY).put(tintFloatBits).put(0.5f).put(0.5f);
+        verticesBuffer.put(lineEndX).put(lineEndY).put(tintFloatBits).put(0.5f).put(0.5f);
+        vertexIndex += 6 * 5;
     }
 
-    // TODO: with and w/o triangulation + local vertices + transform.
-    public void pushThinPolygon(final Array<Vector2> worldVertices, final int[] indices, final float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + worldVertices.size * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+    public void pushThinLineSegment(float x1, float y1, float x2, float y2, final float tintFloatBits) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 2 * 2 > indicesBuffer.limit() || vertexIndex + 2 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 
@@ -432,22 +423,87 @@ public class Renderer2D implements MemoryResourceHolder {
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
-        for (int i = 0; i < indices.length - 2; i += 3) {
-            indicesBuffer.put(startVertex + indices[i]);
-            indicesBuffer.put(startVertex + indices[i + 1]);
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+        ;
+        triangleIndex += 2;
 
-            indicesBuffer.put(startVertex + indices[i + 1]);
-            indicesBuffer.put(startVertex + indices[i + 2]);
+        verticesBuffer
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // a
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // b
+        ;
+        vertexIndex += 2 * 5;
+    }
 
-            indicesBuffer.put(startVertex + indices[i + 2]);
-            indicesBuffer.put(startVertex + indices[i]);
+    @Deprecated public void pushDebugSegment(final Shape2DSegment segment, final float tintFloatBits) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + 2 * 2 > indicesBuffer.limit() || vertexIndex + 2 * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
         }
+
+        useShader(defaultShader);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+        useMode(GL11.GL_LINES);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+        ;
+        triangleIndex += 2;
+
+        Vector2 worldA = segment.worldA();
+        Vector2 worldB = segment.worldB();
+        float x1 = worldA.x, y1 = worldA.y;
+        float x2 = worldB.x, y2 = worldB.y;
+        verticesBuffer
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // a
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // b
+        ;
+        vertexIndex += 2 * 5;
+    }
+
+    public void pushDebugPolygon(final Shape2DPolygon polygon, final float tintFloatBits) {
+        if (!drawing) throw new IllegalStateException("Must call begin() before draw operations.");
+        if (triangleIndex + polygon.indices.length * 2 * 2 + 2 > indicesBuffer.limit() || vertexIndex + polygon.vertexCount * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
+
+        useShader(defaultShader);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+        useMode(GL11.GL_LINES);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 0; i < polygon.indices.length - 2; i += 3) {
+            indicesBuffer.put(startVertex + polygon.indices[i]);
+            indicesBuffer.put(startVertex + polygon.indices[i + 1]);
+
+            indicesBuffer.put(startVertex + polygon.indices[i + 1]);
+            indicesBuffer.put(startVertex + polygon.indices[i + 2]);
+
+            indicesBuffer.put(startVertex + polygon.indices[i + 2]);
+            indicesBuffer.put(startVertex + polygon.indices[i]);
+        }
+        triangleIndex += polygon.indices.length * 2;
+
+        final Array<Vector2> worldVertices = polygon.worldVertices();
 
         for (Vector2 vertex : worldVertices) {
             verticesBuffer.put(vertex.x).put(vertex.y).put(tintFloatBits).put(0.5f).put(0.5f);
         }
 
-        vertexIndex += worldVertices.size * 5;
+        vertexIndex += polygon.vertexCount * 5;
+    }
+
+    public void pushDebugCompoundShape(final Shape2DUnion compound, final float tintFloatBits) {
+        for (Shape2D island : compound.shapes) {
+            pushDebugShape(island, tintFloatBits);
+        }
     }
 
     /** Swap Operations **/
@@ -510,11 +566,12 @@ public class Renderer2D implements MemoryResourceHolder {
         verticesBuffer.clear();
         indicesBuffer.clear();
         vertexIndex = 0;
+        triangleIndex = 0;
         drawCalls++;
     }
 
     public void end() {
-        if (!drawing) throw new GraphicsException("Called " + Renderer2D.class.getSimpleName() + ".end() without calling " + Renderer2D.class.getSimpleName() + ".begin() first.");
+        if (!drawing) throw new IllegalStateException("Called " + a_old_Renderer2D.class.getSimpleName() + ".end() without calling " + a_old_Renderer2D.class.getSimpleName() + ".begin() first.");
         flush();
         GL20.glDepthMask(true);
         GL11.glEnable(GL11.GL_CULL_FACE);
@@ -537,9 +594,9 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     private static ShaderProgram createDefaultShaderProgram() {
-        try (InputStream vertexShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
+        try (InputStream vertexShaderInputStream = a_old_Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
              BufferedReader vertexShaderBufferedReader = new BufferedReader(new InputStreamReader(vertexShaderInputStream, StandardCharsets.UTF_8));
-             InputStream fragmentShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
+             InputStream fragmentShaderInputStream = a_old_Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
              BufferedReader fragmentShaderBufferedReader = new BufferedReader(new InputStreamReader(fragmentShaderInputStream, StandardCharsets.UTF_8))) {
 
             String vertexShader = vertexShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));

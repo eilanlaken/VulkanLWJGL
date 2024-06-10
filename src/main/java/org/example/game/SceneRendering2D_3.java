@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class SceneRendering2D_3 extends ApplicationScreen {
 
-    private Renderer2D renderer2D;
+    private a_old_Renderer2D renderer2D;
     private Camera camera;
     private ComponentGraphics2DShape shape;
 
@@ -32,7 +32,7 @@ public class SceneRendering2D_3 extends ApplicationScreen {
     private Shape2DCircle bounds;
 
     public SceneRendering2D_3() {
-        renderer2D = new Renderer2D();
+        renderer2D = new a_old_Renderer2D();
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.example.game;
 import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.graphics.Camera;
 import org.example.engine.core.graphics.Color;
-import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.a_old_Renderer2D;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.ecs.Component;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class SceneRendering2D_8 extends ApplicationScreen {
 
-    private Renderer2D renderer2D;
+    private a_old_Renderer2D renderer2D;
     private Camera camera;
 
     private ComponentGraphics2DShape shape;
@@ -24,7 +24,7 @@ public class SceneRendering2D_8 extends ApplicationScreen {
 
 
     public SceneRendering2D_8() {
-        renderer2D = new Renderer2D();
+        renderer2D = new a_old_Renderer2D();
     }
 
     @Override

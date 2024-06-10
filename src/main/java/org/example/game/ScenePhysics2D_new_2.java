@@ -3,11 +3,10 @@ package org.example.game;
 import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.graphics.Camera;
 import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.graphics.Renderer2D_new;
+import org.example.engine.core.graphics.a_old_Renderer2D_2;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.Vector3;
 import org.example.engine.core.physics2d_new.Body;
-import org.example.engine.core.physics2d_new.BodyColliderRectangle;
 import org.example.engine.core.physics2d_new.World;
 import org.lwjgl.opengl.GL11;
 
@@ -15,14 +14,14 @@ import org.lwjgl.opengl.GL11;
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
 public class ScenePhysics2D_new_2 extends ApplicationScreen {
 
-    private Renderer2D_new renderer2D;
+    private a_old_Renderer2D_2 renderer2D;
     private Camera camera;
     private World world = new World();
 
     private Body body_a;
 
     public ScenePhysics2D_new_2() {
-        renderer2D = new Renderer2D_new();
+        renderer2D = new a_old_Renderer2D_2();
     }
 
     @Override

@@ -2,7 +2,7 @@ package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.graphics.Camera;
-import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.a_old_Renderer2D;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11;
 // https://www.youtube.com/watch?v=5gDC1GU3Ivg
 public class ScenePhysics2D_3 extends ApplicationScreen {
 
-    private Renderer2D renderer2D;
+    private a_old_Renderer2D renderer2D;
     private Camera camera;
     private Physics2DWorld world = new Physics2DWorld();
 
@@ -24,7 +24,7 @@ public class ScenePhysics2D_3 extends ApplicationScreen {
     private Physics2DBody body_b;
 
     public ScenePhysics2D_3() {
-        renderer2D = new Renderer2D();
+        renderer2D = new a_old_Renderer2D();
     }
 
     @Override

@@ -2,7 +2,7 @@ package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.Color;
-import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.graphics.a_old_Renderer2D;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.shape.Shape2DPolygon;
@@ -32,7 +32,7 @@ public final class Physics2DWorldRenderer {
         this.world = world;
     }
 
-    public void render(Renderer2D renderer) {
+    public void render(a_old_Renderer2D renderer) {
         final float pointPixelRadius = 3;
         float scaleX = renderer.getCurrentCamera().lens.getViewportWidth()  * pointPixelRadius / GraphicsUtils.getWindowWidth();
         float scaleY = renderer.getCurrentCamera().lens.getViewportHeight() * pointPixelRadius / GraphicsUtils.getWindowHeight();
