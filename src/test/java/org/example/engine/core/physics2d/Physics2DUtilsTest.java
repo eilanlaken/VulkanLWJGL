@@ -1,12 +1,8 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 import org.example.engine.core.math.MathUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class Physics2DUtilsTest {
 

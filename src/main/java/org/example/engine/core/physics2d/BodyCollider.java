@@ -1,4 +1,4 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 import org.example.engine.core.math.Vector2;
 
@@ -17,7 +17,6 @@ public abstract class BodyCollider {
     private float   area            = 0;
     private boolean calcArea        = false;
     private float   boundingRadius  = 0;
-    private float   boundingRadius2 = 0; // r squared
     private boolean calcRadius      = false;
     private Vector2 localCenter     = null;
 
@@ -37,18 +36,6 @@ public abstract class BodyCollider {
         this(density, staticFriction, dynamicFriction, restitution, ghost, bitmask, 0,0,0);
     }
 
-    /**
-     * All possible args constructor
-     * @param density
-     * @param staticFriction
-     * @param dynamicFriction
-     * @param restitution
-     * @param ghost
-     * @param bitmask
-     * @param offsetX
-     * @param offsetY
-     * @param offsetAngleRad
-     */
     BodyCollider(float density, float staticFriction, float dynamicFriction, float restitution, boolean ghost, int bitmask, float offsetX, float offsetY, float offsetAngleRad) {
         this.density = density;
         this.staticFriction = staticFriction;
@@ -95,19 +82,9 @@ public abstract class BodyCollider {
     public final float boundingRadius() {
         if (!calcRadius) {
             boundingRadius = calculateBoundingRadius();
-            boundingRadius2 = boundingRadius * boundingRadius;
             calcRadius = true;
         }
         return boundingRadius;
-    }
-
-    public final float boundingRadiusSquared() {
-        if (!calcRadius) {
-            boundingRadius = calculateBoundingRadius();
-            boundingRadius2 = boundingRadius * boundingRadius;
-            calcRadius = true;
-        }
-        return boundingRadius2;
     }
 
     public final float getMinExtentX() {

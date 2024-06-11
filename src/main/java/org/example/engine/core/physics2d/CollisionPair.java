@@ -1,10 +1,10 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 import org.example.engine.core.memory.MemoryPool;
 
 import java.util.Objects;
 
-final class CollisionPair implements MemoryPool.Reset {
+public final class CollisionPair implements MemoryPool.Reset {
 
     public BodyCollider a;
     public BodyCollider b;

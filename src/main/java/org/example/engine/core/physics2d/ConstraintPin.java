@@ -1,4 +1,4 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 public class ConstraintPin extends Constraint {
 

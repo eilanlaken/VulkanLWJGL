@@ -1,4 +1,4 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;

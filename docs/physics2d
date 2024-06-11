@@ -8,3 +8,14 @@ for circle-anything: a single contact point.
 for polygon-polygon:
     - loop through poly A vertices, find closest point on B.
     - loop through poly B vertices, find closest point on A.
+
+rectangle vs rectangle collision detection:
+https://www.jkh.me/files/tutorials/Separating%20Axis%20Theorem%20for%20Oriented%20Bounding%20Boxes.pdf
+
+https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331t
+https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-the-core-engine--gamedev-7493t
+https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-friction-scene-and-jump-table--gamedev-7756t
+https://code.tutsplus.com/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032t
+
+useful reference
+https://github.com/acrlw/Physics2D/blob/master/Physics2D/source/dynamics/physics2d_system.cpp

@@ -1,8 +1,8 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 import org.example.engine.core.memory.MemoryPool;
 
-final class RayCastingRay implements MemoryPool.Reset {
+public final class RayCastingRay implements MemoryPool.Reset {
 
     public float originX;
     public float originY;

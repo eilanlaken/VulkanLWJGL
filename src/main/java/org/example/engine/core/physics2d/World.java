@@ -1,15 +1,18 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.Renderer2D;
-import org.example.engine.core.graphics.a_old_Renderer2D_2;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
-import org.example.engine.core.physics2d.Physics2DBody;
-import org.example.engine.core.physics2d.Physics2DForceField;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 public class World {
 
@@ -30,6 +33,16 @@ public class World {
     private final Array<Body> bodiesToAdd    = new Array<>(false, 100);
     private final Array<Body> bodiesToRemove = new Array<>(false, 500);
 
+    // collision detection - broad phase
+    private final Array<CollisionCell> spacePartition      = new Array<>(false, 1024);
+    private final Array<CollisionCell> activeCells         = new Array<>();
+    private final Set<CollisionPair>   collisionCandidates = new HashSet<>();
+    private final Collision            collisionDetection  = new Collision(this);
+    private final CollisionSolver      collisionSolver     = new CollisionSolver();
+
+    // collision detection - narrow phase
+    private final Array<CollisionManifold> manifolds = new Array<>(false, 20);
+
     // forces
     public Array<ForceField> allForceFields      = new Array<>(false, 4);
     public Array<ForceField> forceFieldsToAdd    = new Array<>(false, 2);
@@ -41,6 +54,13 @@ public class World {
     public Array<Constraint> allConstraints      = new Array<>(false, 10);
     public Array<Constraint> constraintsToAdd    = new Array<>(false, 5);
     public Array<Constraint> constraintsToRemove = new Array<>(false, 5);
+
+    // ray casting
+    final RayCasting rayCasting    = new RayCasting(this);
+    final HashMap<RayCastingRay, RayCastingCallback> allRays       = new HashMap<>(4);
+    final HashMap<RayCastingRay, RayCastingCallback>   raysToAdd     = new HashMap<>(4);
+    final HashMap<RayCastingRay, RayCastingCallback>   raysToRemove  = new HashMap<>(4);
+    final Array<RayCastingIntersection> intersections = new Array<>(false, 10);
 
     // debugger options
     private final WorldRenderer debugRenderer     = new WorldRenderer(this);
@@ -82,6 +102,7 @@ public class World {
         {
             for (Body body : allBodies) {
                 if (body.off) continue;
+
                 if (body.motionType == Body.MotionType.NEWTONIAN) {
                     for (ForceField field : allForceFields) {
                         Vector2 force = new Vector2();
@@ -93,7 +114,6 @@ public class World {
                     body.vy += body.invM * delta * body.netForceY;
                     body.wRad += body.netTorque * body.invI * delta;
                 }
-
                 body.netForceX = 0;
                 body.netForceY = 0;
                 body.netTorque = 0;
@@ -101,18 +121,171 @@ public class World {
             }
         }
 
+        /* collision detection: broad phase */
+        {
+            // to save additional iteration over the world bodies, we update the world's extent as well in this pass.
+            float worldMinX = Float.POSITIVE_INFINITY;
+            float worldMaxX = Float.NEGATIVE_INFINITY;
+            float worldMinY = Float.POSITIVE_INFINITY;
+            float worldMaxY = Float.NEGATIVE_INFINITY;
+            float worldMaxR = Float.NEGATIVE_INFINITY;
+            for (Body body : allBodies) {
+                for (BodyCollider collider : body.colliders) {
+                    worldMinX = Math.min(worldMinX, collider.getMinExtentX());
+                    worldMaxX = Math.max(worldMaxX, collider.getMaxExtentX());
+                    worldMinY = Math.min(worldMinY, collider.getMinExtentY());
+                    worldMaxY = Math.max(worldMaxY, collider.getMaxExtentY());
+                    worldMaxR = Math.max(worldMaxR, collider.boundingRadius());
+                }
+            }
+
+            float maxDiameter = 2 * worldMaxR;
+            float worldWidth = Math.abs(worldMaxX - worldMinX);
+            float worldHeight = Math.abs(worldMaxY - worldMinY);
+            int rows = Math.min((int) Math.ceil(worldHeight / maxDiameter), 32);
+            int cols = Math.min((int) Math.ceil(worldWidth / maxDiameter), 32);
+            float cellWidth = worldWidth / cols;
+            float cellHeight = worldHeight / rows;
+
+            /* collision detection - broad phase */
+            cellsPool.freeAll(spacePartition);
+            spacePartition.clear();
+            activeCells.clear();
+            for (int i = 0; i < rows * cols; i++) {
+                spacePartition.add(cellsPool.allocate());
+            }
+
+            for (Body body : allBodies) {
+                for (BodyCollider collider : body.colliders) {
+                    int startCol = Math.max(0, (int) ((collider.getMinExtentX() - worldMinX) / cellWidth));
+                    int endCol = Math.min(cols - 1, (int) ((collider.getMaxExtentX() - worldMinX) / cellWidth));
+                    int startRow = Math.max(0, (int) ((collider.getMinExtentY() - worldMinY) / cellHeight));
+                    int endRow = Math.min(rows - 1, (int) ((collider.getMaxExtentY() - worldMinY) / cellHeight));
+
+                    for (int row = startRow; row <= endRow; row++) {
+                        for (int col = startCol; col <= endCol; col++) {
+                            CollisionCell cell = spacePartition.get(row * cols + col);
+                            cell.colliders.add(collider);
+                            if (!cell.active) {
+                                cell.active = true;
+                                activeCells.add(cell);
+                            }
+                        }
+                    }
+                }
+            }
+
+            pairsPool.freeAll(collisionCandidates);
+            collisionCandidates.clear();
+            for (CollisionCell cell : activeCells) {
+                for (int i = 0; i < cell.colliders.size - 1; i++) {
+                    for (int j = i + 1; j < cell.colliders.size; j++) {
+                        BodyCollider collider_a = cell.colliders.get(i);
+                        BodyCollider collider_b = cell.colliders.get(j);
+                        Body body_a = collider_a.body;
+                        Body body_b = collider_b.body;
+                        if (body_a.off) continue;
+                        if (body_b.off) continue;
+                        if (body_a.motionType == Body.MotionType.STATIC && body_b.motionType == Body.MotionType.STATIC) continue;
+                        final Vector2 worldCenter_a = collider_a.worldCenter();
+                        final Vector2 worldCenter_b = collider_a.worldCenter();
+                        final float dx = worldCenter_b.x - worldCenter_a.x;
+                        final float dy = worldCenter_b.y - worldCenter_a.y;
+                        final float sum = collider_a.boundingRadius() + collider_b.boundingRadius();
+                        boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
+                        if (!boundingCirclesCollide) continue;
+
+                        CollisionPair pair = pairsPool.allocate();
+                        pair.a = collider_a;
+                        pair.b = collider_b;
+                        collisionCandidates.add(pair);
+                    }
+                }
+            }
+        }
+
+        /* collision detection - narrow phase */
+        {
+            manifoldsPool.freeAll(manifolds);
+            manifolds.clear();
+            for (CollisionPair pair : collisionCandidates) {
+                BodyCollider collider_a = pair.a;
+                BodyCollider collider_b = pair.b;
+                CollisionManifold manifold = collisionDetection.detectCollision(collider_a, collider_b);
+                if (manifold != null) manifolds.add(manifold);
+            }
+        }
+
+        /* collision resolution */
+        {
+            // TODO: need to figure out how to properly set the Body's: justCollided, touching, justSeparated.
+            for (CollisionManifold manifold : manifolds) {
+                Body body_a = manifold.collider_a.body;
+                Body body_b = manifold.collider_b.body;
+
+                body_a.touching.add(body_b);
+                body_b.touching.add(body_a);
+                collisionSolver.beginContact(manifold);
+                collisionSolver.resolve(manifold);
+                collisionSolver.endContact(manifold);
+            }
+        }
+
         /* solve velocity constraints */
 
         /* integrate positions */
+        for (Body body : allBodies) {
+            if (body.off) continue;
+            if (body.motionType == Body.MotionType.STATIC) continue;
+            body.x += delta * body.vx;
+            body.y += delta * body.vy;
+            body.aRad += delta * body.wRad;
+            body.syncTransform();
+        }
 
         /* solve position constraints */
+        boolean positionSolved = false;
+        for (int i = 0; i < positionIterations; ++i) {
 
+        }
+
+        /* ray casting */
+        {
+            for (Map.Entry<RayCastingRay, RayCastingCallback> rayCallback : raysToRemove.entrySet()) {
+                RayCastingRay ray = rayCallback.getKey();
+                allRays.remove(ray);
+                raysPool.free(ray);
+            }
+            allRays.putAll(raysToAdd);
+            raysToRemove.clear();
+            raysToAdd.clear();
+            intersectionsPool.freeAll(intersections);
+            intersections.clear();
+
+            for (Map.Entry<RayCastingRay, RayCastingCallback> rayCallback : allRays.entrySet()) {
+                RayCastingRay ray = rayCallback.getKey();
+                RayCastingCallback callback = rayCallback.getValue();
+                // set the distance for the ray based on world's extent
+                if (ray.dst == Float.POSITIVE_INFINITY || Float.isNaN(ray.dst)) {
+
+                }
+                Array<RayCastingIntersection> results = new Array<>();
+                // TODO: optimize this using the cell grid.
+                rayCasting.calculateIntersections(ray, allBodies, results);
+                intersections.addAll(results);
+                if (callback != null) callback.intersected(results);
+                results.clear();
+                raysToRemove.put(ray, callback);
+            }
+        }
 
     }
 
     public void render(Renderer2D renderer) {
         debugRenderer.render(renderer);
     }
+
+    /* Bodies and Colliders API */
 
     @Contract(pure = true)
     @NotNull
@@ -294,8 +467,51 @@ public class World {
         return body;
     }
 
+    /* Force fields API */
+
+    @Contract(pure = true)
+    @NotNull public ForceField createForceField(BiConsumer<Body, Vector2> forceFunction) {
+        ForceField forceField = new ForceField(this) {
+            @Override
+            public void calculateForce(Body body, Vector2 out) {
+                forceFunction.accept(body, out);
+            }
+        };
+        forceFieldsToAdd.add(forceField);
+        return forceField;
+    }
+
+    /* TODO: Constraints API */
+
     public void destroyConstraint(Constraint constraint) {
         constraintsToRemove.add(constraint);
     }
+
+    /* TODO: Ray casting API */
+
+    public void castRay(final RayCastingCallback callback, float originX, float originY, float dirX, float dirY) {
+        RayCastingRay ray = raysPool.allocate();
+        ray.originX = originX;
+        ray.originY = originY;
+        float len = Vector2.len(dirX, dirY);
+        boolean zero = MathUtils.isZero(dirX) && MathUtils.isZero(dirY);
+        ray.dirX = zero ? 1 : dirX / len;
+        ray.dirY = zero ? 0 : dirY / len;
+        ray.dst = Float.POSITIVE_INFINITY;
+        raysToAdd.put(ray, callback);
+    }
+
+    public void castRay(final RayCastingCallback callback, float originX, float originY, float dirX, float dirY, float maxDst) {
+        RayCastingRay ray = raysPool.allocate();
+        ray.originX = originX;
+        ray.originY = originY;
+        float len = Vector2.len(dirX, dirY);
+        boolean zero = MathUtils.isZero(dirX) && MathUtils.isZero(dirY);
+        ray.dirX = zero ? 1 : dirX / len;
+        ray.dirY = zero ? 0 : dirY / len;
+        ray.dst = Math.abs(maxDst);
+        raysToAdd.put(ray, callback);
+    }
+
 
 }

@@ -1,8 +1,6 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.physics2d.Physics2DBody;
-import org.example.engine.core.physics2d.Physics2DException;
 
 // TODO:
 /*

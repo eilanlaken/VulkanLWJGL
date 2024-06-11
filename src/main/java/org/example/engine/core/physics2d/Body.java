@@ -1,11 +1,11 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.jetbrains.annotations.NotNull;
 
-public class Body implements MemoryPool.Reset, Comparable<Body> {
+public final class Body implements MemoryPool.Reset, Comparable<Body> {
 
     public final Array<BodyCollider> colliders = new Array<>();
 
@@ -89,6 +89,19 @@ public class Body implements MemoryPool.Reset, Comparable<Body> {
         for (BodyCollider collider : colliders) {
             collider.update();
         }
+    }
+
+    public final void setTransform(float x, float y, float angleRad) {
+        this.x = x;
+        this.y = y;
+        this.aRad = angleRad;
+        syncTransform();
+    }
+
+    public final void setVelocity(float vx, float vy, float wRad) {
+        this.vx = vx;
+        this.vy = vy;
+        this.wRad = wRad;
     }
 
     @Override

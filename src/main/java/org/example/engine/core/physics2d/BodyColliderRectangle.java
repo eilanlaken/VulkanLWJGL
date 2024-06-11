@@ -1,5 +1,6 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.Vector2;
 
 /**
@@ -25,6 +26,8 @@ public final class BodyColliderRectangle extends BodyCollider {
     public final Vector2 c2 = new Vector2();
     public final Vector2 c3 = new Vector2();
 
+    public final Array<Vector2> worldVertices = new Array<>(true, 4);
+
     public BodyColliderRectangle(Data data, float width, float height, float offsetX, float offsetY, float offsetAngleRad) {
         this(data.density, data.staticFriction, data.dynamicFriction, data.restitution, data.ghost, data.bitmask, width, height, offsetX, offsetY, offsetAngleRad);
     }
@@ -45,6 +48,7 @@ public final class BodyColliderRectangle extends BodyCollider {
         this.widthHalf = width * 0.5f;
         this.height = height;
         this.heightHalf = height * 0.5f;
+        worldVertices.add(c0, c1, c2, c3);
     }
 
     @Override

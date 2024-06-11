@@ -1,12 +1,12 @@
-package org.example.engine.core.physics2d_new;
+package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.memory.MemoryPool;
 
-final class CollisionCell implements MemoryPool.Reset {
+public final class CollisionCell implements MemoryPool.Reset {
 
-    Array<BodyCollider> colliders = new Array<>(false, 2);
-    boolean             active    = false;
+    public Array<BodyCollider> colliders = new Array<>(false, 2);
+    public boolean             active    = false;
 
     public CollisionCell() {}
 
