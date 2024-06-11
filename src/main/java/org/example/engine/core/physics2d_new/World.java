@@ -4,7 +4,10 @@ import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.graphics.a_old_Renderer2D_2;
 import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
+import org.example.engine.core.physics2d.Physics2DBody;
+import org.example.engine.core.physics2d.Physics2DForceField;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +29,11 @@ public class World {
     public  final Array<Body> allBodies      = new Array<>(false, 500);
     private final Array<Body> bodiesToAdd    = new Array<>(false, 100);
     private final Array<Body> bodiesToRemove = new Array<>(false, 500);
+
+    // forces
+    public Array<ForceField> allForceFields      = new Array<>(false, 4);
+    public Array<ForceField> forceFieldsToAdd    = new Array<>(false, 2);
+    public Array<ForceField> forceFieldsToRemove = new Array<>(false, 2);
 
     // constraints
     public int               velocityIterations  = DEFAULT_VELOCITY_CONSTRAINT_SOLVER_ITERATIONS;
@@ -61,6 +69,45 @@ public class World {
             bodiesToRemove.clear();
             bodiesToAdd.clear();
         }
+
+        /* preparation: add and remove force fields */
+        {
+            allForceFields.removeAll(forceFieldsToRemove, true);
+            allForceFields.addAll(forceFieldsToAdd);
+            forceFieldsToRemove.clear();
+            forceFieldsToAdd.clear();
+        }
+
+        /* Euler integration: integrate velocities */
+        {
+            for (Body body : allBodies) {
+                if (body.off) continue;
+                if (body.motionType == Body.MotionType.NEWTONIAN) {
+                    for (ForceField field : allForceFields) {
+                        Vector2 force = new Vector2();
+                        field.calculateForce(body, force);
+                        body.netForceX += force.x;
+                        body.netForceY += force.y;
+                    }
+                    body.vx += body.invM * delta * body.netForceX;
+                    body.vy += body.invM * delta * body.netForceY;
+                    body.wRad += body.netTorque * body.invI * delta;
+                }
+
+                body.netForceX = 0;
+                body.netForceY = 0;
+                body.netTorque = 0;
+                body.touching.clear();
+            }
+        }
+
+        /* solve velocity constraints */
+
+        /* integrate positions */
+
+        /* solve position constraints */
+
+
     }
 
     public void render(Renderer2D renderer) {

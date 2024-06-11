@@ -5,15 +5,14 @@ import org.example.engine.core.memory.MemoryPool;
 
 final class CollisionCell implements MemoryPool.Reset {
 
-    private final Array<Body> bodies = new Array<>(false, 2);
-
-    private boolean active = false;
+    Array<BodyCollider> colliders = new Array<>(false, 2);
+    boolean             active    = false;
 
     public CollisionCell() {}
 
     @Override
     public void reset() {
-        bodies.clear();
+        colliders.clear();
         active = false;
     }
 

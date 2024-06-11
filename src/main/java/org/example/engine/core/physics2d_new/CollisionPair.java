@@ -6,12 +6,12 @@ import java.util.Objects;
 
 final class CollisionPair implements MemoryPool.Reset {
 
-    public Body a;
-    public Body b;
+    public BodyCollider a;
+    public BodyCollider b;
 
     public CollisionPair() {}
 
-    public CollisionPair(Body a, Body b) {
+    public CollisionPair(BodyCollider a, BodyCollider b) {
         this.a = a;
         this.b = b;
     }
