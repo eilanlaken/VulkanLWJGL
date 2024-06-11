@@ -4,7 +4,6 @@ import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Renderer2D;
-import org.example.engine.core.graphics.a_old_Renderer2D_2;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.shape.Shape2DPolygon;

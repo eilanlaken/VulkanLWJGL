@@ -1,9 +1,0 @@
-// TODO: SOLVED: contact points explained:
-// https://www.youtube.com/watch?v=5gDC1GU3Ivg
-
-contact points:
-
-for circle-anything: a single contact point.
-for polygon-polygon:
-    - loop through poly A vertices, find closest point on B.
-    - loop through poly B vertices, find closest point on A.

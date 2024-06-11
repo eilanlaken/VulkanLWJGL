@@ -1,0 +1,10 @@
+LiquidFun:
+https://docs.google.com/presentation/d/1fEAb4-lSyqxlVGNPog3G1LZ7UgtvxfRAwR0dwd19G4g/edit?pli=1#slide=id.g343a5269c_00
+
+contact points:
+contact points explained:
+https://www.youtube.com/watch?v=5gDC1GU3Ivg
+for circle-anything: a single contact point.
+for polygon-polygon:
+    - loop through poly A vertices, find closest point on B.
+    - loop through poly B vertices, find closest point on A.
