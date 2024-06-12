@@ -18,6 +18,7 @@ public class Matrix2x2 implements MemoryPool.Reset {
     public static final int M10 = 1;
     public static final int M01 = 2;
     public static final int M11 = 3;
+
     public float[] val = new float[4];
 
     public Matrix2x2() {

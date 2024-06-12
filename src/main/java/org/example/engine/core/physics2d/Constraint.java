@@ -2,19 +2,6 @@ package org.example.engine.core.physics2d;
 
 import org.example.engine.core.collections.Array;
 
-// TODO:
-/*
-read
-https://github.com/acrlw/Physics2D/blob/master/Physics2D/include/physics2d_joint.h
-https://github.com/acrlw/Physics2D/blob/master/Physics2D/include/physics2d_weld_joint.h
-
-https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc09/slides/04-GDC09_Catto_Erin_Solver.pdf
-
-https://box2d.org/files/ErinCatto_UnderstandingConstraints_GDC2014.pdf
-
-https://dyn4j.org/tags#constrained-dynamics
-https://dyn4j.org/2010/07/equality-constraints/
- */
 public abstract class Constraint {
 
     public final Body body1;

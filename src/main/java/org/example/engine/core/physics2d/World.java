@@ -90,6 +90,33 @@ public class World {
             bodiesToAdd.clear();
         }
 
+        /* add and remove constraints */
+        {
+            for (Constraint constraint : constraintsToRemove) {
+                Body body1 = constraint.body1;
+                Body body2 = constraint.body2;
+                body1.constraints.removeValue(constraint, true);
+                if (body2 != null) body2.constraints.removeValue(constraint, true);
+                allConstraints.removeValue(constraint, true);
+            }
+            Array<Constraint> tmp = new Array<>(false, 5);
+            for (Constraint constraint : constraintsToAdd) {
+                Body body1 = constraint.body1;
+                Body body2 = constraint.body2;
+                final boolean notReady = !body1.initialized || (body2 != null && !body2.initialized);
+                if (notReady) { // will be added later
+                    tmp.add(constraint);
+                } else {
+                    body1.constraints.add(constraint);
+                    if (body2 != null) body2.constraints.add(constraint);
+                    allConstraints.add(constraint);
+                }
+            }
+            constraintsToRemove.clear();
+            constraintsToAdd.clear();
+            constraintsToAdd.addAll(tmp);
+        }
+
         /* preparation: add and remove force fields */
         {
             allForceFields.removeAll(forceFieldsToRemove, true);
@@ -130,6 +157,7 @@ public class World {
             float worldMaxY = Float.NEGATIVE_INFINITY;
             float worldMaxR = Float.NEGATIVE_INFINITY;
             for (Body body : allBodies) {
+                if (body.off) continue;
                 for (BodyCollider collider : body.colliders) {
                     worldMinX = Math.min(worldMinX, collider.getMinExtentX());
                     worldMaxX = Math.max(worldMaxX, collider.getMaxExtentX());
@@ -232,6 +260,14 @@ public class World {
         }
 
         /* solve velocity constraints */
+        for (Constraint constraint : allConstraints) {
+            constraint.prepare(delta);
+        }
+        for (int i = 0; i < velocityIterations; i++) {
+            for (Constraint constraint : allConstraints) {
+                constraint.solveVelocity(delta);
+            }
+        }
 
         /* integrate positions */
         for (Body body : allBodies) {
@@ -246,7 +282,9 @@ public class World {
         /* solve position constraints */
         boolean positionSolved = false;
         for (int i = 0; i < positionIterations; ++i) {
-
+            for (Constraint constraint : allConstraints) {
+                constraint.solvePosition(delta);
+            }
         }
 
         /* ray casting */
@@ -482,6 +520,12 @@ public class World {
     }
 
     /* TODO: Constraints API */
+
+    public Constraint createMouseConstraint(Body body, Vector2 target) {
+        ConstraintMouse m = new ConstraintMouse(body, target);
+        constraintsToAdd.add(m);
+        return m;
+    }
 
     public void destroyConstraint(Constraint constraint) {
         constraintsToRemove.add(constraint);
