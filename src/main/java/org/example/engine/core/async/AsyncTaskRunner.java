@@ -1,7 +1,6 @@
 package org.example.engine.core.async;
 
 import org.example.engine.core.collections.Array;
-import org.example.engine.core.physics2d.Physics2DException;
 
 import java.util.*;
 
@@ -62,7 +61,7 @@ public class AsyncTaskRunner {
             try {
                 thread.join();
             } catch (InterruptedException e) {
-                throw new Physics2DException(e.getLocalizedMessage());
+                throw new AsyncException(e.getLocalizedMessage());
             }
         }
     }
