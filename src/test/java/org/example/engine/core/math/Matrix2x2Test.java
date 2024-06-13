@@ -88,20 +88,52 @@ class Matrix2x2Test {
     }
 
     @Test
-    void det() {
-
+    void setToScaling() {
+        Matrix2x2 s1 = new Matrix2x2();
+        s1.set(new float[] {4,5,6,7}); // should be ignored when setToScaling
+        s1.setToScaling(4, 2);
+        Assertions.assertEquals(4, s1.val[M00], MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0, s1.val[M10], MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0, s1.val[M01], MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(2, s1.val[M11], MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test
-    void setToScaling() {
+    void det() {
+        Matrix2x2 m1 = new Matrix2x2(new float[] {4,5,6,7});
+        Assertions.assertEquals(-2, m1.det(),   MathUtils.FLOAT_ROUNDING_ERROR);
+
+        Matrix2x2 m2 = new Matrix2x2();
+        Assertions.assertEquals(1, m2.det(),    MathUtils.FLOAT_ROUNDING_ERROR);
+
+        Matrix2x2 m3 = new Matrix2x2(new float[] {4,5,0,0});
+        Assertions.assertEquals(0, m3.det(),    MathUtils.FLOAT_ROUNDING_ERROR);
+
+        Matrix2x2 m4 = new Matrix2x2().setToScaling(2,2);
+        Assertions.assertEquals(4.0f, m4.det(), MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test
     void inv() {
+        Matrix2x2 m1 = new Matrix2x2(new float[] {4,5,6,7});
+        m1.inv();
+        Assertions.assertEquals(-7f/2, m1.val[M00], MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(5f/2, m1.val[M10],  MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(3,   m1.val[M01],   MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(-2, m1.val[M11],    MathUtils.FLOAT_ROUNDING_ERROR);
+
+        Matrix2x2 m2 = new Matrix2x2(new float[] {0,0,0,0});
+        Assertions.assertThrows(MathException.class, m2::inv);
     }
 
     @Test
     void transpose() {
+        Matrix2x2 m1 = new Matrix2x2(new float[] {4,5,6,7});
+        m1.transpose();
+        Assertions.assertEquals(4, m1.val[M00], MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(6, m1.val[M10], MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(5, m1.val[M01], MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(7, m1.val[M11], MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
 }
