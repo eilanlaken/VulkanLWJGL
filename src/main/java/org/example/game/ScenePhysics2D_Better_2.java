@@ -56,7 +56,7 @@ public class ScenePhysics2D_Better_2 extends ApplicationScreen {
         }
 
         if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.S)) {
-            world.createMouseConstraint(body_a, new Vector2(screen.x,screen.y));
+
         }
 
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {

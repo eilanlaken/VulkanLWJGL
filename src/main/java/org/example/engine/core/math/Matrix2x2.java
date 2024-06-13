@@ -6,8 +6,8 @@ import org.example.engine.core.memory.MemoryPool;
 <pre>
     A column major matrix:
 
-    M00 M10
-    M01 M11
+    M00 M01
+    M10 M11
 
 </pre>
 */
@@ -15,8 +15,8 @@ import org.example.engine.core.memory.MemoryPool;
 public class Matrix2x2 implements MemoryPool.Reset {
 
     public static final int M00 = 0;
-    public static final int M10 = 1;
-    public static final int M01 = 2;
+    public static final int M01 = 1;
+    public static final int M10 = 2;
     public static final int M11 = 3;
 
     public float[] val = new float[4];
@@ -42,8 +42,8 @@ public class Matrix2x2 implements MemoryPool.Reset {
     public Matrix2x2 idt () {
         float[] val = this.val;
         val[M00] = 1;
-        val[M10] = 0;
         val[M01] = 0;
+        val[M10] = 0;
         val[M11] = 1;
         return this;
     }
@@ -122,7 +122,7 @@ public class Matrix2x2 implements MemoryPool.Reset {
     /** Sets this matrix to a rotation matrix that will rotate any vector in counter-clockwise direction around the z-axis.
      * @param degrees the angle in degrees.
      * @return This matrix for the purpose of chaining operations. */
-    public Matrix2x2 setToRotation (float degrees) {
+    public Matrix2x2 setToRotationDeg (float degrees) {
         return setToRotationRad(MathUtils.degreesToRadians * degrees);
     }
 
@@ -166,7 +166,7 @@ public class Matrix2x2 implements MemoryPool.Reset {
     /** @return The determinant of this matrix */
     public float det() {
         float[] val = this.val;
-        return val[M00] * val[M11] - val[M01] + val[M01] * val[M10];
+        return val[M00] * val[M11] - val[M01] * val[M10];
     }
 
     /** Inverts this matrix given that the determinant is != 0.
@@ -174,7 +174,7 @@ public class Matrix2x2 implements MemoryPool.Reset {
      * */
     public Matrix2x2 inv() {
         float det = det();
-        if (det == 0) throw new MathException(Matrix2x2.class.getSimpleName() + " " + this + System.lineSeparator() + " not invertible. (det == 0)");
+        if (MathUtils.isZero(det)) throw new MathException(Matrix2x2.class.getSimpleName() + " " + this + System.lineSeparator() + " not invertible. (det == 0)");
 
         float inv_det = 1.0f / det;
         float[] val = this.val;
@@ -185,8 +185,8 @@ public class Matrix2x2 implements MemoryPool.Reset {
         float d = val[M11];
 
         val[M00] =  inv_det * d;
-        val[M10] = -inv_det * b;
-        val[M01] = -inv_det * c;
+        val[M01] = -inv_det * b;
+        val[M10] = -inv_det * c;
         val[M11] =  inv_det * a;
 
         return this;
@@ -207,7 +207,12 @@ public class Matrix2x2 implements MemoryPool.Reset {
      *           <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> order.
      * @return This matrix for the purpose of chaining methods together. */
     public Matrix2x2 set(float[] values) {
+        if (values.length != 4) throw new MathException("Number of arguments must be 4 for a Matrix2x2.set()");
         System.arraycopy(values, 0, val, 0, val.length);
+        this.val[M00] = values[0];
+        this.val[M10] = values[1];
+        this.val[M01] = values[2];
+        this.val[M11] = values[3];
         return this;
     }
 
@@ -227,27 +232,6 @@ public class Matrix2x2 implements MemoryPool.Reset {
         val[M01] = c;
         val[M10] = b;
         return this;
-    }
-
-    /** Multiplies matrix a with matrix b in the following manner:
-     *
-     * <pre>
-     * mul(A, B) => A := AB
-     * </pre>
-     *
-     * @param mata The float array representing the first matrix. Must have at least 9 elements.
-     * @param matb The float array representing the second matrix. Must have at least 9 elements. */
-    private static void mul(float[] mata, float[] matb) {
-        float v00 = mata[M00] * matb[M00] + mata[M01] * matb[M10];
-        float v01 = mata[M00] * matb[M01] + mata[M01] * matb[M11];
-
-        float v10 = mata[M10] * matb[M00] + mata[M11] * matb[M10];
-        float v11 = mata[M10] * matb[M01] + mata[M11] * matb[M11];
-
-        mata[M00] = v00;
-        mata[M10] = v10;
-        mata[M01] = v01;
-        mata[M11] = v11;
     }
 
     @Override

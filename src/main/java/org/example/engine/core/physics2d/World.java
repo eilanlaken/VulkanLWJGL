@@ -521,12 +521,6 @@ public class World {
 
     /* TODO: Constraints API */
 
-    public Constraint createMouseConstraint(Body body, Vector2 target) {
-        ConstraintMouse m = new ConstraintMouse(body, target);
-        constraintsToAdd.add(m);
-        return m;
-    }
-
     public void destroyConstraint(Constraint constraint) {
         constraintsToRemove.add(constraint);
     }
