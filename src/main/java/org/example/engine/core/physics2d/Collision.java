@@ -57,6 +57,12 @@ public final class Collision {
         manifold.contact_a.set(manifold.normal).scl(-c1.r).add(c1.worldCenter);
         manifold.collider_a = collider_a;
         manifold.collider_b = collider_b;
+
+        Vector2 aCenter = collider_a.worldCenter;
+        Vector2 bCenter = collider_b.worldCenter;
+        Vector2 a_b     = new Vector2(bCenter.x - aCenter.x, bCenter.y - aCenter.y);
+        if (a_b.dot(manifold.normal) < 0) manifold.normal.flip();
+
         return manifold;
     }
 
@@ -140,6 +146,11 @@ public final class Collision {
             manifold.normal.set(circleWorldCenter).sub(projection).nor();
             manifold.depth = circle.r - minDstEdge;
         }
+
+        Vector2 aCenter = collider_a.worldCenter;
+        Vector2 bCenter = collider_b.worldCenter;
+        Vector2 a_b     = new Vector2(bCenter.x - aCenter.x, bCenter.y - aCenter.y);
+        if (a_b.dot(manifold.normal) < 0) manifold.normal.flip();
 
         return manifold;
     }
@@ -239,6 +250,12 @@ public final class Collision {
         manifold.depth = minOverlap;
         manifold.collider_a = collider_a;
         manifold.collider_b = collider_b;
+
+        Vector2 aCenter = collider_a.worldCenter;
+        Vector2 bCenter = collider_b.worldCenter;
+        Vector2 a_b     = new Vector2(bCenter.x - aCenter.x, bCenter.y - aCenter.y);
+        if (a_b.dot(manifold.normal) < 0) manifold.normal.flip();
+
         return manifold;
     }
 

@@ -44,6 +44,7 @@ public class World {
     private final Array<CollisionManifold> manifolds = new Array<>(false, 20);
 
     // forces
+    public Vector2           gravity             = new Vector2();
     public Array<ForceField> allForceFields      = new Array<>(false, 4);
     public Array<ForceField> forceFieldsToAdd    = new Array<>(false, 2);
     public Array<ForceField> forceFieldsToRemove = new Array<>(false, 2);
@@ -137,6 +138,8 @@ public class World {
                         body.netForceX += force.x;
                         body.netForceY += force.y;
                     }
+                    body.netForceX += gravity.x;
+                    body.netForceY += gravity.y;
                     body.vx += body.invM * delta * body.netForceX;
                     body.vy += body.invM * delta * body.netForceY;
                     body.wRad += body.netTorque * body.invI * delta;
@@ -321,6 +324,11 @@ public class World {
 
     public void render(Renderer2D renderer) {
         debugRenderer.render(renderer);
+    }
+
+    /* World state setters */
+    public void setGravity(float gx, float gy) {
+        this.gravity.set(gx, gy);
     }
 
     /* Bodies and Colliders API */

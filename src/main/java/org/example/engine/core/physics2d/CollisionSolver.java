@@ -17,15 +17,9 @@ public class CollisionSolver {
         Body body_a = collider_a.body;
         Body body_b = collider_b.body;
 
-        Vector2 aCenter = collider_a.worldCenter;
-        Vector2 bCenter = collider_b.worldCenter;
-        Vector2 a_b     = new Vector2(bCenter.x - aCenter.x, bCenter.y - aCenter.y);
-
-        if (a_b.dot(manifold.normal) < 0) manifold.normal.flip();
-
         final float aMassInv   = body_a.motionType == Body.MotionType.STATIC ? 0 : body_a.invM;
         final float bMassInv   = body_b.motionType == Body.MotionType.STATIC ? 0 : body_b.invM;
-        final float percent    = 0.7f;
+        final float percent    = 0.4f;
         final float threshold  = 0.005f;
         final float invMassSum = aMassInv + bMassInv;
         final float pushBack   = Math.max(manifold.depth - threshold, 0.0f);

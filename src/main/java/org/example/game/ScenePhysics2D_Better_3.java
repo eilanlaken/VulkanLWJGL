@@ -54,7 +54,7 @@ public class ScenePhysics2D_Better_3 extends ApplicationScreen {
         }
 
         if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.S)) {
-
+            world.setGravity(0,-10);
         }
 
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
