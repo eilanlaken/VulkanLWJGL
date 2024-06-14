@@ -6,14 +6,27 @@ import java.util.Objects;
 
 public final class CollisionPair implements MemoryPool.Reset {
 
-    public BodyCollider a;
-    public BodyCollider b;
+    private BodyCollider a;
+    private BodyCollider b;
 
     public CollisionPair() {}
 
-    public CollisionPair(BodyCollider a, BodyCollider b) {
-        this.a = a;
-        this.b = b;
+    void set(BodyCollider a, BodyCollider b) {
+        if (a.body.index < b.body.index) {
+            this.a = a;
+            this.b = b;
+        } else {
+            this.a = b;
+            this.b = a;
+        }
+    }
+
+    BodyCollider getA() {
+        return a;
+    }
+
+    BodyCollider getB() {
+        return b;
     }
 
     @Override
@@ -21,9 +34,7 @@ public final class CollisionPair implements MemoryPool.Reset {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CollisionPair that = (CollisionPair) o;
-        if (Objects.equals(a, that.a) && Objects.equals(b, that.b)) return true;
-        if (Objects.equals(b, that.a) && Objects.equals(a, that.b)) return true;
-        return false;
+        return Objects.equals(a, that.a) && Objects.equals(b, that.b);
     }
 
     @Override

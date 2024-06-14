@@ -57,11 +57,11 @@ public class World {
     public Array<Constraint> constraintsToRemove = new Array<>(false, 5);
 
     // ray casting
-    final RayCasting rayCasting    = new RayCasting(this);
+    final RayCasting                                 rayCasting    = new RayCasting(this);
     final HashMap<RayCastingRay, RayCastingCallback> allRays       = new HashMap<>(4);
-    final HashMap<RayCastingRay, RayCastingCallback>   raysToAdd     = new HashMap<>(4);
-    final HashMap<RayCastingRay, RayCastingCallback>   raysToRemove  = new HashMap<>(4);
-    final Array<RayCastingIntersection> intersections = new Array<>(false, 10);
+    final HashMap<RayCastingRay, RayCastingCallback> raysToAdd     = new HashMap<>(4);
+    final HashMap<RayCastingRay, RayCastingCallback> raysToRemove  = new HashMap<>(4);
+    final Array<RayCastingIntersection>              intersections = new Array<>(false, 10);
 
     // debugger options
     private final WorldRenderer debugRenderer     = new WorldRenderer(this);
@@ -227,8 +227,7 @@ public class World {
                         if (!boundingCirclesCollide) continue;
 
                         CollisionPair pair = pairsPool.allocate();
-                        pair.a = collider_a;
-                        pair.b = collider_b;
+                        pair.set(collider_a, collider_b);
                         collisionCandidates.add(pair);
                     }
                 }
@@ -240,8 +239,8 @@ public class World {
             manifoldsPool.freeAll(manifolds);
             manifolds.clear();
             for (CollisionPair pair : collisionCandidates) {
-                BodyCollider collider_a = pair.a;
-                BodyCollider collider_b = pair.b;
+                BodyCollider collider_a = pair.getA();
+                BodyCollider collider_b = pair.getB();
                 CollisionManifold manifold = collisionDetection.detectCollision(collider_a, collider_b);
                 if (manifold != null) manifolds.add(manifold);
             }

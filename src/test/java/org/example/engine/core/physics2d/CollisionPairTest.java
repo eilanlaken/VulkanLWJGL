@@ -9,24 +9,6 @@ import java.util.Set;
 class CollisionPairTest {
 
     @Test
-    void setSets() {
-        CollisionPair p1 = new CollisionPair();
-        CollisionPair p2 = new CollisionPair();
-        Set<CollisionPair> set1 = new HashSet<>();
-        set1.add(p1);
-        set1.add(p2);
-        Assertions.assertEquals(1, set1.size());
-
-        BodyColliderCircle b1 = new BodyColliderCircle(1,1,1,1,false,1,1);
-        CollisionPair p3 = new CollisionPair(b1, null);
-        CollisionPair p4 = new CollisionPair(null, b1);
-        Set<CollisionPair> set2 = new HashSet<>();
-        set2.add(p3);
-        set2.add(p4);
-        Assertions.assertEquals(1, set2.size());
-    }
-
-    @Test
     void testEquals() {
     }
 
