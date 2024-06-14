@@ -33,8 +33,8 @@ public class CollisionSolver {
         Vector2 correction = new Vector2(manifold.normal).scl(pushBack * percent).scl(1 / invMassSum);
         body_a.x += -aMassInv * correction.x;
         body_a.y += -aMassInv * correction.y;
-        body_b.x += -bMassInv * correction.x;
-        body_b.y += -bMassInv * correction.y;
+        body_b.x +=  bMassInv * correction.x;
+        body_b.y +=  bMassInv * correction.y;
 
         // collision response
         final float e           = Math.min(collider_a.restitution, collider_b.restitution);
