@@ -20,6 +20,7 @@ public class ScenePhysics2D_Better_3 extends ApplicationScreen {
     private World world = new World();
 
     private Body body_a;
+    private Body body_b;
 
     public ScenePhysics2D_Better_3() {
         renderer2D = new Renderer2D();
@@ -35,6 +36,8 @@ public class ScenePhysics2D_Better_3 extends ApplicationScreen {
                 0f,0f,0,
                 1000, 1, 1, 0.8f, false, 1,
                 10, 0.5f, 0, 0, 0);
+
+        world.setGravity(0,-10);
 
     }
 
@@ -53,8 +56,16 @@ public class ScenePhysics2D_Better_3 extends ApplicationScreen {
                     0.5f);
         }
 
+        if (InputMouse.isButtonClicked(InputMouse.Button.RIGHT)) {
+            body_b = world.createBodyCircle(null, Body.MotionType.NEWTONIAN,
+                    screen.x, screen.y, 0,
+                    0f, 0f, 0,
+                    1, 1, 1,0.2f, false, 1,
+                    0.5f);
+        }
+
         if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.S)) {
-            world.setGravity(0,-10);
+            world.createConstraintDistance(body_a, body_b, 4);
         }
 
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {

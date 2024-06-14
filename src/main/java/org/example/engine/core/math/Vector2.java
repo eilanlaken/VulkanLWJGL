@@ -239,6 +239,10 @@ public class Vector2 implements MemoryPool.Reset {
         return new Vector2(-s * a.y, s * a.x);
     }
 
+    public static void crs(float s, final Vector2 a, Vector2 out) {
+        out.set(-s * a.y, s * a.x);
+    }
+
     /**
      * Returns the cross product of this {@link Vector2} and the z value of the right {@link Vector2}.
      * @param z the z component of the {@link Vector2}

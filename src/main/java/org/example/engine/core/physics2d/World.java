@@ -528,6 +528,12 @@ public class World {
 
     /* TODO: Constraints API */
 
+    public ConstraintDistance createConstraintDistance(Body body_a, Body body_b, float distance) {
+        ConstraintDistance constraintDistance = new ConstraintDistance(body_a, body_b, new Vector2(), new Vector2(), distance, 0, 0);
+        constraintsToAdd.add(constraintDistance);
+        return constraintDistance;
+    }
+
     public void destroyConstraint(Constraint constraint) {
         constraintsToRemove.add(constraint);
     }
