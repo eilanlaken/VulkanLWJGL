@@ -2,6 +2,7 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.math.Vector3;
 import org.example.engine.ecs.ComponentTransform;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -38,8 +39,13 @@ public class Renderer3D {
     }
 
     public void draw(final ModelPart modelPart, final ComponentTransform transform) {
-        modelPart.mesh.boundingSphere.translateAndScale(transform.x, transform.y, transform.z, MathUtils.max(transform.scaleX, transform.scaleY, transform.scaleZ));
-        if (camera.lens.frustum.intersectsSphere(modelPart.mesh.boundingSphere)) {
+        // TODO: maybe updating the bounding sphere should be somewhere else.
+        float centerX = modelPart.mesh.boundingSphereCenter.x;
+        float centerY = modelPart.mesh.boundingSphereCenter.y;
+        float centerZ = modelPart.mesh.boundingSphereCenter.z;
+        Vector3 boundingSphereCenter = new Vector3(centerX + transform.x, centerY + transform.y, centerZ + transform.z);
+        float boundingSphereRadius = MathUtils.max(transform.scaleX, transform.scaleY, transform.scaleZ) * modelPart.mesh.boundingSphereRadius;
+        if (camera.lens.frustum.intersectsSphere(boundingSphereCenter, boundingSphereRadius)) {
             System.out.println("intersects");
         } else {
             System.out.println("CULLING");

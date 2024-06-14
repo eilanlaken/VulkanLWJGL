@@ -227,7 +227,18 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         meshData.indices = getIndices(aiMesh);
         meshData.materialIndex = aiMesh.mMaterialIndex();
         meshData.vertexCount = getVertexCount(aiMesh);
-        meshData.boundingSphere = getBoundingSphere(aiMesh);
+        //meshData.boundingSphere = getBoundingSphere(aiMesh); TODO: remove this line
+        // set bounding sphere radius
+        AIAABB aiAABB = aiMesh.mAABB();
+        AIVector3D min = aiAABB.mMin();
+        AIVector3D max = aiAABB.mMax();
+        Vector3 center = new Vector3();
+        center.add(min.x(), min.y(), min.z());
+        center.add(max.x(), max.y(), max.z());
+        center.scl(0.5f);
+        float radius = Vector3.dst(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+        meshData.boundingSphereCenter = center;
+        meshData.boundingSphereRadius = radius;
         return meshData;
     }
 
@@ -391,7 +402,7 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         GL30.glBindVertexArray(0);
         final short bitmask = generateBitmask(attributesCollector);
         final int[] vbos = vbosCollector.pack().items;
-        return new ModelPartMesh(vaoId, meshData.vertexCount, bitmask,meshData.indices != null, meshData.boundingSphere, vbos);
+        return new ModelPartMesh(vaoId, meshData.vertexCount, bitmask,meshData.indices != null, meshData.boundingSphereCenter, meshData.boundingSphereRadius, vbos);
     }
 
     private void storeIndicesBuffer(int[] indices, ArrayInt vbosCollector) {
@@ -431,6 +442,8 @@ public class AssetLoaderModel implements AssetLoader<Model> {
         public Map<ModelVertexAttribute, Object> vertexBuffers = new HashMap<>();
         public int materialIndex;
         public int[] indices;
+        public Vector3 boundingSphereCenter;
+        public float   boundingSphereRadius;
         public Shape3DSphere boundingSphere;
     }
 

@@ -18,7 +18,8 @@ public class CameraLens {
     protected float zoom;
     protected float viewportWidth;
     protected float viewportHeight;
-    protected final Shape3DFrustum frustum;
+    @Deprecated protected final Shape3DFrustum frustum_delete;
+    protected final CameraLensFrustum frustum;
 
     public CameraLens(Mode mode, float viewportWidth, float viewportHeight, float zoom, float near, float far, float fov) {
         this.mode = mode;
@@ -32,7 +33,8 @@ public class CameraLens {
         this.view = new Matrix4x4();
         this.combined = new Matrix4x4();
         this.invProjectionView = new Matrix4x4();
-        this.frustum = new Shape3DFrustum();
+        this.frustum_delete = new Shape3DFrustum();
+        this.frustum = new CameraLensFrustum();
     }
 
     public void update(Vector3 position, Vector3 direction, Vector3 up) {

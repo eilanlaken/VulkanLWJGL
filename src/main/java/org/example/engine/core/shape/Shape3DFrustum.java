@@ -12,15 +12,13 @@ import org.example.engine.core.math.Vector3;
  *
  */
 // TODO: redo entire Shape3D
-public class Shape3DFrustum implements Shape3D_old {
+@Deprecated public class Shape3DFrustum implements Shape3D_old {
 
     public static final Vector3[] canonicalCubeCorners = { // This is the clipping volume - a cube with 8 corners: (+-1, +-1, +-1)
             new Vector3(-1, -1, -1), new Vector3(1, -1, -1), new Vector3(1, 1, -1), new Vector3(-1, 1, -1), // near clipping plane corners
             new Vector3(-1, -1, 1), new Vector3(1, -1, 1), new Vector3(1, 1, 1), new Vector3(-1, 1, 1), // far clipping plane corners
     };
 
-    // for the purpose of intermediate computations
-    private final Vector3 vector = new Vector3();
     public Shape3DPlane[] planes; // the 6 clipping planes: near, far, left, right, top, bottom
     private final Vector3[] frustumCorners = {
             new Vector3(), new Vector3(), new Vector3(), new Vector3(), // near frustum plane corners
@@ -45,15 +43,10 @@ public class Shape3DFrustum implements Shape3D_old {
         planes[5].set(frustumCorners[4], frustumCorners[0], frustumCorners[1]); // bottom
     }
 
-    public boolean intersectsSphere(final Shape3DSphere sphere) {
-        final float x = sphere.translatedCenter.x;
-        final float y = sphere.translatedCenter.y;
-        final float z = sphere.translatedCenter.z;
-        final float radius = sphere.scaledRadius;
-
+    public boolean intersectsSphere(final Vector3 center, final float r) {
         for (Shape3DPlane plane : planes) {
-            float signedDistance = plane.normal.x * x + plane.normal.y * y + plane.normal.z * z + plane.d;
-            float diff = signedDistance + radius;
+            float signedDistance = plane.normal.x * center.x + plane.normal.y * center.y + plane.normal.z * center.z + plane.d;
+            float diff = signedDistance + r;
             if (diff < 0) return false;
         }
         return true;
