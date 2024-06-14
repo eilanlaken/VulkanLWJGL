@@ -276,63 +276,6 @@ public final class MathUtils {
         return Math.abs(a - b) <= tolerance;
     }
 
-    /**
-     * Solves the system of linear equations:
-     * <p style="white-space: pre;"> Ax = B
-     * Multiply by A<sup>-1</sup> on both sides
-     * x = A<sup>-1</sup>B</p>
-     * @param B the B {@link Vector3}
-     * @return {@link Vector3} the x vector
-     */
-    public static void solve33(Matrix3x3 A, Vector3 B, Vector3 out) {
-        // get the determinant
-        float detInv = A.det();
-        // check for zero determinant
-        if (Math.abs(detInv) > FLOAT_ROUNDING_ERROR) {
-            detInv = 1.0f / detInv;
-        } else {
-            detInv = 0.0f;
-        }
-
-        float m00 =  A.val[M11] * A.val[M22] - A.val[M12] * A.val[M21];
-        float m01 = -A.val[M01] * A.val[M22] + A.val[M21] * A.val[M02];
-        float m02 =  A.val[M01] * A.val[M12] - A.val[M11] * A.val[M02];
-
-        float m10 = -A.val[M10] * A.val[M22] + A.val[M20] * A.val[M12];
-        float m11 =  A.val[M00] * A.val[M22] - A.val[M20] * A.val[M02];
-        float m12 = -A.val[M00] * A.val[M12] + A.val[M10] * A.val[M02];
-
-        float m20 =  A.val[M10] * A.val[M21] - A.val[M20] * A.val[M11];
-        float m21 = -A.val[M00] * A.val[M21] + A.val[M20] * A.val[M01];
-        float m22 =  A.val[M00] * A.val[M11] - A.val[M10] * A.val[M01];
-
-        out.x = detInv * (m00 * B.x + m01 * B.y + m02 * B.z);
-        out.y = detInv * (m10 * B.x + m11 * B.y + m12 * B.z);
-        out.z = detInv * (m20 * B.x + m21 * B.y + m22 * B.z);
-    }
-
-    /**
-     * Solves the system of linear equations:
-     * <p style="white-space: pre;"> Ax = b
-     * Multiply by A<sup>-1</sup> on both sides
-     * x = A<sup>-1</sup>b</p>
-     * @param b the b {@link Vector2}
-     * @return {@link Vector2} the x vector
-     */
-    public static void solve22(Matrix3x3 A, Vector2 b, Vector2 out) {
-        // get the 2D determinant
-        float det = A.val[M00] * A.val[M11] - A.val[M01] * A.val[M10];
-        // check for zero determinant
-        if (Math.abs(det) > FLOAT_ROUNDING_ERROR) {
-            det = 1.0f / det;
-        } else {
-            det = 0.0f;
-        }
-
-        out.x = det * (A.val[M11] * b.x - A.val[M01] * b.y);
-        out.y = det * (A.val[M00] * b.y - A.val[M10] * b.x);
-    }
-
     /** @return the logarithm of value with base a */
     public static float log(float a, float value) {
         return (float)(Math.log(value) / Math.log(a));

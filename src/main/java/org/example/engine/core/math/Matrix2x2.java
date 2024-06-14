@@ -234,6 +234,31 @@ public class Matrix2x2 implements MemoryPool.Reset {
         return this;
     }
 
+    /**
+     * Solves the system of linear equations:
+     * <p style="white-space: pre;"> Ax = B
+     * Multiply by A<sup>-1</sup> on both sides
+     * x = A<sup>-1</sup>B</p>
+     * @param B the B {@link Vector2}
+     * @return {@link Vector2} the x vector
+     */
+    public static void solve22(Matrix2x2 A, Vector2 B, Vector2 out) {
+        // get the determinant
+        float detInv = A.det();
+        // check for zero determinant
+        if (Math.abs(detInv) > MathUtils.FLOAT_ROUNDING_ERROR) {
+            detInv = 1.0f / detInv;
+        } else {
+            detInv = 0.0f;
+        }
+
+        final float Dx = B.x * A.val[M11] - A.val[M01] * B.y;
+        final float Dy = A.val[M00] * B.y - B.x * A.val[M10];
+
+        out.x = detInv * Dx;
+        out.y = detInv * Dy;
+    }
+
     @Override
     public void reset() {
         this.idt();

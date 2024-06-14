@@ -136,4 +136,26 @@ class Matrix2x2Test {
         Assertions.assertEquals(7, m1.val[M11], MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
+    @Test
+    void solve2x2() {
+        Matrix2x2 I = new Matrix2x2();
+        Vector2 b = new Vector2(3,6);
+        Vector2 solution = new Vector2();
+        Matrix2x2.solve22(I, b, solution);
+
+        Assertions.assertEquals(3, solution.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(6, solution.y, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        Matrix2x2 zero = new Matrix2x2(new float[] {0,0,0,0});
+        Matrix2x2.solve22(zero, b, solution);
+        Assertions.assertEquals(0, solution.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0, solution.y, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        Matrix2x2 m1 = new Matrix2x2(new float[] {3,7,12,-8});
+        Vector2 b1 = new Vector2(-4, 3);
+        Matrix2x2.solve22(m1, b1, solution);
+        Assertions.assertEquals(1f / 27, solution.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(-37f / 108, solution.y, MathUtils.FLOAT_ROUNDING_ERROR);
+    }
+
 }

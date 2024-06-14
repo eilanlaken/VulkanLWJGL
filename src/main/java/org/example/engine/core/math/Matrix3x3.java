@@ -2,6 +2,17 @@ package org.example.engine.core.math;
 
 import org.example.engine.core.memory.MemoryPool;
 
+/*
+<pre>
+    A column major matrix:
+
+    M00 M01 M02
+    M10 M11 M12
+    M20 M21 M22
+
+</pre>
+*/
+
 public class Matrix3x3 implements MemoryPool.Reset {
 
     public static final int M00 = 0;
@@ -37,7 +48,7 @@ public class Matrix3x3 implements MemoryPool.Reset {
 
     /** Sets this matrix to the identity matrix
      * @return This matrix for the purpose of chaining operations. */
-    public Matrix3x3 idt () {
+    public Matrix3x3 idt() {
         float[] val = this.val;
         val[M00] = 1;
         val[M10] = 0;
@@ -59,7 +70,7 @@ public class Matrix3x3 implements MemoryPool.Reset {
      *
      * @param m Matrix to multiply by.
      * @return This matrix for the purpose of chaining operations together. */
-    public Matrix3x3 mul (Matrix3x3 m) {
+    public Matrix3x3 mul(Matrix3x3 m) {
         float[] val = this.val;
 
         float v00 = val[M00] * m.val[M00] + val[M01] * m.val[M10] + val[M02] * m.val[M20];
@@ -113,9 +124,11 @@ public class Matrix3x3 implements MemoryPool.Reset {
         val[M00] = v00;
         val[M10] = v10;
         val[M20] = v20;
+
         val[M01] = v01;
         val[M11] = v11;
         val[M21] = v21;
+
         val[M02] = v02;
         val[M12] = v12;
         val[M22] = v22;
@@ -323,6 +336,23 @@ public class Matrix3x3 implements MemoryPool.Reset {
         return this;
     }
 
+    public Matrix3x3 set(float col0x, float col0y, float col0z,
+                         float col1x, float col1y, float col1z,
+                         float col2x, float col2y, float col2z) {
+        this.val[M00] = col0x;
+        this.val[M10] = col0y;
+        this.val[M20] = col0z;
+
+        this.val[M01] = col1x;
+        this.val[M11] = col1y;
+        this.val[M21] = col1z;
+
+        this.val[M02] = col2x;
+        this.val[M12] = col2y;
+        this.val[M22] = col2z;
+        return this;
+    }
+
     /** Sets the matrix to the given matrix as a float array. The float array must have at least 9 elements; the first 9 will be
      * copied.
      *
@@ -330,6 +360,7 @@ public class Matrix3x3 implements MemoryPool.Reset {
      *           <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> order.
      * @return This matrix for the purpose of chaining methods together. */
     public Matrix3x3 set(float[] values) {
+        if (values.length != 9) throw new MathException("Expected exactly 9 elements for Matrix3x3.set()");
         System.arraycopy(values, 0, val, 0, val.length);
         return this;
     }
@@ -590,6 +621,41 @@ public class Matrix3x3 implements MemoryPool.Reset {
         mata[M02] = v02;
         mata[M12] = v12;
         mata[M22] = v22;
+    }
+
+    /**
+     * Solves the system of linear equations:
+     * <p style="white-space: pre;"> Ax = B
+     * Multiply by A<sup>-1</sup> on both sides
+     * x = A<sup>-1</sup>B</p>
+     * @param B the B {@link Vector3}
+     * @return {@link Vector3} the x vector
+     */
+    public static void solve3x3(Matrix3x3 A, Vector3 B, Vector3 out) {
+        // get the determinant
+        float detInv = A.det();
+        // check for zero determinant
+        if (Math.abs(detInv) > MathUtils.FLOAT_ROUNDING_ERROR) {
+            detInv = 1.0f / detInv;
+        } else {
+            detInv = 0.0f;
+        }
+
+        float m00 =  A.val[M11] * A.val[M22] - A.val[M12] * A.val[M21];
+        float m01 = -A.val[M01] * A.val[M22] + A.val[M21] * A.val[M02];
+        float m02 =  A.val[M01] * A.val[M12] - A.val[M11] * A.val[M02];
+
+        float m10 = -A.val[M10] * A.val[M22] + A.val[M20] * A.val[M12];
+        float m11 =  A.val[M00] * A.val[M22] - A.val[M20] * A.val[M02];
+        float m12 = -A.val[M00] * A.val[M12] + A.val[M10] * A.val[M02];
+
+        float m20 =  A.val[M10] * A.val[M21] - A.val[M20] * A.val[M11];
+        float m21 = -A.val[M00] * A.val[M21] + A.val[M20] * A.val[M01];
+        float m22 =  A.val[M00] * A.val[M11] - A.val[M10] * A.val[M01];
+
+        out.x = detInv * (m00 * B.x + m01 * B.y + m02 * B.z);
+        out.y = detInv * (m10 * B.x + m11 * B.y + m12 * B.z);
+        out.z = detInv * (m20 * B.x + m21 * B.y + m22 * B.z);
     }
 
     @Override
