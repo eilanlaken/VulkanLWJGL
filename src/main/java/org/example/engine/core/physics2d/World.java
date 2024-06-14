@@ -22,8 +22,8 @@ public class World {
     // memory pools
     final MemoryPool<Body>                   bodiesPool        = new MemoryPool<>(Body.class,10);
     final MemoryPool<CollisionManifold>      manifoldsPool     = new MemoryPool<>(CollisionManifold.class,10);
-    final MemoryPool<CollisionPair>          pairsPool         = new MemoryPool<>(CollisionPair.class,5);
-    final MemoryPool<CollisionCell>          cellsPool         = new MemoryPool<>(CollisionCell.class,1024);
+    final MemoryPool<Collision.Pair>         pairsPool         = new MemoryPool<>(Collision.Pair.class,5);
+    final MemoryPool<Collision.GridCell>     cellsPool         = new MemoryPool<>(Collision.GridCell.class,1024);
     final MemoryPool<RayCastingRay>          raysPool          = new MemoryPool<>(RayCastingRay.class,4);
     final MemoryPool<RayCastingIntersection> intersectionsPool = new MemoryPool<>(RayCastingIntersection.class,4);
 
@@ -34,11 +34,11 @@ public class World {
     private final Array<Body> bodiesToRemove = new Array<>(false, 500);
 
     // collision detection - broad phase
-    private final Array<CollisionCell> spacePartition      = new Array<>(false, 1024);
-    private final Array<CollisionCell> activeCells         = new Array<>();
-    private final Set<CollisionPair>   collisionCandidates = new HashSet<>();
-    private final Collision            collisionDetection  = new Collision(this);
-    private final CollisionSolver      collisionSolver     = new CollisionSolver();
+    private final Array<Collision.GridCell> spacePartition      = new Array<>(false, 1024);
+    private final Array<Collision.GridCell> activeCells         = new Array<>();
+    private final Set<Collision.Pair>       collisionCandidates = new HashSet<>();
+    private final Collision                 collisionDetection  = new Collision(this);
+    private final CollisionSolver           collisionSolver     = new CollisionSolver();
 
     // collision detection - narrow phase
     private final Array<CollisionManifold> manifolds = new Array<>(false, 20);
@@ -195,7 +195,7 @@ public class World {
 
                     for (int row = startRow; row <= endRow; row++) {
                         for (int col = startCol; col <= endCol; col++) {
-                            CollisionCell cell = spacePartition.get(row * cols + col);
+                            Collision.GridCell cell = spacePartition.get(row * cols + col);
                             cell.colliders.add(collider);
                             if (!cell.active) {
                                 cell.active = true;
@@ -208,7 +208,7 @@ public class World {
 
             pairsPool.freeAll(collisionCandidates);
             collisionCandidates.clear();
-            for (CollisionCell cell : activeCells) {
+            for (Collision.GridCell cell : activeCells) {
                 for (int i = 0; i < cell.colliders.size - 1; i++) {
                     for (int j = i + 1; j < cell.colliders.size; j++) {
                         BodyCollider collider_a = cell.colliders.get(i);
@@ -226,7 +226,7 @@ public class World {
                         boolean boundingCirclesCollide = dx * dx + dy * dy < sum * sum;
                         if (!boundingCirclesCollide) continue;
 
-                        CollisionPair pair = pairsPool.allocate();
+                        Collision.Pair pair = pairsPool.allocate();
                         pair.set(collider_a, collider_b);
                         collisionCandidates.add(pair);
                     }
@@ -238,7 +238,7 @@ public class World {
         {
             manifoldsPool.freeAll(manifolds);
             manifolds.clear();
-            for (CollisionPair pair : collisionCandidates) {
+            for (Collision.Pair pair : collisionCandidates) {
                 BodyCollider collider_a = pair.getA();
                 BodyCollider collider_b = pair.getB();
                 CollisionManifold manifold = collisionDetection.detectCollision(collider_a, collider_b);

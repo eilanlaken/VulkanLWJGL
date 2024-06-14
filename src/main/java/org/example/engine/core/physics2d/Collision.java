@@ -6,6 +6,8 @@ import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public final class Collision {
 
     private final MemoryPool<Projection> projectionsPool = new MemoryPool<>(Projection.class, 200);
@@ -338,4 +340,61 @@ public final class Collision {
 
     }
 
+    public static final class GridCell implements MemoryPool.Reset {
+
+        public Array<BodyCollider> colliders = new Array<>(false, 2);
+        public boolean             active    = false;
+
+        public GridCell() {}
+
+        @Override
+        public void reset() {
+            colliders.clear();
+            active = false;
+        }
+
+    }
+
+    public static final class Pair implements MemoryPool.Reset {
+
+        private BodyCollider a;
+        private BodyCollider b;
+
+        public Pair() {}
+
+        void set(BodyCollider a, BodyCollider b) {
+            if (a.body.index < b.body.index) {
+                this.a = a;
+                this.b = b;
+            } else {
+                this.a = b;
+                this.b = a;
+            }
+        }
+
+        BodyCollider getA() {
+            return a;
+        }
+
+        BodyCollider getB() {
+            return b;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pair that = (Pair) o;
+            return Objects.equals(a, that.a) && Objects.equals(b, that.b);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(a) + Objects.hashCode(b); // A commutative operation to ensure symmetry
+        }
+
+        @Override
+        public void reset() {}
+
+    }
 }
