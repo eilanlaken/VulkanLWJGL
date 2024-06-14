@@ -37,10 +37,10 @@ public class World {
     private final Array<Collision.GridCell> spacePartition      = new Array<>(false, 1024);
     private final Array<Collision.GridCell> activeCells         = new Array<>();
     private final Set<Collision.Pair>       collisionCandidates = new HashSet<>();
-    private final Collision                 collisionDetection  = new Collision(this);
     private final CollisionSolver           collisionSolver     = new CollisionSolver();
 
     // collision detection - narrow phase
+    private final Collision                collision = new Collision(this);
     private final Array<CollisionManifold> manifolds = new Array<>(false, 20);
 
     // forces
@@ -241,7 +241,7 @@ public class World {
             for (Collision.Pair pair : collisionCandidates) {
                 BodyCollider collider_a = pair.getA();
                 BodyCollider collider_b = pair.getB();
-                CollisionManifold manifold = collisionDetection.detectCollision(collider_a, collider_b);
+                CollisionManifold manifold = collision.detectCollision(collider_a, collider_b);
                 if (manifold != null) manifolds.add(manifold);
             }
         }
