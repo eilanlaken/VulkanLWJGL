@@ -27,6 +27,16 @@ import java.util.stream.Collectors;
 // TODO: fix rendering bug.
 // TODO: overhaul, rename some methods, give option to render functions using lines.
 // TODO: instead of taking shaders as arguments, deploy useShader()
+// TODO:
+/*
+instead of:
+int startVertex = this.vertexIndex / VERTEX_SIZE;
+vertexIndex += vertices * VERTEX_SIZE;
+
+do:
+int startVertex = this.vertexIndex;
+vertexIndex += vertices;
+ */
 public class Renderer2D implements MemoryResourceHolder {
 
     // constants
