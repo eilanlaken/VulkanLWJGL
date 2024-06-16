@@ -485,7 +485,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
     public void pushFilledRectangle(float width, float height, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, float tintFloatBits) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex + 20 > BATCH_SIZE * 4) flush();
+        if (vertexIndex + 4 * VERTEX_SIZE > BATCH_SIZE * 4) flush();
 
         // TODO: make sure we apply scaling first, then rotation, then translation.
         if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
@@ -585,7 +585,7 @@ public class Renderer2D implements MemoryResourceHolder {
                 .put(x3).put(y3).put(tintFloatBits).put(0.5f).put(0.5f) // V3
                 .put(x4).put(y4).put(tintFloatBits).put(0.5f).put(0.5f) // V4
         ;
-        vertexIndex += 20;
+        vertexIndex += 4 * VERTEX_SIZE; // TODO: update vertex index correctly.
     }
 
     public void pushThinLineSegment(float x1, float y1, float x2, float y2, final Color color) {
@@ -630,6 +630,9 @@ public class Renderer2D implements MemoryResourceHolder {
     public void pushThinCurve(Function<Float, Float> f, float minX, float maxX, int refinement, float tintFloatBits) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (refinement < 2) throw new GraphicsException("refinement must be at least 2 for curve rendering. Got: " + refinement);
+        if (vertexIndex + refinement * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
 
         useShader(defaultShader);
         useTexture(whitePixel);
@@ -661,6 +664,10 @@ public class Renderer2D implements MemoryResourceHolder {
     public void pushThinCurve(final Vector2[] values, float tintFloatBits) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (values.length < 2) throw new GraphicsException("values must contain at least 2 points. Got: " + values.length);
+        if (vertexIndex + values.length * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
+
         useShader(defaultShader);
         useTexture(whitePixel);
         useCustomAttributes(null);
@@ -682,6 +689,10 @@ public class Renderer2D implements MemoryResourceHolder {
     public void pushCurve(Function<Float, Float> f, float minX, float maxX, int refinement, float stroke, float tintFloatBits) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (refinement < 2) throw new GraphicsException("refinement must be at least 2 for curve rendering. Got: " + refinement);
+        if (vertexIndex + refinement * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
+
         stroke = Math.abs(stroke);
 
         useShader(defaultShader);
