@@ -788,7 +788,15 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += worldVertices.size * 5;
     }
 
+    /* Font Rendering API */
+    // LWJGL example:
+    // https://github.com/LWJGL/lwjgl3/blob/master/modules/samples/src/test/java/org/lwjgl/demo/stb/Truetype.java
+    public void pushText(final String text, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, float tintFloatBits) {
+
+    }
+
     /** Swap Operations **/
+    // TODO: refactor into public.
     private void useShader(ShaderProgram shader) {
         if (shader == null) shader = defaultShader;
         if (currentShader != shader) {
