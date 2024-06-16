@@ -3,6 +3,7 @@ package org.example.engine.core.graphics;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
+import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.memory.MemoryResourceHolder;
 import org.example.engine.core.shape.Shape2DPolygon;
 import org.lwjgl.BufferUtils;
@@ -19,6 +20,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 // TODO: to make it a standalone, make it initialize the opengl context itself, in case it is not initialized. Maybe.
@@ -37,7 +39,10 @@ public class Renderer2D implements MemoryResourceHolder {
     private final Texture       whitePixel    = createWhiteSinglePixelTexture();
     private final Camera        defaultCamera = createDefaultCamera();
 
-    // cached colors
+    // memory pools
+    private final MemoryPool<Vector2> vector2MemoryPool = new MemoryPool<>(Vector2.class, 10);
+
+    // caches
     private final float TINT_WHITE = new Color(1,1,1,1).toFloatBits();
 
     // state
@@ -611,7 +616,126 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += 2 * 5;
     }
 
+    public void pushFilledLineSegment(float x1, float y1, float x2, float y2, float stroke, final float tintFloatBits) {
+        // we simply draw a rectangle with center: ((x1 + x2) / 2, (y1 + y2) / 2), width: segment length and height: stroke
+        // and angle: slope
+        float centerX = (x1 + x2) * 0.5f;
+        float centerY = (y1 + y2) * 0.5f;
+        float angleZ = MathUtils.atanDeg((y2 - y1) / (x2 - x1));
+        float width = Vector2.dst(x1, y1, x2, y2);
+        float height = stroke;
+        pushFilledRectangle(width, height, centerX, centerY, 0,0, angleZ, 1, 1, tintFloatBits);
+    }
+
+    public void pushThinCurve(Function<Float, Float> f, float minX, float maxX, int refinement, float tintFloatBits) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (refinement < 2) throw new GraphicsException("refinement must be at least 2 for curve rendering. Got: " + refinement);
+
+        useShader(defaultShader);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+        useMode(GL11.GL_LINES);
+
+        if (minX > maxX) {
+            float tmp = minX;
+            minX = maxX;
+            maxX = tmp;
+        }
+        float step = (maxX - minX) / refinement;
+
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 0; i < refinement - 1; i++) {
+            indicesBuffer.put(startVertex + i);
+            indicesBuffer.put(startVertex + i + 1);
+        }
+
+        for (int i = 0; i < refinement; i++) {
+            float currentX = minX + step * i;
+            float currentY = f.apply(currentX);
+            verticesBuffer.put(currentX).put(currentY).put(tintFloatBits).put(0.5f).put(0.5f);
+        }
+
+        vertexIndex += refinement * 5;
+    }
+
+    public void pushThinCurve(final Vector2[] values, float tintFloatBits) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values.length < 2) throw new GraphicsException("values must contain at least 2 points. Got: " + values.length);
+        useShader(defaultShader);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+        useMode(GL11.GL_LINES);
+
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 0; i < values.length - 1; i++) {
+            indicesBuffer.put(startVertex + i);
+            indicesBuffer.put(startVertex + i + 1);
+        }
+
+        for (Vector2 value : values) {
+            verticesBuffer.put(value.x).put(value.y).put(tintFloatBits).put(0.5f).put(0.5f);
+        }
+
+        vertexIndex += values.length * 5;
+    }
+
+    public void pushCurve(Function<Float, Float> f, float minX, float maxX, int refinement, float stroke, float tintFloatBits) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (refinement < 2) throw new GraphicsException("refinement must be at least 2 for curve rendering. Got: " + refinement);
+        stroke = Math.abs(stroke);
+
+        useShader(defaultShader);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+        useMode(GL11.GL_TRIANGLES);
+
+        if (minX > maxX) {
+            float tmp = minX;
+            minX = maxX;
+            maxX = tmp;
+        }
+        float step = (maxX - minX) / refinement;
+
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 0; i < refinement * 2 - 2; i += 2) {
+            indicesBuffer.put(startVertex + i);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 3);
+        }
+
+        for (int i = 0; i < refinement; i++) {
+            float currentX = minX + step * i;
+            float currentY = f.apply(currentX);
+
+            float nextX = minX + step * (i + 1);
+            float nextY = f.apply(nextX);
+
+            Vector2 strokeVec = vector2MemoryPool.allocate();
+            strokeVec.set(nextX - currentX, nextY - currentY);
+            strokeVec.nor();
+            strokeVec.rotate90(1);
+            strokeVec.scl(stroke * 0.5f);
+
+            float x1 = currentX + strokeVec.x;
+            float y1 = currentY + strokeVec.y;
+
+            float x2 = currentX - strokeVec.x;
+            float y2 = currentY - strokeVec.y;
+
+            verticesBuffer.put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f);
+            verticesBuffer.put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f);
+
+            vector2MemoryPool.free(strokeVec);
+        }
+
+        vertexIndex += 6 * refinement * 5;
+    }
+
     // TODO: with and w/o triangulation + local vertices + transform.
+    // TODO: use Vector2[] or float[] for the vertices.
     public void pushThinPolygon(final Array<Vector2> worldVertices, final int[] indices, final float tintFloatBits) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (vertexIndex + worldVertices.size * 5 * 2 > BATCH_SIZE * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented

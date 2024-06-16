@@ -61,6 +61,18 @@ public class Vector2 implements MemoryPool.Reset {
         return this;
     }
 
+    public Vector2 setFromAToB(float x1, float y1, float x2, float y2) {
+        this.x = x2 - x1;
+        this.y = y2 - y1;
+        return this;
+    }
+
+    public Vector2 setFromAToB(final Vector2 a, final Vector2 b) {
+        this.x = b.x - a.x;
+        this.y = b.y - a.y;
+        return this;
+    }
+
     public Vector2 sub(Vector2 v) {
         x -= v.x;
         y -= v.y;
