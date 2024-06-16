@@ -307,6 +307,7 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += 15 * 5;
     }
 
+    // TODO: consider transform (translation, rotation, scale).
     public void pushThinCircle(final float r, final float centerX, final float centerY, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, final float tintFloatBits) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (vertexIndex + 15 * 5 * 2 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
@@ -342,6 +343,92 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += 15 * 5;
     }
 
+    // TODO: consider transform and set angle range
+    public void pushFilledCircle(float r, float x, float y, int refinement, float angleX, float angleY, float angleZ, float scaleX, float scaleY, float tintFloatBits) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (refinement < 3) throw new GraphicsException("refinement must be >= 3. Got: " + refinement);
+        if (vertexIndex + refinement * 5 * 2 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
+
+        useShader(defaultShader);
+        useMode(GL11.GL_TRIANGLES);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 0; i < refinement; i++) {
+            indicesBuffer.put(startVertex);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+        }
+        indicesBuffer.put(startVertex);
+        indicesBuffer.put(startVertex + refinement);
+        indicesBuffer.put(startVertex + 1);
+
+        float da = 360f / refinement;
+        verticesBuffer.put(x).put(y).put(tintFloatBits).put(0.5f).put(0.5f);
+        for (int i = 0; i < refinement; i++) {
+            float currentAngle = da * i;
+            float pointX = x + r * (MathUtils.cosDeg(currentAngle) - MathUtils.sinDeg(currentAngle));
+            float pointY = y + r * (MathUtils.sinDeg(currentAngle) + MathUtils.cosDeg(currentAngle));
+            verticesBuffer.put(pointX).put(pointY).put(tintFloatBits).put(0.5f).put(0.5f);
+        }
+
+        vertexIndex += refinement * 5;
+    }
+
+    public void pushCircleBorder(float r, float thickness, float x, float y, int refinement, float angleX, float angleY, float angleZ, float scaleX, float scaleY, float tintFloatBits) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (refinement < 3) throw new GraphicsException("refinement must be >= 3. Got: " + refinement);
+        if (vertexIndex + refinement * 5 * 4 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
+
+        useShader(defaultShader);
+        useMode(GL11.GL_TRIANGLES);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 0; i < refinement * 4; i += 2) { // 012 213
+            indicesBuffer.put(startVertex + i + 0);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 3);
+        }
+
+        float da = 360f / refinement;
+        float halfBorder = thickness * 0.5f;
+        // render arc segments.
+        for (int i = 0; i < refinement; i++) {
+            float currentAngle = da * i;
+            float nextAngle = currentAngle + da;
+            float point0_X = x + (r - halfBorder) * (MathUtils.cosDeg(currentAngle) - MathUtils.sinDeg(currentAngle));
+            float point0_Y = y + (r - halfBorder) * (MathUtils.sinDeg(currentAngle) + MathUtils.cosDeg(currentAngle));
+
+            float point1_X = x + (r + halfBorder) * (MathUtils.cosDeg(currentAngle) - MathUtils.sinDeg(currentAngle));
+            float point1_Y = y + (r + halfBorder) * (MathUtils.sinDeg(currentAngle) + MathUtils.cosDeg(currentAngle));
+
+            float point2_X = x + (r - halfBorder) * (MathUtils.cosDeg(nextAngle) - MathUtils.sinDeg(nextAngle));
+            float point2_Y = y + (r - halfBorder) * (MathUtils.sinDeg(nextAngle) + MathUtils.cosDeg(nextAngle));
+
+            float point3_X = x + (r + halfBorder) * (MathUtils.cosDeg(nextAngle) - MathUtils.sinDeg(nextAngle));
+            float point3_Y = y + (r + halfBorder) * (MathUtils.sinDeg(nextAngle) + MathUtils.cosDeg(nextAngle));
+
+            verticesBuffer.put(point0_X).put(point0_Y).put(tintFloatBits).put(0.5f).put(0.5f);
+            verticesBuffer.put(point1_X).put(point1_Y).put(tintFloatBits).put(0.5f).put(0.5f);
+            verticesBuffer.put(point2_X).put(point2_Y).put(tintFloatBits).put(0.5f).put(0.5f);
+            verticesBuffer.put(point3_X).put(point3_Y).put(tintFloatBits).put(0.5f).put(0.5f);
+        }
+
+        vertexIndex += refinement * 5 * 4;
+    }
+
     public void pushThinRectangle(
             float x0, float y0,
             float x1, float y1,
@@ -367,6 +454,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
+        // TODO: why the fuck do I put the same vertex twice? Bug?
         indicesBuffer
                 .put(startVertex)
                 .put(startVertex + 1)
@@ -388,6 +476,111 @@ public class Renderer2D implements MemoryResourceHolder {
         ;
 
         vertexIndex += 4 * 5;
+    }
+
+    public void pushFilledRectangle(float width, float height, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, float tintFloatBits) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (vertexIndex + 20 > BATCH_SIZE * 4) flush();
+
+        // TODO: make sure we apply scaling first, then rotation, then translation.
+        if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
+        if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
+
+        useShader(defaultShader);
+        useTexture(whitePixel);
+        useCustomAttributes(null);
+        useMode(GL11.GL_TRIANGLES);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        indicesBuffer
+                .put(startVertex)
+                .put(startVertex + 1)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+        ;
+
+        // put vertices
+        float localX1, localY1;
+        float localX2, localY2;
+        float localX3, localY3;
+        float localX4, localY4;
+
+        float halfWidth = width * 0.5f;
+        float halfHeight = height * 0.5f;
+
+        localX1 = localX2 =  -halfWidth;
+        localX3 = localX4 =  +halfWidth;
+        localY1 = localY4 =  -halfHeight;
+        localY2 = localY3 =  +halfHeight;
+
+        if (scaleX != 1.0f) {
+            localX1 *= scaleX;
+            localX2 *= scaleX;
+            localX3 *= scaleX;
+            localX4 *= scaleX;
+        }
+        if (scaleY != 1.0f) {
+            localY1 *= scaleY;
+            localY2 *= scaleY;
+            localY3 *= scaleY;
+            localY4 *= scaleY;
+        }
+
+        float x1, y1;
+        float x2, y2;
+        float x3, y3;
+        float x4, y4;
+
+        if (angleZ != 0.0f) {
+            final float sin = MathUtils.sinDeg(angleZ);
+            final float cos = MathUtils.cosDeg(angleZ);
+            x1 = localX1 * cos - localY1 * sin;
+            y1 = localX1 * sin + localY1 * cos;
+
+            x2 = localX2 * cos - localY2 * sin;
+            y2 = localX2 * sin + localY2 * cos;
+
+            x3 = localX3 * cos - localY3 * sin;
+            y3 = localX3 * sin + localY3 * cos;
+
+            x4 = localX4 * cos - localY4 * sin;
+            y4 = localX4 * sin + localY4 * cos;
+        } else {
+            x1 = localX1;
+            y1 = localY1;
+
+            x2 = localX2;
+            y2 = localY2;
+
+            x3 = localX3;
+            y3 = localY3;
+
+            x4 = localX4;
+            y4 = localY4;
+        }
+
+        x1 += x;
+        y1 += y;
+
+        x2 += x;
+        y2 += y;
+
+        x3 += x;
+        y3 += y;
+
+        x4 += x;
+        y4 += y;
+
+        verticesBuffer
+                .put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f) // V1
+                .put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f) // V2
+                .put(x3).put(y3).put(tintFloatBits).put(0.5f).put(0.5f) // V3
+                .put(x4).put(y4).put(tintFloatBits).put(0.5f).put(0.5f) // V4
+        ;
+        vertexIndex += 20;
     }
 
     public void pushThinLineSegment(float x1, float y1, float x2, float y2, final Color color) {
