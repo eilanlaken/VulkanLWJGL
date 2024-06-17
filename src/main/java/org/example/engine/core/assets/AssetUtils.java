@@ -3,6 +3,9 @@ package org.example.engine.core.assets;
 import com.google.gson.Gson;
 import org.example.engine.core.application.ApplicationWindow;
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.memory.MemoryUtils;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryUtil;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.Property;
@@ -11,6 +14,10 @@ import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +26,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.Set;
 
+// TODO: change whole package from Asset to File
 public final class AssetUtils {
 
     private static boolean           initialized = false;
@@ -158,6 +166,45 @@ public final class AssetUtils {
         } catch (IOException e) {
             throw e;
         }
+    }
+
+    /**
+     * Reads the specified resource and returns the raw data as a ByteBuffer.
+     *
+     * @param resource   the resource to read
+     * @param bufferSize the initial buffer size
+     *
+     * @return the resource data
+     *
+     * @throws IOException if an IO error occurs
+     */
+    public static ByteBuffer readFileToByteBuffer(String resource, int bufferSize) throws IOException {
+        ByteBuffer buffer;
+        Path path = Paths.get(resource);
+
+        if (Files.isReadable(path)) {
+            try (SeekableByteChannel fc = Files.newByteChannel(path)) {
+                buffer = BufferUtils.createByteBuffer((int)fc.size() + 1);
+                while (fc.read(buffer) != -1) ;
+            }
+        } else {
+            try (InputStream source = AssetUtils.class.getClassLoader().getResourceAsStream(resource); ReadableByteChannel rbc = Channels.newChannel(source)) {
+                buffer = BufferUtils.createByteBuffer(bufferSize);
+
+                while (true) {
+                    int bytes = rbc.read(buffer);
+                    if (bytes == -1) {
+                        break;
+                    }
+                    if (buffer.remaining() == 0) {
+                        buffer = MemoryUtils.resizeBuffer(buffer, buffer.capacity() * 3 / 2); // 50%
+                    }
+                }
+            }
+        }
+
+        buffer.flip();
+        return MemoryUtil.memSlice(buffer);
     }
 
 }
