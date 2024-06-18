@@ -178,7 +178,7 @@ public final class AssetUtils {
      *
      * @throws IOException if an IO error occurs
      */
-    public static ByteBuffer readFileToByteBuffer(String resource, int bufferSize) throws IOException {
+    public synchronized static ByteBuffer readFileToByteBuffer(String resource, int bufferSize) throws IOException {
         ByteBuffer buffer;
         Path path = Paths.get(resource);
 

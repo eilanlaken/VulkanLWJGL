@@ -21,6 +21,7 @@ public class TexturePacker {
         if (directory == null) throw new IllegalArgumentException("Must provide non-null directory name.");
         if (!AssetUtils.directoryExists(directory)) throw new IllegalArgumentException("The provided path: " + directory + " does not exist, or is not a directory");
     }
+
     public static synchronized void packTextures(final String directory, final String outputName, final String ...texturePaths) throws IOException {
         final Options options = new Options(directory, outputName);
         packTextures(options, texturePaths);
@@ -291,6 +292,7 @@ public class TexturePacker {
 
     public static final class Options {
 
+        // TODO: allow rectangular packs.
         public enum Size {
 
             XX_SMALL_128(128),
