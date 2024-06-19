@@ -94,6 +94,11 @@ public class ArrayLong {
         return items[0];
     }
 
+    /** Returns the last item. */
+    public long peek () {
+        return items[size - 1];
+    }
+
     public boolean notEmpty() {
         return size > 0;
     }

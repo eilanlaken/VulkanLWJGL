@@ -242,6 +242,24 @@ public class ArrayConcurrent<T> implements Iterable<T> {
         return size != startSize;
     }
 
+    /** Removes the items between the specified indices, inclusive. */
+    public synchronized void removeRange(int start, int end) {
+        int n = size;
+        if (end >= n) throw new IndexOutOfBoundsException("end can't be >= size: " + end + " >= " + size);
+        if (start > end) throw new IndexOutOfBoundsException("start can't be > end: " + start + " > " + end);
+        T[] items = this.items;
+        int count = end - start + 1, lastIndex = n - count;
+        if (ordered)
+            System.arraycopy(items, start + count, items, start, n - (start + count));
+        else {
+            int i = Math.max(lastIndex, end + 1);
+            System.arraycopy(items, i, items, start, n - i);
+        }
+        for (int i = lastIndex; i < n; i++)
+            items[i] = null;
+        size = n - count;
+    }
+
     public synchronized T pop() {
         if (size == 0) throw new IllegalStateException("Array is empty.");
         --size;

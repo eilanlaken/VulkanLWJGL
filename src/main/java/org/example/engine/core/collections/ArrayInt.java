@@ -47,9 +47,14 @@ public class ArrayInt {
         size += 3;
     }
 
-    public long get(int index) {
+    public int get(int index) {
         if (index >= size) throw new IndexOutOfBoundsException("Tried to retrieve array element at index " + index + " >= " + size);
         return items[index];
+    }
+
+    public void set (int index, int value) {
+        if (index >= size) throw new IndexOutOfBoundsException("index can't be >= size: " + index + " >= " + size);
+        items[index] = value;
     }
 
     public int getCircular(int index) {
@@ -94,6 +99,16 @@ public class ArrayInt {
         return items[0];
     }
 
+    /** Removes and returns the last item. */
+    public int pop() {
+        return items[--size];
+    }
+
+    /** Returns the last item. */
+    public int peek () {
+        return items[size - 1];
+    }
+
     public boolean notEmpty () {
         return size > 0;
     }
@@ -119,6 +134,16 @@ public class ArrayInt {
         System.arraycopy(items, 0, newItems, 0, Math.min(size, newItems.length));
         this.items = newItems;
         return newItems;
+    }
+
+    /** Increases the size of the backing array to accommodate the specified number of additional items. Useful before adding many
+     * items to avoid multiple backing array resizes.
+     * @return {@link #items} */
+    public int[] ensureCapacity (int additionalCapacity) {
+        if (additionalCapacity < 0) throw new IllegalArgumentException("additionalCapacity must be >= 0: " + additionalCapacity);
+        int sizeNeeded = size + additionalCapacity;
+        if (sizeNeeded > items.length) resize(Math.max(Math.max(8, sizeNeeded), (int)(size * 1.75f)));
+        return items;
     }
 
     public void sort() {

@@ -42,6 +42,22 @@ public class Array<T> implements Iterable<T> {
         System.arraycopy(array, start, items, 0, size);
     }
 
+    /** Creates a new array containing the elements in the specified array. The new array will have the same type of backing array
+     * and will be ordered if the specified array is ordered. The capacity is set to the number of elements, so any subsequent
+     * elements added will cause the backing array to be grown. */
+    public Array (Array<? extends T> array) {
+        this(array.ordered, array.size, array.items.getClass().getComponentType());
+        size = array.size;
+        System.arraycopy(array.items, 0, items, 0, size);
+    }
+
+    /** Creates a new ordered array containing the elements in the specified array. The new array will have the same type of
+     * backing array. The capacity is set to the number of elements, so any subsequent elements added will cause the backing array
+     * to be grown. */
+    public Array (T[] array) {
+        this(true, array, 0, array.length);
+    }
+
     public void add(T value) {
         T[] items = this.items;
         if (size == items.length) items = resize(Math.max(8, (int)(size * 1.75f)));
@@ -264,6 +280,24 @@ public class Array<T> implements Iterable<T> {
         return size != startSize;
     }
 
+    /** Removes the items between the specified indices, inclusive. */
+    public void removeRange (int start, int end) {
+        int n = size;
+        if (end >= n) throw new IndexOutOfBoundsException("end can't be >= size: " + end + " >= " + size);
+        if (start > end) throw new IndexOutOfBoundsException("start can't be > end: " + start + " > " + end);
+        T[] items = this.items;
+        int count = end - start + 1, lastIndex = n - count;
+        if (ordered)
+            System.arraycopy(items, start + count, items, start, n - (start + count));
+        else {
+            int i = Math.max(lastIndex, end + 1);
+            System.arraycopy(items, i, items, start, n - i);
+        }
+        for (int i = lastIndex; i < n; i++)
+            items[i] = null;
+        size = n - count;
+    }
+
     public T pop() {
         if (size == 0) throw new IllegalStateException("Array is empty.");
         --size;
@@ -280,6 +314,10 @@ public class Array<T> implements Iterable<T> {
     public T first() {
         if (size == 0) throw new IllegalStateException("Array is empty.");
         return items[0];
+    }
+
+    static public <T> Array<T> of(T... array) {
+        return new Array(array);
     }
 
     /** Returns true if the array has one or more items. */

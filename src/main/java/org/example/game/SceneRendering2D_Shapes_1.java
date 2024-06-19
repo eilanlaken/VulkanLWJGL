@@ -14,14 +14,14 @@ import org.example.engine.core.physics2d.Body;
 import org.example.engine.core.physics2d.World;
 import org.lwjgl.opengl.GL11;
 
-public class SceneRendering2D_Better_1 extends ApplicationScreen {
+public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
 
     private Renderer2D renderer2D;
     private Camera camera;
     private float red = new Color(1,0,0,1).toFloatBits();
     private float blue = new Color(0,0,1,1).toFloatBits();
 
-    public SceneRendering2D_Better_1() {
+    public SceneRendering2D_Shapes_1() {
         renderer2D = new Renderer2D();
     }
 
