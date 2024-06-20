@@ -5,18 +5,16 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 
 // REFERENCE TODO: DefaultTextureBinder (libGDX)
-// TODO: fix
 public class TextureBinder {
 
-    private static final int RESERVED_OFFSET = 0; // we will begin binding from slots OFFSET, OFFSET + 1,... leaving slots 0... OFFSET - 1 for texture loading and manipulation?
-    private static final int MAXIMUM_BOUND_TEXTURE_UNITS = GraphicsUtils.getMaxBoundTextureUnits();
-    private static final int AVAILABLE_TEXTURE_SLOTS = MAXIMUM_BOUND_TEXTURE_UNITS - RESERVED_OFFSET;
-    private static final Texture[] boundTextures = new Texture[MAXIMUM_BOUND_TEXTURE_UNITS];
-    private static int roundRobinCounter = 0;
+    private static final int       RESERVED_OFFSET             = 0; // we will begin binding from slots OFFSET, OFFSET + 1,... leaving slots 0... OFFSET - 1 for texture loading and manipulation?
+    private static final int       MAXIMUM_BOUND_TEXTURE_UNITS = GraphicsUtils.getMaxBoundTextureUnits();
+    private static final int       AVAILABLE_TEXTURE_SLOTS     = MAXIMUM_BOUND_TEXTURE_UNITS - RESERVED_OFFSET;
+    private static final Texture[] boundTextures               = new Texture[MAXIMUM_BOUND_TEXTURE_UNITS];
+    private static int             roundRobinCounter           = 0;
 
-    // TODO: fix
     public static synchronized int bind(final Texture texture) {
-        if (texture.handle == 0) throw new IllegalStateException("Trying to bind " + Texture.class.getSimpleName() + " that was already freed.");
+        if (texture.handle == 0) throw new GraphicsException("Trying to bind " + Texture.class.getSimpleName() + " that was already freed.");
         if (texture.getSlot() >= 0) return texture.getSlot();
         int slot = roundRobinCounter + RESERVED_OFFSET;
         if (boundTextures[slot] != null) unbind(boundTextures[slot]);
