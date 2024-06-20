@@ -105,8 +105,8 @@ public final class AssetUtils {
         return new Date(view.lastModifiedTime().toMillis());
     }
 
-    public static synchronized boolean filesExist(final String ...filepaths) {
-        for (String filepath : filepaths) {
+    public static synchronized boolean filesExist(final String ...filePaths) {
+        for (String filepath : filePaths) {
             if (!fileExists(filepath)) return false;
         }
         return true;
@@ -127,6 +127,7 @@ public final class AssetUtils {
         Array<String> paths = new Array<>();
         File directory = new File(dirpath);
         File[] children = directory.listFiles();
+        assert children != null;
         for (File child : children) {
             if (child.isFile() && hasExtension(child, extensions)) paths.add(child.getPath());
             else if (child.isDirectory() && recursive) getDirectoryFiles(child.getPath(), extensions, paths);
@@ -137,6 +138,7 @@ public final class AssetUtils {
     private static synchronized void getDirectoryFiles(final String dirpath, final String[] extensions, Array<String> collector) {
         File directory = new File(dirpath);
         File[] children = directory.listFiles();
+        assert children != null;
         for (File child : children) {
             if (child.isFile() && hasExtension(child, extensions)) collector.add(child.getPath());
             else if (child.isDirectory()) getDirectoryFiles(child.getPath(), extensions, collector);
@@ -166,6 +168,20 @@ public final class AssetUtils {
         } catch (IOException e) {
             throw e;
         }
+    }
+
+    /** Returns the file extension (without the dot) or an empty string if the file name doesn't contain a dot. */
+    public static String extension(final String name) {
+        int dotIndex = name.lastIndexOf('.');
+        if (dotIndex == -1) return "";
+        return name.substring(dotIndex + 1);
+    }
+
+    /** @return the name of the file, without parent paths or the extension. */
+    public static String nameWithoutExtension(final String name) {
+        int dotIndex = name.lastIndexOf('.');
+        if (dotIndex == -1) return name;
+        return name.substring(0, dotIndex);
     }
 
     /**

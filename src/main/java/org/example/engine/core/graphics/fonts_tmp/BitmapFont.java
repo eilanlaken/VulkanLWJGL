@@ -19,9 +19,9 @@ public class BitmapFont {
     public static final int PAGE_SIZE = 1 << LOG2_PAGE_SIZE;
     public static final int PAGES = 0x10000 / PAGE_SIZE;
 
-    final BitmapFontData data;
+    BitmapFontData data;
     Array<TextureRegion> regions;
-    private final BitmapFontCache cache;
+    private BitmapFontCache cache;
     private boolean flipped;
     boolean integer;
     private boolean ownsTexture;
@@ -29,16 +29,14 @@ public class BitmapFont {
     /** Creates a BitmapFont using the default 15pt Liberation Sans font included in the libgdx JAR file. This is convenient to
      * easily display text without bothering without generating a bitmap font yourself. */
     public BitmapFont () {
-        this(Gdx.files.classpath("com/badlogic/gdx/utils/lsans-15.fnt"), Gdx.files.classpath("com/badlogic/gdx/utils/lsans-15.png"),
-                false, true);
+        //this(Gdx.files.classpath("com/badlogic/gdx/utils/lsans-15.fnt"), Gdx.files.classpath("com/badlogic/gdx/utils/lsans-15.png"),false, true);
     }
 
     /** Creates a BitmapFont using the default 15pt Liberation Sans font included in the libgdx JAR file. This is convenient to
      * easily display text without bothering without generating a bitmap font yourself.
      * @param flip If true, the glyphs will be flipped for use with a perspective where 0,0 is the upper left corner. */
     public BitmapFont (boolean flip) {
-        this(Gdx.files.classpath("com/badlogic/gdx/utils/lsans-15.fnt"), Gdx.files.classpath("com/badlogic/gdx/utils/lsans-15.png"),
-                flip, true);
+        //this(Gdx.files.classpath("com/badlogic/gdx/utils/lsans-15.fnt"), Gdx.files.classpath("com/badlogic/gdx/utils/lsans-15.png"), flip, true);
     }
 
     /** Creates a BitmapFont with the glyphs relative to the specified region. If the region is null, the glyph textures are loaded
@@ -88,7 +86,7 @@ public class BitmapFont {
      * @param flip If true, the glyphs will be flipped for use with a perspective where 0,0 is the upper left corner.
      * @param integer If true, rendering positions will be at integer values to avoid filtering artifacts. */
     public BitmapFont (FileHandle fontFile, FileHandle imageFile, boolean flip, boolean integer) {
-        this(new BitmapFontData(fontFile, flip), new TextureRegion(new Texture(imageFile, false)), integer);
+        //this(new BitmapFontData(fontFile, flip), new TextureRegion(new Texture(imageFile, false)), integer);
         ownsTexture = true;
     }
 
@@ -122,11 +120,9 @@ public class BitmapFont {
             regions = new Array<>(n);
             for (int i = 0; i < n; i++) {
                 FileHandle file;
-                if (data.fontFile == null)
-                    file = Gdx.files.internal(data.imagePaths[i]);
-                else
-                    file = Gdx.files.getFileHandle(data.imagePaths[i], data.fontFile.type());
-                regions.add(new TextureRegion(new Texture(file, false)));
+                if (data.fontFile == null) file = null; // Gdx.files.internal(data.imagePaths[i]);
+                else file = null; // Gdx.files.getFileHandle(data.imagePaths[i], data.fontFile.type());
+                //regions.add(new TextureRegion(new Texture(file, false)));
             }
             ownsTexture = true;
         } else {
@@ -398,13 +394,7 @@ public class BitmapFont {
         /** Additional characters besides whitespace where text is wrapped. Eg, a hypen (-). */
         public char[] breakChars;
         public char[] xChars = {'x', 'e', 'a', 'o', 'n', 's', 'r', 'c', 'u', 'm', 'v', 'w', 'z'};
-        public char[] capChars = {'M', 'N', 'B', 'D', 'C', 'E', 'F', 'K', 'A', 'G', 'H', 'I', 'J', 'L', 'O', 'P', 'Q', 'R', 'S',
-                'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-
-        /** Creates an empty BitmapFontData for configuration before calling {@link #load(FileHandle, boolean)}, to subclass, or to
-         * populate yourself, e.g. using stb-truetype or FreeType. */
-        public BitmapFontData () {
-        }
+        public char[] capChars = {'M', 'N', 'B', 'D', 'C', 'E', 'F', 'K', 'A', 'G', 'H', 'I', 'J', 'L', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 
         public BitmapFontData (FileHandle fontFile, boolean flip) {
             this.fontFile = fontFile;
@@ -832,10 +822,6 @@ public class BitmapFont {
 
         public String[] getImagePaths () {
             return imagePaths;
-        }
-
-        public FileHandle getFontFile () {
-            return fontFile;
         }
 
         /** Scales the font by the specified amounts on both axes

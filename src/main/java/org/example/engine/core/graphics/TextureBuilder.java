@@ -66,13 +66,13 @@ public final class TextureBuilder {
             IntBuffer heightBuffer = stack.mallocInt(1);
             IntBuffer channelsBuffer = stack.mallocInt(1);
             final ByteBuffer buffer = STBImage.stbi_load(path, widthBuffer, heightBuffer, channelsBuffer, 4);
-            if (buffer == null) throw new RuntimeException("Failed to load a texture file. Check that the path is correct: " + path
+            if (buffer == null) throw new GraphicsException("Failed to load a texture file. Check that the path is correct: " + path
                     + System.lineSeparator() + "STBImage error: "
                     + STBImage.stbi_failure_reason());
             final int width = widthBuffer.get();
             final int height = heightBuffer.get();
             if (width > maxTextureSize || height > maxTextureSize)
-                throw new IllegalStateException("Trying to load texture " + path + " with resolution (" + width + "," + height + ") greater than allowed on your GPU: " + maxTextureSize);
+                throw new GraphicsException("Trying to load texture " + path + " with resolution (" + width + "," + height + ") greater than allowed on your GPU: " + maxTextureSize);
             return new Data(width, height, buffer);
         }
     }
