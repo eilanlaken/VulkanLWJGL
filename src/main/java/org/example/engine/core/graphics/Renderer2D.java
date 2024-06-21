@@ -3,6 +3,7 @@ package org.example.engine.core.graphics;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
+import org.example.engine.core.math.Vector3;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.memory.MemoryResourceHolder;
 import org.example.engine.core.shape.Shape2DPolygon;
@@ -57,11 +58,12 @@ public class Renderer2D implements MemoryResourceHolder {
 
     // state
     private Camera        currentCamera = null;
-    private Texture       lastTexture   = null;
+    private Texture       currentTexture = null;
     private ShaderProgram currentShader = null;
+    private float         currentTint   = TINT_WHITE;
     private boolean       drawing       = false;
     private int           vertexIndex   = 0;
-    private int           mode          = GL11.GL_TRIANGLES;
+    private int           currentMode = GL11.GL_TRIANGLES;
     private int           drawCalls     = 0;
 
     // buffers
@@ -242,6 +244,78 @@ public class Renderer2D implements MemoryResourceHolder {
                 .put(x4).put(y4).put(t).put(uf).put(vi) // V4
         ;
         vertexIndex += 20;
+    }
+
+    /* State */
+
+    public void setShader(ShaderProgram shader) {
+        if (shader == null) shader = defaultShader;
+        if (currentShader != shader) {
+            flush();
+            ShaderProgramBinder.bind(shader);
+            shader.bindUniform("u_camera_combined", currentCamera.lens.combined);
+            shader.bindUniform("u_texture", currentTexture);
+        }
+        currentShader = shader;
+    }
+
+    public void setTexture(Texture texture) {
+        if (currentTexture != texture) flush();
+        currentTexture = texture;
+        currentShader.bindUniform("u_texture", currentTexture);
+    }
+
+    public void setShaderAttributes(HashMap<String, Object> customAttributes) {
+        if (customAttributes != null) {
+            flush();
+            currentShader.bindUniforms(customAttributes);
+        }
+    }
+
+    private void setMode(final int mode) {
+        if (mode != this.currentMode) flush();
+        this.currentMode = mode;
+    }
+
+    /* Rendering API */
+
+    /* Rendering 2D primitives - Circles */
+    public void drawCircleThin(float r, float centerX, float centerY, int refinement, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (vertexIndex * VERTEX_SIZE + (refinement + 4) * 5 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
+
+        setMode(GL11.GL_LINES);
+
+        // put indices
+        int startVertex = this.vertexIndex;
+        for (int i = 1; i < refinement; i++) {
+            indicesBuffer.put(startVertex + i - 1);
+            indicesBuffer.put(startVertex + i);
+        }
+        indicesBuffer.put(startVertex + refinement - 1);
+        indicesBuffer.put(startVertex);
+        indicesBuffer.put(startVertex + refinement);
+        indicesBuffer.put(startVertex + refinement + 1);
+
+        scaleX *= MathUtils.cosDeg(angleX);
+        scaleY *= MathUtils.cosDeg(angleY);
+
+        Vector2 arm = vector2MemoryPool.allocate();
+        float da = 360f / refinement;
+        for (int i = 0; i < refinement; i++) {
+            // TODO: finish.
+            verticesBuffer
+                    .put(centerX + r * MathUtils.cosDeg(da * i))
+                    .put(centerY + r * MathUtils.sinDeg(da * i))
+                    .put(currentTint)
+                    .put(0.5f)
+                    .put(0.5f)
+            ;
+        }
+        vector2MemoryPool.free(arm);
+        vertexIndex += refinement + 4;
     }
 
     // TODO: delete. Break down the drawing operations to explicit pushCircleFilled, pushCircleHollow, pushRectangleFilled, pushRectangleHollow, pushCurve
@@ -804,11 +878,11 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     private void useTexture(Texture texture) {
-        if (lastTexture != texture) {
+        if (currentTexture != texture) {
             flush();
         }
-        lastTexture = texture;
-        currentShader.bindUniform("u_texture", lastTexture);
+        currentTexture = texture;
+        currentShader.bindUniform("u_texture", currentTexture);
     }
 
     // TODO: unify with shader switching?
@@ -820,10 +894,10 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     private void useMode(final int mode) {
-        if (mode != this.mode) {
+        if (mode != this.currentMode) {
             flush();
         }
-        this.mode = mode;
+        this.currentMode = mode;
     }
 
     // contains the logic that sends everything to the GPU for rendering
@@ -842,7 +916,7 @@ public class Renderer2D implements MemoryResourceHolder {
             GL20.glEnableVertexAttribArray(0);
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);
-            GL11.glDrawElements(mode, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            GL11.glDrawElements(currentMode, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
             GL20.glDisableVertexAttribArray(2);
             GL20.glDisableVertexAttribArray(1);
             GL20.glDisableVertexAttribArray(0);
