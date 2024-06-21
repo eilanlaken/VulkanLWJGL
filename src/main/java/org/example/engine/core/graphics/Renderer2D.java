@@ -278,10 +278,6 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += polygon.vertexCount * 5;
     }
 
-    public void pushLight() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
     public void pushThinCircle(final float r, final float centerX, final float centerY, final Color color) {
         pushThinCircle(r, centerX, centerY, color.toFloatBits());
     }
