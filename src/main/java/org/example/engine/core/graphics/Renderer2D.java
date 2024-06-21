@@ -3,7 +3,6 @@ package org.example.engine.core.graphics;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
-import org.example.engine.core.math.Vector3;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.memory.MemoryResourceHolder;
 import org.example.engine.core.shape.Shape2DPolygon;
@@ -116,6 +115,8 @@ public class Renderer2D implements MemoryResourceHolder {
         this.drawCalls = 0;
         this.currentCamera = camera != null ? camera : defaultCamera.update(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight());
         this.currentShader = null;
+        this.currentTexture = null;
+        this.currentTint = TINT_WHITE;
         this.drawing = true;
     }
 
@@ -151,10 +152,10 @@ public class Renderer2D implements MemoryResourceHolder {
         if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
         if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
 
-        useShader(shader);
-        useTexture(texture);
-        useCustomAttributes(customAttributes);
-        useMode(GL11.GL_TRIANGLES);
+        setShader(shader);
+        useTexture_old(texture);
+        useCustomAttributes_old(customAttributes);
+        useMode_old(GL11.GL_TRIANGLES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -248,6 +249,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
     /* State */
 
+
     public void setShader(ShaderProgram shader) {
         if (shader == null) shader = defaultShader;
         if (currentShader != shader) {
@@ -277,16 +279,28 @@ public class Renderer2D implements MemoryResourceHolder {
         this.currentMode = mode;
     }
 
+    public void setTint(final Color color) {
+        setTint(color.toFloatBits());
+    }
+
+    public void setTint(float tintFloatBits) {
+        this.currentTint = tintFloatBits;
+    }
+
     /* Rendering API */
 
     /* Rendering 2D primitives - Circles */
+    // TODO: fix
     public void drawCircleThin(float r, float centerX, float centerY, int refinement, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (vertexIndex * VERTEX_SIZE + (refinement + 4) * 5 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
+        if (vertexIndex * VERTEX_SIZE + refinement * 5 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
             flush();
         }
 
+        setShader(currentShader);
         setMode(GL11.GL_LINES);
+        setTexture(currentTexture);
+        setShaderAttributes(null);
 
         // put indices
         int startVertex = this.vertexIndex;
@@ -296,8 +310,6 @@ public class Renderer2D implements MemoryResourceHolder {
         }
         indicesBuffer.put(startVertex + refinement - 1);
         indicesBuffer.put(startVertex);
-        indicesBuffer.put(startVertex + refinement);
-        indicesBuffer.put(startVertex + refinement + 1);
 
         scaleX *= MathUtils.cosDeg(angleX);
         scaleY *= MathUtils.cosDeg(angleY);
@@ -315,7 +327,42 @@ public class Renderer2D implements MemoryResourceHolder {
             ;
         }
         vector2MemoryPool.free(arm);
-        vertexIndex += refinement + 4;
+        vertexIndex += refinement;
+    }
+
+    public void drawCircleFilled(float r, float x, float y, int refinement, float angleX, float angleY, float angleZ, float scaleX, float scaleY, float tintFloatBits) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (refinement < 3) throw new GraphicsException("refinement must be >= 3. Got: " + refinement);
+        if (vertexIndex + refinement * 5 * 2 > BATCH_SIZE * 4) { // left hand sides are multiplied by 2 to make sure buffer overflow is prevented
+            flush();
+        }
+
+        setShader(defaultShader);
+        useMode_old(GL11.GL_TRIANGLES);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
+
+        // put indices
+        int startVertex = this.vertexIndex / VERTEX_SIZE;
+        for (int i = 0; i < refinement; i++) {
+            indicesBuffer.put(startVertex);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+        }
+        indicesBuffer.put(startVertex);
+        indicesBuffer.put(startVertex + refinement);
+        indicesBuffer.put(startVertex + 1);
+
+        float da = 360f / refinement;
+        verticesBuffer.put(x).put(y).put(tintFloatBits).put(0.5f).put(0.5f);
+        for (int i = 0; i < refinement; i++) {
+            float currentAngle = da * i;
+            float pointX = x + r * (MathUtils.cosDeg(currentAngle) - MathUtils.sinDeg(currentAngle));
+            float pointY = y + r * (MathUtils.sinDeg(currentAngle) + MathUtils.cosDeg(currentAngle));
+            verticesBuffer.put(pointX).put(pointY).put(tintFloatBits).put(0.5f).put(0.5f);
+        }
+
+        vertexIndex += refinement * 5;
     }
 
     // TODO: delete. Break down the drawing operations to explicit pushCircleFilled, pushCircleHollow, pushRectangleFilled, pushRectangleHollow, pushCurve
@@ -324,10 +371,10 @@ public class Renderer2D implements MemoryResourceHolder {
         if (vertexIndex + polygon.vertices.length > BATCH_SIZE * 4) {
             flush();
         }
-        useShader(shader);
-        useTexture(whitePixel);
-        useCustomAttributes(customAttributes);
-        useMode(GL11.GL_TRIANGLES);
+        setShader(shader);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(customAttributes);
+        useMode_old(GL11.GL_TRIANGLES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -363,10 +410,10 @@ public class Renderer2D implements MemoryResourceHolder {
             flush();
         }
 
-        useShader(defaultShader);
-        useMode(GL11.GL_LINES);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
+        setShader(defaultShader);
+        useMode_old(GL11.GL_LINES);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -399,10 +446,10 @@ public class Renderer2D implements MemoryResourceHolder {
             flush();
         }
 
-        useShader(defaultShader);
-        useMode(GL11.GL_LINES);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
+        setShader(defaultShader);
+        useMode_old(GL11.GL_LINES);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -436,10 +483,10 @@ public class Renderer2D implements MemoryResourceHolder {
             flush();
         }
 
-        useShader(defaultShader);
-        useMode(GL11.GL_TRIANGLES);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
+        setShader(defaultShader);
+        useMode_old(GL11.GL_TRIANGLES);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -471,10 +518,10 @@ public class Renderer2D implements MemoryResourceHolder {
             flush();
         }
 
-        useShader(defaultShader);
-        useMode(GL11.GL_TRIANGLES);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
+        setShader(defaultShader);
+        useMode_old(GL11.GL_TRIANGLES);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -532,10 +579,10 @@ public class Renderer2D implements MemoryResourceHolder {
             flush();
         }
 
-        useShader(defaultShader);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-        useMode(GL11.GL_LINES);
+        setShader(defaultShader);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
+        useMode_old(GL11.GL_LINES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -571,10 +618,10 @@ public class Renderer2D implements MemoryResourceHolder {
         if (angleX != 0.0f) scaleX *= MathUtils.cosDeg(angleX);
         if (angleY != 0.0f) scaleY *= MathUtils.cosDeg(angleY);
 
-        useShader(defaultShader);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-        useMode(GL11.GL_TRIANGLES);
+        setShader(defaultShader);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
+        useMode_old(GL11.GL_TRIANGLES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -678,10 +725,10 @@ public class Renderer2D implements MemoryResourceHolder {
             flush();
         }
 
-        useShader(defaultShader);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-        useMode(GL11.GL_LINES);
+        setShader(defaultShader);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
+        useMode_old(GL11.GL_LINES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -714,10 +761,10 @@ public class Renderer2D implements MemoryResourceHolder {
             flush();
         }
 
-        useShader(defaultShader);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-        useMode(GL11.GL_LINES);
+        setShader(defaultShader);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
+        useMode_old(GL11.GL_LINES);
 
         if (minX > maxX) {
             float tmp = minX;
@@ -748,10 +795,10 @@ public class Renderer2D implements MemoryResourceHolder {
             flush();
         }
 
-        useShader(defaultShader);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-        useMode(GL11.GL_LINES);
+        setShader(defaultShader);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
+        useMode_old(GL11.GL_LINES);
 
         int startVertex = this.vertexIndex / VERTEX_SIZE;
         for (int i = 0; i < values.length - 1; i++) {
@@ -775,10 +822,10 @@ public class Renderer2D implements MemoryResourceHolder {
 
         stroke = Math.abs(stroke);
 
-        useShader(defaultShader);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-        useMode(GL11.GL_TRIANGLES);
+        setShader(defaultShader);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
+        useMode_old(GL11.GL_TRIANGLES);
 
         if (minX > maxX) {
             float tmp = minX;
@@ -833,10 +880,10 @@ public class Renderer2D implements MemoryResourceHolder {
             flush();
         }
 
-        useShader(defaultShader);
-        useTexture(whitePixel);
-        useCustomAttributes(null);
-        useMode(GL11.GL_LINES);
+        setShader(defaultShader);
+        useTexture_old(whitePixel);
+        useCustomAttributes_old(null);
+        useMode_old(GL11.GL_LINES);
 
         // put indices
         int startVertex = this.vertexIndex / VERTEX_SIZE;
@@ -867,7 +914,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
     /** Swap Operations **/
     // TODO: refactor into public.
-    private void useShader(ShaderProgram shader) {
+    private void useShader_old(ShaderProgram shader) {
         if (shader == null) shader = defaultShader;
         if (currentShader != shader) {
             flush();
@@ -877,7 +924,7 @@ public class Renderer2D implements MemoryResourceHolder {
         currentShader = shader;
     }
 
-    private void useTexture(Texture texture) {
+    private void useTexture_old(Texture texture) {
         if (currentTexture != texture) {
             flush();
         }
@@ -886,14 +933,14 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     // TODO: unify with shader switching?
-    @Deprecated private void useCustomAttributes(HashMap<String, Object> customAttributes) {
+    @Deprecated private void useCustomAttributes_old(HashMap<String, Object> customAttributes) {
         if (customAttributes != null) {
             flush();
             currentShader.bindUniforms(customAttributes);
         }
     }
 
-    private void useMode(final int mode) {
+    private void useMode_old(final int mode) {
         if (mode != this.currentMode) {
             flush();
         }

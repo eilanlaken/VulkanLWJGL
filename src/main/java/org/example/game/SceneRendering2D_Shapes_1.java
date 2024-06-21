@@ -67,14 +67,20 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
         GL11.glClearColor(0,0,0,1);
 
         renderer2D.begin(camera);
-        //renderer2D.pushFilledCircle(1, 0,0, 15, 0,0,0,1,1, new Color(1,0,0,0.2f).toFloatBits());
+        renderer2D.setTint(red);
         //renderer2D.pushCircleBorder(1, 0.2f,0, 0, 40,0,0,1,1, 1, new Color(1,0,0,0.6f).toFloatBits());
         //renderer2D.pushFilledRectangle(3,1,0,0,0,aY,30,1,1, new Color(1,1,0,1).toFloatBits());
         // x -> 400 * MathUtils.sinDeg(x)
         //renderer2D.pushFilledLineSegment(0,0,0,2,0.1f,new Color(1,0,0,1).toFloatBits());
         //renderer2D.pushThinCurve(MathUtils::sinRad, -3, 3, 20, red);
-        renderer2D.pushCurve(MathUtils::sinRad, -3, 3, 20, 0.1f, blue);
-        renderer2D.pushThinCurve(new Vector2[] {new Vector2(0,0), new Vector2(1,1), new Vector2(2,0)}, red);
+        //renderer2D.pushCurve(MathUtils::sinRad, -3, 3, 20, 0.1f, blue);
+        //renderer2D.pushThinCurve(new Vector2[] {new Vector2(0,0), new Vector2(1,1), new Vector2(2,0)}, red);
+
+        //renderer2D.drawCircleFilled(1, 0,0, 15, 0,0,0,1,1, new Color(1,0,0,0.2f).toFloatBits());
+        renderer2D.drawCircleThin(1, 0, 0, 78, 0, 0, 0, 1, 1);
+        renderer2D.setTint(blue);
+        renderer2D.drawCircleThin(1, 2, 0, 15, 0, 0, 0, 1, 1);
+
         renderer2D.end();
     }
 
