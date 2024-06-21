@@ -95,7 +95,10 @@ public final class AssetStore {
     }
 
     public static synchronized <T extends MemoryResource> T get(final String path) {
-        return (T) store.get(path).obj;
+        var t = store.get(path);
+        if (t == null) throw new AssetsException("File not loaded: " + path + System.lineSeparator() + "Make sure you spelled the file path correctly. You must " +
+                "provide the full relative path.");
+        return (T) t.obj;
     }
 
     public static synchronized Asset getAsset(final String path) {

@@ -1,18 +1,20 @@
 package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
-import org.example.engine.core.graphics.Camera;
-import org.example.engine.core.graphics.Color;
-import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.graphics.Renderer2D;
+import org.example.engine.core.assets.AssetStore;
+import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.math.Vector3;
+import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.core.physics2d.Body;
 import org.example.engine.core.physics2d.World;
 import org.lwjgl.opengl.GL11;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
 
@@ -20,6 +22,8 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
     private Camera camera;
     private float red = new Color(1,0,0,1).toFloatBits();
     private float blue = new Color(0,0,1,1).toFloatBits();
+
+    private ShaderProgram shaderYellow;
 
     public SceneRendering2D_Shapes_1() {
         renderer2D = new Renderer2D();
@@ -29,6 +33,7 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
     public void show() {
         camera = new Camera(640f/32,480f/32, 1);
         camera.update();
+        shaderYellow = AssetStore.get("assets/shaders/graphics-2d-shader-yellow");
 
     }
 
@@ -84,6 +89,15 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
     @Override
     public void deleteAll() {
 
+    }
+
+    @Override
+    public Map<String, Class<? extends MemoryResource>> getRequiredAssets() {
+        Map<String, Class<? extends MemoryResource>> requiredAssets = new HashMap<>();
+
+        requiredAssets.put("assets/shaders/graphics-2d-shader-yellow", ShaderProgram.class);
+
+        return requiredAssets;
     }
 
 }
