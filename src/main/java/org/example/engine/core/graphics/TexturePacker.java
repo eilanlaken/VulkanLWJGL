@@ -6,14 +6,15 @@ import org.lwjgl.stb.STBRPContext;
 import org.lwjgl.stb.STBRPNode;
 import org.lwjgl.stb.STBRPRect;
 import org.lwjgl.stb.STBRectPack;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class TexturePacker {
 
@@ -54,13 +55,14 @@ public class TexturePacker {
 
     private static synchronized boolean pack(Options options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack, Array<PackedRegionData> remaining, int last, int currentImageIndex) {
         if (last < 0) return true;
-        int size = 1;
+        int width = 1;
+        int height = 1;
+        boolean stepWidth = true;
         System.out.println("last: " + last);
-        while (size <= options.maxTexturesSize) {
-            System.out.println(remaining.size + ": " + "<" + size + ">");
+        while (width <= options.maxTexturesSize) {
             STBRPContext context = STBRPContext.create();
-            STBRPNode.Buffer nodes = STBRPNode.create(size); // Number of nodes can be context width
-            STBRectPack.stbrp_init_target(context, size, size, nodes);
+            STBRPNode.Buffer nodes = STBRPNode.create(width); // Number of nodes can be context width
+            STBRectPack.stbrp_init_target(context, width, height, nodes);
             STBRPRect.Buffer rects = STBRPRect.create(last + 1);
             for (int i = 0; i < rects.capacity(); i++) {
                 rects.position(i);
@@ -72,7 +74,7 @@ public class TexturePacker {
             int result = STBRectPack.stbrp_pack_rects(context, rects);
             if (result != 0) {
                 //BufferedImage bufferedImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-                IndexedBufferedImage bufferedImage = new IndexedBufferedImage(currentImageIndex, size, size);
+                IndexedBufferedImage bufferedImage = new IndexedBufferedImage(currentImageIndex, width, height);
                 Array<PackedRegionData> regionsData = new Array<>();
                 rects.position(0);
                 for (int i = 0; i < rects.capacity(); i++) {
@@ -87,7 +89,9 @@ public class TexturePacker {
                 remaining.removeAll(regionsData, true);
                 return true;
             } else {
-                size *= 2;
+                if (stepWidth) width *= 2;
+                else height *= 2;
+                stepWidth = !stepWidth;
             }
         }
         return false;
@@ -138,7 +142,7 @@ public class TexturePacker {
         Map<String, Object> optionsData = new HashMap<>();
         optionsData.put("extrude", options.extrude);
         optionsData.put("padding", options.padding);
-        optionsData.put("maxTextureSize", options.maxTexturesSize);
+        optionsData.put("maxTexturesSize", options.maxTexturesSize);
         optionsData.put("magFilter", options.magFilter.name());
         optionsData.put("minFilter", options.minFilter.name());
         optionsData.put("uWrap", options.uWrap.name());
@@ -223,17 +227,79 @@ public class TexturePacker {
     private static synchronized boolean alreadyPacked(final Options options, final String ...texturePaths) {
         final String outputDirectory = options.outputDirectory;
         // check if the output directory or the texture map file is missing
-        if (!AssetUtils.directoryExists(outputDirectory)) return false;
-        File atlasFile = new File(outputDirectory, options.outputName);
-        if (!AssetUtils.fileExists(atlasFile.getPath())) return false;
-        // if we did find the map file, check for the presence of all required textures
-        final String mapPath = outputDirectory + File.separator + options.outputName;
-        String contents = AssetUtils.getFileContent(mapPath);
-        // contents should be a json string.
-        // get all the textures names and the options object.
-        // TODO: continue.
+        if (!AssetUtils.directoryExists(outputDirectory)) {
+            System.out.println("returns here 1");
+            return false;
+        }
+        final String mapPath = outputDirectory + File.separator + options.outputName + ".txp";
+        if (!AssetUtils.fileExists(mapPath)) {
+            System.out.println("returns here 2");
+            return false;
+        }
 
-        return false;
+        // if we did find the map file, check for the presence of all required textures
+        String contents = AssetUtils.getFileContent(mapPath);
+        Map<String, Object> yamlData = AssetUtils.yaml.load(contents);
+
+        try {
+            ArrayList<LinkedHashMap<String, Object>> regionsData = (ArrayList<LinkedHashMap<String, Object>>) yamlData.get("regions");
+            Set<String> packingNow = new HashSet<>(Arrays.asList(texturePaths));
+
+            Set<String> packedAlready = new HashSet<>();
+            for (LinkedHashMap<String, Object> regionData : regionsData) {
+                packedAlready.add((String) regionData.get("name"));
+            }
+
+            /* if we are packing different textures, we must run the packer again. */
+            if (!packingNow.equals(packedAlready)) return false;
+
+            /* if we are packing the same textures, but one or more of the source textures was modified after our last
+            packing, we need to pack again. */
+            Date created = AssetUtils.lastModified(mapPath);
+            System.out.println("created: " + created);
+            for (String texturePath : packingNow) {
+                Date lastModified = AssetUtils.lastModified(texturePath);
+                System.out.println("lm: " + lastModified);
+
+                if (lastModified.after(created)) return false;
+            }
+        } catch (Exception any) {
+            System.out.println(any);
+            return false;
+        }
+
+        /* check if options are the same */
+        try {
+            Map<String, Object> optionsMap = (Map<String, Object>) yamlData.get("options");
+
+            int padding = (Integer) optionsMap.get("padding");
+            if (padding != options.padding) return false;
+
+            int extrude = (Integer) optionsMap.get("extrude");
+            if (extrude != options.extrude) return false;
+
+            int maxTexturesSize = (Integer) optionsMap.get("maxTexturesSize");
+            if (maxTexturesSize != options.maxTexturesSize) return false;
+
+            Texture.Filter minFilter = Texture.Filter.valueOf((String) optionsMap.get("minFilter"));
+            if (minFilter != options.minFilter) return false;
+
+            Texture.Filter magFilter = Texture.Filter.valueOf((String) optionsMap.get("magFilter"));
+            if (magFilter != options.magFilter) return false;
+
+            Texture.Wrap uWrap = Texture.Wrap.valueOf((String) optionsMap.get("uWrap"));
+            if (uWrap != options.uWrap) return false;
+
+            Texture.Wrap vWrap = Texture.Wrap.valueOf((String) optionsMap.get("vWrap"));
+            if (vWrap != options.vWrap) return false;
+
+        } catch (Exception any) {
+            System.out.println(any);
+            return false;
+        }
+
+        System.out.println("already packed");
+        return true;
     }
 
     private static final class PackedRegionData implements Comparable<PackedRegionData> {
@@ -281,7 +347,7 @@ public class TexturePacker {
 
     public static final class IndexedBufferedImage extends BufferedImage {
 
-        private int index;
+        private final int index;
 
         private IndexedBufferedImage(int index, int width, int height) {
             super(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -339,4 +405,5 @@ public class TexturePacker {
         }
 
     }
+
 }

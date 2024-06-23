@@ -1,0 +1,33 @@
+regions:
+- name: assets/textures/physicsCircle.png
+  offsetX: 0
+  offsetY: 0
+  originalHeight: 128
+  originalWidth: 128
+  packedHeight: 128
+  packedWidth: 128
+  textureIndex: 0
+  x: 128
+  y: 0
+- name: assets/textures/physicsSquare.png
+  offsetX: 0
+  offsetY: 0
+  originalHeight: 128
+  originalWidth: 128
+  packedHeight: 128
+  packedWidth: 128
+  textureIndex: 0
+  x: 0
+  y: 0
+textures:
+- file: texture-packer-2-output_0.png
+  height: 128
+  width: 256
+options:
+  padding: 0
+  minFilter: MIP_MAP_NEAREST_NEAREST
+  uWrap: CLAMP_TO_EDGE
+  extrude: 0
+  maxTexturesSize: 512
+  vWrap: CLAMP_TO_EDGE
+  magFilter: MIP_MAP_NEAREST_NEAREST
