@@ -18,7 +18,7 @@ import java.util.*;
 
 public class TexturePacker {
 
-    public static synchronized void packDirectory(final String outputName, final String directory, final boolean recursive) {
+    public static synchronized void packDirectory(final String directory, final String outputName, final boolean recursive) {
         if (directory == null) throw new IllegalArgumentException("Must provide non-null directory name.");
         if (!AssetUtils.directoryExists(directory)) throw new IllegalArgumentException("The provided path: " + directory + " does not exist, or is not a directory");
     }
@@ -58,7 +58,6 @@ public class TexturePacker {
         int width = 1;
         int height = 1;
         boolean stepWidth = true;
-        System.out.println("last: " + last);
         while (width <= options.maxTexturesSize) {
             STBRPContext context = STBRPContext.create();
             STBRPNode.Buffer nodes = STBRPNode.create(width); // Number of nodes can be context width
@@ -118,13 +117,11 @@ public class TexturePacker {
         }
         maxX++;
         maxY++;
+        // TODO: FIXME?
         int packedWidth = maxX - minX;// + options.extrude + options.padding;
         int packedHeight = maxY - minY;// + options.extrude + options.padding;
         int offsetX = minX;
         int offsetY = originalHeight - packedHeight - minY;
-        System.out.println("orig: w, h: " + originalWidth + ", " + originalHeight);
-        System.out.println("packed: w, h: " + packedWidth + ", " + packedHeight);
-        System.out.println("offset x, y: " + offsetX + ", " + offsetY);
         return new PackedRegionData(sourceImage, path, packedWidth, packedHeight, offsetX, offsetY, minX, minY);
     }
 
@@ -211,8 +208,7 @@ public class TexturePacker {
                 // extrude right
                 for (int x = region.x + region.packedWidth; x < region.x + region.packedWidth + options.extrude; x++) {
                     for (int y = region.y; y < region.y + region.packedHeight; y++) {
-                        int color = 0;
-                        color = sourceImage.getRGB(region.originalWidth - 1, region.minY + y - region.y);
+                        int color = sourceImage.getRGB(region.originalWidth - 1, region.minY + y - region.y);
                         texturePackImage.setRGB(x,y,color);
                     }
                 }
@@ -223,7 +219,6 @@ public class TexturePacker {
         }
     }
 
-    // TODO: implement.
     private static synchronized boolean alreadyPacked(final Options options, final String ...texturePaths) {
         final String outputDirectory = options.outputDirectory;
         // check if the output directory or the texture map file is missing
@@ -256,11 +251,8 @@ public class TexturePacker {
             /* if we are packing the same textures, but one or more of the source textures was modified after our last
             packing, we need to pack again. */
             Date created = AssetUtils.lastModified(mapPath);
-            System.out.println("created: " + created);
             for (String texturePath : packingNow) {
                 Date lastModified = AssetUtils.lastModified(texturePath);
-                System.out.println("lm: " + lastModified);
-
                 if (lastModified.after(created)) return false;
             }
         } catch (Exception any) {
