@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+// TODO: complete, possible fix, test.
 public class TexturePacker {
 
     public static synchronized void packDirectory(final String directory, final String outputName, final boolean recursive) {
@@ -158,7 +159,7 @@ public class TexturePacker {
 
         String content = AssetUtils.yaml.dump(yamlData);
         try {
-            AssetUtils.saveFile(options.outputDirectory, options.outputName + ".txp", content);
+            AssetUtils.saveFile(options.outputDirectory, options.outputName + ".yml", content);
         } catch (Exception e) {
             // TODO: take care as part of the error handling branch
             // ignored for now
@@ -226,9 +227,8 @@ public class TexturePacker {
             System.out.println("returns here 1");
             return false;
         }
-        final String mapPath = outputDirectory + File.separator + options.outputName + ".txp";
+        final String mapPath = outputDirectory + File.separator + options.outputName + ".yml";
         if (!AssetUtils.fileExists(mapPath)) {
-            System.out.println("returns here 2");
             return false;
         }
 
@@ -256,7 +256,6 @@ public class TexturePacker {
                 if (lastModified.after(created)) return false;
             }
         } catch (Exception any) {
-            System.out.println(any);
             return false;
         }
 
@@ -286,11 +285,9 @@ public class TexturePacker {
             if (vWrap != options.vWrap) return false;
 
         } catch (Exception any) {
-            System.out.println(any);
             return false;
         }
 
-        System.out.println("already packed");
         return true;
     }
 
