@@ -19,6 +19,8 @@ import java.util.*;
 // TODO: complete, possible fix, test.
 public class TexturePacker {
 
+    private TexturePacker() {}
+
     public static synchronized void packDirectory(final String directory, final String outputName, final boolean recursive) {
         if (directory == null) throw new IllegalArgumentException("Must provide non-null directory name.");
         if (!AssetUtils.directoryExists(directory)) throw new IllegalArgumentException("The provided path: " + directory + " does not exist, or is not a directory");
