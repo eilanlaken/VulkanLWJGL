@@ -97,6 +97,7 @@ public class TexturePacker {
         return false;
     }
 
+    // TODO: use options?
     private static synchronized PackedRegionData getPackedRegionData(final Options options, final String path, final BufferedImage sourceImage) {
         int originalWidth = sourceImage.getWidth();
         int originalHeight = sourceImage.getHeight();
@@ -161,8 +162,7 @@ public class TexturePacker {
         try {
             AssetUtils.saveFile(options.outputDirectory, options.outputName + ".yml", content);
         } catch (Exception e) {
-            // TODO: take care as part of the error handling branch
-            // ignored for now
+            throw new GraphicsException("Could not save texture pack data file. Exception: " + e.getMessage());
         }
     }
 
@@ -224,7 +224,6 @@ public class TexturePacker {
         final String outputDirectory = options.outputDirectory;
         // check if the output directory or the texture map file is missing
         if (!AssetUtils.directoryExists(outputDirectory)) {
-            System.out.println("returns here 1");
             return false;
         }
         final String mapPath = outputDirectory + File.separator + options.outputName + ".yml";
@@ -329,12 +328,14 @@ public class TexturePacker {
     }
 
     private static final class TextureData {
+
         public String file;
         public int width;
         public int height;
+
     }
 
-    public static final class IndexedBufferedImage extends BufferedImage {
+    private static final class IndexedBufferedImage extends BufferedImage {
 
         private final int index;
 
@@ -347,7 +348,6 @@ public class TexturePacker {
 
     public static final class Options {
 
-        // TODO: allow rectangular packs.
         public enum Size {
 
             XX_SMALL_128(128),
@@ -367,15 +367,15 @@ public class TexturePacker {
 
         }
 
-        public final String outputDirectory;
-        public final String outputName;
+        public final String         outputDirectory;
+        public final String         outputName;
         public final Texture.Filter magFilter;
         public final Texture.Filter minFilter;
-        public final Texture.Wrap uWrap;
-        public final Texture.Wrap vWrap;
-        public final int extrude; // extrude REPEATS the border i.e. adding colors.
-        public final int padding;
-        public final int maxTexturesSize;
+        public final Texture.Wrap   uWrap;
+        public final Texture.Wrap   vWrap;
+        public final int            extrude; // extrude REPEATS the border i.e. adding colors.
+        public final int            padding;
+        public final int            maxTexturesSize;
 
         public Options(String outputDirectory, String outputName) {
             this(outputDirectory, outputName, Texture.Filter.MIP_MAP_NEAREST_NEAREST, Texture.Filter.MIP_MAP_NEAREST_NEAREST, Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE, 1,1, Size.XX_LARGE_8192);
