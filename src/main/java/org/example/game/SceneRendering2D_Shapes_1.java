@@ -63,14 +63,18 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
         GL11.glClearColor(0,0,0,1);
 
         renderer2D.begin(camera);
+        renderer2D.drawCircleBorder(1, 0.2f,60, 0,-3, ay,0,0,1, 1);
+        renderer2D.drawCircleFilled(3, 3, 0, 8, 0, 0, 0, 1, 1);
+        renderer2D.drawCircleFilled(3, -4, 0, 30,25, 0, 0, ay, 1, 1);
 
+        renderer2D.drawCircleThin(1, 20, 0, 0, 0, ay*11, 0, 1, 1);
         renderer2D.setTint(blue);
-        renderer2D.drawCircleBorder(1, 0.2f,0, 0, 40,0,0,0,1, 1);
+        renderer2D.drawCircleBorder(1, 0.2f, 90, 30, 0, 3,ay,0,45,1, 1);
+        renderer2D.setTint(blue);
+
+        //renderer2D.drawCircleBorder(1, 0.2f,-3, 0, 6,ay,0,0,1, 1);
 
 //        renderer2D.setTint(red);
-//        renderer2D.drawCircleThin(1, 0, 0, 20, 0, ay*11, 0, 1, 1);
-//        renderer2D.drawCircleFilled(3, -4, 0, 30,25, 0, 0, ay, 1, 1);
-//        renderer2D.drawCircleFilled(3, 3, 0, 8, 0, 0, 0, 1, 1);
 //        renderer2D.setTint(blue);
 //
         renderer2D.end();
