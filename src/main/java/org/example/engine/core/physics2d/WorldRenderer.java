@@ -73,7 +73,7 @@ public class WorldRenderer {
                         float x3 = rectangle.c3.x;
                         float y3 = rectangle.c3.y;
 
-                        renderer.pushThinRectangle(x0,y0, x1,y1, x2,y2, x3,y3, tint);
+                        renderer.pushThinRectangle_old(x0,y0, x1,y1, x2,y2, x3,y3, tint);
                         renderer.pushThinLineSegment(
                                 rectangle.worldCenter().x,
                                 rectangle.worldCenter().y,

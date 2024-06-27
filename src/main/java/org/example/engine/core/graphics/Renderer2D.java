@@ -504,6 +504,286 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += refinement * 2;
     }
 
+    /* Rendering 2D primitives - Rectangles */
+
+    public void drawRectangleThin(
+            float x0, float y0,
+            float x1, float y1,
+            float x2, float y2,
+            float x3, float y3) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if ((vertexIndex + 4) * VERTEX_SIZE > verticesBuffer.capacity()) renderCurrentBatch();
+
+        setMode(GL11.GL_LINES);
+
+        // put indices
+        int startVertex = this.vertexIndex;
+        indicesBuffer
+                .put(startVertex + 0)
+                .put(startVertex + 1)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+                .put(startVertex + 2)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex + 0)
+        ;
+
+        verticesBuffer
+                .put(x0).put(y0).put(currentTint).put(0.5f).put(0.5f) // V0
+                .put(x1).put(y1).put(currentTint).put(0.5f).put(0.5f) // V1
+                .put(x2).put(y2).put(currentTint).put(0.5f).put(0.5f) // V2
+                .put(x3).put(y3).put(currentTint).put(0.5f).put(0.5f) // V3
+        ;
+
+        vertexIndex += 4;
+    }
+
+    public void drawRectangleThin(float width, float height,
+            float x, float y,
+            float angleX, float angleY, float angleZ,
+            float scaleX, float scaleY) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if ((vertexIndex + 4) * VERTEX_SIZE > verticesBuffer.capacity()) renderCurrentBatch();
+
+        setMode(GL11.GL_LINES);
+
+        // put indices
+        int startVertex = this.vertexIndex;
+        indicesBuffer
+                .put(startVertex + 0)
+                .put(startVertex + 1)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+                .put(startVertex + 2)
+                .put(startVertex + 3)
+                .put(startVertex + 3)
+                .put(startVertex + 0)
+        ;
+
+        float widthHalf  = width  * scaleX * MathUtils.cosDeg(angleY) * 0.5f;
+        float heightHalf = height * scaleY * MathUtils.cosDeg(angleX) * 0.5f;
+
+        Vector2 arm0 = vector2MemoryPool.allocate();
+        Vector2 arm1 = vector2MemoryPool.allocate();
+        Vector2 arm2 = vector2MemoryPool.allocate();
+        Vector2 arm3 = vector2MemoryPool.allocate();
+
+        arm0.x = -widthHalf;
+        arm0.y = heightHalf;
+        arm0.rotateDeg(angleZ);
+
+        arm1.x = -widthHalf;
+        arm1.y = -heightHalf;
+        arm1.rotateDeg(angleZ);
+
+        arm2.x = widthHalf;
+        arm2.y = -heightHalf;
+        arm2.rotateDeg(angleZ);
+
+        arm3.x = widthHalf;
+        arm3.y = heightHalf;
+        arm3.rotateDeg(angleZ);
+
+        verticesBuffer
+                .put(arm0.x + x).put(arm0.y + y).put(currentTint).put(0.5f).put(0.5f) // V0
+                .put(arm1.x + x).put(arm1.y + y).put(currentTint).put(0.5f).put(0.5f) // V1
+                .put(arm2.x + x).put(arm2.y + y).put(currentTint).put(0.5f).put(0.5f) // V2
+                .put(arm3.x + x).put(arm3.y + y).put(currentTint).put(0.5f).put(0.5f) // V3
+        ;
+
+        vector2MemoryPool.free(arm0);
+        vector2MemoryPool.free(arm1);
+        vector2MemoryPool.free(arm2);
+        vector2MemoryPool.free(arm3);
+
+        vertexIndex += 4;
+    }
+
+    public void drawRectangleFilled(
+            float x0, float y0,
+            float x1, float y1,
+            float x2, float y2,
+            float x3, float y3) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if ((vertexIndex + 4) * VERTEX_SIZE > verticesBuffer.capacity()) renderCurrentBatch();
+
+        setMode(GL11.GL_TRIANGLES);
+
+        // put indices
+        int startVertex = this.vertexIndex;
+        indicesBuffer
+                .put(startVertex + 0)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+                .put(startVertex + 2)
+                .put(startVertex + 3)
+                .put(startVertex + 0)
+        ;
+
+        verticesBuffer
+                .put(x0).put(y0).put(currentTint).put(0.5f).put(0.5f) // V0
+                .put(x1).put(y1).put(currentTint).put(0.5f).put(0.5f) // V1
+                .put(x2).put(y2).put(currentTint).put(0.5f).put(0.5f) // V2
+                .put(x3).put(y3).put(currentTint).put(0.5f).put(0.5f) // V3
+        ;
+
+        vertexIndex += 4;
+    }
+
+    public void drawRectangleFilled(float width, float height,
+                                  float x, float y,
+                                  float angleX, float angleY, float angleZ,
+                                  float scaleX, float scaleY) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if ((vertexIndex + 4) * VERTEX_SIZE > verticesBuffer.capacity()) renderCurrentBatch();
+
+        setMode(GL11.GL_TRIANGLES);
+
+        // put indices
+        int startVertex = this.vertexIndex;
+        indicesBuffer
+                .put(startVertex + 0)
+                .put(startVertex + 1)
+                .put(startVertex + 2)
+                .put(startVertex + 2)
+                .put(startVertex + 3)
+                .put(startVertex + 0)
+        ;
+
+        float widthHalf  = width  * scaleX * MathUtils.cosDeg(angleY) * 0.5f;
+        float heightHalf = height * scaleY * MathUtils.cosDeg(angleX) * 0.5f;
+
+        Vector2 arm0 = vector2MemoryPool.allocate();
+        Vector2 arm1 = vector2MemoryPool.allocate();
+        Vector2 arm2 = vector2MemoryPool.allocate();
+        Vector2 arm3 = vector2MemoryPool.allocate();
+
+        arm0.x = -widthHalf;
+        arm0.y =  heightHalf;
+        arm0.rotateDeg(angleZ);
+
+        arm1.x = -widthHalf;
+        arm1.y = -heightHalf;
+        arm1.rotateDeg(angleZ);
+
+        arm2.x =  widthHalf;
+        arm2.y = -heightHalf;
+        arm2.rotateDeg(angleZ);
+
+        arm3.x = widthHalf;
+        arm3.y = heightHalf;
+        arm3.rotateDeg(angleZ);
+
+        verticesBuffer
+                .put(arm0.x + x).put(arm0.y + y).put(currentTint).put(0.5f).put(0.5f) // V0
+                .put(arm1.x + x).put(arm1.y + y).put(currentTint).put(0.5f).put(0.5f) // V1
+                .put(arm2.x + x).put(arm2.y + y).put(currentTint).put(0.5f).put(0.5f) // V2
+                .put(arm3.x + x).put(arm3.y + y).put(currentTint).put(0.5f).put(0.5f) // V3
+        ;
+
+        vector2MemoryPool.free(arm0);
+        vector2MemoryPool.free(arm1);
+        vector2MemoryPool.free(arm2);
+        vector2MemoryPool.free(arm3);
+
+        vertexIndex += 4;
+    }
+
+    /**
+     * Renders a rectangle with rounded corners.
+     *
+     * <p> This adds a single vertex at the center of the rectangle,
+     * Then traces the rest of the vertices using the radius and the
+     * refinement of the corners. The rendered triangles are casted
+     * from the center x,y into the edge vertices.
+     * </p>
+     *
+     * @param width the width of the rectangle
+     * @param height the height of the rectangle
+     * @param r the corner radius, given in world units, not pixels
+     * @param refinement how smooth the corners are, minimum value is 3
+     * @param x the x value of the center of the rectangle
+     * @param y the y value of the center of the rectangle
+     * @param angleX the angle around the x-axis
+     * @param angleY the angle around the y-axis
+     * @param angleZ the angle around the z-axis
+     * @param scaleX the scale around the x-axis (before transform is applied)
+     * @param scaleY the scale around the y-axis (before transform is applied)
+     */
+    public void drawRectangleFilled(float width, float height, float r, int refinement,
+                                    float x, float y,
+                                    float angleX, float angleY, float angleZ,
+                                    float scaleX, float scaleY) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if ((vertexIndex + 4) * VERTEX_SIZE > verticesBuffer.capacity()) renderCurrentBatch();
+        refinement = Math.max(3, refinement);
+
+        setMode(GL11.GL_TRIANGLES);
+
+        float widthHalf  = width  * 0.5f;
+        float heightHalf = height * 0.5f;
+        float da = 90.0f / refinement;
+
+        // we store the vertices in this array and apply the transform after, then put them in the buffer
+        Array<Vector2> vertices = new Array<>(true, 1 + refinement * 4);
+
+        // add center vertex
+        Vector2 center = vector2MemoryPool.allocate().set(0, 0);
+        vertices.add(center); // center vertex
+
+        // add upper left corner vertices
+        for (int i = 0; i < refinement; i++) {
+            Vector2 corner = vector2MemoryPool.allocate();
+            corner.set(-r, 0);
+            corner.rotateDeg(da * i); // rotate clockwise
+            corner.add(-widthHalf + r, heightHalf - r);
+            vertices.add(corner);
+        }
+
+        // add upper right corner vertices
+        for (int i = 0; i < refinement; i++) {
+            Vector2 corner = vector2MemoryPool.allocate();
+            corner.set(0, r);
+            corner.rotateDeg(da * i); // rotate clockwise
+            corner.add(widthHalf - r, heightHalf - r);
+            vertices.add(corner);
+        }
+
+        // add lower right corner vertices
+        for (int i = 0; i < refinement; i++) {
+            Vector2 corner = vector2MemoryPool.allocate();
+            corner.set(r, 0);
+            corner.rotateDeg(da * i); // rotate clockwise
+            corner.add(widthHalf - r, -heightHalf + r);
+            vertices.add(corner);
+        }
+
+        // add lower left corner vertices
+        for (int i = 0; i < refinement; i++) {
+            Vector2 corner = vector2MemoryPool.allocate();
+            corner.set(0, -r);
+            corner.rotateDeg(da * i); // rotate clockwise
+            corner.add(-widthHalf + r, -heightHalf + r);
+            vertices.add(corner);
+        }
+
+        // transform each vertex, then put it in the buffer + tint + uv
+        scaleX *= MathUtils.cosDeg(angleY);
+        scaleY *= MathUtils.cosDeg(angleX);
+        for (int i = 0; i < vertices.size; i++) {
+            Vector2 vertex = vertices.get(i).scl(scaleX, scaleY).rotateDeg(angleZ).add(x, y);
+            // TODO: use proper UV.
+            verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
+        }
+
+        // put indices
+        int startVertex = this.vertexIndex;
+        // TODO: updates indices. Use sketch.
+
+        vector2MemoryPool.freeAll(vertices);
+        vertexIndex += 1 + refinement * 4;
+    }
 
     // TODO: delete. Break down the drawing operations to explicit pushCircleFilled, pushCircleHollow, pushRectangleFilled, pushRectangleHollow, pushCurve
     @Deprecated public void pushPolygon(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
@@ -577,15 +857,15 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
 
-    public void pushThinRectangle(
+    @Deprecated public void pushThinRectangle_old(
             float x0, float y0,
             float x1, float y1,
             float x2, float y2,
             float x3, float y3, final Color color) {
-        pushThinRectangle(x0, y0, x1, y1, x2, y2, x3, y3, color.toFloatBits());
+        pushThinRectangle_old(x0, y0, x1, y1, x2, y2, x3, y3, color.toFloatBits());
     }
 
-    public void pushThinRectangle(
+    @Deprecated public void pushThinRectangle_old(
             float x0, float y0,
             float x1, float y1,
             float x2, float y2,
