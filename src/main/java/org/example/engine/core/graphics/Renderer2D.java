@@ -1066,12 +1066,12 @@ public class Renderer2D implements MemoryResourceHolder {
         indicesBuffer.put(startVertex + 3);
 
         // put indices for circle 1
-        indicesBuffer.put(startVertex + 5);
-        indicesBuffer.put(startVertex + 5 + 1);
-        indicesBuffer.put(startVertex + 5 + 2);
+        indicesBuffer.put(startVertex + 4);
+        indicesBuffer.put(startVertex + 4 + 1);
+        indicesBuffer.put(startVertex + 4 + 2);
 
         vector2MemoryPool.free(p);
-        vertexIndex += 4 + (1 + edgeRefinement) + (1 + edgeRefinement); // 4 vertices for the line segment, (1 + edgeRefinement) for each half-circle.
+        vertexIndex += 4 + (1 + edgeRefinement) + 0;//(1 + edgeRefinement); // 4 vertices for the line segment, (1 + edgeRefinement) for each half-circle.
     }
 
     @Deprecated public void pushPolygon(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
