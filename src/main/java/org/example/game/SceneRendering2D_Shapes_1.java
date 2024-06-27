@@ -74,11 +74,10 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
         renderer2D.drawRectangleThin(0,0, 2,0,2,2,0,2);
         renderer2D.drawCircleBorder(1, 0.2f, 90, 30, 0, 3,ay,0,45,1, 1);
         renderer2D.setTint(blue);
-        renderer2D.drawRectangleThin(4,2, 0,0,0,0,ay,1,1);
 
-        renderer2D.drawRectangleFilled(0-3,0-3, 2-3,0-3,2-3,2-3,0-3,2-3);
 
-        renderer2D.drawRectangleFilled(4,3, 4,-2,0,ay,0,1,1);
+        //renderer2D.drawRectangleFilled(4,3, 4,-2,0,ay,0,1,1);
+        renderer2D.drawRectangleFilled(5,5, 0.4f, 5,4,-2,0,ay,0,1,1);
 
         //renderer2D.drawCircleBorder(1, 0.2f,-3, 0, 6,ay,0,0,1, 1);
 

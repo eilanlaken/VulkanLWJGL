@@ -736,7 +736,7 @@ public class Renderer2D implements MemoryResourceHolder {
         for (int i = 0; i < refinement; i++) {
             Vector2 corner = vector2MemoryPool.allocate();
             corner.set(-r, 0);
-            corner.rotateDeg(da * i); // rotate clockwise
+            corner.rotateDeg(-da * i); // rotate clockwise
             corner.add(-widthHalf + r, heightHalf - r);
             vertices.add(corner);
         }
@@ -745,7 +745,7 @@ public class Renderer2D implements MemoryResourceHolder {
         for (int i = 0; i < refinement; i++) {
             Vector2 corner = vector2MemoryPool.allocate();
             corner.set(0, r);
-            corner.rotateDeg(da * i); // rotate clockwise
+            corner.rotateDeg(-da * i); // rotate clockwise
             corner.add(widthHalf - r, heightHalf - r);
             vertices.add(corner);
         }
@@ -754,7 +754,7 @@ public class Renderer2D implements MemoryResourceHolder {
         for (int i = 0; i < refinement; i++) {
             Vector2 corner = vector2MemoryPool.allocate();
             corner.set(r, 0);
-            corner.rotateDeg(da * i); // rotate clockwise
+            corner.rotateDeg(-da * i); // rotate clockwise
             corner.add(widthHalf - r, -heightHalf + r);
             vertices.add(corner);
         }
@@ -763,7 +763,7 @@ public class Renderer2D implements MemoryResourceHolder {
         for (int i = 0; i < refinement; i++) {
             Vector2 corner = vector2MemoryPool.allocate();
             corner.set(0, -r);
-            corner.rotateDeg(da * i); // rotate clockwise
+            corner.rotateDeg(-da * i); // rotate clockwise
             corner.add(-widthHalf + r, -heightHalf + r);
             vertices.add(corner);
         }
@@ -779,7 +779,46 @@ public class Renderer2D implements MemoryResourceHolder {
 
         // put indices
         int startVertex = this.vertexIndex;
-        // TODO: updates indices. Use sketch.
+        // upper left corner
+        for (int i = 0; i < refinement - 1; i++) {
+            indicesBuffer.put(startVertex + 0);
+            indicesBuffer.put(startVertex + refinement * 0 + i + 1);
+            indicesBuffer.put(startVertex + refinement * 0 + i + 2);
+        }
+        // upper triangle
+        indicesBuffer.put(startVertex + 0);
+        indicesBuffer.put(startVertex + refinement * 1 + 0);
+        indicesBuffer.put(startVertex + refinement * 1 + 1);
+        // upper right corner
+        for (int i = 0; i < refinement - 1; i++) {
+            indicesBuffer.put(startVertex + 0);
+            indicesBuffer.put(startVertex + refinement * 1 + i + 1);
+            indicesBuffer.put(startVertex + refinement * 1 + i + 2);
+        }
+        // right triangle
+        indicesBuffer.put(startVertex + 0);
+        indicesBuffer.put(startVertex + refinement * 2 + 0);
+        indicesBuffer.put(startVertex + refinement * 2 + 1);
+        // lower right corner
+        for (int i = 0; i < refinement - 1; i++) {
+            indicesBuffer.put(startVertex + 0);
+            indicesBuffer.put(startVertex + refinement * 2 + i + 1);
+            indicesBuffer.put(startVertex + refinement * 2 + i + 2);
+        }
+        // bottom triangle
+        indicesBuffer.put(startVertex + 0);
+        indicesBuffer.put(startVertex + refinement * 3 + 0);
+        indicesBuffer.put(startVertex + refinement * 3 + 1);
+        // lower left corner
+        for (int i = 0; i < refinement - 1; i++) {
+            indicesBuffer.put(startVertex + 0);
+            indicesBuffer.put(startVertex + refinement * 3 + i + 1);
+            indicesBuffer.put(startVertex + refinement * 3 + i + 2);
+        }
+        // right triangle
+        indicesBuffer.put(startVertex + 0);
+        indicesBuffer.put(startVertex + refinement * 4 + 0);
+        indicesBuffer.put(startVertex + refinement * 0 + 1);
 
         vector2MemoryPool.freeAll(vertices);
         vertexIndex += 1 + refinement * 4;
