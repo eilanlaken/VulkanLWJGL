@@ -18,6 +18,7 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
     private Camera camera;
     private float red = new Color(1,0,0,1).toFloatBits();
     private float blue = new Color(0,0,1,0.5f).toFloatBits();
+    private float yellow = new Color(1,1,0,0.3f).toFloatBits();
 
     private ShaderProgram shaderYellow;
 
@@ -64,20 +65,25 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
 
         renderer2D.begin(camera);
         renderer2D.setTint(blue);
-        //renderer2D.drawCircleFilled(3, 3, 0, 8, 0, 0, 0, 1, 1);
-        //renderer2D.drawCircleFilled(3, -3, 0, 8, 0, 0, 0, 1, 1);
-        renderer2D.drawCircleBorder(1, 0.2f,60, 0,-3, ay,0,0,1, 1);
-        //renderer2D.drawCircleFilled(3, -4, 0, 30,25, 0, 0, ay, 1, 1);
+//        renderer2D.drawCircleFilled(3, 3, 0, 8, 0, 0, 0, 1, 1);
+//        renderer2D.drawCircleFilled(3, -3, 0, 8, 0, 0, 0, 1, 1);
+//        renderer2D.drawCircleBorder(1, 0.2f,60, 0,-3, ay,0,0,1, 1);
+//        //renderer2D.drawCircleFilled(3, -4, 0, 30,25, 0, 0, ay, 1, 1);
+//
+//        renderer2D.drawCircleThin(1, 20, 0, 0, 0, ay, 0, 1, 1);
+//        renderer2D.setTint(red);
+//        renderer2D.drawRectangleThin(5,5, 1f, 5,4,-2,0,ay,0,1,1);
+//        renderer2D.drawRectangleThin(0,0, 2,0,2,2,0,2);
+//        renderer2D.drawCircleBorder(1, 0.2f, 90, 30, 0, 3,ay,0,45,1, 1);
+        renderer2D.setTint(yellow);
 
-        renderer2D.drawCircleThin(1, 20, 0, 0, 0, ay, 0, 1, 1);
-        renderer2D.setTint(red);
-        renderer2D.drawRectangleThin(0,0, 2,0,2,2,0,2);
-        renderer2D.drawCircleBorder(1, 0.2f, 90, 30, 0, 3,ay,0,45,1, 1);
-        renderer2D.setTint(blue);
 
 
-        //renderer2D.drawRectangleFilled(4,3, 4,-2,0,ay,0,1,1);
-        renderer2D.drawRectangleFilled(5,5, 0.4f, 5,4,-2,0,ay,0,1,1);
+//        renderer2D.drawRectangleBorder(4,3, 0.1f,4,-2,0,ay,0,1,1);
+        //renderer2D.drawRectangleFilled(5,5, 0.4f, 5,4,-2,0,ay,0,1,1);
+
+//        renderer2D.drawLineThin(0,0,3,5);
+        renderer2D.drawLineFilled(-3,0,3,0, 8f, 3);
 
         //renderer2D.drawCircleBorder(1, 0.2f,-3, 0, 6,ay,0,0,1, 1);
 
