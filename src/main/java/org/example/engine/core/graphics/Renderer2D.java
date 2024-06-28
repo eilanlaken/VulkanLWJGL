@@ -1138,16 +1138,22 @@ public class Renderer2D implements MemoryResourceHolder {
         vertices.add(up_first);
 
         /* in-between vertices */
+        int skipped = 0;
         for (int i = 1; i < values.length - 1; i++) {
             dir_prev.x = values[i].x - values[i-1].x;
             dir_prev.y = values[i].y - values[i-1].y;
             dir_prev.negate();
-            dir_prev.nor();
             dir_next.x = values[i+1].x - values[i].x;
             dir_next.y = values[i+1].y - values[i].y;
+            float cross = Vector2.crs(dir_prev, dir_next);
+            if (cross == 0) {
+                skipped++;
+                continue;
+            }
+            dir_prev.nor();
             dir_next.nor();
             float angle_between = Vector2.angleBetweenDeg(dir_prev, dir_next);
-            float length = thickness * MathUtils.sinDeg(angle_between * 0.5f);
+            float length = thickness / MathUtils.sinDeg(angle_between * 0.5f);
             v.x = dir_prev.x + dir_next.x;
             v.y = dir_prev.y + dir_next.y;
             v.nor().scl(length);
@@ -1157,7 +1163,6 @@ public class Renderer2D implements MemoryResourceHolder {
             Vector2 vertex_up = vector2MemoryPool.allocate();
             vertex_up.x = values[i].x - v.x;
             vertex_up.y = values[i].y - v.y;
-            float cross = Vector2.crs(dir_prev, dir_next);
             if (cross > 0) {
                 vertices.add(vertex_down);
                 vertices.add(vertex_up);
@@ -1192,7 +1197,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
         /* put indices */
         int startVertex = this.vertexIndex;
-        for (int i = 0; i < values.length * 2 - 2; i += 2) {
+        for (int i = 0; i < values.length * 2 - 2 - skipped * 2; i += 2) {
             indicesBuffer.put(startVertex + i);
             indicesBuffer.put(startVertex + i + 1);
             indicesBuffer.put(startVertex + i + 2);
@@ -1203,11 +1208,11 @@ public class Renderer2D implements MemoryResourceHolder {
 
         // TODO: remove
         if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
-            System.out.println(vertices);
+            System.out.println(skipped);
         }
 
         vector2MemoryPool.freeAll(vertices);
-        vertexIndex += values.length * 2;
+        vertexIndex += (values.length - skipped) * 2;
     }
 
     @Deprecated public void pushPolygon(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
