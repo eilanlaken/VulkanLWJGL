@@ -6,6 +6,20 @@ import org.junit.jupiter.api.Test;
 class Vector2Test {
 
     @Test
+    void testAngleBetweenDeg() {
+        Vector2 a = new Vector2(1, 0);
+        Vector2 b = new Vector2(1, 0);
+        Assertions.assertEquals(0, Vector2.angleBetweenDeg(a,b), MathUtils.FLOAT_ROUNDING_ERROR);
+
+        b.set(0,1);
+        Assertions.assertEquals(90.0f, Vector2.angleBetweenDeg(a,b), MathUtils.FLOAT_ROUNDING_ERROR);
+        b.set(1,1);
+        Assertions.assertEquals(45.0f, Vector2.angleBetweenDeg(a,b), MathUtils.FLOAT_ROUNDING_ERROR);
+        b.set(0,-1);
+        Assertions.assertEquals(90.0f, Vector2.angleBetweenDeg(a,b), MathUtils.FLOAT_ROUNDING_ERROR);
+    }
+
+    @Test
     void cpy() {
     }
 

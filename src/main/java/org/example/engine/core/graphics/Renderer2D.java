@@ -2,7 +2,9 @@ package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.math.Matrix2x2;
 import org.example.engine.core.math.Vector2;
+import org.example.engine.core.math.Vector4;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.memory.MemoryResourceHolder;
 import org.example.engine.core.shape.Shape2DPolygon;
@@ -22,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.example.engine.core.math.Matrix2x2.*;
 
 // TODO: to make it a standalone, make it initialize the opengl context itself, in case it is not initialized. Maybe.
 // TODO: fix rendering bug.
@@ -955,7 +959,7 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += 8;
     }
 
-    /* Rendering 2D primitives - Lines & Curves */
+    /* Rendering 2D primitives - Lines */
 
     public void drawLineThin(float x1, float y1, float x2, float y2) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
@@ -1027,33 +1031,26 @@ public class Renderer2D implements MemoryResourceHolder {
         verticesBuffer.put(x2 - p.x).put(y2 - p.y).put(currentTint).put(0.5f).put(0.5f);
         verticesBuffer.put(x2 + p.x).put(y2 + p.y).put(currentTint).put(0.5f).put(0.5f);
 
+        /* put edge circles */
         final float da = 180.0f / (edgeRefinement - 1);
         Vector2 vertex = vector2MemoryPool.allocate();
-        // first circle
-
-        // put center point
+        /* circle 1: */
         verticesBuffer.put(x1).put(y1).put(currentTint).put(0.5f).put(0.5f); // center point
-        // put arc vertices
-        verticesBuffer.put(x1 + p.x).put(y1 + p.y).put(currentTint).put(0.5f).put(0.5f);
-        p.rotateDeg(30);
-        verticesBuffer.put(x1 + p.x).put(y1 + p.y).put(currentTint).put(0.5f).put(0.5f);
-
-//        for (int i = 0; i < edgeRefinement; i++) {
-//            vertex.set(dir);
-//            vertex.rotateDeg(da * i).add(x1, y1);
-//            verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f); // center point
-//        }
-
-//        // second circle
-//        verticesBuffer.put(x2).put(y2).put(currentTint).put(0.5f).put(0.5f); // center point
-//        for (int i = 0; i < edgeRefinement; i++) {
-//            vertex.set(dir);
-//            vertex.rotateDeg(-da * i).add(x2, y2);
-//            verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
-//        }
-
+        /* put arc vertices */
+        for (int i = 0; i < edgeRefinement; i++) {
+            vertex.set(p);
+            vertex.rotateDeg(da * i);
+            verticesBuffer.put(x1 + vertex.x).put(y1 + vertex.y).put(currentTint).put(0.5f).put(0.5f);
+        }
+        /* circle 2: */
+        verticesBuffer.put(x2).put(y2).put(currentTint).put(0.5f).put(0.5f); // center point
+        /* put arc vertices */
+        for (int i = 0; i < edgeRefinement; i++) {
+            vertex.set(p);
+            vertex.rotateDeg(-da * i);
+            verticesBuffer.put(x2 + vertex.x).put(y2 + vertex.y).put(currentTint).put(0.5f).put(0.5f);
+        }
         vector2MemoryPool.free(vertex);
-
 
         int startVertex = this.vertexIndex;
 
@@ -1066,12 +1063,69 @@ public class Renderer2D implements MemoryResourceHolder {
         indicesBuffer.put(startVertex + 3);
 
         // put indices for circle 1
-        indicesBuffer.put(startVertex + 4);
-        indicesBuffer.put(startVertex + 4 + 1);
-        indicesBuffer.put(startVertex + 4 + 2);
+        for (int i = 0; i < edgeRefinement - 1; i++) {
+            indicesBuffer.put(startVertex + 4);
+            indicesBuffer.put(startVertex + 4 + i + 1);
+            indicesBuffer.put(startVertex + 4 + i + 2);
+        }
+
+        // put indices for circle 2
+        for (int i = 0; i < edgeRefinement - 1; i++) {
+            indicesBuffer.put(startVertex + 4 + edgeRefinement + 1);
+            indicesBuffer.put(startVertex + 4 + edgeRefinement + 1 + i + 1);
+            indicesBuffer.put(startVertex + 4 + edgeRefinement + 1 + i + 2);
+        }
 
         vector2MemoryPool.free(p);
-        vertexIndex += 4 + (1 + edgeRefinement) + 0;//(1 + edgeRefinement); // 4 vertices for the line segment, (1 + edgeRefinement) for each half-circle.
+        vertexIndex += 4 + (1 + edgeRefinement) + (1 + edgeRefinement); // 4 vertices for the line segment, (1 + edgeRefinement) for each half-circle.
+    }
+
+    /* Rendering 2D primitives - Curves */
+
+    public void drawCurveThin(final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values == null || values.length < 2) return;
+        if ((vertexIndex + values.length) * VERTEX_SIZE > VERTICES_CAPACITY * 4) flush();
+
+        setMode(GL11.GL_LINES);
+
+        /* put vertices */
+        for (Vector2 value : values) {
+            verticesBuffer.put(value.x).put(value.y).put(currentTint).put(0.5f).put(0.5f);
+        }
+
+        /* put indices */
+        int startVertex = this.vertexIndex;
+        for (int i = 0; i < values.length - 1; i++) {
+            indicesBuffer.put(startVertex + i);
+            indicesBuffer.put(startVertex + i + 1);
+        }
+
+        vertexIndex += values.length;
+    }
+
+    public void drawCurveFilled(float thickness, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values == null || values.length < 2) return;
+        if ((vertexIndex + values.length * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_TRIANGLES);
+
+        /* put vertices */
+
+
+        /* put indices */
+        int startVertex = this.vertexIndex;
+        for (int i = 0; i < values.length * 2 - 2; i += 2) {
+            indicesBuffer.put(startVertex + i);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 3);
+        }
+
+        vertexIndex += values.length * 2;
     }
 
     @Deprecated public void pushPolygon(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {

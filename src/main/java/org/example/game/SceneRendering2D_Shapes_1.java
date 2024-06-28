@@ -5,6 +5,7 @@ import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
+import org.example.engine.core.math.Vector2;
 import org.example.engine.core.math.Vector3;
 import org.example.engine.core.memory.MemoryResource;
 import org.lwjgl.opengl.GL11;
@@ -75,21 +76,15 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
 //        renderer2D.drawRectangleThin(5,5, 1f, 5,4,-2,0,ay,0,1,1);
 //        renderer2D.drawRectangleThin(0,0, 2,0,2,2,0,2);
 //        renderer2D.drawCircleBorder(1, 0.2f, 90, 30, 0, 3,ay,0,45,1, 1);
-        renderer2D.setTint(yellow);
+        //renderer2D.setTint(yellow);
 
 
+        //renderer2D.drawCurveThin(new Vector2(0,0));
+        //renderer2D.drawLineFilled(-3,0,3,0, 8f, 18);
+        //renderer2D.drawLineFilled(-3,0,3,3, 0.2f, 18);
+        renderer2D.drawCurveFilled(0.1f,new Vector2(-1,-1), new Vector2(0,0), new Vector2(2,0));
 
-//        renderer2D.drawRectangleBorder(4,3, 0.1f,4,-2,0,ay,0,1,1);
-        //renderer2D.drawRectangleFilled(5,5, 0.4f, 5,4,-2,0,ay,0,1,1);
 
-//        renderer2D.drawLineThin(0,0,3,5);
-        renderer2D.drawLineFilled(-3,0,3,0, 8f, 3);
-
-        //renderer2D.drawCircleBorder(1, 0.2f,-3, 0, 6,ay,0,0,1, 1);
-
-//        renderer2D.setTint(red);
-//        renderer2D.setTint(blue);
-//
         renderer2D.end();
     }
 

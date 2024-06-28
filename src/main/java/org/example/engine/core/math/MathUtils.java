@@ -184,21 +184,6 @@ public final class MathUtils {
         return radians * ((0.0010582010582010583f) * x4 - (0.1111111111111111f) * x2 + 1f) / ((0.015873015873015872f) * x4 - (0.4444444444444444f) * x2 + 1f);
     }
 
-    static public float acos(float a) {
-        float a2 = a * a; // a squared
-        float a3 = a * a2; // a cubed
-        if (a >= 0f) return (float) Math.sqrt(1f - a) * (1.5707288f - 0.2121144f * a + 0.0742610f * a2 - 0.0187293f * a3);
-        return 3.14159265358979323846f - (float)Math.sqrt(1f + a) * (1.5707288f + 0.2121144f * a + 0.0742610f * a2 + 0.0187293f * a3);
-    }
-
-
-    public static float asin(float a) {
-        float a2 = a * a; // a squared
-        float a3 = a * a2; // a cubed
-        if (a >= 0f) return 1.5707963267948966f - (float)Math.sqrt(1f - a) * (1.5707288f - 0.2121144f * a + 0.0742610f * a2 - 0.0187293f * a3);
-        return -1.5707963267948966f + (float)Math.sqrt(1f + a) * (1.5707288f + 0.2121144f * a + 0.0742610f * a2 + 0.0187293f * a3);
-    }
-
     public static float tanDeg(float degrees) {
         degrees *= (1f / 180f);
         degrees += 0.5f;

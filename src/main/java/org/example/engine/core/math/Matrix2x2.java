@@ -29,7 +29,7 @@ public class Matrix2x2 implements MemoryPool.Reset {
         set(matrix);
     }
 
-    /** Constructs a matrix from the given float array. The array must have at least 9 elements; the first 9 will be copied.
+    /** Constructs a matrix from the given float array. The array must have at least 4 elements; the first 9 will be copied.
      * @param values The float array to copy. Remember that this matrix is in
      *           <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> order. (The float array
      *           is not modified.) */
