@@ -1112,6 +1112,8 @@ public class Renderer2D implements MemoryResourceHolder {
 
         setMode(GL11.GL_TRIANGLES);
 
+        thickness *= 0.5f;
+
         Array<Vector2> vertices = new Array<>(true, values.length);
         /* put vertices */
 
