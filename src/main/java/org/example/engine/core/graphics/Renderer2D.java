@@ -1157,9 +1157,14 @@ public class Renderer2D implements MemoryResourceHolder {
             Vector2 vertex_up = vector2MemoryPool.allocate();
             vertex_up.x = values[i].x - v.x;
             vertex_up.y = values[i].y - v.y;
-            // TODO: fix the order
-            vertices.add(vertex_down);
-            vertices.add(vertex_up);
+            float cross = Vector2.crs(dir_prev, dir_next);
+            if (cross > 0) {
+                vertices.add(vertex_down);
+                vertices.add(vertex_up);
+            } else {
+                vertices.add(vertex_up);
+                vertices.add(vertex_down);
+            }
         }
 
         /* last 2 vertices */
@@ -1196,6 +1201,7 @@ public class Renderer2D implements MemoryResourceHolder {
             indicesBuffer.put(startVertex + i + 3);
         }
 
+        // TODO: remove
         if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
             System.out.println(vertices);
         }

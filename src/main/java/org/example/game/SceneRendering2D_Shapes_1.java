@@ -82,7 +82,7 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
         //renderer2D.drawCurveThin(new Vector2(0,0));
         //renderer2D.drawLineFilled(-3,0,3,0, 8f, 18);
         //renderer2D.drawLineFilled(-3,0,3,3, 0.2f, 18);
-        renderer2D.drawCurveFilled(0.1f,new Vector2(-1,0), new Vector2(0,0), new Vector2(1,1), new Vector2(2,-1));
+        renderer2D.drawCurveFilled(0.1f,new Vector2(-3,0), new Vector2(0,0), new Vector2(3,3));
 
 
         renderer2D.end();
