@@ -244,6 +244,44 @@ class MathUtilsTest {
     }
 
     @Test
+    void testFindIntersection() {
+        Vector2 a1 = new Vector2();
+        Vector2 a2 = new Vector2();
+        Vector2 b1 = new Vector2();
+        Vector2 b2 = new Vector2();
+        Vector2 out = new Vector2();
+
+        a1.set(0, 0);
+        a2.set(1, 1);
+        b1.set(0,-2);
+        b2.set(1, 2);
+        MathUtils.findIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(0.6666667f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.6666667f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        a1.set(0, 0);
+        a2.set(1, 1);
+        b1.set(0,0);
+        b2.set(-1, 1);
+        MathUtils.findIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(0, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        a1.set(0, 0);
+        a2.set(1, 1);
+        b1.set(0,1);
+        b2.set(1, 2);
+        Assertions.assertThrows(MathException.class, () -> MathUtils.findIntersection(a1, a2, b1, b2, out));
+
+        a1.set(0, 0);
+        a2.set(1, 1);
+        b1.set(0, 0);
+        b2.set(1, 1);
+        Assertions.assertThrows(MathException.class, () -> MathUtils.findIntersection(a1, a2, b1, b2, out));
+
+    }
+
+    @Test
     void testSin() {
     }
 

@@ -2,6 +2,7 @@ package org.example.engine.core.math;
 
 import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.CollectionsUtils;
+import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 import org.example.engine.core.shape.ShapeUtils;
 
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.example.engine.core.math.Matrix3x3.*;
+import static org.example.engine.core.math.Matrix2x2.*;
 
 // TODO: implement init() block that will take care of configuration.
 public final class MathUtils {
@@ -30,6 +31,9 @@ public final class MathUtils {
     private static final float   RADIANS_TO_INDEX     = SIN_COUNT / RADIANS_FULL;
     private static final float   DEGREES_TO_INDEX     = SIN_COUNT / DEGREES_FULL;
     private static final Random  random               = new Random();
+
+    private static final MemoryPool<Vector2>   vector2MemoryPool   = new MemoryPool<>(Vector2.class, 5);
+    private static final MemoryPool<Matrix2x2> matrix2x2MemoryPool = new MemoryPool<>(Matrix2x2.class, 2);
 
     private MathUtils() {}
 
@@ -243,6 +247,28 @@ public final class MathUtils {
         rad %= PI2;
         if (rad < 0) rad += PI2;
         return rad;
+    }
+
+    public static void findIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) throws MathException {
+        Vector2 D1 = vector2MemoryPool.allocate();
+        D1.x = a2.x - a1.x;
+        D1.y = a2.y - a1.y;
+
+        Vector2 D2 = vector2MemoryPool.allocate();
+        D2.x = b2.x - b1.x;
+        D2.y = b2.y - b1.y;
+
+        Matrix2x2 A = matrix2x2MemoryPool.allocate();
+        A.val[M00] =  D2.x;
+        A.val[M01] = -D1.x;
+        A.val[M10] =  D2.y;
+        A.val[M11] = -D1.y;
+
+        Vector2 B = vector2MemoryPool.allocate();
+        B.x = a1.x - b1.x;
+        B.y = a1.y - b1.y;
+
+        Matrix2x2.solve22(A, B, out);
     }
 
     public static boolean isZero(float value) {
