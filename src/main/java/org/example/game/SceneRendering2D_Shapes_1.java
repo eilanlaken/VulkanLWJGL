@@ -2,6 +2,7 @@ package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.assets.AssetStore;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
@@ -98,21 +99,14 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
 //        renderer2D.setTint(Color.BLACK);
 //        renderer2D.drawCircleFilled(0.1f, -0.30868483f,0.74523115f, 11, 0, 0, 0, 1, 1);
 
-        renderer2D.setTint(red);
-        renderer2D.drawCircleFilled(0.1f, -0.30868483f,0.5f, 11, 0, 0, 0, 1, 1);
-        renderer2D.setTint(green);
-        renderer2D.drawCircleFilled(0.1f, -0.30868483f,-0.5f, 11, 0, 0, 0, 1, 1);
-        renderer2D.setTint(blue);
-        renderer2D.drawCircleFilled(0.1f, -0.13528025f,0.5718265f, 11, 0, 0, 0, 1, 1);
-        renderer2D.setTint(Color.WHITE);
-        renderer2D.drawCircleFilled(0.1f, 0.5718265f,-0.13528025f, 11, 0, 0, 0, 1, 1);
-        renderer2D.setTint(Color.BLACK);
-        renderer2D.drawCircleFilled(0.1f, -0.30868483f,0.74523115f, 11, 0, 0, 0, 1, 1);
-
 
         renderer2D.setTint(new Color(0,0,0,0.1f));
-        renderer2D.drawCurveFilled(1f, 5, new Vector2(-4,0), new Vector2(0,0), new Vector2(4,4));
-
+        Array<Vector2> verts = renderer2D.drawCurveFilled(1f, 2, new Vector2(-4,0), new Vector2(0,0), new Vector2(4,4));
+        renderer2D.setTint(Color.BLACK);
+        System.out.println(verts);
+        for (int i = 0; i < verts.size; i++) {
+            renderer2D.drawCircleFilled(0.02f, verts.get(i).x,verts.get(i).y, 11, 0, 0, 0, 1, 1);
+        }
 
         renderer2D.end();
     }
