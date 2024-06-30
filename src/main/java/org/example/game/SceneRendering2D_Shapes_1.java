@@ -85,16 +85,30 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
         //renderer2D.drawLineFilled(-3,0,3,0, 8f, 18);
         //renderer2D.drawLineFilled(-3,0,3,3, 0.2f, 18);
         //renderer2D.drawCurveFilled(0.1f,new Vector2(-3,0), new Vector2(0,0), new Vector2(3,0), new Vector2(3,-3), new Vector2(0,-1));
+
+
+//        renderer2D.setTint(red);
+//        renderer2D.drawCircleFilled(0.1f, -0.30868483f,0.0f, 11, 0, 0, 0, 1, 1);
+//        renderer2D.setTint(green);
+//        renderer2D.drawCircleFilled(0.1f, -0.30868483f,0.5f, 11, 0, 0, 0, 1, 1);
+//        renderer2D.setTint(blue);
+//        renderer2D.drawCircleFilled(0.1f, 0.21827313f,0.21827313f, 11, 0, 0, 0, 1, 1);
+//        renderer2D.setTint(Color.WHITE);
+//        renderer2D.drawCircleFilled(0.1f, -0.13528025f,0.5718265f, 11, 0, 0, 0, 1, 1);
+//        renderer2D.setTint(Color.BLACK);
+//        renderer2D.drawCircleFilled(0.1f, -0.30868483f,0.74523115f, 11, 0, 0, 0, 1, 1);
+
         renderer2D.setTint(red);
-        renderer2D.drawCircleFilled(0.1f, -0.30868483f,0.0f, 11, 0, 0, 0, 1, 1);
-        renderer2D.setTint(green);
         renderer2D.drawCircleFilled(0.1f, -0.30868483f,0.5f, 11, 0, 0, 0, 1, 1);
+        renderer2D.setTint(green);
+        renderer2D.drawCircleFilled(0.1f, -0.30868483f,-0.5f, 11, 0, 0, 0, 1, 1);
         renderer2D.setTint(blue);
-        renderer2D.drawCircleFilled(0.1f, 0.21827313f,0.21827313f, 11, 0, 0, 0, 1, 1);
-        renderer2D.setTint(Color.WHITE);
         renderer2D.drawCircleFilled(0.1f, -0.13528025f,0.5718265f, 11, 0, 0, 0, 1, 1);
+        renderer2D.setTint(Color.WHITE);
+        renderer2D.drawCircleFilled(0.1f, 0.5718265f,-0.13528025f, 11, 0, 0, 0, 1, 1);
         renderer2D.setTint(Color.BLACK);
         renderer2D.drawCircleFilled(0.1f, -0.30868483f,0.74523115f, 11, 0, 0, 0, 1, 1);
+
 
         renderer2D.setTint(new Color(0,0,0,0.1f));
         renderer2D.drawCurveFilled(1f, 5, new Vector2(-4,0), new Vector2(0,0), new Vector2(4,4));

@@ -1267,35 +1267,42 @@ public class Renderer2D implements MemoryResourceHolder {
                 Vector2 normal_prev = vector2MemoryPool.allocate();
                 normal_prev.set(dir_prev);
                 normal_prev.rotate90(-1);
-                normal_prev.scl(t);
 
                 Vector2 normal_next = vector2MemoryPool.allocate();
                 normal_next.set(dir_next);
                 normal_next.rotate90(1);
-                normal_next.scl(t);
 
-                float a_n = Vector2.angleBetweenDeg(normal_prev, normal_next);
-                float a_v = Vector2.angleBetweenDeg(dir_prev, dir_next);
-                float a = (a_v - a_n) * 0.5f;
+                float an = Vector2.angleBetweenDeg(normal_prev, normal_next); // angle between normals
+                float av = Vector2.angleBetweenDeg(dir_prev, dir_next); // angle at the corner vertex
+                float a = (av - an) * 0.5f;
                 float l = t / (float) Math.tan(a);
+
+                // find cutoff points on curve
+                Vector2 c1 = vector2MemoryPool.allocate();
+                c1.set(corner);
+                c1.add(dir_prev.x * l, dir_prev.y * l);
+
+                Vector2 c2 = vector2MemoryPool.allocate();
+                c2.set(corner);
+                c2.add(dir_next.x * l, dir_next.y * l);
 
                 // find first  & second points on line segment 1
                 Vector2 a1 = vector2MemoryPool.allocate();
-                a1.set(corner);
-                a1.add(dir_prev.x * l, dir_prev.y * l);
+                a1.set(c1);
+                a1.add(normal_prev.x * t, normal_prev.y * t);
 
                 Vector2 a2 = vector2MemoryPool.allocate();
-                a2.set(a1);
-                a2.add(normal_prev);
+                a2.set(c1);
+                a2.add(-normal_prev.x * t, -normal_prev.y * t);
 
                 // find first  & second points on line segment 2
                 Vector2 b1 = vector2MemoryPool.allocate();
-                b1.set(corner);
-                b1.add(dir_next.x * l, dir_next.y * l);
+                b1.set(c2);
+                b1.add(normal_next.x * t, normal_next.y * t);
 
                 Vector2 b2 = vector2MemoryPool.allocate();
-                b2.set(b1);
-                b2.add(normal_next);
+                b2.set(c2);
+                b2.add(-normal_next.x * t, -normal_next.y * t);
 
                 Vector2 intersection = vector2MemoryPool.allocate();
 

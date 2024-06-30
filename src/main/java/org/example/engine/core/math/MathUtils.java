@@ -262,6 +262,8 @@ public final class MathUtils {
      * @throws MathException
      */
     public static void findIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) throws MathException {
+        if (a1.equals(a2)) throw new MathException("Points a1 and a2 cannot be equal.");
+        if (b1.equals(b2)) throw new MathException("Points b1 and b2 cannot be equal.");
         /* For line L1 passing through (a1, a2): */
         float A1 = a2.y - a1.y;
         float B1 = a1.x - a2.x;
