@@ -1218,7 +1218,7 @@ public class Renderer2D implements MemoryResourceHolder {
         setMode(GL11.GL_TRIANGLES);
 
         cornerSmoothness = Math.min(3, cornerSmoothness);
-        thickness *= 0.5f;
+        final float t = 0.5f * thickness;
 
         Array<Vector2> vertices = new Array<>(true, values.length);
         /* put vertices */
@@ -1235,31 +1235,81 @@ public class Renderer2D implements MemoryResourceHolder {
         norm.nor();
         norm.rotate90(1);
         Vector2 up_first = vector2MemoryPool.allocate();
-        up_first.x = values[0].x + thickness * norm.x;
-        up_first.y = values[0].y + thickness * norm.y;
+        up_first.x = values[0].x + t * norm.x;
+        up_first.y = values[0].y + t * norm.y;
         Vector2 down_first = vector2MemoryPool.allocate();
-        down_first.x = values[0].x - thickness * norm.x;
-        down_first.y = values[0].y - thickness * norm.y;
+        down_first.x = values[0].x - t * norm.x;
+        down_first.y = values[0].y - t * norm.y;
         vertices.add(down_first);
         vertices.add(up_first);
 
-        /* in-between vertices */
+        /* compute circular corner vertices */
         int skipped = 0;
         for (int i = 1; i < values.length - 1; i++) {
+
+            Vector2 corner = values[i];
+
             dir_prev.x = values[i].x - values[i-1].x;
             dir_prev.y = values[i].y - values[i-1].y;
             dir_prev.negate();
             dir_next.x = values[i+1].x - values[i].x;
             dir_next.y = values[i+1].y - values[i].y;
             float cross = Vector2.crs(dir_prev, dir_next);
-            if (cross == 0) { // we skip co-linear vertices
+            if (cross == 0) { // skip co-linear corners
                 skipped++;
                 continue;
             }
             dir_prev.nor();
             dir_next.nor();
+
+            // actual calculation
+            {
+                Vector2 normal_prev = vector2MemoryPool.allocate();
+                normal_prev.set(dir_prev);
+                normal_prev.rotate90(-1);
+                normal_prev.scl(t);
+
+                Vector2 normal_next = vector2MemoryPool.allocate();
+                normal_next.set(dir_next);
+                normal_next.rotate90(1);
+                normal_next.scl(t);
+
+                float a_n = Vector2.angleBetweenDeg(normal_prev, normal_next);
+                float a_v = Vector2.angleBetweenDeg(dir_prev, dir_next);
+                float a = (a_v - a_n) * 0.5f;
+                float l = t / (float) Math.tan(a);
+
+                // find first  & second points on line segment 1
+                Vector2 a1 = vector2MemoryPool.allocate();
+                a1.set(corner);
+                a1.add(dir_prev.x * l, dir_prev.y * l);
+
+                Vector2 a2 = vector2MemoryPool.allocate();
+                a2.set(a1);
+                a2.add(normal_prev);
+
+                // find first  & second points on line segment 2
+                Vector2 b1 = vector2MemoryPool.allocate();
+                b1.set(corner);
+                b1.add(dir_next.x * l, dir_next.y * l);
+
+                Vector2 b2 = vector2MemoryPool.allocate();
+                b2.set(b1);
+                b2.add(normal_next);
+
+                Vector2 intersection = vector2MemoryPool.allocate();
+
+                MathUtils.findIntersection(a1, a2, b1, b2, intersection);
+
+                System.out.println("intersection: " + intersection);
+                System.out.println(a1);
+                System.out.println(a2);
+                System.out.println(b1);
+                System.out.println(b2);
+            }
+
             float angle_between = Vector2.angleBetweenDeg(dir_prev, dir_next);
-            float length = thickness / MathUtils.sinDeg(angle_between * 0.5f);
+            float length = t / MathUtils.sinDeg(angle_between * 0.5f);
             v.x = dir_prev.x + dir_next.x;
             v.y = dir_prev.y + dir_next.y;
             v.nor().scl(length);
@@ -1284,11 +1334,11 @@ public class Renderer2D implements MemoryResourceHolder {
         norm.nor();
         norm.rotate90(1);
         Vector2 up_last   = vector2MemoryPool.allocate();
-        up_last.x = values[values.length - 1].x + thickness * norm.x;
-        up_last.y = values[values.length - 1].y + thickness * norm.y;
+        up_last.x = values[values.length - 1].x + t * norm.x;
+        up_last.y = values[values.length - 1].y + t * norm.y;
         Vector2 down_last = vector2MemoryPool.allocate();
-        down_last.x = values[values.length - 1].x - thickness * norm.x;
-        down_last.y = values[values.length - 1].y - thickness * norm.y;
+        down_last.x = values[values.length - 1].x - t * norm.x;
+        down_last.y = values[values.length - 1].y - t * norm.y;
         vertices.add(down_last);
         vertices.add(up_last);
 

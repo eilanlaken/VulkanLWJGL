@@ -2,14 +2,12 @@ package org.example.engine.core.math;
 
 import org.example.engine.core.memory.MemoryPool;
 
-/*
+/**
+ A column major matrix:
 <pre>
-    A column major matrix:
-
     M00 M01 M02
     M10 M11 M12
     M20 M21 M22
-
 </pre>
 */
 
@@ -24,7 +22,8 @@ public class Matrix3x3 implements MemoryPool.Reset {
     public static final int M20 = 2;
     public static final int M21 = 5;
     public static final int M22 = 8;
-    public float[] val = new float[9];
+
+    public  float[] val = new float[9];
     private float[] tmp = new float[9];
 
     public Matrix3x3() {

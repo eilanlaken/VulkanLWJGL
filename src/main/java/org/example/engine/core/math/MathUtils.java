@@ -249,26 +249,34 @@ public final class MathUtils {
         return rad;
     }
 
+    /**
+     * Finds the intersection of two lines L1 & L2
+     * where L1 is the line between (a1, a2)
+     * and   L2 is the line between (b1, b2).
+     * Stores the result in out.
+     * @param a1
+     * @param a2
+     * @param b1
+     * @param b2
+     * @param out
+     * @throws MathException
+     */
     public static void findIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) throws MathException {
-        Vector2 D1 = vector2MemoryPool.allocate();
-        D1.x = a2.x - a1.x;
-        D1.y = a2.y - a1.y;
-
-        Vector2 D2 = vector2MemoryPool.allocate();
-        D2.x = b2.x - b1.x;
-        D2.y = b2.y - b1.y;
-
-        Matrix2x2 A = matrix2x2MemoryPool.allocate();
-        A.val[M00] =  D2.x;
-        A.val[M01] = -D1.x;
-        A.val[M10] =  D2.y;
-        A.val[M11] = -D1.y;
-
-        Vector2 B = vector2MemoryPool.allocate();
-        B.x = a1.x - b1.x;
-        B.y = a1.y - b1.y;
-
-        Matrix2x2.solve22(A, B, out);
+        /* For line L1 passing through (a1, a2): */
+        float A1 = a2.y - a1.y;
+        float B1 = a1.x - a2.x;
+        float C1 = A1 * a1.x + B1 * a1.y;
+        /* For line L2 passing through (b1, b2): */
+        float A2 = b2.y - b1.y;
+        float B2 = b1.x - b2.x;
+        float C2 = A2 * b1.x + B2 * b1.y;
+        /* Calculate the determinant */
+        float det = A1 * B2 - A2 * B1;
+        /* If det == 0, then lines are either parallel or overlap */
+        if (isZero(det)) throw new MathException("Lines don't have a unique intersection (zero or infinite).");
+        /* Otherwise, we have a unique intersection. */
+        out.x = (B2 * C1 - B1 * C2) / det;
+        out.y = (A1 * C2 - A2 * C1) / det;
     }
 
     public static boolean isZero(float value) {
