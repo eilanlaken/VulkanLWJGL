@@ -100,14 +100,24 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
 //        renderer2D.drawCircleFilled(0.1f, -0.30868483f,0.74523115f, 11, 0, 0, 0, 1, 1);
 
 
-        renderer2D.setTint(new Color(0,0,0,0.1f));
-        Array<Vector2> verts = renderer2D.drawCurveFilled(1f, 2, new Vector2(-4,0), new Vector2(0,0), new Vector2(4,4));
-        renderer2D.setTint(Color.BLACK);
-        System.out.println(verts);
-        for (int i = 0; i < verts.size; i++) {
-            renderer2D.drawCircleFilled(0.02f, verts.get(i).x,verts.get(i).y, 11, 0, 0, 0, 1, 1);
-        }
+        //renderer2D.drawCurveFilled(1f, new Vector2(-4,0), new Vector2(0,0), new Vector2(4,4));
 
+        renderer2D.setTint(new Color(0,0,0,0.2f));
+
+        if (true) {
+            renderer2D.drawCurveFilled(1f, 3, new Vector2(-4,4), new Vector2(0,0), new Vector2(4,4));
+            //renderer2D.drawCurveFilled(1f, new Vector2(-4,-6), new Vector2(0,0), new Vector2(4,6));
+
+            //renderer2D.drawCurveFilled(1f, 3, new Vector2(-4,-4), new Vector2(0,0), new Vector2(4,4));
+        }
+        else {
+
+            Array<Vector2> verts = renderer2D.drawCurveFilled_0(1f, 2, new Vector2(-4, 0), new Vector2(0, 0), new Vector2(4, 4));
+            renderer2D.setTint(Color.BLACK);
+            for (int i = 0; i < verts.size; i+=2) {
+                renderer2D.drawCircleFilled(0.05f, verts.get(i).x, verts.get(i).y, 11, 0, 0, 0, 1, 1);
+            }
+        }
         renderer2D.end();
     }
 

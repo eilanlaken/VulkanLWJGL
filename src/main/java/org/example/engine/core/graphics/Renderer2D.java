@@ -1210,7 +1210,167 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += (values.length - skipped) * 2;
     }
 
-    public Array<Vector2> drawCurveFilled(float thickness, int refinement, final Vector2... values) {
+    // FIXME
+    public void drawCurveFilled(float thickness, int refinement, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values == null || values.length < 2) return;
+        if ((vertexIndex + 2 + (values.length - 2) * (refinement + 1) * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_TRIANGLES);
+
+        refinement = Math.max(1, refinement);
+        final float t = 0.5f * thickness;
+
+        Array<Vector2> vertices = new Array<>(true, values.length);
+        /* put vertices */
+
+        /* allocate required memory */
+        Vector2 norm = vector2MemoryPool.allocate();
+        Vector2 dir_prev = vector2MemoryPool.allocate();
+        Vector2 dir_next = vector2MemoryPool.allocate();
+        Vector2 normal_prev = vector2MemoryPool.allocate();
+        Vector2 normal_next = vector2MemoryPool.allocate();
+        Vector2 c1 = vector2MemoryPool.allocate();
+        Vector2 c2 = vector2MemoryPool.allocate();
+        Vector2 a1 = vector2MemoryPool.allocate();
+        Vector2 a2 = vector2MemoryPool.allocate();
+        Vector2 b1 = vector2MemoryPool.allocate();
+        Vector2 b2 = vector2MemoryPool.allocate();
+        Vector2 intersection = vector2MemoryPool.allocate();
+
+        /* first 2 vertices */
+        norm.x = values[1].x - values[0].x;
+        norm.y = values[1].y - values[0].y;
+        norm.nor();
+        norm.rotate90(1);
+        Vector2 up_first = vector2MemoryPool.allocate();
+        up_first.x = values[0].x + t * norm.x;
+        up_first.y = values[0].y + t * norm.y;
+        Vector2 down_first = vector2MemoryPool.allocate();
+        down_first.x = values[0].x - t * norm.x;
+        down_first.y = values[0].y - t * norm.y;
+        vertices.add(down_first);
+        vertices.add(up_first);
+
+        /* compute circular corner vertices */
+        int skipped = 0;
+        /* iterate over all internal corners */
+        for (int i = 1; i < values.length - 1; i++) {
+            Vector2 corner = values[i];
+            dir_prev.x = values[i].x - values[i-1].x;
+            dir_prev.y = values[i].y - values[i-1].y;
+            dir_prev.negate();
+            dir_next.x = values[i+1].x - values[i].x;
+            dir_next.y = values[i+1].y - values[i].y;
+
+            float cross = Vector2.crs(dir_prev, dir_next);
+            if (cross == 0) { // skip co-linear corners
+                skipped++;
+                continue;
+            }
+
+            dir_prev.nor();
+            dir_next.nor();
+
+            normal_prev.set(dir_prev);
+            normal_prev.rotate90(-1);
+
+            normal_next.set(dir_next);
+            normal_next.rotate90(1);
+
+            float an = Vector2.angleBetweenDeg(normal_prev, normal_next); // angle between normals
+            float av = Vector2.angleBetweenDeg(dir_prev, dir_next); // angle at the corner vertex
+            float a = (av - an) * 0.5f;
+            float l = t / (float) Math.cos(a);
+
+            // find cutoff points on curve
+            c1.set(corner);
+            c1.add(dir_prev.x * l, dir_prev.y * l);
+
+            c2.set(corner);
+            c2.add(dir_next.x * l, dir_next.y * l);
+
+            // find first  & second points on line segment 1
+            a1.set(c1);
+            a1.add(normal_prev.x * t, normal_prev.y * t);
+
+            a2.set(c1);
+            a2.add(-normal_prev.x * t, -normal_prev.y * t);
+
+            // find first  & second points on line segment 2
+            b1.set(c2);
+            b1.add(normal_next.x * t, normal_next.y * t);
+
+            b2.set(c2);
+            b2.add(-normal_next.x * t, -normal_next.y * t);
+
+            MathUtils.findIntersection(a1, a2, b1, b2, intersection);
+
+            float da = an / refinement;
+
+            for (int j = 0; j < refinement + 1; j++) {
+                Vector2 arm_1 = vector2MemoryPool.allocate();
+                Vector2 arm_2 = vector2MemoryPool.allocate();
+                arm_1.set(a1);
+                arm_2.set(a2);
+                arm_1.rotateAroundDeg(intersection, da * j);
+                arm_2.rotateAroundDeg(intersection, da * j);
+                vertices.add(arm_2);
+                vertices.add(arm_1);
+            }
+        }
+
+        /* last 2 vertices */
+        norm.x = values[values.length - 1].x - values[values.length - 2].x;
+        norm.y = values[values.length - 1].y - values[values.length - 2].y;
+        norm.nor();
+        norm.rotate90(1);
+        Vector2 up_last   = vector2MemoryPool.allocate();
+        up_last.x = values[values.length - 1].x + t * norm.x;
+        up_last.y = values[values.length - 1].y + t * norm.y;
+        Vector2 down_last = vector2MemoryPool.allocate();
+        down_last.x = values[values.length - 1].x - t * norm.x;
+        down_last.y = values[values.length - 1].y - t * norm.y;
+        vertices.add(down_last);
+        vertices.add(up_last);
+
+        for (int i = 0; i < vertices.size; i++) {
+            verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
+        }
+
+        /* put indices ("connect the dots") */
+        int startVertex = this.vertexIndex;
+        for (int i = 0; i < vertices.size - 2; i += 2) {
+            indicesBuffer.put(startVertex + i);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 3);
+        }
+        vertexIndex += vertices.size;
+
+        /* free memory */
+        vector2MemoryPool.free(up_first);
+        vector2MemoryPool.free(down_first);
+        vector2MemoryPool.free(up_last);
+        vector2MemoryPool.free(down_last);
+        vector2MemoryPool.free(norm);
+        vector2MemoryPool.free(dir_prev);
+        vector2MemoryPool.free(dir_next);
+        vector2MemoryPool.free(normal_prev);
+        vector2MemoryPool.free(normal_next);
+        vector2MemoryPool.free(c1);
+        vector2MemoryPool.free(c2);
+        vector2MemoryPool.free(a1);
+        vector2MemoryPool.free(a2);
+        vector2MemoryPool.free(b1);
+        vector2MemoryPool.free(b2);
+        vector2MemoryPool.free(intersection);
+    }
+
+    // TODO: remove
+    public Array<Vector2> drawCurveFilled_0(float thickness, int refinement, final Vector2... values) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (values == null || values.length < 2) return null;
         if ((vertexIndex + values.length * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
@@ -1236,8 +1396,6 @@ public class Renderer2D implements MemoryResourceHolder {
         Vector2 b1 = vector2MemoryPool.allocate();
         Vector2 b2 = vector2MemoryPool.allocate();
         Vector2 intersection = vector2MemoryPool.allocate();
-        Vector2 arm_1 = vector2MemoryPool.allocate();
-        Vector2 arm_2 = vector2MemoryPool.allocate();
 
         /* first 2 vertices */
         norm.x = values[1].x - values[0].x;
@@ -1312,12 +1470,14 @@ public class Renderer2D implements MemoryResourceHolder {
             float da = an / refinement;
 
             for (int j = 0; j < refinement + 1; j++) {
+                Vector2 arm_1 = vector2MemoryPool.allocate();
+                Vector2 arm_2 = vector2MemoryPool.allocate();
                 arm_1.set(a1);
                 arm_2.set(a2);
-                arm_1.rotateAroundDeg(intersection, da * i);
-                arm_2.rotateAroundDeg(intersection, da * i);
-                vertices.add(arm_1);
+                arm_1.rotateAroundDeg(intersection, da * j);
+                arm_2.rotateAroundDeg(intersection, da * j);
                 vertices.add(arm_2);
+                vertices.add(arm_1);
             }
 
 
