@@ -102,24 +102,43 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
 
         //renderer2D.drawCurveFilled(1f, new Vector2(-4,0), new Vector2(0,0), new Vector2(4,4));
 
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) dy += GraphicsUtils.getDeltaTime();
+        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) dy -= GraphicsUtils.getDeltaTime();
+
         renderer2D.setTint(new Color(0,0,0,0.2f));
 
-        if (true) {
-            renderer2D.drawCurveFilled(1f, 3, new Vector2(-4,4), new Vector2(0,0), new Vector2(4,4));
-            //renderer2D.drawCurveFilled(1f, new Vector2(-4,-6), new Vector2(0,0), new Vector2(4,6));
+        if (false) {
+            // ~
+            renderer2D.drawCurveFilled_1(0.6f, 3, new Vector2(-4,4 + dy), new Vector2(0,0), new Vector2(4,4 + dy));
 
-            //renderer2D.drawCurveFilled(1f, 3, new Vector2(-4,-4), new Vector2(0,0), new Vector2(4,4));
+            // V
+            //renderer2D.drawCurveFilled(0.6f, 3, new Vector2(-2,4), new Vector2(0,0), new Vector2(2,4));
+
+            // happy
+            //renderer2D.drawCurveFilled(0.6f, 3, new Vector2(-4,4), new Vector2(0,0), new Vector2(4,4));
+
+            // sad
+            //renderer2D.drawCurveFilled(0.6f, 3, new Vector2(-4,-4), new Vector2(0,0), new Vector2(4,-4));
+
+            // Nike
+            //renderer2D.drawCurveFilled(0.6f, 3, new Vector2(-4,-4), new Vector2(0,-4), new Vector2(4,0));
+
+            // ---
+            //renderer2D.drawCurveFilled(0.6f, 3, new Vector2(-4,-4), new Vector2(0,0), new Vector2(4,4));
         }
         else {
+            renderer2D.drawCurveFilled(1f, new Vector2(-4, 0), new Vector2(0, 0), new Vector2(4, 4));
 
-            Array<Vector2> verts = renderer2D.drawCurveFilled_0(1f, 2, new Vector2(-4, 0), new Vector2(0, 0), new Vector2(4, 4));
+            Array<Vector2> verts = renderer2D.drawCurveFilled_1(1f, 2, new Vector2(-4, 0), new Vector2(0, 0), new Vector2(4, 4));
             renderer2D.setTint(Color.BLACK);
-            for (int i = 0; i < verts.size; i+=2) {
+            for (int i = 0; i < verts.size; i++) {
                 renderer2D.drawCircleFilled(0.05f, verts.get(i).x, verts.get(i).y, 11, 0, 0, 0, 1, 1);
             }
         }
         renderer2D.end();
     }
+
+    float dy = 0;
 
     @Override
     public void resize(int width, int height) { }

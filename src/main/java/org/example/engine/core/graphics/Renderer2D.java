@@ -1,6 +1,7 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Matrix2x2;
@@ -1225,6 +1226,130 @@ public class Renderer2D implements MemoryResourceHolder {
         /* put vertices */
 
         /* allocate required memory */
+        Vector2 edgeNormal = vector2MemoryPool.allocate();
+        Vector2 dir_prev = vector2MemoryPool.allocate();
+        Vector2 dir_next = vector2MemoryPool.allocate();
+        Vector2 normal_prev = vector2MemoryPool.allocate();
+        Vector2 normal_next = vector2MemoryPool.allocate();
+        Vector2 norm = vector2MemoryPool.allocate();
+
+        /* first 2 vertices */
+        edgeNormal.x = values[1].x - values[0].x;
+        edgeNormal.y = values[1].y - values[0].y;
+        edgeNormal.nor();
+        edgeNormal.rotate90(1);
+        Vector2 up_first = vector2MemoryPool.allocate();
+        up_first.x = values[0].x + t * edgeNormal.x;
+        up_first.y = values[0].y + t * edgeNormal.y;
+        Vector2 down_first = vector2MemoryPool.allocate();
+        down_first.x = values[0].x - t * edgeNormal.x;
+        down_first.y = values[0].y - t * edgeNormal.y;
+        vertices.add(down_first);
+        vertices.add(up_first);
+
+        /* compute circular corner vertices */
+        /* iterate over all internal corners */
+        for (int i = 1; i < values.length - 1; i++) {
+            Vector2 corner = values[i];
+            dir_prev.x = values[i].x - values[i-1].x;
+            dir_prev.y = values[i].y - values[i-1].y;
+            dir_prev.negate();
+            dir_next.x = values[i+1].x - values[i].x;
+            dir_next.y = values[i+1].y - values[i].y;
+
+            float cross = Vector2.crs(dir_prev, dir_next);
+            if (cross == 0) { // skip co-linear corners
+                continue;
+            }
+
+            dir_prev.nor();
+            dir_next.nor();
+
+            normal_prev.set(dir_prev);
+            normal_prev.rotate90(-1);
+
+            normal_next.set(dir_next);
+            normal_next.rotate90(1);
+
+            float an = Vector2.angleBetweenDeg(normal_prev, normal_next); // angle between normals
+            float da = an / refinement;
+            norm.x = normal_prev.x + normal_next.x;
+            norm.y = normal_prev.y + normal_next.y;
+            norm.nor();
+            norm.scl(t);
+
+            for (int j = 0; j < refinement + 1; j++) {
+                Vector2 arm_1 = vector2MemoryPool.allocate();
+                Vector2 arm_2 = vector2MemoryPool.allocate();
+                arm_1.set(normal_prev);
+                arm_1.rotateDeg(da * j);
+                arm_1.add(corner);
+
+                arm_2.x = arm_1.x - norm.x;
+                arm_2.y = arm_1.y - norm.y;
+                vertices.add(arm_2);
+                vertices.add(arm_1);
+            }
+        }
+
+        /* last 2 vertices */
+        edgeNormal.x = values[values.length - 1].x - values[values.length - 2].x;
+        edgeNormal.y = values[values.length - 1].y - values[values.length - 2].y;
+        edgeNormal.nor();
+        edgeNormal.rotate90(1);
+        Vector2 up_last   = vector2MemoryPool.allocate();
+        up_last.x = values[values.length - 1].x + t * edgeNormal.x;
+        up_last.y = values[values.length - 1].y + t * edgeNormal.y;
+        Vector2 down_last = vector2MemoryPool.allocate();
+        down_last.x = values[values.length - 1].x - t * edgeNormal.x;
+        down_last.y = values[values.length - 1].y - t * edgeNormal.y;
+        vertices.add(down_last);
+        vertices.add(up_last);
+
+        for (int i = 0; i < vertices.size; i++) {
+            verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
+        }
+
+        /* put indices ("connect the dots") */
+        int startVertex = this.vertexIndex;
+        for (int i = 0; i < vertices.size - 2; i += 2) {
+            indicesBuffer.put(startVertex + i);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 3);
+        }
+        vertexIndex += vertices.size;
+
+        /* free memory */
+        vector2MemoryPool.free(up_first);
+        vector2MemoryPool.free(down_first);
+        vector2MemoryPool.free(up_last);
+        vector2MemoryPool.free(down_last);
+        vector2MemoryPool.free(edgeNormal);
+        vector2MemoryPool.free(dir_prev);
+        vector2MemoryPool.free(dir_next);
+        vector2MemoryPool.free(normal_prev);
+        vector2MemoryPool.free(normal_next);
+        vector2MemoryPool.free(norm);
+    }
+
+    // TODO: remove
+    public void drawCurveFilled_broken(float thickness, int refinement, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values == null || values.length < 2) return;
+        if ((vertexIndex + 2 + (values.length - 2) * (refinement + 1) * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_TRIANGLES);
+
+        refinement = Math.max(1, refinement);
+        final float t = 0.5f * thickness;
+
+        Array<Vector2> vertices = new Array<>(true, values.length);
+        /* put vertices */
+
+        /* allocate required memory */
         Vector2 norm = vector2MemoryPool.allocate();
         Vector2 dir_prev = vector2MemoryPool.allocate();
         Vector2 dir_next = vector2MemoryPool.allocate();
@@ -1307,6 +1432,12 @@ public class Renderer2D implements MemoryResourceHolder {
             MathUtils.findIntersection(a1, a2, b1, b2, intersection);
 
             float da = an / refinement;
+
+            if (InputMouse.isButtonClicked(InputMouse.Button.LEFT)) {
+                System.out.println("an " + an);
+                System.out.println("av " + av);
+                System.out.println("a " + a);
+            }
 
             for (int j = 0; j < refinement + 1; j++) {
                 Vector2 arm_1 = vector2MemoryPool.allocate();
@@ -1534,6 +1665,137 @@ public class Renderer2D implements MemoryResourceHolder {
         vector2MemoryPool.free(intersection);
         //vector2MemoryPool.free(arm_1);
         //vector2MemoryPool.free(arm_2);
+
+        //vertexIndex += 2 + (values.length - 2 - skipped) * (refinement + 1) * 2;
+
+        return vertices;
+    }// TODO: remove
+
+    public Array<Vector2> drawCurveFilled_1(float thickness, int refinement, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values == null || values.length < 2) return null;
+        if ((vertexIndex + values.length * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_TRIANGLES);
+
+        refinement = Math.max(1, refinement);
+        final float t = 0.5f * thickness;
+
+        Array<Vector2> vertices = new Array<>(true, values.length);
+        /* put vertices */
+
+        /* allocate required memory */
+        Vector2 norm = vector2MemoryPool.allocate();
+        Vector2 dir_prev = vector2MemoryPool.allocate();
+        Vector2 dir_next = vector2MemoryPool.allocate();
+        Vector2 normal_prev = vector2MemoryPool.allocate();
+        Vector2 normal_next = vector2MemoryPool.allocate();
+
+
+        /* first 2 vertices */
+        norm.x = values[1].x - values[0].x;
+        norm.y = values[1].y - values[0].y;
+        norm.nor();
+        norm.rotate90(1);
+        Vector2 up_first = vector2MemoryPool.allocate();
+        up_first.x = values[0].x + t * norm.x;
+        up_first.y = values[0].y + t * norm.y;
+        Vector2 down_first = vector2MemoryPool.allocate();
+        down_first.x = values[0].x - t * norm.x;
+        down_first.y = values[0].y - t * norm.y;
+        vertices.add(down_first);
+        vertices.add(up_first);
+
+
+
+        /* compute circular corner vertices */
+        int skipped = 0;
+        /* iterate over all internal corners */
+        for (int i = 1; i < values.length - 1; i++) {
+            //if (true) continue;
+            Vector2 corner = values[i];
+            dir_prev.x = values[i].x - values[i-1].x;
+            dir_prev.y = values[i].y - values[i-1].y;
+            dir_prev.negate();
+            dir_next.x = values[i+1].x - values[i].x;
+            dir_next.y = values[i+1].y - values[i].y;
+
+            float cross = Vector2.crs(dir_prev, dir_next);
+            if (cross == 0) { // skip co-linear corners
+                skipped++;
+                continue;
+            }
+
+            dir_prev.nor();
+            dir_next.nor();
+
+            normal_prev.set(dir_prev);
+            normal_prev.rotate90(-1);
+
+            normal_next.set(dir_next);
+            normal_next.rotate90(1);
+
+            float av = Vector2.angleBetweenDeg(dir_prev, dir_next); // angle between normals
+            float an = Vector2.angleBetweenDeg(normal_prev, normal_next); // angle between normals
+            float da = an / refinement;
+
+            System.out.println(MathUtils.cosDeg(av / 2));
+
+            norm.set(normal_prev).add(normal_next).nor().scl(2*t / MathUtils.sinDeg(av / 2));
+
+            for (int j = 0; j < refinement + 1; j++) {
+
+            }
+
+            Vector2 test1 = vector2MemoryPool.allocate();
+            test1.set(corner).add(-normal_prev.x * t, -normal_prev.y * t);
+
+            Vector2 test2 = vector2MemoryPool.allocate();
+            test2.set(-normal_prev.x * t, -normal_prev.y * t).rotateDeg(an/2).add(corner);
+
+            Vector2 test3 = vector2MemoryPool.allocate();
+            test3.set(-normal_prev.x * t, -normal_prev.y * t).rotateDeg(an).add(corner);
+
+
+
+
+            Vector2 test_1 = vector2MemoryPool.allocate();
+            test_1.set(test1).add(norm);
+
+            Vector2 test_2 = vector2MemoryPool.allocate();
+            test_2.set(-normal_prev.x * t, -normal_prev.y * t).rotateDeg(an/2).add(corner);
+
+            Vector2 test_3 = vector2MemoryPool.allocate();
+            test_3.set(-normal_prev.x * t, -normal_prev.y * t).rotateDeg(an).add(corner);
+
+            vertices.add(corner);
+            vertices.add(test1);
+            //vertices.add(test2);
+            //vertices.add(test3);
+
+            vertices.add(test_1);
+
+        }
+
+        /* last 2 vertices */
+        norm.x = values[values.length - 1].x - values[values.length - 2].x;
+        norm.y = values[values.length - 1].y - values[values.length - 2].y;
+        norm.nor();
+        norm.rotate90(1);
+        Vector2 up_last   = vector2MemoryPool.allocate();
+        up_last.x = values[values.length - 1].x + t * norm.x;
+        up_last.y = values[values.length - 1].y + t * norm.y;
+        Vector2 down_last = vector2MemoryPool.allocate();
+        down_last.x = values[values.length - 1].x - t * norm.x;
+        down_last.y = values[values.length - 1].y - t * norm.y;
+        vertices.add(down_last);
+        vertices.add(up_last);
+
+        // TODO: un-comment
+        for (int i = 0; i < vertices.size; i++) {
+            //verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
+        }
+
 
         //vertexIndex += 2 + (values.length - 2 - skipped) * (refinement + 1) * 2;
 
