@@ -1739,34 +1739,48 @@ public class Renderer2D implements MemoryResourceHolder {
             float an = Vector2.angleBetweenDeg(normal_prev, normal_next); // angle between normals
             float da = an / refinement;
 
-            System.out.println(MathUtils.cosDeg(av / 2));
-
             norm.set(normal_prev).add(normal_next).nor().scl(2*t / MathUtils.sinDeg(av / 2));
+
+            float c = Vector2.crs(normal_prev, normal_next);
+
+            if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) System.out.println("c: " + c);
+            if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) System.out.println("c: " + c);
 
             for (int j = 0; j < refinement + 1; j++) {
 
             }
 
             Vector2 test1 = vector2MemoryPool.allocate();
-            test1.set(corner).add(-normal_prev.x * t, -normal_prev.y * t);
-
             Vector2 test2 = vector2MemoryPool.allocate();
-            test2.set(-normal_prev.x * t, -normal_prev.y * t).rotateDeg(an/2).add(corner);
-
             Vector2 test3 = vector2MemoryPool.allocate();
-            test3.set(-normal_prev.x * t, -normal_prev.y * t).rotateDeg(an).add(corner);
-
-
-
-
             Vector2 test_1 = vector2MemoryPool.allocate();
-            test_1.set(test1).add(norm);
-
             Vector2 test_2 = vector2MemoryPool.allocate();
-            test_2.set(test2).add(norm);
-
             Vector2 test_3 = vector2MemoryPool.allocate();
-            test_3.set(test3).add(norm);
+
+
+
+            if (c > 0) {
+                if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) System.out.println("less");
+                if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) System.out.println("less");
+                test1.set(corner).add(-normal_prev.x * t, -normal_prev.y * t);
+                test2.set(-normal_prev.x * t, -normal_prev.y * t).rotateDeg(an/2).add(corner);
+                test3.set(-normal_prev.x * t, -normal_prev.y * t).rotateDeg(an).add(corner);
+                test_1.set(test1).add(norm);
+                test_2.set(test2).add(norm);
+                test_3.set(test3).add(norm);
+            } else {
+                if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) System.out.println("more");
+                if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) System.out.println("more");
+                if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) System.out.println("less");
+                if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) System.out.println("less");
+                test1.set(corner).add(normal_prev.x * t, normal_prev.y * t);
+                test2.set(normal_prev.x * t, normal_prev.y * t).rotateDeg(-an/2).add(corner);
+                test3.set(normal_prev.x * t, normal_prev.y * t).rotateDeg(-an).add(corner);
+                test_1.set(test1).add(-norm.x, -norm.y);
+                test_2.set(test2).add(-norm.x, -norm.y);
+                test_3.set(test3).add(-norm.x, -norm.y);
+
+            }
 
             vertices.add(corner);
 
@@ -1774,9 +1788,9 @@ public class Renderer2D implements MemoryResourceHolder {
             vertices.add(test2);
             vertices.add(test3);
 
-            vertices.add(test_1);
-            vertices.add(test_2);
-            vertices.add(test_3);
+            //vertices.add(test_1);
+            //vertices.add(test_2);
+            //vertices.add(test_3);
 
         }
 
