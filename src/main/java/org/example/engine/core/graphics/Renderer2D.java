@@ -1763,17 +1763,20 @@ public class Renderer2D implements MemoryResourceHolder {
             test_1.set(test1).add(norm);
 
             Vector2 test_2 = vector2MemoryPool.allocate();
-            test_2.set(-normal_prev.x * t, -normal_prev.y * t).rotateDeg(an/2).add(corner);
+            test_2.set(test2).add(norm);
 
             Vector2 test_3 = vector2MemoryPool.allocate();
-            test_3.set(-normal_prev.x * t, -normal_prev.y * t).rotateDeg(an).add(corner);
+            test_3.set(test3).add(norm);
 
             vertices.add(corner);
+
             vertices.add(test1);
-            //vertices.add(test2);
-            //vertices.add(test3);
+            vertices.add(test2);
+            vertices.add(test3);
 
             vertices.add(test_1);
+            vertices.add(test_2);
+            vertices.add(test_3);
 
         }
 
