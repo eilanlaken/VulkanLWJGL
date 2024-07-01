@@ -1788,9 +1788,9 @@ public class Renderer2D implements MemoryResourceHolder {
             vertices.add(test2);
             vertices.add(test3);
 
-            //vertices.add(test_1);
-            //vertices.add(test_2);
-            //vertices.add(test_3);
+            vertices.add(test_1);
+            vertices.add(test_2);
+            vertices.add(test_3);
 
         }
 
