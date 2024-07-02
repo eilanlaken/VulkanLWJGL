@@ -94,12 +94,6 @@ public class Vector2 implements MemoryPool.Reset {
         return this;
     }
 
-    public Vector2 negate() {
-        this.x = -this.x;
-        this.y = -this.y;
-        return this;
-    }
-
     public Vector2 add(Vector2 v) {
         x += v.x;
         y += v.y;

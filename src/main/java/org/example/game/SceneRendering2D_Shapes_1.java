@@ -127,10 +127,12 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
             //renderer2D.drawCurveFilled(0.6f, 3, new Vector2(-4,-4), new Vector2(0,0), new Vector2(4,4));
         }
         else {
-            renderer2D.drawCurveFilled(1f, new Vector2(-4, 0), new Vector2(0, 0), new Vector2(4, -4 + dy * 2));
+            //renderer2D.drawCurveFilled(1f, new Vector2(-4, 0), new Vector2(0, 0), new Vector2(4, -4 + dy * 2));
 
-            Array<Vector2> vertices_1 = renderer2D.drawCurveFilled_1(1f, 2, new Vector2(-4, 0), new Vector2(0, 0), new Vector2(4, 4));
-            Array<Vector2> vertices_2 = renderer2D.drawCurveFilled_1(1f, 2, new Vector2(-4, 0), new Vector2(0, 0), new Vector2(4, -4 + dy * 2));
+            // V
+            renderer2D.drawCurveFilled(0.6f, new Vector2(-2,4), new Vector2(0,0), new Vector2(2,4));
+
+            Array<Vector2> vertices_2 = renderer2D.drawCurveFilled_2(0.6f, 12, new Vector2(-2,4 + dy), new Vector2(0,0), new Vector2(2,4 + dy));
             renderer2D.setTint(Color.BLACK);
             for (int i = 0; i < vertices_2.size; i++) {
                 renderer2D.drawCircleFilled(0.05f, vertices_2.get(i).x, vertices_2.get(i).y, 11, 0, 0, 0, 1, 1);
