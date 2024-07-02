@@ -1272,7 +1272,8 @@ public class Renderer2D implements MemoryResourceHolder {
             float an = Vector2.angleBetweenDeg(normal_prev, normal_next); // angle between normals
             float da = an / refinement;
 
-            norm.set(normal_prev).add(normal_next).nor().scl(2*t / MathUtils.sinDeg(av / 2));
+            //norm.set(normal_prev).add(normal_next).nor().scl(2*t / MathUtils.sinDeg(av / 2));
+            norm.set(normal_prev).add(normal_next).nor().scl(t / MathUtils.sinDeg(av / 2)); // <- looks better
             float sign = Math.signum(cross);
 
             for (int j = 0; j < refinement + 1; j++) {
@@ -1280,12 +1281,14 @@ public class Renderer2D implements MemoryResourceHolder {
                 Vector2 v2 = vector2MemoryPool.allocate();
                 if (sign < 0) {
                     v1.set(sign * normal_prev.x * t, sign * normal_prev.y * t).rotateDeg(da * j).add(corner);
-                    v2.set(v1).add(norm.x, norm.y);
+                    //v2.set(v1).add(norm.x, norm.y);
+                    v2.set(corner).add(norm.x, norm.y); // <- looks better
                     vertices.add(v1);
                     vertices.add(v2);
                 } else {
                     v1.set(sign * normal_prev.x * t, sign * normal_prev.y * t).rotateDeg(-da * j).add(corner);
-                    v2.set(v1).add(-norm.x, -norm.y);
+                    //v2.set(v1).add(-norm.x, -norm.y);
+                    v2.set(corner).add(-norm.x, -norm.y); // <- looks better
                     vertices.add(v2);
                     vertices.add(v1);
                 }
@@ -1366,7 +1369,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
         // put indices for half-circle 0
         for (int i = 0; i < refinement - 1; i++) {
-            indicesBuffer.put(startVertex + curveEndIndex + 1);
+            indicesBuffer.put(startVertex + curveEndIndex + 1 + 0);
             indicesBuffer.put(startVertex + curveEndIndex + 1 + i + 1);
             indicesBuffer.put(startVertex + curveEndIndex + 1 + i + 2);
         }
