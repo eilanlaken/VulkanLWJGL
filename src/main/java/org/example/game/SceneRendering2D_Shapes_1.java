@@ -105,7 +105,6 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) dy += GraphicsUtils.getDeltaTime();
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) dy -= GraphicsUtils.getDeltaTime();
 
-        renderer2D.setTint(new Color(0,0,0,0.2f));
 
         if (false) {
             // ~
@@ -130,9 +129,22 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
             //renderer2D.drawCurveFilled(1f, new Vector2(-4, 0), new Vector2(0, 0), new Vector2(4, -4 + dy * 2));
 
             // V
+            renderer2D.setTint(red);
+//            renderer2D.drawCircleFilled(0.1f, 10, -1.7316718f, 4.134164f, 0, 0, 0, 1,1);
+//            renderer2D.drawCircleFilled(0.1f, 10, -1.9820062f, 4.29946f, 0, 0, 0, 1,1);
+//            renderer2D.drawCircleFilled(0.1f, 10, -2.250364f, 4.165281f, 0, 0, 0, 1,1);
+//            renderer2D.drawCircleFilled(0.1f, 10, -2.2683282f, 3.865836f, 0, 0, 0, 1,1);
+
+            renderer2D.setTint(Color.WHITE);
+            //renderer2D.drawCircleFilled(0.1f, 10, -2.0f, 4.0f, 0, 0, 0, 1,1);
+
+
+
             //renderer2D.drawCurveFilled(0.6f, new Vector2(-2,4), new Vector2(0,0), new Vector2(2,4));
-            renderer2D.drawCurveFilled(0.6f, 12,  new Vector2(-2,4 + dy), new Vector2(0,0), new Vector2(2,4 + dy));
-            renderer2D.drawCurveFilled(0.6f, 12,  new Vector2(-2,4 + dy - 3), new Vector2(0,0 - 3), new Vector2(2,4 + dy - 3));
+            renderer2D.setTint(new Color(0,0,0,0.2f));
+            //renderer2D.drawCurveFilled(0.6f, 3,  new Vector2(-2,4 + dy), new Vector2(0,0), new Vector2(2,4 + dy));
+            renderer2D.drawCurveFilled(0.6f, 10,  new Vector2(-2,4 + dy), new Vector2(0,0), new Vector2(2,4 + dy));
+            //renderer2D.drawCurveFilled(0.6f, 12,  new Vector2(-2,4 + dy - 3), new Vector2(0,0 - 3), new Vector2(2,4 + dy - 3));
 
         }
         renderer2D.end();
