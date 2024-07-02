@@ -1899,7 +1899,7 @@ public class Renderer2D implements MemoryResourceHolder {
                     vertices.add(v2);
                 } else {
                     v1.set(sign * normal_prev.x * t, sign * normal_prev.y * t).rotateDeg(-da * j).add(corner);
-                    v2.set(v1).add(norm.x, norm.y);
+                    v2.set(v1).add(-norm.x, -norm.y);
                     vertices.add(v1);
                     vertices.add(v2);
                 }
