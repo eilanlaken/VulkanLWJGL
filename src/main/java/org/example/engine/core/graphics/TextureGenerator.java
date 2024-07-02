@@ -17,7 +17,7 @@ public final class TextureGenerator {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                image.setRGB(i, j, 0xFFFFFF);
+                image.setRGB(i, j, Color.RED.toIntBits());
             }
         }
 

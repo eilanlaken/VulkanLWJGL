@@ -336,7 +336,7 @@ public class Color {
     /** Packs the color components into a 32-bit integer with the format ABGR.
      * @return the packed color as a 32-bit int. */
     public int toIntBits() {
-        return ((int)(255 * a) << 24) | ((int)(255 * b) << 16) | ((int)(255 * g) << 8) | ((int)(255 * r));
+        return ((int)(255 * a) << 24) | ((int)(255 * r) << 16) | ((int)(255 * g) << 8) | ((int)(255 * b));
     }
 
     /** Returns the color encoded as hex string with the format RRGGBBAA. */

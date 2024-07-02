@@ -11,7 +11,7 @@ public class Main {
 
         /* texture generator tests */
         try {
-            TextureGenerator.generateTextureNoisePerlin(128, 128, "assets/textures/hi.png", false);
+            TextureGenerator.generateTextureNoisePerlin(128, 128, "assets/textures/hi", false);
         } catch (Exception e) {
 
         }
