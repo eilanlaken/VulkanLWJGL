@@ -1306,30 +1306,45 @@ public class Renderer2D implements MemoryResourceHolder {
         vertices.add(down_last);
         vertices.add(up_last);
 
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.Y)) System.out.println(vertices);
-
         final int curveEndIndex = vertices.size;
 
-        /* put far edges half circles */
+        /* add far edges half circles */
         final float da = 180.0f / (refinement);
-        /* half circle 1: */
 
         Vector2 p_0 = vector2MemoryPool.allocate();
         p_0.x = vertices.get(1).x - vertices.get(0).x;
         p_0.y = vertices.get(1).y - vertices.get(0).y;
         p_0.nor();
         p_0.scl(t);
+        Vector2 p_1 = vector2MemoryPool.allocate();
+        p_1.x = vertices.get(vertices.size - 1).x - vertices.get(vertices.size - 2).x;
+        p_1.y = vertices.get(vertices.size - 1).y - vertices.get(vertices.size - 2).y;
+        p_1.nor();
+        p_1.scl(t);
 
-        /* put center 0 */
+        /* add center 0 */
         Vector2 center_0 = vector2MemoryPool.allocate();
         center_0.x = values[0].x;
         center_0.y = values[0].y;
         vertices.add(center_0);
-        /* half circle 0: */
+        /* add half circle 0: */
         for (int i = 0; i < refinement + 1; i++) {
             Vector2 vertex = vector2MemoryPool.allocate();
             vertex.set(p_0);
             vertex.rotateDeg(da * i).add(center_0);
+            vertices.add(vertex);
+        }
+
+        /* add center 1 */
+        Vector2 center_1 = vector2MemoryPool.allocate();
+        center_1.x = values[values.length - 1].x;
+        center_1.y = values[values.length - 1].y;
+        vertices.add(center_1);
+        /* add half circle 1: */
+        for (int i = 0; i < refinement + 2; i++) {
+            Vector2 vertex = vector2MemoryPool.allocate();
+            vertex.set(p_1);
+            vertex.rotateDeg(-da * i).add(center_1);
             vertices.add(vertex);
         }
 
@@ -1349,26 +1364,21 @@ public class Renderer2D implements MemoryResourceHolder {
             indicesBuffer.put(startVertex + i + 3);
         }
 
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.Q)) System.out.println(indicesBuffer);
-
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.A)) System.out.println(indicesBuffer);
-
-
         // put indices for half-circle 0
-        for (int i = 0; i < refinement -1; i++) {
+        for (int i = 0; i < refinement - 1; i++) {
             indicesBuffer.put(startVertex + curveEndIndex + 1);
             indicesBuffer.put(startVertex + curveEndIndex + 1 + i + 1);
             indicesBuffer.put(startVertex + curveEndIndex + 1 + i + 2);
         }
 
-//        // put indices for circle 1
-//        for (int i = 0; i < refinement + 1; i++) {
-//            indicesBuffer.put(startVertex + vertices.size + refinement + 1 + 1);
-//            indicesBuffer.put(startVertex + vertices.size + refinement + 1 + 1 + i + 1);
-//            indicesBuffer.put(startVertex + vertices.size + refinement + 1 + 1 + i + 2);
-//        }
+        // put indices for circle 1
+        for (int i = 0; i < refinement; i++) {
+            indicesBuffer.put(startVertex + curveEndIndex + refinement + 2 + 0);
+            indicesBuffer.put(startVertex + curveEndIndex + refinement + 2 + i + 1);
+            indicesBuffer.put(startVertex + curveEndIndex + refinement + 2 + i + 2);
+        }
 
-        vertexIndex += vertices.size + 3;
+        vertexIndex += vertices.size;
 
         /* free memory */
         vector2MemoryPool.free(up_first);
@@ -1382,6 +1392,7 @@ public class Renderer2D implements MemoryResourceHolder {
         vector2MemoryPool.free(normal_prev);
         vector2MemoryPool.free(normal_next);
         vector2MemoryPool.free(p_0);
+        vector2MemoryPool.free(p_1);
 
     }
 
