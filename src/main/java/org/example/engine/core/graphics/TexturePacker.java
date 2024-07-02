@@ -55,9 +55,8 @@ public class TexturePacker {
     private static synchronized boolean pack(Options options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack, Array<PackedRegionData> remaining, int last, int currentImageIndex) {
         if (last < 0) return true;
         int size = 1;
-        System.out.println("last: " + last);
+
         while (size <= options.maxTexturesSize) {
-            System.out.println(remaining.size + ": " + "<" + size + ">");
             STBRPContext context = STBRPContext.create();
             STBRPNode.Buffer nodes = STBRPNode.create(size); // Number of nodes can be context width
             STBRectPack.stbrp_init_target(context, size, size, nodes);
@@ -167,7 +166,6 @@ public class TexturePacker {
     private static synchronized void generatePackTextureFiles(final Options options, Map<IndexedBufferedImage, Array<PackedRegionData>> texturePack) throws IOException {
         for (Map.Entry<IndexedBufferedImage, Array<PackedRegionData>> imageRegions : texturePack.entrySet()) {
             IndexedBufferedImage texturePackImage = imageRegions.getKey();
-            Graphics2D graphics = texturePackImage.createGraphics();
             for (PackedRegionData region : imageRegions.getValue()) {
                 File sourceImageFile = new File(region.name);
                 BufferedImage sourceImage = ImageIO.read(sourceImageFile);
@@ -175,8 +173,7 @@ public class TexturePacker {
                 // copy non-transparent region
                 for (int y = region.y; y < region.y + region.packedHeight; y++) {
                     for (int x = region.x; x < region.x + region.packedWidth; x++) {
-                        int color = 0;
-                        color = sourceImage.getRGB(region.minX + x - region.x, region.minY + y - region.y);
+                        int color = sourceImage.getRGB(region.minX + x - region.x, region.minY + y - region.y);
                         texturePackImage.setRGB(x,y,color);
                     }
                 }
@@ -213,9 +210,9 @@ public class TexturePacker {
                     }
                 }
             }
+            // TODO: use asset utils.
             File outputFile = new File(options.outputDirectory + File.separator + options.outputName + "_" + texturePackImage.index + ".png");
             ImageIO.write(texturePackImage, "png", outputFile);
-            graphics.dispose();
         }
     }
 

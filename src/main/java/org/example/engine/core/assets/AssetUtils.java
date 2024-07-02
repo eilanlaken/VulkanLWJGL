@@ -13,6 +13,8 @@ import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -165,6 +167,15 @@ public final class AssetUtils {
             bufferedWriter.close();
             fileWriter.close();
             return fileExists;
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    public static void saveImage(final String outputPath, BufferedImage image) throws IOException {
+        File outputFile = new File(outputPath + ".png");
+        try {
+            ImageIO.write(image, "png", outputFile);
         } catch (IOException e) {
             throw e;
         }

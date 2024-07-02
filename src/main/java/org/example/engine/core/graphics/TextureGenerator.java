@@ -1,12 +1,29 @@
 package org.example.engine.core.graphics;
 
+import org.example.engine.core.assets.AssetUtils;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
 // TODO: implement
 public final class TextureGenerator {
 
     private TextureGenerator() {}
 
     /* Noise */
-    public static void generateTextureNoisePerlin() {}
+    public synchronized static void generateTextureNoisePerlin(int width, int height, final String outputPath, boolean overrideExistingFile) throws IOException {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                image.setRGB(i, j, 0xFFFFFF);
+            }
+        }
+
+        AssetUtils.saveImage(outputPath, image);
+    }
+
     public static void generateTextureNoiseSimplex() {}
     public static void generateTextureNoiseWhite() {}
     public static void generateTextureNoiseValue() {}
