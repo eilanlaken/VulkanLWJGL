@@ -67,7 +67,7 @@ public final class TextureGenerator {
 
     /* Texture Generation Utils  */
     private static float fade(float t) {
-        return t * t * t * (t * (t * 6 - 15) + 10);
+        return t * t * t * (t * (t * 6 - 15) + 10); // t^3 * (6 * t^2 - 16 * t + 10)
     }
 
     private static float grad(int hash, float x, float y, float z) {
@@ -98,15 +98,6 @@ public final class TextureGenerator {
                 grad(p[BA], x - 1, y, z)),
                 MathUtils.lerp(u, grad(p[AB], x, y - 1, z), grad(p[BB], x - 1, y - 1, z))),
                 MathUtils.lerp(v, MathUtils.lerp(u, grad(p[AA + 1], x, y, z - 1), grad(p[BA + 1], x - 1, y, z - 1)), MathUtils.lerp(u, grad(p[AB + 1], x, y - 1, z - 1), grad(p[BB + 1], x - 1, y - 1, z - 1))));
-    }
-
-    private static int getColor(float r, float g, float b, float a) {
-        int rInt = (int) (r * 255);
-        int gInt = (int) (g * 255);
-        int bInt = (int) (b * 255);
-        int aInt = (int) (a * 255);
-
-        return (aInt << 24) | (rInt << 16) | (gInt << 8) | bInt;
     }
 
 }
