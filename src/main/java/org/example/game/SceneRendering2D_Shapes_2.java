@@ -44,6 +44,13 @@ public class SceneRendering2D_Shapes_2 extends ApplicationScreen {
         Vector3 screen = new Vector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
         camera.lens.unproject(screen);
 
+        Vector2[] vs = new Vector2[3];
+        vs[0] = new Vector2(-2,-2);
+        vs[1] = new Vector2(0,0);
+        vs[2] = new Vector2(2,0);
+        for (Vector2 v : vs) {
+            v.rotateRad(dy);
+        }
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) dy += GraphicsUtils.getDeltaTime();
         if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) dy -= GraphicsUtils.getDeltaTime();
 
@@ -57,12 +64,14 @@ public class SceneRendering2D_Shapes_2 extends ApplicationScreen {
 
         renderer2D.begin(camera);
         renderer2D.setTint(blue);
+        //renderer2D.drawCurveFilled(0.6f, 10, vs);
 
-        //renderer2D.drawCurveThin(x -> MathUtils.sinRad(x), -4, 4, 5);
-        //renderer2D.drawCurveThin(x -> MathUtils.sinRad(x)-4, -4, 4, 5);
-        //renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x) - 4,0.1f, -4, 4, 20);
-        renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x) + 4,0.2f, -4, 4, 10, 30);
-        renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x) - 4,0.2f, -4, 4, 10, 30);
+        // TODO: FIX HERE
+        //renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x+dy) + 4,0.2f, -4, 4, 10, 10);
+        renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x+dy) + 4,0.2f, -4, 4, 10, 10);
+
+
+
 
         renderer2D.end();
     }

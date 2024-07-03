@@ -1552,6 +1552,7 @@ public class Renderer2D implements MemoryResourceHolder {
         vectorsPool.free(p_1);
     }
 
+    // TODO: FIXME
     public void drawCurveFilled(Function<Float, Float> f, float thickness, float minX, float maxX, int smoothness, int points) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         points = Math.max(2, points);
