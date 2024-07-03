@@ -12,11 +12,11 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         /* texture generator tests */
-        try {
-            TextureGenerator.generateTextureNoisePerlin(128, 128, "assets/textures", "hi", false);
-        } catch (Exception e) {
-            throw e;
-        }
+//        try {
+//            TextureGenerator.generateTextureNoisePerlin(128, 128, "assets/textures", "hi", false);
+//        } catch (Exception e) {
+//            throw e;
+//        }
 
 
 //        try {
@@ -30,7 +30,7 @@ public class Main {
 //            e.printStackTrace();
 //        }
 
-        if (true) return;
+        //if (true) return;
 
         ApplicationWindowAttributes config = new ApplicationWindowAttributes();
         Application.createSingleWindowApplication(config);

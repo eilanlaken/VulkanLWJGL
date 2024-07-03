@@ -5,6 +5,7 @@ import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.InputKeyboard;
 import org.example.engine.core.input.InputMouse;
+import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.math.Vector3;
 import org.example.engine.core.memory.MemoryResource;
@@ -57,6 +58,11 @@ public class SceneRendering2D_Shapes_2 extends ApplicationScreen {
         renderer2D.begin(camera);
         renderer2D.setTint(blue);
 
+        //renderer2D.drawCurveThin(x -> MathUtils.sinRad(x), -4, 4, 5);
+        //renderer2D.drawCurveThin(x -> MathUtils.sinRad(x)-4, -4, 4, 5);
+        //renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x) - 4,0.1f, -4, 4, 20);
+        renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x) + 4,0.2f, -4, 4, 10, 30);
+        renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x) - 4,0.2f, -4, 4, 10, 30);
 
         renderer2D.end();
     }
