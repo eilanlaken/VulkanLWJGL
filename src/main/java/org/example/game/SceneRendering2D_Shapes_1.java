@@ -142,8 +142,8 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
             //renderer2D.drawCurveFilled(0.6f, new Vector2(-2,4), new Vector2(0,0), new Vector2(2,4));
             renderer2D.setTint(new Color(0,0,0,0.2f));
             //renderer2D.drawCurveFilled(0.6f, 3,  new Vector2(-2,4 + dy), new Vector2(0,0), new Vector2(2,4 + dy));
-            renderer2D.drawCurveFilled(0.6f, 10,  new Vector2(-2,4 + dy), new Vector2(0,0), new Vector2(2,4 + dy));
-            renderer2D.drawCurveFilled(0.6f, 10,  new Vector2(-2,4 + dy - 4), new Vector2(0,0 - 4), new Vector2(2,4 + dy - 4));
+            renderer2D.drawCurveFilled_old(0.6f, 10,  new Vector2(-2,4 + dy), new Vector2(0,0), new Vector2(2,4 + dy));
+            renderer2D.drawCurveFilled_old(0.6f, 10,  new Vector2(-2,4 + dy - 4), new Vector2(0,0 - 4), new Vector2(2,4 + dy - 4));
             //renderer2D.drawCurveFilled(0.6f, 12,  new Vector2(-2,4 + dy - 3), new Vector2(0,0 - 3), new Vector2(2,4 + dy - 3));
 
         }

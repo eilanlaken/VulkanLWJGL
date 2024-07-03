@@ -5,7 +5,6 @@ import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
-import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.math.Vector3;
 import org.example.engine.core.memory.MemoryResource;
@@ -14,7 +13,7 @@ import org.lwjgl.opengl.GL11;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SceneRendering2D_Shapes_2 extends ApplicationScreen {
+public class SceneRendering2D_Shapes_3 extends ApplicationScreen {
 
     private Renderer2D renderer2D;
     private Camera camera;
@@ -26,7 +25,7 @@ public class SceneRendering2D_Shapes_2 extends ApplicationScreen {
 
     private ShaderProgram shaderYellow;
 
-    public SceneRendering2D_Shapes_2() {
+    public SceneRendering2D_Shapes_3() {
         renderer2D = new Renderer2D();
     }
 
@@ -64,13 +63,9 @@ public class SceneRendering2D_Shapes_2 extends ApplicationScreen {
 
         renderer2D.begin(camera);
         renderer2D.setTint(blue);
-        //renderer2D.drawCurveFilled(0.6f, 10, vs);
 
-        // TODO: FIX HERE
-        //renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x+dy) + 4,0.2f, -4, 4, 10, 10);
-        //renderer2D.drawCurveFilled_broken2(x -> MathUtils.sinRad(x+dy) + 4,0.2f, -4, 4, 8);
-        //renderer2D.drawCurveFilled_broken(x -> MathUtils.sinRad(x+dy) + 4,0.2f, -4, 4, 10, 10);
 
+        renderer2D.drawCurveFilled(1,8, new Vector2(0,0), new Vector2(1,1), new Vector2(2,2), new Vector2(3,3), new Vector2(4,4));
 
 
 
