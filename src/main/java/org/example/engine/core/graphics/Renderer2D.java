@@ -1121,9 +1121,9 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += refinement;
     }
 
-    public void drawCurveFilled(float stroke, int smoothness, final Vector2... values) {
+    public Array<Vector2> drawCurveFilled(float stroke, int smoothness, final Vector2... values) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (values == null || values.length < 2) return;
+        if (values == null || values.length < 2) return null;
 
         final int maxVertices = 2 + 2 + (values.length - 2) * (smoothness + 1) * 2; // 2 vertices first point, 2 vertices last point
         // and for every internal corner we add (smoothness + 1) * 2 vertices. We have values.length - 2 internal corners.
@@ -1158,11 +1158,20 @@ public class Renderer2D implements MemoryResourceHolder {
         vertices.set(maxVertices - 2, last_up, true);
         vertices.set(maxVertices - 1, last_down, true);
 
-        /* internal vertices */
+        /* compute the vertices for all internal corners .--.--.--. */
         for (int i = 1; i < values.length - 1; i++) {
-            // here we compute the vertices for every internal corner.
+            Vector2 corner = values[i];
+
+            Vector2 n_prev_up = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(1);
+            Vector2 n_prev_down = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(-1);
+
+            Vector2 n_next_up = vectorsPool.allocate().set(dirs.get(i)).rotate90(1);
+            Vector2 n_next_down = vectorsPool.allocate().set(dirs.get(i)).rotate90(-1);
+
+
         }
 
+        return vertices;
 
     }
 

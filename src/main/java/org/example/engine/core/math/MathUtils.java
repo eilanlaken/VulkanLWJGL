@@ -4,13 +4,10 @@ import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
-import org.example.engine.core.shape.ShapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static org.example.engine.core.math.Matrix2x2.*;
 
 // TODO: implement init() block that will take care of configuration.
 public final class MathUtils {
@@ -250,9 +247,9 @@ public final class MathUtils {
     }
 
     /**
-     * Finds the intersection of two lines L1 & L2
-     * where L1 is the line between (a1, a2)
-     * and   L2 is the line between (b1, b2).
+     * Finds the intersection of two line segments: S1 & S2
+     * where S1 is the line segment between (a1, a2)
+     * and   S2 is the line between (b1, b2).
      * Stores the result in out.
      * @param a1
      * @param a2
@@ -261,24 +258,67 @@ public final class MathUtils {
      * @param out
      * @throws MathException
      */
-    public static void findIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) throws MathException {
-        if (a1.equals(a2)) throw new MathException("Points a1 and a2 cannot be equal.");
-        if (b1.equals(b2)) throw new MathException("Points b1 and b2 cannot be equal.");
-        /* For line L1 passing through (a1, a2): */
-        float A1 = a2.y - a1.y;
-        float B1 = a1.x - a2.x;
-        float C1 = A1 * a1.x + B1 * a1.y;
-        /* For line L2 passing through (b1, b2): */
-        float A2 = b2.y - b1.y;
-        float B2 = b1.x - b2.x;
-        float C2 = A2 * b1.x + B2 * b1.y;
-        /* Calculate the determinant */
-        float det = A1 * B2 - A2 * B1;
-        /* If det == 0, then lines are either parallel or overlap */
-        if (isZero(det)) throw new MathException("Lines don't have a unique intersection (zero or infinite).");
-        /* Otherwise, we have a unique intersection. */
-        out.x = (B2 * C1 - B1 * C2) / det;
-        out.y = (A1 * C2 - A2 * C1) / det;
+    public static boolean segmentIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) throws MathException {
+        float Ax = a2.x - a1.x;
+        float Ay = a2.y - a1.y;
+        float Bx = b2.x - b1.x;
+        float By = b2.y - b1.y;
+        float Cx = b1.x - a1.x;
+        float Cy = b1.y - a1.y;
+
+        float det = Ax * By - Ay * Bx;
+        /* handle degenerate cases */
+        if (isZero(det)) {
+            /* a1 == a2 == b1 == b2 */
+            if (a1.equals(a2) && b1.equals(b2) && a1.equals(b1)) {
+                out.set(a1);
+                return true;
+            }
+            /* a1 == a2 */
+            if (a1.equals(a2) && pointOnSegment(a1,b1,b2)) {
+                out.set(a1);
+                return true;
+            }
+            /* ab == ab */
+            if (b1.equals(b2) && pointOnSegment(b1,a1,a2)) {
+                out.set(b1);
+                return true;
+            }
+        }
+
+        float t = (Cx * By - Cy * Bx) / det;
+        float u = (Ay * Cx - Ax * Cy) / det;
+
+        if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+            out.x = a1.x + t * (a2.x - a1.x);
+            out.y = a1.y + t * (a2.y - a1.y);
+            return true;
+        }
+
+        return false;
+    }
+
+    /** Point p is on-line segment S: (a1, a2) if:
+     * segments (a1, p) and (p, a2) are co-linear
+     * and p is within the bounding box enclosing S.
+     * @param p the point to check
+     * @param a1 first point on the line segment
+     * @param a2 second point on the line segment
+    */
+    public static boolean pointOnSegment(Vector2 p, Vector2 a1, Vector2 a2) {
+        Vector2 v1 = vector2MemoryPool.allocate().set(p).sub(a1);
+        Vector2 v2 = vector2MemoryPool.allocate().set(a2).sub(p);
+
+        /* check co-linearity */
+        if (!isZero(Vector2.crs(v1, v2))) return false;
+
+        /* check if point within bounding box */
+        if (p.x > Math.max(a1.x, a2.x)) return false;
+        if (p.x < Math.min(a1.x, a2.x)) return false;
+        if (p.y > Math.max(a1.y, a2.y)) return false;
+        if (p.y < Math.min(a1.y, a2.y)) return false;
+
+        return true;
     }
 
     public static boolean isZero(float value) {

@@ -208,11 +208,11 @@ public class Matrix2x2 implements MemoryPool.Reset {
      * @param B the B {@link Vector2}
      * @return {@link Vector2} the x vector
      */
-    public static void solve22(Matrix2x2 A, Vector2 B, Vector2 out) {
+    public static boolean solve22(Matrix2x2 A, Vector2 B, Vector2 out) {
         // get the determinant
         float det = A.det();
         // check for zero determinant
-        if (MathUtils.isZero(det)) throw new MathException("System of equation Ax=B has no unique solution (zero or infinite): " + Matrix2x2.class.getSimpleName() + " is non invertible (zero determinant).");
+        if (MathUtils.isZero(det)) return false;
         float detInv = 1.0f / det;
 
         final float Dx = B.x * A.val[M11] - A.val[M01] * B.y;
@@ -220,6 +220,7 @@ public class Matrix2x2 implements MemoryPool.Reset {
 
         out.x = detInv * Dx;
         out.y = detInv * Dy;
+        return true;
     }
 
     @Override

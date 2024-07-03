@@ -253,32 +253,54 @@ class MathUtilsTest {
 
         a1.set(0, 0);
         a2.set(1, 1);
-        b1.set(0,-2);
-        b2.set(1, 2);
-        MathUtils.findIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(0.6666667f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0.6666667f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+        b1.set(0, 1);
+        b2.set(1, 0);
+        boolean i1 = MathUtils.segmentIntersection(a1, a2, b1, b2, out);
+        Assertions.assertTrue(i1);
+        Assertions.assertEquals(0.5f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
         a1.set(0, 0);
-        a2.set(1, 1);
-        b1.set(0,0);
-        b2.set(-1, 1);
-        MathUtils.findIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(0, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+        a2.set(0, 2);
+        b1.set(-4, 1);
+        b2.set(5, 1);
+        boolean i2 = MathUtils.segmentIntersection(a1, a2, b1, b2, out);
+        Assertions.assertTrue(i2);
+        Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(1f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
         a1.set(0, 0);
-        a2.set(1, 1);
-        b1.set(0,1);
-        b2.set(1, 2);
-        Assertions.assertThrows(MathException.class, () -> MathUtils.findIntersection(a1, a2, b1, b2, out));
+        a2.set(0, 0);
+        b1.set(-4, 0);
+        b2.set(5, 0);
+        boolean i3 = MathUtils.segmentIntersection(a1, a2, b1, b2, out);
+        Assertions.assertTrue(i3);
+        Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
-        a1.set(0, 0);
-        a2.set(1, 1);
-        b1.set(0, 0);
-        b2.set(1, 1);
-        Assertions.assertThrows(MathException.class, () -> MathUtils.findIntersection(a1, a2, b1, b2, out));
 
+    }
+
+    @Test
+    void pointOnSegment() {
+        Vector2 p  = new Vector2();
+        Vector2 a1 = new Vector2();
+        Vector2 a2 = new Vector2();
+
+        a1.set(0,0);
+        a2.set(1,0);
+        p.set(0.4f,0);
+        Assertions.assertTrue(MathUtils.pointOnSegment(p, a1, a2));
+
+        a1.set(0,0);
+        a2.set(1,0);
+        p.set(1.4f,0);
+        Assertions.assertFalse(MathUtils.pointOnSegment(p, a1, a2));
+
+        a1.set(0,0);
+        a2.set(1,1);
+        p.set(0.5f,0.5f);
+        Assertions.assertTrue(MathUtils.pointOnSegment(p, a1, a2));
     }
 
     @Test
