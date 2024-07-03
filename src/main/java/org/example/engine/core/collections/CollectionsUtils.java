@@ -70,6 +70,15 @@ public final class CollectionsUtils {
         arraySorter.doSort(a, c, fromIndex, toIndex);
     }
 
+    public static void shuffle(int[] array) {
+        for (int i = array.length - 1; i > 0; i--) {
+            int ii = MathUtils.random(i);
+            int temp = array[i];
+            array[i] = array[ii];
+            array[ii] = temp;
+        }
+    }
+
     public static final class CollectionsSorterArray<T> {
 
         private static final int MIN_MERGE = 32;

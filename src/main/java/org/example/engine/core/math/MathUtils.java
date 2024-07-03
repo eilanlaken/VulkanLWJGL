@@ -302,6 +302,10 @@ public final class MathUtils {
         return (float)(Math.log(value) / Math.log(a));
     }
 
+    public static float lerp(float step, float a, float b) {
+        return a + step * (b - a);
+    }
+
     // TODO: move to init block
     private static class Sin {
 

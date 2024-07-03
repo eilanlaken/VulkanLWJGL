@@ -335,8 +335,8 @@ public class Color {
 
     /** Packs the color components into a 32-bit integer with the format ABGR.
      * @return the packed color as a 32-bit int. */
-    public int toIntBits() {
-        return ((int)(255 * a) << 24) | ((int)(255 * r) << 16) | ((int)(255 * g) << 8) | ((int)(255 * b));
+    public int toIntBits () {
+        return ((int)(255 * a) << 24) | ((int)(255 * b) << 16) | ((int)(255 * g) << 8) | ((int)(255 * r));
     }
 
     /** Returns the color encoded as hex string with the format RRGGBBAA. */
@@ -374,7 +374,7 @@ public class Color {
      * @param a the alpha component, 0 - 255
      * @return the packed color as a 32-bit int */
     public static int toIntBits(int r, int g, int b, int a) {
-        return (a << 24) | (b << 16) | (g << 8) | r;
+        return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
     public static int alpha(float alpha) {
@@ -572,7 +572,7 @@ public class Color {
      * @param name the name of the color
      * @return the color to which the specified {@code name} is mapped, or {@code null} if there was no mapping for {@code name}
      *         . */
-    public static Color getFromCatalog (String name) {
+    public static Color getFromCatalog(String name) {
         return catalog.get(name);
     }
 

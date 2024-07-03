@@ -3,7 +3,14 @@ package org.example.engine.core.collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 class CollectionsUtilsTest {
+
+    @Test
+    void shuffle() {
+
+    }
 
     @Test
     void isSorted() {

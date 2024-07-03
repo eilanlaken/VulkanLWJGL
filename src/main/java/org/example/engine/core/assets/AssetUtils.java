@@ -155,9 +155,9 @@ public final class AssetUtils {
         return false;
     }
 
-    public static boolean saveFile(final String dirpath, final String filename, final String content) throws IOException {
-        if (!directoryExists(dirpath)) throw new IOException("Directory " + dirpath + " does not exist.");
-        String filePath = dirpath + File.separator + filename;
+    public static boolean saveFile(final String directory, final String filename, final String content) throws IOException {
+        if (!directoryExists(directory)) throw new AssetsException("Directory: " + directory + " does not exist.");
+        String filePath = directory + File.separator + filename;
         File file = new File(filePath);
         boolean fileExists = file.exists();
         try {
@@ -172,10 +172,12 @@ public final class AssetUtils {
         }
     }
 
-    public static void saveImage(final String outputPath, BufferedImage image) throws IOException {
-        File outputFile = new File(outputPath + ".png");
+    public static void saveImage(final String directory, final String filename, BufferedImage image) throws IOException {
+        if (!directoryExists(directory)) throw new AssetsException("Directory: " + directory + " does not exist.");
+        String filePath = directory + File.separator + filename + ".png";
+        File file = new File(filePath);
         try {
-            ImageIO.write(image, "png", outputFile);
+            ImageIO.write(image, "png", file);
         } catch (IOException e) {
             throw e;
         }

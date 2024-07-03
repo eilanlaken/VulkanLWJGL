@@ -379,9 +379,9 @@ public class Array<T> implements Iterable<T> {
         }
     }
 
-    public void shuffle() {
+    public void shuffle () {
         T[] items = this.items;
-        for (int i = size - 1; i >= 0; i--) {
+        for (int i = size - 1; i > 0; i--) {
             int ii = MathUtils.random(i);
             T temp = items[i];
             items[i] = items[ii];

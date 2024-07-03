@@ -5,15 +5,17 @@ import org.example.engine.core.application.ApplicationWindowAttributes;
 import org.example.engine.core.graphics.TextureGenerator;
 import org.example.game.ScreenLoading;
 
+import java.io.IOException;
+
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         /* texture generator tests */
         try {
-            TextureGenerator.generateTextureNoisePerlin(128, 128, "assets/textures/hi", false);
+            TextureGenerator.generateTextureNoisePerlin(128, 128, "assets/textures", "hi", false);
         } catch (Exception e) {
-
+            throw e;
         }
 
 
