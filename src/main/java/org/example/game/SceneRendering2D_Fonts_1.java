@@ -5,10 +5,8 @@ import org.example.engine.core.graphics.Camera;
 import org.example.engine.core.graphics.Color;
 import org.example.engine.core.graphics.GraphicsException;
 import org.example.engine.core.graphics.Renderer2D;
-import org.example.engine.core.input.InputKeyboard;
-import org.example.engine.core.input.InputMouse;
-import org.example.engine.core.math.MathUtils;
-import org.example.engine.core.math.Vector2;
+import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.input.Mouse;
 import org.example.engine.core.math.Vector3;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL11;
@@ -61,26 +59,26 @@ public class SceneRendering2D_Fonts_1 extends ApplicationScreen {
 
     @Override
     protected void refresh() {
-        Vector3 screen = new Vector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
+        Vector3 screen = new Vector3(Mouse.getCursorX(), Mouse.getCursorY(), 0);
         camera.lens.unproject(screen);
 
-        if (InputMouse.isButtonPressed(InputMouse.Button.LEFT)) {
+        if (Mouse.isButtonPressed(Mouse.Button.LEFT)) {
 
         }
 
-        if (InputMouse.isButtonClicked(InputMouse.Button.RIGHT)) {
+        if (Mouse.isButtonClicked(Mouse.Button.RIGHT)) {
 
         }
 
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.S)) {
+        if (Keyboard.isKeyJustPressed(Keyboard.Key.S)) {
 
         }
 
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.R)) {
             //body_a.applyForce(1,0, body_a.shape.x(), body_a.shape.y() + 0.2f);
         }
 
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.SPACE)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.SPACE)) {
             //world.createConstraintWeld(body_a, body_b, new Vector2(1,0));
         }
 

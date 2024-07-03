@@ -4,7 +4,7 @@ import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.assets.AssetStore;
 import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.InputKeyboard;
+import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.math.Matrix4x4;
 import org.example.engine.core.memory.MemoryResource;
 import org.example.engine.ecs.Component;
@@ -62,38 +62,38 @@ public class SceneRendering3D_1 extends ApplicationScreen {
 
         Matrix4x4 m = transform.computeMatrix();
         // rotate
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.R)) {
             transform.angleX += 0.01f;
         }
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.T)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.T)) {
             transform.angleY += 0.01f;
         }
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.Y)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.Y)) {
             transform.angleZ += 0.01f;
         }
 
         // scale
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.KEY_1)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.KEY_1)) {
             transform.scaleX *= 1.01f;
         }
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.KEY_2)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.KEY_2)) {
             transform.scaleY *= 1.01f;
         }
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.KEY_3)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.KEY_3)) {
             transform.scaleZ *= 1.01f;
         }
 
         // translate
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.A)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.A)) {
             transform.x += 0.1f;
         }
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.D)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.D)) {
             transform.x -= 0.1f;
         }
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.W)) {
             transform.y += 0.1f;
         }
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.S)) {
             transform.y -= 0.1f;
         }
 

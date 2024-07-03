@@ -2,10 +2,9 @@ package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.assets.AssetStore;
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
-import org.example.engine.core.input.InputKeyboard;
-import org.example.engine.core.input.InputMouse;
+import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.input.Mouse;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.math.Vector3;
 import org.example.engine.core.memory.MemoryResource;
@@ -41,26 +40,26 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
     float ay = 0;
     @Override
     protected void refresh() {
-        Vector3 screen = new Vector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
+        Vector3 screen = new Vector3(Mouse.getCursorX(), Mouse.getCursorY(), 0);
         camera.lens.unproject(screen);
 
-        if (InputMouse.isButtonPressed(InputMouse.Button.LEFT)) {
+        if (Mouse.isButtonPressed(Mouse.Button.LEFT)) {
             ay++;
         }
 
-        if (InputMouse.isButtonClicked(InputMouse.Button.RIGHT)) {
+        if (Mouse.isButtonClicked(Mouse.Button.RIGHT)) {
 
         }
 
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.S)) {
+        if (Keyboard.isKeyJustPressed(Keyboard.Key.S)) {
 
         }
 
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.R)) {
             //body_a.applyForce(1,0, body_a.shape.x(), body_a.shape.y() + 0.2f);
         }
 
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.SPACE)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.SPACE)) {
             //world.createConstraintWeld(body_a, body_b, new Vector2(1,0));
         }
 
@@ -102,8 +101,8 @@ public class SceneRendering2D_Shapes_1 extends ApplicationScreen {
 
         //renderer2D.drawCurveFilled(1f, new Vector2(-4,0), new Vector2(0,0), new Vector2(4,4));
 
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.W)) dy += GraphicsUtils.getDeltaTime();
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.S)) dy -= GraphicsUtils.getDeltaTime();
+        if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += GraphicsUtils.getDeltaTime();
+        if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= GraphicsUtils.getDeltaTime();
 
 
         if (false) {

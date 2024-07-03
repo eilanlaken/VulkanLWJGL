@@ -4,8 +4,8 @@ import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.graphics.Camera;
 import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Renderer2D;
-import org.example.engine.core.input.InputKeyboard;
-import org.example.engine.core.input.InputMouse;
+import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.input.Mouse;
 import org.example.engine.core.math.Vector3;
 import org.example.engine.core.physics2d.Body;
 import org.example.engine.core.physics2d.World;
@@ -56,13 +56,13 @@ public class ScenePhysics2D_Better_1 extends ApplicationScreen {
     @Override
     protected void refresh() {
         world.update(GraphicsUtils.getDeltaTime());
-        Vector3 screen = new Vector3(InputMouse.getCursorX(), InputMouse.getCursorY(), 0);
+        Vector3 screen = new Vector3(Mouse.getCursorX(), Mouse.getCursorY(), 0);
         camera.lens.unproject(screen);
         world.castRay((intersections) -> {
 
         }, 0,0, screen.x, screen.y, Float.POSITIVE_INFINITY);
 
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.A)) {
+        if (Keyboard.isKeyJustPressed(Keyboard.Key.A)) {
             body_a = world.createBodyCircle(null, Body.MotionType.NEWTONIAN,
                     screen.x, screen.y, 0,
                     0f, 0f, 0,
@@ -70,7 +70,7 @@ public class ScenePhysics2D_Better_1 extends ApplicationScreen {
                     0.5f);
         }
 
-        if (InputKeyboard.isKeyJustPressed(InputKeyboard.Key.S)) {
+        if (Keyboard.isKeyJustPressed(Keyboard.Key.S)) {
             body_b = world.createBodyRectangle(null, Body.MotionType.NEWTONIAN,
                     screen.x, screen.y, -30,
                     0f, 0f, 0,
@@ -78,11 +78,11 @@ public class ScenePhysics2D_Better_1 extends ApplicationScreen {
                     1, 1f, 0, 0, 0);
         }
 
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.R)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.R)) {
             //body_a.applyForce(1,0, body_a.shape.x(), body_a.shape.y() + 0.2f);
         }
 
-        if (InputKeyboard.isKeyPressed(InputKeyboard.Key.SPACE)) {
+        if (Keyboard.isKeyPressed(Keyboard.Key.SPACE)) {
             //world.createConstraintWeld(body_a, body_b, new Vector2(1,0));
         }
 

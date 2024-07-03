@@ -5,7 +5,7 @@ import org.example.engine.core.collections.ArrayInt;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
-public class InputKeyboard {
+public class Keyboard {
 
     private static boolean initialized = false;
 
@@ -15,12 +15,12 @@ public class InputKeyboard {
     private static ArrayInt keysHeld = new ArrayInt(12);
     private static ArrayInt keysJustPressed = new ArrayInt(12);
 
-    private InputKeyboard() {}
+    private Keyboard() {}
 
     // TODO: change window to application context.
     public static void init(ApplicationWindow window) {
         if (initialized)
-            throw new IllegalStateException("Device input " + InputKeyboard.class.getSimpleName() + " already initialized.");
+            throw new IllegalStateException("Device input " + Keyboard.class.getSimpleName() + " already initialized.");
 
         GLFW.glfwSetKeyCallback(window.getHandle(), new GLFWKeyCallback() {
             @Override

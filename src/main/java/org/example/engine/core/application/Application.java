@@ -5,8 +5,8 @@ import org.example.engine.core.assets.AssetUtils;
 import org.example.engine.core.async.AsyncUtils;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.GraphicsUtils;
-import org.example.engine.core.input.InputKeyboard;
-import org.example.engine.core.input.InputMouse;
+import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.input.Mouse;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -30,8 +30,8 @@ public class Application {
         AsyncUtils.init();
         GraphicsUtils.init(window);
         AssetUtils.init(window);
-        InputMouse.init(window);
-        InputKeyboard.init(window);
+        Mouse.init(window);
+        Keyboard.init(window);
         // init OpenGL Context
         initialized = true;
     }
@@ -56,8 +56,8 @@ public class Application {
 
             // asset loading
             AssetStore.update();
-            InputMouse.resetInternalState();
-            InputKeyboard.resetInternalState();
+            Mouse.resetInternalState();
+            Keyboard.resetInternalState();
             GLFW.glfwPollEvents();
 
             boolean requestRendering;

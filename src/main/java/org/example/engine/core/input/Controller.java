@@ -1,5 +1,5 @@
 package org.example.engine.core.input;
 
 // TODO: implement
-public class InputSteeringWheel {
+public class Controller {
 }

@@ -3,7 +3,7 @@ package org.example.engine.core.input;
 import org.example.engine.core.application.ApplicationWindow;
 import org.lwjgl.glfw.*;
 
-public class InputMouse {
+public class Mouse {
 
     private static ApplicationWindow window;
     private static boolean initialized = false;
@@ -21,17 +21,17 @@ public class InputMouse {
     private static int[] mouseButtonsPrevStates = new int[5];
     private static int[] mouseButtonsCurrentStates = new int[5];
 
-    private InputMouse() {}
+    private Mouse() {}
 
     // TODO: change window to application context.
     public static void init(ApplicationWindow window) {
-        if (initialized) throw new IllegalStateException("Device input " + InputMouse.class.getSimpleName() + " already initialized.");
-        InputMouse.window = window;
+        if (initialized) throw new IllegalStateException("Device input " + Mouse.class.getSimpleName() + " already initialized.");
+        Mouse.window = window;
 
         GLFW.glfwSetMouseButtonCallback(window.getHandle(), new GLFWMouseButtonCallback() {
             @Override
             public void invoke(long window, int button, int action, int mods) {
-                mouseButtonsPrevStates[button] = InputMouse.mouseButtonsCurrentStates[button];
+                mouseButtonsPrevStates[button] = Mouse.mouseButtonsCurrentStates[button];
                 mouseButtonsCurrentStates[button] = action;
             }
         });
@@ -93,7 +93,7 @@ public class InputMouse {
     }
 
     public static void setMouseSensitivity(float sensitivity) {
-        InputMouse.sensitivity = sensitivity;
+        Mouse.sensitivity = sensitivity;
     }
 
     public static float getMouseSensitivity() {
