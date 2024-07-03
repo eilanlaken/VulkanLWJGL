@@ -1101,7 +1101,7 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += values.length;
     }
 
-    public void drawCurveThin(Function<Float, Float> f, float minX, float maxX, int refinement) {
+    public void drawCurveThin(float minX, float maxX, int refinement, Function<Float, Float> f) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         refinement = Math.max(2, refinement);
         if ((vertexIndex + refinement) * VERTEX_SIZE  > verticesBuffer.capacity()) flush();
@@ -1149,127 +1149,6 @@ public class Renderer2D implements MemoryResourceHolder {
         thickness *= 0.5f;
 
         Array<Vector2> vertices = new Array<>(true, values.length * 2);
-        /* put vertices */
-
-        /* allocate memory */
-        Vector2 norm = vectorsPool.allocate();
-        Vector2 dir_prev = vectorsPool.allocate();
-        Vector2 dir_next = vectorsPool.allocate();
-        Vector2 v = vectorsPool.allocate();
-
-        /* first 2 vertices */
-        norm.x = values[1].x - values[0].x;
-        norm.y = values[1].y - values[0].y;
-        norm.nor();
-        norm.rotate90(1);
-        Vector2 up_first = vectorsPool.allocate();
-        up_first.x = values[0].x + thickness * norm.x;
-        up_first.y = values[0].y + thickness * norm.y;
-        Vector2 down_first = vectorsPool.allocate();
-        down_first.x = values[0].x - thickness * norm.x;
-        down_first.y = values[0].y - thickness * norm.y;
-        vertices.add(down_first);
-        vertices.add(up_first);
-
-        /* in-between vertices */
-        int skipped = 0;
-        for (int i = 1; i < values.length - 1; i++) {
-            dir_prev.x = values[i].x - values[i-1].x;
-            dir_prev.y = values[i].y - values[i-1].y;
-            dir_prev.flip();
-            dir_next.x = values[i+1].x - values[i].x;
-            dir_next.y = values[i+1].y - values[i].y;
-            float cross = Vector2.crs(dir_prev, dir_next);
-            if (cross == 0) {
-                skipped++;
-                continue;
-            }
-            dir_prev.nor();
-            dir_next.nor();
-            float angle_between = Vector2.angleBetweenDeg(dir_prev, dir_next);
-            float length = thickness / MathUtils.sinDeg(angle_between * 0.5f);
-            v.x = dir_prev.x + dir_next.x;
-            v.y = dir_prev.y + dir_next.y;
-            v.nor().scl(length);
-            Vector2 vertex_down = vectorsPool.allocate();
-            vertex_down.x = values[i].x + v.x;
-            vertex_down.y = values[i].y + v.y;
-            Vector2 vertex_up = vectorsPool.allocate();
-            vertex_up.x = values[i].x - v.x;
-            vertex_up.y = values[i].y - v.y;
-            if (cross > 0) {
-                vertices.add(vertex_down);
-                vertices.add(vertex_up);
-            } else {
-                vertices.add(vertex_up);
-                vertices.add(vertex_down);
-            }
-        }
-
-        /* last 2 vertices */
-        norm.x = values[values.length - 1].x - values[values.length - 2].x;
-        norm.y = values[values.length - 1].y - values[values.length - 2].y;
-        norm.nor();
-        norm.rotate90(1);
-        Vector2 up_last   = vectorsPool.allocate();
-        up_last.x = values[values.length - 1].x + thickness * norm.x;
-        up_last.y = values[values.length - 1].y + thickness * norm.y;
-        Vector2 down_last = vectorsPool.allocate();
-        down_last.x = values[values.length - 1].x - thickness * norm.x;
-        down_last.y = values[values.length - 1].y - thickness * norm.y;
-        vertices.add(down_last);
-        vertices.add(up_last);
-
-        for (int i = 0; i < vertices.size; i++) {
-            verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
-        }
-
-        /* put indices */
-        int startVertex = this.vertexIndex;
-        for (int i = 0; i < values.length * 2 - 2 - skipped * 2; i += 2) {
-            indicesBuffer.put(startVertex + i + 0);
-            indicesBuffer.put(startVertex + i + 1);
-            indicesBuffer.put(startVertex + i + 2);
-            indicesBuffer.put(startVertex + i + 2);
-            indicesBuffer.put(startVertex + i + 1);
-            indicesBuffer.put(startVertex + i + 3);
-        }
-
-        vertexIndex += vertices.size;
-
-        /* free resource */
-        vectorsPool.free(norm);
-        vectorsPool.free(dir_prev);
-        vectorsPool.free(dir_next);
-        vectorsPool.free(v);
-        vectorsPool.freeAll(vertices);
-    }
-
-    public void drawCurveFilled(Function<Float, Float> f, float thickness, float minX, float maxX, int points) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        points = Math.max(2, points);
-        if ((vertexIndex + points * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
-
-        setMode(GL11.GL_TRIANGLES);
-
-        if (minX > maxX) {
-            float tmp = minX;
-            minX = maxX;
-            maxX = tmp;
-        }
-        float step = (maxX - minX) / points;
-
-        thickness *= 0.5f;
-
-        Vector2[] values = new Vector2[points];
-        for (int i = 0; i < points; i++) {
-            Vector2 point = new Vector2();
-            point.x = minX + i * step;
-            point.y = f.apply(point.x);
-            values[i] = point;
-        }
-
-        Array<Vector2> vertices = new Array<>(true, points * 2);
         /* put vertices */
 
         /* allocate memory */
@@ -1553,8 +1432,134 @@ public class Renderer2D implements MemoryResourceHolder {
         vectorsPool.free(p_1);
     }
 
+    // TODO: implement.
+    public void drawCurveFilled(float thickness, float minX, float maxX, int refinement, Function<Float, Float> f, boolean roundEnds) {
+
+    }
+
+    public void drawCurveFilled_broken2(Function<Float, Float> f, float thickness, float minX, float maxX, int refinement) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        refinement = Math.max(2, refinement);
+        if ((vertexIndex + refinement * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_TRIANGLES);
+
+        if (minX > maxX) {
+            float tmp = minX;
+            minX = maxX;
+            maxX = tmp;
+        }
+        float step = (maxX - minX) / refinement;
+
+        thickness *= 0.5f;
+
+        Vector2[] values = new Vector2[refinement];
+        for (int i = 0; i < refinement; i++) {
+            Vector2 point = new Vector2();
+            point.x = minX + i * step;
+            point.y = f.apply(point.x);
+            values[i] = point;
+        }
+
+        Array<Vector2> vertices = new Array<>(true, refinement * 2);
+        /* put vertices */
+
+        /* allocate memory */
+        Vector2 norm = vectorsPool.allocate();
+        Vector2 dir_prev = vectorsPool.allocate();
+        Vector2 dir_next = vectorsPool.allocate();
+        Vector2 v = vectorsPool.allocate();
+
+        /* first 2 vertices */
+        norm.x = values[1].x - values[0].x;
+        norm.y = values[1].y - values[0].y;
+        norm.nor();
+        norm.rotate90(1);
+        Vector2 up_first = vectorsPool.allocate();
+        up_first.x = values[0].x + thickness * norm.x;
+        up_first.y = values[0].y + thickness * norm.y;
+        Vector2 down_first = vectorsPool.allocate();
+        down_first.x = values[0].x - thickness * norm.x;
+        down_first.y = values[0].y - thickness * norm.y;
+        vertices.add(down_first);
+        vertices.add(up_first);
+
+        /* in-between vertices */
+        int skipped = 0;
+        for (int i = 1; i < values.length - 1; i++) {
+            dir_prev.x = values[i].x - values[i-1].x;
+            dir_prev.y = values[i].y - values[i-1].y;
+            dir_prev.flip();
+            dir_next.x = values[i+1].x - values[i].x;
+            dir_next.y = values[i+1].y - values[i].y;
+            float cross = Vector2.crs(dir_prev, dir_next);
+            if (cross == 0) {
+                skipped++;
+                continue;
+            }
+            dir_prev.nor();
+            dir_next.nor();
+            float angle_between = Vector2.angleBetweenDeg(dir_prev, dir_next);
+            float length = thickness / MathUtils.sinDeg(angle_between * 0.5f);
+            v.x = dir_prev.x + dir_next.x;
+            v.y = dir_prev.y + dir_next.y;
+            v.nor().scl(length);
+            Vector2 vertex_down = vectorsPool.allocate();
+            vertex_down.x = values[i].x + v.x;
+            vertex_down.y = values[i].y + v.y;
+            Vector2 vertex_up = vectorsPool.allocate();
+            vertex_up.x = values[i].x - v.x;
+            vertex_up.y = values[i].y - v.y;
+            if (cross > 0) {
+                vertices.add(vertex_down);
+                vertices.add(vertex_up);
+            } else {
+                vertices.add(vertex_up);
+                vertices.add(vertex_down);
+            }
+        }
+
+        /* last 2 vertices */
+        norm.x = values[values.length - 1].x - values[values.length - 2].x;
+        norm.y = values[values.length - 1].y - values[values.length - 2].y;
+        norm.nor();
+        norm.rotate90(1);
+        Vector2 up_last   = vectorsPool.allocate();
+        up_last.x = values[values.length - 1].x + thickness * norm.x;
+        up_last.y = values[values.length - 1].y + thickness * norm.y;
+        Vector2 down_last = vectorsPool.allocate();
+        down_last.x = values[values.length - 1].x - thickness * norm.x;
+        down_last.y = values[values.length - 1].y - thickness * norm.y;
+        vertices.add(down_last);
+        vertices.add(up_last);
+
+        for (int i = 0; i < vertices.size; i++) {
+            verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
+        }
+
+        /* put indices */
+        int startVertex = this.vertexIndex;
+        for (int i = 0; i < values.length * 2 - 2 - skipped * 2; i += 2) {
+            indicesBuffer.put(startVertex + i + 0);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 3);
+        }
+
+        vertexIndex += vertices.size;
+
+        /* free resource */
+        vectorsPool.free(norm);
+        vectorsPool.free(dir_prev);
+        vectorsPool.free(dir_next);
+        vectorsPool.free(v);
+        vectorsPool.freeAll(vertices);
+    }
+
     // TODO: FIXME
-    public void drawCurveFilled(Function<Float, Float> f, float thickness, float minX, float maxX, int refinement, boolean roundEdges) {
+    public void drawCurveFilled_TODO(Function<Float, Float> f, float thickness, float minX, float maxX, int refinement, boolean roundEdges) {
 
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         refinement = Math.max(2, refinement);
@@ -1627,13 +1632,13 @@ public class Renderer2D implements MemoryResourceHolder {
 
             float av = Vector2.angleBetweenDeg(dir_prev, dir_next); // angle between normals
             float an = Vector2.angleBetweenDeg(normal_prev, normal_next); // angle between normals
-            float da = an / smoothness;
+            float da = an / refinement;
 
             //norm.set(normal_prev).add(normal_next).nor().scl(t / MathUtils.sinDeg(av / 2)); // causes skipped vertex
             norm.set(normal_prev).add(normal_next).nor().scl(t); // <- isn't as broken
             float sign = Math.signum(cross);
 
-            for (int j = 0; j < smoothness + 1; j++) {
+            for (int j = 0; j < refinement; j++) {
                 Vector2 v1 = vectorsPool.allocate();
                 Vector2 v2 = vectorsPool.allocate();
                 if (sign < 0) {
@@ -1671,7 +1676,7 @@ public class Renderer2D implements MemoryResourceHolder {
         /* add far edges half circles */
         if (false)
         {
-            final float da = 180.0f / (smoothness);
+            final float da = 180.0f / (refinement);
 
             Vector2 p_0 = vectorsPool.allocate();
             p_0.x = vertices.get(1).x - vertices.get(0).x;
@@ -1690,7 +1695,7 @@ public class Renderer2D implements MemoryResourceHolder {
             center_0.y = values[0].y;
             vertices.add(center_0);
             /* add half circle 0: */
-            for (int i = 0; i < smoothness + 1; i++) {
+            for (int i = 0; i < refinement + 1; i++) {
                 Vector2 vertex = vectorsPool.allocate();
                 vertex.set(p_0);
                 vertex.rotateDeg(da * i).add(center_0);
@@ -1703,7 +1708,7 @@ public class Renderer2D implements MemoryResourceHolder {
             center_1.y = values[values.length - 1].y;
             vertices.add(center_1);
             /* add half circle 1: */
-            for (int i = 0; i < smoothness + 2; i++) {
+            for (int i = 0; i < refinement + 2; i++) {
                 Vector2 vertex = vectorsPool.allocate();
                 vertex.set(p_1);
                 vertex.rotateDeg(-da * i).add(center_1);
@@ -1729,7 +1734,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
         // put indices for half-circle 0
         if (false)
-        for (int i = 0; i < smoothness - 1; i++) {
+        for (int i = 0; i < refinement - 1; i++) {
             indicesBuffer.put(startVertex + curveEndIndex + 1 + 0);
             indicesBuffer.put(startVertex + curveEndIndex + 1 + i + 1);
             indicesBuffer.put(startVertex + curveEndIndex + 1 + i + 2);
@@ -1737,10 +1742,10 @@ public class Renderer2D implements MemoryResourceHolder {
 
         // put indices for circle 1
         if (false)
-        for (int i = 0; i < smoothness; i++) {
-            indicesBuffer.put(startVertex + curveEndIndex + smoothness + 2 + 0);
-            indicesBuffer.put(startVertex + curveEndIndex + smoothness + 2 + i + 1);
-            indicesBuffer.put(startVertex + curveEndIndex + smoothness + 2 + i + 2);
+        for (int i = 0; i < refinement; i++) {
+            indicesBuffer.put(startVertex + curveEndIndex + refinement + 2 + 0);
+            indicesBuffer.put(startVertex + curveEndIndex + refinement + 2 + i + 1);
+            indicesBuffer.put(startVertex + curveEndIndex + refinement + 2 + i + 2);
         }
 
         vertexIndex += vertices.size;
@@ -1759,7 +1764,6 @@ public class Renderer2D implements MemoryResourceHolder {
         //vectorsPool.free(p_0);
         //vectorsPool.free(p_1);
     }
-
 
     public void drawCurveFilled_broken(Function<Float, Float> f, float thickness, float minX, float maxX, int smoothness, int points) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
@@ -1967,6 +1971,145 @@ public class Renderer2D implements MemoryResourceHolder {
         vectorsPool.free(p_1);
     }
 
+    /**
+     * Renders the current batch, if not empty.
+     */
+    private void flush() {
+        if (verticesBuffer.position() == 0) return;
+
+        verticesBuffer.flip();
+        indicesBuffer.flip();
+        GL30.glBindVertexArray(vao);
+        {
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+            GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, verticesBuffer);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
+            GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 0, indicesBuffer);
+
+            GL20.glEnableVertexAttribArray(0);
+            GL20.glEnableVertexAttribArray(1);
+            GL20.glEnableVertexAttribArray(2);
+            GL11.glDrawElements(currentMode, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
+            GL20.glDisableVertexAttribArray(2);
+            GL20.glDisableVertexAttribArray(1);
+            GL20.glDisableVertexAttribArray(0);
+        }
+        GL30.glBindVertexArray(0);
+
+        verticesBuffer.clear();
+        indicesBuffer.clear();
+        vertexIndex = 0;
+        drawCalls++;
+    }
+
+    /**
+     * Must be called after every call to begin().
+     */
+    public void end() {
+        if (!drawing) throw new GraphicsException("Called " + Renderer2D.class.getSimpleName() + ".end() without calling " + Renderer2D.class.getSimpleName() + ".begin() first.");
+        flush();
+        GL20.glDepthMask(true);
+        GL11.glEnable(GL11.GL_CULL_FACE);
+        currentCamera = null;
+        currentShader = null;
+        drawing = false;
+    }
+
+    @Override
+    public void deleteAll() {
+        defaultShader.delete();
+        GL30.glDeleteVertexArrays(vao);
+        GL30.glDeleteBuffers(vbo);
+        GL30.glDeleteBuffers(ebo);
+        whitePixel.delete();
+    }
+
+    /* Create defaults: shader, texture (single white pixel), camera */
+
+    private static ShaderProgram createDefaultShaderProgram() {
+        try (InputStream vertexShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
+             BufferedReader vertexShaderBufferedReader = new BufferedReader(new InputStreamReader(vertexShaderInputStream, StandardCharsets.UTF_8));
+             InputStream fragmentShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
+             BufferedReader fragmentShaderBufferedReader = new BufferedReader(new InputStreamReader(fragmentShaderInputStream, StandardCharsets.UTF_8))) {
+
+            String vertexShader = vertexShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+            String fragmentShader = fragmentShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+            return new ShaderProgram(vertexShader, fragmentShader);
+        } catch (Exception e) {
+            System.err.println("Could not create shader program from resources: ");
+            e.printStackTrace();
+            String vertexShader = "#version 450\n" +
+                    "\n" +
+                    "// attributes\n" +
+                    "layout(location = 0) in vec2 a_position;\n" +
+                    "layout(location = 1) in vec4 a_color;\n" +
+                    "layout(location = 2) in vec2 a_texCoord0;\n" +
+                    "\n" +
+                    "// uniforms\n" +
+                    "uniform mat4 u_camera_combined;\n" +
+                    "\n" +
+                    "// outputs\n" +
+                    "out vec4 color;\n" +
+                    "out vec2 uv;\n" +
+                    "\n" +
+                    "void main() {\n" +
+                    "    color = a_color;\n" +
+                    "    uv = a_texCoord0;\n" +
+                    "    gl_Position = u_camera_combined * vec4(a_position.x, a_position.y, 0.0, 1.0);\n" +
+                    "};";
+
+            String fragmentShader = "#version 450\n" +
+                    "\n" +
+                    "// inputs\n" +
+                    "in vec4 color;\n" +
+                    "in vec2 uv;\n" +
+                    "\n" +
+                    "// uniforms\n" +
+                    "uniform sampler2D u_texture;\n" +
+                    "\n" +
+                    "// outputs\n" +
+                    "layout (location = 0) out vec4 out_color;\n" +
+                    "\n" +
+                    "void main() {\n" +
+                    "    out_color = color * texture(u_texture, uv);\n" +
+                    "}";
+
+            return new ShaderProgram(vertexShader, fragmentShader);
+        }
+    }
+
+    private static Texture createWhiteSinglePixelTexture() {
+        try {
+            return TextureBuilder.buildFromClassPath("graphics-2d-single-white-pixel.png");
+        } catch (Exception e) {
+            System.err.println("Could not create single white pixel texture from resource. Creating manually.");
+            e.printStackTrace();
+
+            ByteBuffer buffer = ByteBuffer.allocateDirect(4);
+            buffer.put((byte) ((0xFFFFFFFF >> 16) & 0xFF));   // Red component
+            buffer.put((byte) ((0xFFFFFFFF >> 8) & 0xFF));    // Green component
+            buffer.put((byte) (0xFF));           // Blue component
+            buffer.put((byte) ((0xFFFFFFFF >> 24) & 0xFF));   // Alpha component
+            buffer.flip();
+            int glHandle = GL11.glGenTextures();
+            Texture texture = new Texture(glHandle,
+                    1, 1,
+                    Texture.Filter.NEAREST, Texture.Filter.NEAREST,
+                    Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE
+            );
+            TextureBinder.bind(texture);
+            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, 1, 1, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+            return texture;
+        }
+    }
+
+    private static Camera createDefaultCamera() {
+        return new Camera(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight(), 1);
+    }
+
+    /* TODO: DELETE after replacing in the physics renderer. */
+
     @Deprecated public void pushPolygon(final Shape2DPolygon polygon, Color tint, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY, ShaderProgram shader, HashMap<String, Object> customAttributes) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (vertexIndex + polygon.vertices.length > VERTICES_CAPACITY * 4) {
@@ -2096,124 +2239,6 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += 2 * 5;
     }
 
-    @Deprecated public void pushThinCurve(Function<Float, Float> f, float minX, float maxX, int refinement, float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (refinement < 2) throw new GraphicsException("refinement must be at least 2 for curve rendering. Got: " + refinement);
-        if (vertexIndex + refinement * 5 * 2 > VERTICES_CAPACITY * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
-            flush();
-        }
-
-        setShader(defaultShader);
-        useTexture_old(whitePixel);
-        useCustomAttributes_old(null);
-        useMode_old(GL11.GL_LINES);
-
-        if (minX > maxX) {
-            float tmp = minX;
-            minX = maxX;
-            maxX = tmp;
-        }
-        float step = (maxX - minX) / refinement;
-
-        int startVertex = this.vertexIndex / VERTEX_SIZE;
-        for (int i = 0; i < refinement - 1; i++) {
-            indicesBuffer.put(startVertex + i);
-            indicesBuffer.put(startVertex + i + 1);
-        }
-
-        for (int i = 0; i < refinement; i++) {
-            float currentX = minX + step * i;
-            float currentY = f.apply(currentX);
-            verticesBuffer.put(currentX).put(currentY).put(tintFloatBits).put(0.5f).put(0.5f);
-        }
-
-        vertexIndex += refinement * 5;
-    }
-
-    @Deprecated public void pushThinCurve(final Vector2[] values, float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (values.length < 2) throw new GraphicsException("values must contain at least 2 points. Got: " + values.length);
-        if (vertexIndex + values.length * 5 * 2 > VERTICES_CAPACITY * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
-            flush();
-        }
-
-        setShader(defaultShader);
-        useTexture_old(whitePixel);
-        useCustomAttributes_old(null);
-        useMode_old(GL11.GL_LINES);
-
-        int startVertex = this.vertexIndex / VERTEX_SIZE;
-        for (int i = 0; i < values.length - 1; i++) {
-            indicesBuffer.put(startVertex + i);
-            indicesBuffer.put(startVertex + i + 1);
-        }
-
-        for (Vector2 value : values) {
-            verticesBuffer.put(value.x).put(value.y).put(tintFloatBits).put(0.5f).put(0.5f);
-        }
-
-        vertexIndex += values.length * 5;
-    }
-
-    @Deprecated public void pushCurve(Function<Float, Float> f, float minX, float maxX, int refinement, float stroke, float tintFloatBits) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (refinement < 2) throw new GraphicsException("refinement must be at least 2 for curve rendering. Got: " + refinement);
-        if (vertexIndex + refinement * 5 * 2 > VERTICES_CAPACITY * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
-            flush();
-        }
-
-        stroke = Math.abs(stroke);
-
-        setShader(defaultShader);
-        useTexture_old(whitePixel);
-        useCustomAttributes_old(null);
-        useMode_old(GL11.GL_TRIANGLES);
-
-        if (minX > maxX) {
-            float tmp = minX;
-            minX = maxX;
-            maxX = tmp;
-        }
-        float step = (maxX - minX) / refinement;
-
-        int startVertex = this.vertexIndex / VERTEX_SIZE;
-        for (int i = 0; i < refinement * 2 - 2; i += 2) {
-            indicesBuffer.put(startVertex + i);
-            indicesBuffer.put(startVertex + i + 1);
-            indicesBuffer.put(startVertex + i + 2);
-            indicesBuffer.put(startVertex + i + 2);
-            indicesBuffer.put(startVertex + i + 1);
-            indicesBuffer.put(startVertex + i + 3);
-        }
-
-        for (int i = 0; i < refinement; i++) {
-            float currentX = minX + step * i;
-            float currentY = f.apply(currentX);
-
-            float nextX = minX + step * (i + 1);
-            float nextY = f.apply(nextX);
-
-            Vector2 strokeVec = vectorsPool.allocate();
-            strokeVec.set(nextX - currentX, nextY - currentY);
-            strokeVec.nor();
-            strokeVec.rotate90(1);
-            strokeVec.scl(stroke * 0.5f);
-
-            float x1 = currentX + strokeVec.x;
-            float y1 = currentY + strokeVec.y;
-
-            float x2 = currentX - strokeVec.x;
-            float y2 = currentY - strokeVec.y;
-
-            verticesBuffer.put(x1).put(y1).put(tintFloatBits).put(0.5f).put(0.5f);
-            verticesBuffer.put(x2).put(y2).put(tintFloatBits).put(0.5f).put(0.5f);
-
-            vectorsPool.free(strokeVec);
-        }
-
-        vertexIndex += 6 * refinement * 5;
-    }
-
     @Deprecated public void pushThinPolygon(final Array<Vector2> worldVertices, final int[] indices, final float tintFloatBits) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (vertexIndex + worldVertices.size * 5 * 2 > VERTICES_CAPACITY * 4) { // left hand side are multiplied by 2 to make sure buffer overflow is prevented
@@ -2245,16 +2270,6 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += worldVertices.size * 5;
     }
 
-    @Deprecated private void useShader_old(ShaderProgram shader) {
-        if (shader == null) shader = defaultShader;
-        if (currentShader != shader) {
-            flush();
-            ShaderProgramBinder.bind(shader);
-            shader.bindUniform("u_camera_combined", currentCamera.lens.combined);
-        }
-        currentShader = shader;
-    }
-
     @Deprecated private void useTexture_old(Texture texture) {
         if (currentTexture != texture) {
             flush();
@@ -2275,147 +2290,6 @@ public class Renderer2D implements MemoryResourceHolder {
             flush();
         }
         this.currentMode = mode;
-    }
-
-    /**
-     * Renders the current batch, if not empty.
-     */
-    private void flush() {
-        if (verticesBuffer.position() == 0) return;
-
-        verticesBuffer.flip();
-        indicesBuffer.flip();
-        GL30.glBindVertexArray(vao);
-        {
-            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-            GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, verticesBuffer);
-            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
-            GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 0, indicesBuffer);
-
-            GL20.glEnableVertexAttribArray(0);
-            GL20.glEnableVertexAttribArray(1);
-            GL20.glEnableVertexAttribArray(2);
-            GL11.glDrawElements(currentMode, indicesBuffer.limit(), GL11.GL_UNSIGNED_INT, 0);
-            GL20.glDisableVertexAttribArray(2);
-            GL20.glDisableVertexAttribArray(1);
-            GL20.glDisableVertexAttribArray(0);
-        }
-        GL30.glBindVertexArray(0);
-
-        verticesBuffer.clear();
-        indicesBuffer.clear();
-        vertexIndex = 0;
-        drawCalls++;
-    }
-
-    /**
-     * Must be called after every call to begin().
-     */
-    public void end() {
-        if (!drawing) throw new GraphicsException("Called " + Renderer2D.class.getSimpleName() + ".end() without calling " + Renderer2D.class.getSimpleName() + ".begin() first.");
-        flush();
-        GL20.glDepthMask(true);
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        currentCamera = null;
-        currentShader = null;
-        drawing = false;
-    }
-
-    public int getDrawCalls() {
-        return drawCalls;
-    }
-
-    @Override
-    public void deleteAll() {
-        defaultShader.delete();
-        GL30.glDeleteVertexArrays(vao);
-        GL30.glDeleteBuffers(vbo);
-        GL30.glDeleteBuffers(ebo);
-        whitePixel.delete();
-    }
-
-    /* Create defaults: shader, texture (single white pixel), camera */
-
-    private static ShaderProgram createDefaultShaderProgram() {
-        try (InputStream vertexShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
-             BufferedReader vertexShaderBufferedReader = new BufferedReader(new InputStreamReader(vertexShaderInputStream, StandardCharsets.UTF_8));
-             InputStream fragmentShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
-             BufferedReader fragmentShaderBufferedReader = new BufferedReader(new InputStreamReader(fragmentShaderInputStream, StandardCharsets.UTF_8))) {
-
-            String vertexShader = vertexShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
-            String fragmentShader = fragmentShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
-            return new ShaderProgram(vertexShader, fragmentShader);
-        } catch (Exception e) {
-            System.err.println("Could not create shader program from resources: ");
-            e.printStackTrace();
-            String vertexShader = "#version 450\n" +
-                    "\n" +
-                    "// attributes\n" +
-                    "layout(location = 0) in vec2 a_position;\n" +
-                    "layout(location = 1) in vec4 a_color;\n" +
-                    "layout(location = 2) in vec2 a_texCoord0;\n" +
-                    "\n" +
-                    "// uniforms\n" +
-                    "uniform mat4 u_camera_combined;\n" +
-                    "\n" +
-                    "// outputs\n" +
-                    "out vec4 color;\n" +
-                    "out vec2 uv;\n" +
-                    "\n" +
-                    "void main() {\n" +
-                    "    color = a_color;\n" +
-                    "    uv = a_texCoord0;\n" +
-                    "    gl_Position = u_camera_combined * vec4(a_position.x, a_position.y, 0.0, 1.0);\n" +
-                    "};";
-
-            String fragmentShader = "#version 450\n" +
-                    "\n" +
-                    "// inputs\n" +
-                    "in vec4 color;\n" +
-                    "in vec2 uv;\n" +
-                    "\n" +
-                    "// uniforms\n" +
-                    "uniform sampler2D u_texture;\n" +
-                    "\n" +
-                    "// outputs\n" +
-                    "layout (location = 0) out vec4 out_color;\n" +
-                    "\n" +
-                    "void main() {\n" +
-                    "    out_color = color * texture(u_texture, uv);\n" +
-                    "}";
-
-            return new ShaderProgram(vertexShader, fragmentShader);
-        }
-    }
-
-    private static Texture createWhiteSinglePixelTexture() {
-        try {
-            return TextureBuilder.buildFromClassPath("graphics-2d-single-white-pixel.png");
-        } catch (Exception e) {
-            System.err.println("Could not create single white pixel texture from resource. Creating manually.");
-            e.printStackTrace();
-
-            ByteBuffer buffer = ByteBuffer.allocateDirect(4);
-            buffer.put((byte) ((0xFFFFFFFF >> 16) & 0xFF));   // Red component
-            buffer.put((byte) ((0xFFFFFFFF >> 8) & 0xFF));    // Green component
-            buffer.put((byte) (0xFF));           // Blue component
-            buffer.put((byte) ((0xFFFFFFFF >> 24) & 0xFF));   // Alpha component
-            buffer.flip();
-            int glHandle = GL11.glGenTextures();
-            Texture texture = new Texture(glHandle,
-                    1, 1,
-                    Texture.Filter.NEAREST, Texture.Filter.NEAREST,
-                    Texture.Wrap.CLAMP_TO_EDGE, Texture.Wrap.CLAMP_TO_EDGE
-            );
-            TextureBinder.bind(texture);
-            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, 1, 1, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-            return texture;
-        }
-    }
-
-    private static Camera createDefaultCamera() {
-        return new Camera(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight(), 1);
     }
 
 }

@@ -68,7 +68,7 @@ public class SceneRendering2D_Shapes_2 extends ApplicationScreen {
 
         // TODO: FIX HERE
         //renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x+dy) + 4,0.2f, -4, 4, 10, 10);
-        renderer2D.drawCurveFilled(x -> MathUtils.sinRad(x+dy) + 4,0.2f, -4, 4, 80, 10);
+        renderer2D.drawCurveFilled_broken2(x -> MathUtils.sinRad(x+dy) + 4,0.2f, -4, 4, 8);
         //renderer2D.drawCurveFilled_broken(x -> MathUtils.sinRad(x+dy) + 4,0.2f, -4, 4, 10, 10);
 
 
