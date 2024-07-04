@@ -258,7 +258,7 @@ public final class MathUtils {
      * @param out
      * @throws MathException
      */
-    public static boolean segmentIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) throws MathException {
+    public static boolean segmentsIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) {
         float Ax = a2.x - a1.x;
         float Ay = a2.y - a1.y;
         float Bx = b2.x - b1.x;
@@ -267,35 +267,43 @@ public final class MathUtils {
         float Cy = b1.y - a1.y;
 
         float det = Ax * By - Ay * Bx;
+        float t = (Cx * By - Cy * Bx) / det;
+        float u = (Ay * Cx - Ax * Cy) / det;
+
         /* handle degenerate cases */
         if (isZero(det)) {
             /* a1 == a2 == b1 == b2 */
-            if (a1.equals(a2) && b1.equals(b2) && a1.equals(b1)) {
+            if (a1.equals(a2) && b1.equals(b2) && a1.equals(b2)) {
                 out.set(a1);
                 return true;
             }
+
             /* a1 == a2 */
             if (a1.equals(a2) && pointOnSegment(a1,b1,b2)) {
                 out.set(a1);
                 return true;
             }
+
             /* ab == ab */
             if (b1.equals(b2) && pointOnSegment(b1,a1,a2)) {
                 out.set(b1);
                 return true;
             }
+
+            /* segments are parallel - they are either completely separate, or have some overlap. */
+            out.set(Float.NaN, Float.NaN);
+            if (pointOnSegment(b1, a1, a2)) return true;
+            if (pointOnSegment(b2, a1, a2)) return true;
+            if (pointOnSegment(a1, b1, b2)) return true;
+            if (pointOnSegment(a2, b1, b2)) return true;
+
+            return false;
         }
 
-        float t = (Cx * By - Cy * Bx) / det;
-        float u = (Ay * Cx - Ax * Cy) / det;
+        out.x = a1.x + t * (a2.x - a1.x);
+        out.y = a1.y + t * (a2.y - a1.y);
 
-        if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-            out.x = a1.x + t * (a2.x - a1.x);
-            out.y = a1.y + t * (a2.y - a1.y);
-            return true;
-        }
-
-        return false;
+        return t >= 0 && t <= 1 && u >= 0 && u <= 1;
     }
 
     /** Point p is on-line segment S: (a1, a2) if:
@@ -306,11 +314,16 @@ public final class MathUtils {
      * @param a2 second point on the line segment
     */
     public static boolean pointOnSegment(Vector2 p, Vector2 a1, Vector2 a2) {
-        Vector2 v1 = vector2MemoryPool.allocate().set(p).sub(a1);
-        Vector2 v2 = vector2MemoryPool.allocate().set(a2).sub(p);
+        Vector2 v1 = new Vector2().set(p).sub(a1);
+        Vector2 v2 = new Vector2().set(a2).sub(p);
 
         /* check co-linearity */
-        if (!isZero(Vector2.crs(v1, v2))) return false;
+        float crs = Vector2.crs(v1, v2);
+        if (Float.isNaN(crs)) {
+            /* handle degenerate cases */
+            if (p.x == a1.x && p.y == a1.y) return true;
+            if (p.x == a2.x && p.y == a2.y) return true;
+        } else if (!isZero(crs)) return false;
 
         /* check if point within bounding box */
         if (p.x > Math.max(a1.x, a2.x)) return false;
@@ -335,6 +348,12 @@ public final class MathUtils {
 
     public static boolean floatsEqual(float a, float b, float tolerance) {
         return Math.abs(a - b) <= tolerance;
+    }
+
+    public static boolean isNumeric(float a) {
+        if (Float.isNaN(a)) return false;
+        if (!Float.isFinite(a)) return false;
+        return true;
     }
 
     /** @return the logarithm of value with base a */

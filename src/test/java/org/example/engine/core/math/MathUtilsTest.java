@@ -244,7 +244,7 @@ class MathUtilsTest {
     }
 
     @Test
-    void testFindIntersection() {
+    void testSegmentsIntersection() {
         Vector2 a1 = new Vector2();
         Vector2 a2 = new Vector2();
         Vector2 b1 = new Vector2();
@@ -255,7 +255,7 @@ class MathUtilsTest {
         a2.set(1, 1);
         b1.set(0, 1);
         b2.set(1, 0);
-        boolean i1 = MathUtils.segmentIntersection(a1, a2, b1, b2, out);
+        boolean i1 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
         Assertions.assertTrue(i1);
         Assertions.assertEquals(0.5f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(0.5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
@@ -264,7 +264,7 @@ class MathUtilsTest {
         a2.set(0, 2);
         b1.set(-4, 1);
         b2.set(5, 1);
-        boolean i2 = MathUtils.segmentIntersection(a1, a2, b1, b2, out);
+        boolean i2 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
         Assertions.assertTrue(i2);
         Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(1f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
@@ -273,12 +273,46 @@ class MathUtilsTest {
         a2.set(0, 0);
         b1.set(-4, 0);
         b2.set(5, 0);
-        boolean i3 = MathUtils.segmentIntersection(a1, a2, b1, b2, out);
+        boolean i3 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
         Assertions.assertTrue(i3);
         Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
+        a1.set(0, 0);
+        a2.set(1, 0);
+        b1.set(0, 1);
+        b2.set(1, 1);
+        boolean i4 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertFalse(i4);
+        Assertions.assertEquals(Float.NaN, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(Float.NaN, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
+        a1.set(0, 0);
+        a2.set(0, 0);
+        b1.set(-4, 0);
+        b2.set(5, 0);
+        boolean i5 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertTrue(i5);
+        Assertions.assertEquals(0, out.x);
+        Assertions.assertEquals(0, out.y);
+
+        a1.set(0, 0);
+        a2.set(1, 0);
+        b1.set(4, 0);
+        b2.set(5, 0);
+        boolean i6 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertFalse(i6);
+        Assertions.assertEquals(Float.NaN, out.x);
+        Assertions.assertEquals(Float.NaN, out.y);
+
+        a1.set(0, 0);
+        a2.set(2, 0);
+        b1.set(1, 0);
+        b2.set(5, 0);
+        boolean i7 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertTrue(i7);
+        Assertions.assertEquals(Float.NaN, out.x);
+        Assertions.assertEquals(Float.NaN, out.y);
     }
 
     @Test
@@ -287,24 +321,71 @@ class MathUtilsTest {
         Vector2 a1 = new Vector2();
         Vector2 a2 = new Vector2();
 
+        p.set(0.4f,0);
         a1.set(0,0);
         a2.set(1,0);
-        p.set(0.4f,0);
         Assertions.assertTrue(MathUtils.pointOnSegment(p, a1, a2));
 
+        p.set(1.4f,0);
         a1.set(0,0);
         a2.set(1,0);
-        p.set(1.4f,0);
         Assertions.assertFalse(MathUtils.pointOnSegment(p, a1, a2));
 
+        p.set(0.5f,0.5f);
         a1.set(0,0);
         a2.set(1,1);
-        p.set(0.5f,0.5f);
         Assertions.assertTrue(MathUtils.pointOnSegment(p, a1, a2));
+
+        p.set(1.0f,1.0f);
+        a1.set(0,0);
+        a2.set(1,1);
+        Assertions.assertTrue(MathUtils.pointOnSegment(p, a1, a2));
+
+        p.set(-0.5f,-0.5f);
+        a1.set(-0.5f,-0.5f);
+        a2.set(1,1);
+        Assertions.assertTrue(MathUtils.pointOnSegment(p, a1, a2));
+
+        p.set(0.5f,0.6f);
+        a1.set(0,0);
+        a2.set(1,1);
+        Assertions.assertFalse(MathUtils.pointOnSegment(p, a1, a2));
+
+        p.set(1.0f,0.0f);
+        a1.set(0,0);
+        a2.set(Float.POSITIVE_INFINITY, 0);
+        Assertions.assertTrue(MathUtils.pointOnSegment(p, a1, a2));
+
+        p.set(1.0f,0.0f);
+        a1.set(0,0);
+        a2.set(-Float.POSITIVE_INFINITY, 0);
+        Assertions.assertFalse(MathUtils.pointOnSegment(p, a1, a2));
+
+        p.set(1.0f,1.0f);
+        a1.set(0,0);
+        a2.set(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
+        Assertions.assertTrue(MathUtils.pointOnSegment(p, a1, a2));
+
+        p.set(1.0f,-1.0f);
+        a1.set(0,0);
+        a2.set(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
+        Assertions.assertFalse(MathUtils.pointOnSegment(p, a1, a2));
+    }
+
+    @Test
+    void testIsNumeric() {
+        Assertions.assertTrue(MathUtils.isNumeric(4.0f));
+        Assertions.assertTrue(MathUtils.isNumeric(Float.MIN_VALUE));
+        Assertions.assertTrue(MathUtils.isNumeric(Float.MAX_VALUE));
+        Assertions.assertFalse(MathUtils.isNumeric(4.0f / 0f));
+        Assertions.assertFalse(MathUtils.isNumeric(Float.NaN));
+        Assertions.assertFalse(MathUtils.isNumeric(Float.POSITIVE_INFINITY));
+        Assertions.assertFalse(MathUtils.isNumeric(Float.NEGATIVE_INFINITY));
     }
 
     @Test
     void testSin() {
+
     }
 
     @Test
