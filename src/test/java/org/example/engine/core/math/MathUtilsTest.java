@@ -313,6 +313,15 @@ class MathUtilsTest {
         Assertions.assertTrue(i7);
         Assertions.assertEquals(Float.NaN, out.x);
         Assertions.assertEquals(Float.NaN, out.y);
+
+        a1.set(0, 0);
+        a2.set(2, 0);
+        b1.set(2, 0);
+        b2.set(4, 0);
+        boolean i8 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertTrue(i8);
+        Assertions.assertEquals(2, out.x);
+        Assertions.assertEquals(0, out.y);
     }
 
     @Test

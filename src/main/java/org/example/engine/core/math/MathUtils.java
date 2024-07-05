@@ -284,13 +284,26 @@ public final class MathUtils {
                 return true;
             }
 
-            /* ab == ab */
+            /* b1 == b2 */
             if (b1.equals(b2) && pointOnSegment(b1,a1,a2)) {
                 out.set(b1);
                 return true;
             }
 
-            /* segments are parallel - they are either completely separate, or have some overlap. */
+            /* Segments are parallel - they are either completely separate, or have some overlap. */
+            /* It is still possible that they have a unique intersection - if segment b "continues" a; i.e.:
+                a1 == b1 or a1 == b2, or a2 == b1 or a2 == b2.
+             */
+            if (a1.equals(b1) || a1.equals(b2)) {
+                out.set(a1);
+                return true;
+            }
+
+            if (a2.equals(b1) || a2.equals(b2)) {
+                out.set(a2);
+                return true;
+            }
+
             out.set(Float.NaN, Float.NaN);
             if (pointOnSegment(b1, a1, a2)) return true;
             if (pointOnSegment(b2, a1, a2)) return true;
