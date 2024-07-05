@@ -65,17 +65,18 @@ public class SceneRendering2D_Shapes_3 extends ApplicationScreen {
         renderer2D.begin(camera);
         renderer2D.setTint(blue);
 
-        Vector2 third = new Vector2(2, 0);
-        third.rotateAroundDeg(Vector2.Zero, dy * 10);
+        Vector2 third = new Vector2(0.2f, 0);
+        third.rotateAroundDeg(Vector2.Zero, dy * 25);
 
-        Array<Vector2> a = renderer2D.drawCurveFilled(1,8, new Vector2(-2,0), new Vector2(0,0), third);
+        // TODO: ***bug here*** when the refinement is too high and the segment is very narrow, narrower than the stroke, then we get problems.
+        Array<Vector2> a = renderer2D.drawCurveFilled(1,8, new Vector2(-4,0), new Vector2(0,0), third);
         for (int i = 0; i < a.size - 1; i += 2) {
             Vector2 v_up = a.get(i);
             Vector2 v_down = a.get(i + 1);
             renderer2D.setTint(Color.RED);
-            renderer2D.drawCircleFilled(0.1f, 10, v_up.x, v_up.y, 0,0,0,1,1);
+            renderer2D.drawCircleFilled(0.04f, 10, v_up.x, v_up.y, 0,0,0,1,1);
             renderer2D.setTint(Color.BLUE);
-            renderer2D.drawCircleFilled(0.1f, 10, v_down.x, v_down.y, 0,0,0,1,1);
+            renderer2D.drawCircleFilled(0.04f, 10, v_down.x, v_down.y, 0,0,0,1,1);
         }
 
         renderer2D.end();

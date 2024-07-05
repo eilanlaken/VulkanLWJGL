@@ -1190,6 +1190,12 @@ public class Renderer2D implements MemoryResourceHolder {
                 vertices.add(intersection_down);
                 vertices.add(corner_right_up);
                 vertices.add(intersection_down);
+            } else {
+                /* a very oblique angle - up-up and down-down are not intersecting. Try: up-down */
+                boolean b1 = MathUtils.segmentsIntersection(corner_prev_up, corner_left_up, corner_right_down, corner_next_down, intersection_up);
+                boolean b2 = MathUtils.segmentsIntersection(corner_prev_down, corner_left_down, corner_right_up, corner_next_up, intersection_down);
+                if (b1) System.out.println("b1");
+                if (b2) System.out.println("b2");
             }
 
 //            vertices.add(corner_prev_up);
