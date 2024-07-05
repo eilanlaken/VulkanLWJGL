@@ -1146,30 +1146,38 @@ public class Renderer2D implements MemoryResourceHolder {
 
         /* compute vertices */
         Array<Vector2> vertices = new Array<>(true, maxVertices);
+
         /* first 2 vertices */
         Vector2 first_up = vectorsPool.allocate().set(dirs.get(0)).rotate90(1).add(values[0]);
         Vector2 first_down = vectorsPool.allocate().set(dirs.get(0)).rotate90(-1).add(values[0]);
-        vertices.set(0, first_up, true);
-        vertices.set(1, first_down, true);
+        vertices.add(first_up);
+        vertices.add(first_down);
+
+        /* compute the vertices for all internal corners (ci):  c---ci---ci----ci----c */
+        for (int i = 1; i < values.length - 1; i++) {
+            Vector2 corner = values[i];
+
+            Vector2 corner_prev_up = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(1).add(corner);
+            Vector2 corner_prev_down = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(-1).add(corner);
+
+            Vector2 corner_next_up = vectorsPool.allocate().set(dirs.get(i)).rotate90(1).add(corner);
+            Vector2 corner_next_down = vectorsPool.allocate().set(dirs.get(i)).rotate90(-1).add(corner);
+
+
+            vertices.add(corner_prev_up);
+            vertices.add(corner_prev_down);
+
+            vertices.add(corner_next_up);
+            vertices.add(corner_next_down);
+        }
 
         /* last 2 vertices */
         Vector2 last_up = vectorsPool.allocate().set(dirs.get(dirs.size - 1)).rotate90(1).add(values[values.length - 1]);
         Vector2 last_down = vectorsPool.allocate().set(dirs.get(dirs.size - 1)).rotate90(-1).add(values[values.length - 1]);
-        vertices.set(maxVertices - 2, last_up, true);
-        vertices.set(maxVertices - 1, last_down, true);
+        vertices.add(last_up);
+        vertices.add(last_down);
 
-        /* compute the vertices for all internal corners .--.--.--. */
-        for (int i = 1; i < values.length - 1; i++) {
-            Vector2 corner = values[i];
-
-            Vector2 n_prev_up = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(1);
-            Vector2 n_prev_down = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(-1);
-
-            Vector2 n_next_up = vectorsPool.allocate().set(dirs.get(i)).rotate90(1);
-            Vector2 n_next_down = vectorsPool.allocate().set(dirs.get(i)).rotate90(-1);
-
-
-        }
+        //vectorsPool.freeAll(vertices);
 
         return vertices;
 
