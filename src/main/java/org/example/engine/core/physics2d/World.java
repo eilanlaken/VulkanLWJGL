@@ -5,6 +5,7 @@ import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
+import org.example.engine.core.shape.ShapeUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -490,7 +491,7 @@ public class World {
         body.off = false;
         body.motionType = motionType;
 
-        boolean convex = MathUtils.isPolygonConvex(vertices);
+        boolean convex = ShapeUtils.isPolygonConvex_old(vertices);
 
         if (!convex) throw new IllegalArgumentException("concave polygons not supported yet.");
 

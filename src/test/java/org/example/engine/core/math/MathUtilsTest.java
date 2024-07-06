@@ -1,6 +1,8 @@
 package org.example.engine.core.math;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayInt;
+import org.example.engine.core.collections.CollectionsUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -550,6 +552,8 @@ class MathUtilsTest {
         Assertions.assertFalse(Vector2.areColinear(v1,v2,v3));
     }
 
+
+
     @Test
     void triangulatePolygon() {
         ArrayInt indices = new ArrayInt();
@@ -562,6 +566,16 @@ class MathUtilsTest {
 
         float[] poly_3 = new float[] {0,0,  1,0,  1,1, 0.5f,1f,  0,1};
         MathUtils.triangulatePolygon(poly_3, indices);
+    }
+
+    @Test
+    void isConvex() {
+        float[] vertices_1 = new float[] {0,0,   1,0,   1,1,   0,1};
+        Assertions.assertTrue(MathUtils.isPolygonConvex(vertices_1));
+
+
+        float[] vertices_2 = new float[] {0,0,   1,0,   0.25f,0.25f,   0,1};
+        Assertions.assertFalse(MathUtils.isPolygonConvex(vertices_2));
     }
 
     // TODO: remove

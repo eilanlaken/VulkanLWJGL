@@ -4,6 +4,7 @@ import org.example.engine.core.collections.Array;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryUtils;
+import org.example.engine.core.shape.ShapeUtils;
 import org.jetbrains.annotations.NotNull;
 
 /*
@@ -51,7 +52,7 @@ public final class BodyColliderPolygon extends BodyCollider {
         for (int i = 0; i < vertexCount; i++) {
             this.worldVertices.add(new Vector2());
         }
-        this.indices = MathUtils.triangulate2DPolygon(this.vertices);
+        this.indices = ShapeUtils.triangulate2DPolygon(this.vertices);
     }
 
     @Override
