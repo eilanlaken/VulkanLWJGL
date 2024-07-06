@@ -1,6 +1,8 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.ArrayInt;
+import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
@@ -25,28 +27,28 @@ import java.util.stream.Collectors;
 
 public class Renderer2D implements MemoryResourceHolder {
 
-    // constants
+    /* constants */
     private static final int   VERTEX_SIZE       = 5;    // A vertex is composed of 5 floats: x,y: position, t: color (as float bits) and u,v: texture coordinates.
     private static final int   VERTICES_CAPACITY = 6000; // The batch can render VERTICES_CAPACITY vertices (so wee need a float buffer of size: VERTICES_CAPACITY * VERTEX_SIZE)
     private static final int   INDICES_CAPACITY  = VERTICES_CAPACITY * 2; // TODO
     private static final float WHITE_TINT        = Color.WHITE.toFloatBits();
 
-    // buffers
+    /* buffers */
     private final int         vao;
     private final int         vbo;
     private final int         ebo;
     private final IntBuffer   indicesBuffer  = BufferUtils.createIntBuffer(INDICES_CAPACITY * 3);
     private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(VERTICES_CAPACITY * VERTEX_SIZE);
 
-    // defaults
+    /* defaults */
     private final ShaderProgram defaultShader = createDefaultShaderProgram();
     private final Texture       whitePixel    = createWhiteSinglePixelTexture();
     private final Camera        defaultCamera = createDefaultCamera();
 
-    // memory pools
+    /* memory pools */
     private final MemoryPool<Vector2> vectorsPool = new MemoryPool<>(Vector2.class, 10);
 
-    // state
+    /* state */
     private Camera        currentCamera  = null;
     private Texture       currentTexture = null;
     private ShaderProgram currentShader  = null;
@@ -58,6 +60,9 @@ public class Renderer2D implements MemoryResourceHolder {
     private int           currentDFactor = GL11.GL_ONE_MINUS_SRC_ALPHA;
     private int           drawCalls      = 0;
 
+    /* caches */
+    private final Array<Vector2> vertices = new Array<>(true, 100);
+    private final ArrayInt       indices  = new ArrayInt(true, 100);
 
     public Renderer2D() {
         this.vao = GL30.glGenVertexArrays();
@@ -96,8 +101,8 @@ public class Renderer2D implements MemoryResourceHolder {
         if (drawing) throw new GraphicsException("Already in a drawing state; Must call " + Renderer2D.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);
-        GL11.glEnable(GL11.GL_BLEND); // TODO: make camera attributes, get as additional parameter to begin()
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); // TODO: make camera attributes, get as additional parameter to begin()
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         this.drawCalls = 0;
         this.currentCamera = camera != null ? camera : defaultCamera.update(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight());
         setShader(defaultShader);
@@ -945,6 +950,47 @@ public class Renderer2D implements MemoryResourceHolder {
         vectorsPool.freeAll(vertices);
         vertexIndex += 8;
     }
+
+    /* Rendering 2D primitives - Polygons */
+    public void drawPolygonThin(float[] polygon, boolean triangulated, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (polygon.length < 6) throw new GraphicsException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.length);
+        if (polygon.length % 2 != 0) throw new GraphicsException("Polygon must be represented as a flat array of vertices, each vertex must have x and y coordinates: [x0,y0,  x1,y1, ...]. Therefore, polygon array length must be even.");
+
+        if ((vertexIndex + polygon.length / 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_LINES);
+
+        scaleX *= MathUtils.cosDeg(angleY);
+        scaleY *= MathUtils.cosDeg(angleX);
+
+        Vector2 vertex = vectorsPool.allocate();
+        for (int i = 0; i < polygon.length; i += 2) {
+            float poly_x = polygon[i];
+            float poly_y = polygon[i + 1];
+
+            vertex.set(poly_x, poly_y);
+            vertex.scl(scaleX, scaleY);
+            vertex.rotateDeg(angleZ);
+            vertex.add(x, y);
+
+            verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
+        }
+        vectorsPool.free(vertex);
+
+        int startVertex = this.vertexIndex;
+        if (!triangulated) {
+            for (int i = 0; i < polygon.length / 2; i++) {
+                indicesBuffer.put(startVertex + i);
+                indicesBuffer.put(startVertex + i + 1);
+            }
+            indicesBuffer.put(startVertex + polygon.length / 2 - 1);
+            indicesBuffer.put(startVertex + 0);
+        }
+
+        vertexIndex += polygon.length / 2;
+    }
+
 
     /* Rendering 2D primitives - Lines */
 

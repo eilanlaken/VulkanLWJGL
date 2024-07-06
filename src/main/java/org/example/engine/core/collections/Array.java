@@ -1,10 +1,11 @@
 package org.example.engine.core.collections;
 
 import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.memory.MemoryPool;
 
 import java.util.*;
 
-public class Array<T> implements Iterable<T> {
+public class Array<T> implements Iterable<T>, MemoryPool.Reset {
 
     public  int              size;
     public  T[]              items;
@@ -22,7 +23,7 @@ public class Array<T> implements Iterable<T> {
     }
 
     public Array(boolean ordered, int capacity) {
-        if (capacity <= 0) throw new IllegalArgumentException(Array.class.getSimpleName() + " must have a positive capacity. Got: " + capacity);
+        capacity = Math.max(1, capacity);
         this.ordered = ordered;
         items = (T[])new Object[capacity];
     }
@@ -463,6 +464,12 @@ public class Array<T> implements Iterable<T> {
         for (int i = 0; i < n; i++)
             if (items1[i] != items2[i]) return false;
         return true;
+    }
+
+    @Override
+    public void reset() {
+        clear();
+        this.ordered = true;
     }
 
     @Override
