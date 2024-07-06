@@ -957,6 +957,7 @@ public class Renderer2D implements MemoryResourceHolder {
         if (polygon.length < 6) throw new GraphicsException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.length);
         if (polygon.length % 2 != 0) throw new GraphicsException("Polygon must be represented as a flat array of vertices, each vertex must have x and y coordinates: [x0,y0,  x1,y1, ...]. Therefore, polygon array length must be even.");
 
+        int count = polygon.length / 2;
         if ((vertexIndex + polygon.length / 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
 
         setMode(GL11.GL_LINES);
@@ -980,15 +981,15 @@ public class Renderer2D implements MemoryResourceHolder {
 
         int startVertex = this.vertexIndex;
         if (!triangulated) {
-            for (int i = 0; i < polygon.length / 2; i++) {
+            for (int i = 0; i < count - 1; i++) {
                 indicesBuffer.put(startVertex + i);
                 indicesBuffer.put(startVertex + i + 1);
             }
-            indicesBuffer.put(startVertex + polygon.length / 2 - 1);
+            indicesBuffer.put(startVertex + count - 1);
             indicesBuffer.put(startVertex + 0);
         }
 
-        vertexIndex += polygon.length / 2;
+        vertexIndex += count;
     }
 
 

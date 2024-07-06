@@ -76,6 +76,7 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
 
         renderer2D.setTint(new Color(1,0,0,1));
         renderer2D.drawPolygonThin(new float[] {0,0, 1,0, 1,1, 0,1}, false, 0, 0, 0, 0, 0, 1, 1);
+        renderer2D.drawPolygonThin(new float[] {-4,0, -5,0, -5,1, -4,1}, false, 0, 0, 0, 0, 0, 1, 1);
 
         //renderer2D.drawRectangleThin(4,2,0,0,0,0,0,1,1);
         //renderer2D.drawPolygonThin(new float[] {0-4,0, 1-4,0, 1-4,1, 0-4,1}, false, 0, 0, 0, 0, 0, 1, 1);
