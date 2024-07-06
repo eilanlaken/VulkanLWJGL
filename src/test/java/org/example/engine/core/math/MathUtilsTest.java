@@ -2,6 +2,16 @@ package org.example.engine.core.math;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
+import org.locationtech.jts.operation.union.CascadedPolygonUnion;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class MathUtilsTest {
 
@@ -460,4 +470,85 @@ class MathUtilsTest {
     @Test
     void testLog() {
     }
+
+    @Test
+    void subtractPolygons() throws ParseException {
+        GeometryFactory geometryFactory = new GeometryFactory();
+        WKTReader reader = new WKTReader(geometryFactory);
+        // Define polygons in set P (using WKT for simplicity)
+        List<Geometry> polygonSetP = new ArrayList<>();
+        polygonSetP.add(reader.read("POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0))"));
+
+        // Define polygons in set S (using WKT for simplicity)
+        List<Geometry> polygonSetS = new ArrayList<>();
+        polygonSetS.add(reader.read("POLYGON ((2 2, 6 2, 6 6, 2 6, 2 2))")); // Example polygon
+        // Add more polygons to polygonSetS as needed
+
+        // Union all polygons in set S
+        Geometry unionOfS = CascadedPolygonUnion.union(polygonSetS);
+
+        // Subtract S from each polygon in P
+        List<Geometry> resultSetA = new ArrayList<>();
+        for (Geometry p : polygonSetP) {
+            Geometry result = p.difference(unionOfS);
+            if (!result.isEmpty()) {
+                resultSetA.add(result);
+            }
+        }
+
+        // Output the resulting polygons
+        for (Geometry result : resultSetA) {
+            System.out.println(result);
+        }
+    }
+
+    @Test
+    void subtractPolygons2() {
+        GeometryFactory geometryFactory = new GeometryFactory();
+
+        // Define polygon P1 using arrays of coordinates
+        Coordinate[] coordinatesP1 = new Coordinate[] {
+                new Coordinate(0, 0),
+                new Coordinate(4, 0),
+                new Coordinate(4, 4),
+                new Coordinate(0, 4),
+                new Coordinate(0, 0) // Closed ring
+        };
+        Polygon polygonP1 = geometryFactory.createPolygon(coordinatesP1);
+
+        // Define polygon S1 using arrays of coordinates
+        Coordinate[] coordinatesS1 = new Coordinate[] {
+                new Coordinate(2, 2),
+                new Coordinate(6, 2),
+                new Coordinate(6, 6),
+                new Coordinate(2, 6),
+                new Coordinate(2, 2) // Closed ring
+        };
+        Polygon polygonS1 = geometryFactory.createPolygon(coordinatesS1);
+
+        // Add polygons to their respective sets
+        List<Geometry> polygonSetP = new ArrayList<>();
+        polygonSetP.add(polygonP1);
+
+        List<Geometry> polygonSetS = new ArrayList<>();
+        polygonSetS.add(polygonS1);
+
+        // Union all polygons in set S
+        Geometry unionOfS = CascadedPolygonUnion.union(polygonSetS);
+
+        // Subtract S from each polygon in P
+        List<Geometry> resultSetA = new ArrayList<>();
+        for (Geometry p : polygonSetP) {
+            Geometry result = p.difference(unionOfS);
+            if (!result.isEmpty()) {
+                resultSetA.add(result);
+            }
+        }
+
+        // Output the resulting polygons
+        for (Geometry result : resultSetA) {
+            System.out.println(result);
+        }
+    }
+
 }
