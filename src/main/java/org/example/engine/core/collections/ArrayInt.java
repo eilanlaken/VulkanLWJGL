@@ -57,7 +57,8 @@ public class ArrayInt {
         items[index] = value;
     }
 
-    public int getCircular(int index) {
+    public int getCyclic(int index) {
+        if (size == 0) throw new CollectionsException(Array.class.getSimpleName() + " is empty.");
         if (index >= size) return items[index % size];
         else if (index < 0) return items[index % size + size];
         return items[index];
@@ -140,7 +141,7 @@ public class ArrayInt {
      * items to avoid multiple backing array resizes.
      * @return {@link #items} */
     public int[] ensureCapacity (int additionalCapacity) {
-        if (additionalCapacity < 0) throw new IllegalArgumentException("additionalCapacity must be >= 0: " + additionalCapacity);
+        if (additionalCapacity < 0) throw new CollectionsException("additionalCapacity must be >= 0: " + additionalCapacity);
         int sizeNeeded = size + additionalCapacity;
         if (sizeNeeded > items.length) resize(Math.max(Math.max(8, sizeNeeded), (int)(size * 1.75f)));
         return items;

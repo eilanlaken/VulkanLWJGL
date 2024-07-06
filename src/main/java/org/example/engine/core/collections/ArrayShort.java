@@ -121,7 +121,8 @@ public class ArrayShort {
         return items[index];
     }
 
-    public short getCircular(int index) {
+    public short getCyclic(int index) {
+        if (size == 0) throw new CollectionsException(Array.class.getSimpleName() + " is empty.");
         if (index >= size) return items[index % size];
         else if (index < 0) return items[index % size + size];
         return items[index];

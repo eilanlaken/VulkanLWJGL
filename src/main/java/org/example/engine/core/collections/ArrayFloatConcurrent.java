@@ -114,7 +114,8 @@ public class ArrayFloatConcurrent {
         return items[index];
     }
 
-    public synchronized float getCircular(int index) {
+    public synchronized float getCyclic(int index) {
+        if (size == 0) throw new CollectionsException(Array.class.getSimpleName() + " is empty.");
         if (index >= size) return items[index % size];
         else if (index < 0) return items[index % size + size];
         return items[index];

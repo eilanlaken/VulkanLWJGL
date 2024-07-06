@@ -1,5 +1,6 @@
 package org.example.engine.core.math;
 
+import org.example.engine.core.collections.ArrayInt;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -42,11 +43,11 @@ class MathUtilsTest {
     @Test
     void normalizeAngleRad() {
         Assertions.assertEquals(0.0f, MathUtils.normalizeAngleRad(0.0f), MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0.0f, MathUtils.normalizeAngleRad(MathUtils.PI2), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.0f, MathUtils.normalizeAngleRad(MathUtils.PI_TWO), MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(1.0f, MathUtils.normalizeAngleRad(1.0f), MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0.1f, MathUtils.normalizeAngleRad(MathUtils.PI2 + 0.1f), MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(MathUtils.PI2 - 0.1f, MathUtils.normalizeAngleRad(-0.1f), MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0.1f, MathUtils.normalizeAngleRad(MathUtils.PI2 * 3 + 0.1f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.1f, MathUtils.normalizeAngleRad(MathUtils.PI_TWO + 0.1f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(MathUtils.PI_TWO - 0.1f, MathUtils.normalizeAngleRad(-0.1f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.1f, MathUtils.normalizeAngleRad(MathUtils.PI_TWO * 3 + 0.1f), MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test
@@ -502,6 +503,68 @@ class MathUtilsTest {
         }
     }
 
+    @Test
+    void areColinear() {
+        Vector2 v1 = new Vector2();
+        Vector2 v2 = new Vector2();
+        Vector2 v3 = new Vector2();
+
+        v1.set(0,0);
+        v2.set(1,0);
+        v3.set(2,0);
+        Assertions.assertTrue(Vector2.areColinear(v1,v2,v3));
+
+        v1.set(0,1);
+        v2.set(0,2);
+        v3.set(0,3);
+        Assertions.assertTrue(Vector2.areColinear(v1,v2,v3));
+
+        v1.set(0,0);
+        v2.set(1,1);
+        v3.set(2,2);
+        Assertions.assertTrue(Vector2.areColinear(v1,v2,v3));
+
+        v1.set(0,0);
+        v2.set(1,1);
+        v3.set(-5,-5);
+        Assertions.assertTrue(Vector2.areColinear(v1,v2,v3));
+
+        v1.set(0,0);
+        v2.set(1,1);
+        v3.set(2,0);
+        Assertions.assertFalse(Vector2.areColinear(v1,v2,v3));
+
+        v1.set(-1,-1);
+        v2.set(2,-2);
+        v3.set(4,3);
+        Assertions.assertFalse(Vector2.areColinear(v1,v2,v3));
+
+        v1.set(0,0);
+        v2.set(0,-6);
+        v3.set(2,5);
+        Assertions.assertFalse(Vector2.areColinear(v1,v2,v3));
+
+        v1.set(10,-10);
+        v2.set(100,100);
+        v3.set(-555,-555);
+        Assertions.assertFalse(Vector2.areColinear(v1,v2,v3));
+    }
+
+    @Test
+    void triangulatePolygon() {
+        ArrayInt indices = new ArrayInt();
+        float[] poly_1 = new float[] {0,0,  1,0,  1,1,  0,1};
+        MathUtils.triangulatePolygon(poly_1, indices);
+        System.out.println(indices);
+
+        float[] poly_2 = new float[] {0,1,  1,1,  1,0,  0,0};
+        MathUtils.triangulatePolygon(poly_2, indices);
+
+        float[] poly_3 = new float[] {0,0,  1,0,  1,1, 0.5f,1f,  0,1};
+        MathUtils.triangulatePolygon(poly_3, indices);
+    }
+
+    // TODO: remove
     @Test
     void subtractPolygons2() {
         GeometryFactory geometryFactory = new GeometryFactory();

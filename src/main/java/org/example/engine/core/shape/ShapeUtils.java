@@ -308,8 +308,8 @@ public final class ShapeUtils {
      */
     public static float getRelativeRotationRad(final Shape2D shape_1, final Shape2D shape_2) {
         float rr = (shape_1.angle() - shape_2.angle()) * MathUtils.degreesToRadians;
-        if (rr < -MathUtils.PI) rr += MathUtils.PI2;
-        if (rr >  MathUtils.PI) rr -= MathUtils.PI2;
+        if (rr < -MathUtils.PI) rr += MathUtils.PI_TWO;
+        if (rr >  MathUtils.PI) rr -= MathUtils.PI_TWO;
         return rr;
     }
 

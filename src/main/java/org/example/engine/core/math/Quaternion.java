@@ -402,7 +402,7 @@ public class Quaternion implements MemoryPool.Reset {
         float d = Vector3.len(x, y, z);
         if (d == 0f) return idt();
         d = 1f / d;
-        float l_ang = radians < 0 ? MathUtils.PI2 - (-radians % MathUtils.PI2) : radians % MathUtils.PI2;
+        float l_ang = radians < 0 ? MathUtils.PI_TWO - (-radians % MathUtils.PI_TWO) : radians % MathUtils.PI_TWO;
         float l_sin = (float)Math.sin(l_ang / 2);
         float l_cos = (float)Math.cos(l_ang / 2);
         return this.set(d * x * l_sin, d * y * l_sin, d * z * l_sin, l_cos).nor();

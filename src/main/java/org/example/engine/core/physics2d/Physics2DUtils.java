@@ -95,8 +95,8 @@ public final class Physics2DUtils {
      */
     public static float getRelativeRotationRad(Body body_1, Body body_2, float referenceAngleRad) {
         float rr = (body_1.aRad - body_2.aRad) - referenceAngleRad;
-        if (rr < -MathUtils.PI) rr += MathUtils.PI2;
-        if (rr >  MathUtils.PI) rr -= MathUtils.PI2;
+        if (rr < -MathUtils.PI) rr += MathUtils.PI_TWO;
+        if (rr >  MathUtils.PI) rr -= MathUtils.PI_TWO;
         return rr;
     }
 

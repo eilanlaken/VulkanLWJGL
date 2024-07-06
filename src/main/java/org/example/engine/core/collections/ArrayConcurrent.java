@@ -107,7 +107,7 @@ public class ArrayConcurrent<T> implements Iterable<T> {
         return items[index];
     }
 
-    public synchronized T getCircular(int index) {
+    public synchronized T getCyclic(int index) {
         if (size == 0) throw new IllegalStateException(ArrayConcurrent.class.getSimpleName() + " is empty.");
         if (index >= size) return items[index % size];
         else if (index < 0) return items[index % size + size];

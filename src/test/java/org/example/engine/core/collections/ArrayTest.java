@@ -47,7 +47,7 @@ class ArrayTest {
     }
 
     @Test
-    void getCircular() {
+    void getCyclic() {
     }
 
     @Test

@@ -1,9 +1,11 @@
 package org.example.engine.core.math;
 
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,25 +14,26 @@ import java.util.Random;
 // TODO: implement init() block that will take care of configuration.
 public final class MathUtils {
 
-    public static  final float   NANO_TO_SEC          = 1.0f / 1000000000f;
     public static  final float   FLOAT_ROUNDING_ERROR = 0.000001f; // 32 bits
     public static  final float   PI                   = (float) Math.PI;
-    public static  final float   PI2                  = PI * 2;
-    public static  final float   HALF_PI              = PI / 2;
+    public static  final float   PI_TWO               = PI * 2;
+    public static  final float   PI_HALF              = PI / 2;
     public static  final float   E                    = (float) Math.E;
     public static  final float   radiansToDegrees     = 180f / PI;
     public static  final float   degreesToRadians     = PI / 180;
     private static final int     SIN_BITS             = 14; // 16KB. Adjust for accuracy.
     private static final int     SIN_MASK             = ~(-1 << SIN_BITS);
     private static final int     SIN_COUNT            = SIN_MASK + 1;
-    private static final float   RADIANS_FULL         = PI2;
+    private static final float   RADIANS_FULL         = PI_TWO;
     private static final float   DEGREES_FULL         = 360.0f;
     private static final float   RADIANS_TO_INDEX     = SIN_COUNT / RADIANS_FULL;
     private static final float   DEGREES_TO_INDEX     = SIN_COUNT / DEGREES_FULL;
     private static final Random  random               = new Random();
 
-    private static final MemoryPool<Vector2>   vector2MemoryPool   = new MemoryPool<>(Vector2.class, 5);
-    private static final MemoryPool<Matrix2x2> matrix2x2MemoryPool = new MemoryPool<>(Matrix2x2.class, 2);
+    private static final MemoryPool<Vector2>   vectors2Pool  = new MemoryPool<>(Vector2.class, 5);
+    private static final MemoryPool<Matrix2x2> matrix2x2Pool = new MemoryPool<>(Matrix2x2.class, 2);
+
+    private static final Array<Vector2> polygonVertices = new Array<>(false, 10);
 
     private MathUtils() {}
 
@@ -114,8 +117,8 @@ public final class MathUtils {
             if (y >= 0) return atanUnchecked(n) + PI;
             return atanUnchecked(n) - PI;
         } else if (y > 0)
-            return x + HALF_PI;
-        else if (y < 0) return x - HALF_PI;
+            return x + PI_HALF;
+        else if (y < 0) return x - PI_HALF;
         return x + y; // returns 0 for 0,0 or NaN if either y or x is NaN
     }
 
@@ -166,7 +169,7 @@ public final class MathUtils {
     }
 
     public static float cosRad(float radians) {
-        return Sin.lookup[(int)((radians + HALF_PI) * RADIANS_TO_INDEX) & SIN_MASK];
+        return Sin.lookup[(int)((radians + PI_HALF) * RADIANS_TO_INDEX) & SIN_MASK];
     }
 
     public static float sinDeg(float degrees) {
@@ -241,8 +244,8 @@ public final class MathUtils {
     }
 
     public static float normalizeAngleRad(float rad) {
-        rad %= PI2;
-        if (rad < 0) rad += PI2;
+        rad %= PI_TWO;
+        if (rad < 0) rad += PI_TWO;
         return rad;
     }
 
@@ -378,7 +381,6 @@ public final class MathUtils {
         return a + step * (b - a);
     }
 
-    // TODO: move to init block
     private static class Sin {
 
         private static final float[] lookup = new float[SIN_COUNT];
@@ -399,8 +401,8 @@ public final class MathUtils {
      */
     public static float getRelativeRotationRad(final Shape2D shape_1, final Shape2D shape_2) {
         float rr = (shape_1.angle() - shape_2.angle()) * MathUtils.degreesToRadians;
-        if (rr < -MathUtils.PI) rr += MathUtils.PI2;
-        if (rr >  MathUtils.PI) rr -= MathUtils.PI2;
+        if (rr < -MathUtils.PI) rr += MathUtils.PI_TWO;
+        if (rr >  MathUtils.PI) rr -= MathUtils.PI_TWO;
         return rr;
     }
 
@@ -417,6 +419,11 @@ public final class MathUtils {
 
     public static float getAreaTriangle(float ax, float ay, float bx, float by, float cx, float cy) {
         return 0.5f * Math.abs((bx - ax) * (cy - ay) - (by - ay) * (cx - ax));
+    }
+
+    public static boolean pointInTriangle(float px, float py, float ax, float ay, float bx, float by, float cx, float cy) {
+        return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 && (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0
+                && (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;
     }
 
     /**
@@ -466,13 +473,136 @@ public final class MathUtils {
         return true;
     }
 
+    public static void triangulatePolygon(@NotNull float[] polygon, @NotNull ArrayInt out) {
+        if (polygon.length < 6) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.length);
+        if (polygon.length % 2 != 0) throw new MathException("Polygon must be represented as a flat array of vertices, each vertex must have x and y coordinates: [x0,y0,  x1,y1, ...]. Therefore, polygon array length must be even.");
+
+        polygonVertices.clear();
+        Vector2 prev    = vectors2Pool.allocate();
+        Vector2 current = vectors2Pool.allocate();
+        Vector2 next    = vectors2Pool.allocate();
+        for (int i = 0; i < polygon.length; i += 2) {
+
+            prev.x = CollectionsUtils.getCyclic(polygon, i - 2);
+            prev.y = CollectionsUtils.getCyclic(polygon, i - 1);
+
+            current.x = polygon[i];
+            current.y = polygon[i + 1];
+
+            next.x = CollectionsUtils.getCyclic(polygon, i + 2);
+            next.y = CollectionsUtils.getCyclic(polygon, i + 3);
+
+            if (Vector2.areColinear(prev, current, next)) continue;
+
+            Vector2 vertex = vectors2Pool.allocate();
+            vertex.x = current.x;
+            vertex.y = current.y;
+            polygonVertices.add(vertex);
+        }
+
+        if (polygonVertices.size < 3) throw new MathException("Polygon contains 1 or more colinear vertices; When removed, that total vertex count is: " + polygonVertices.size + ". Must have at least 3 non-colinear vertices.");
+
+        int windingOrder = MathUtils.polygonWindingOrder(polygon);
+        if (windingOrder > 0) polygonVertices.reverse();
+
+        out.clear();
+
+        ArrayInt indexList = new ArrayInt();
+        for(int i = 0; i < polygonVertices.size; i++) {
+            indexList.add(i);
+        }
+
+        int totalTriangleCount = polygonVertices.size - 2;
+        int totalTriangleIndexCount = totalTriangleCount * 3;
+
+        out.clear();
+        out.ensureCapacity(totalTriangleIndexCount);
+
+        Vector2 va_to_vb = vectors2Pool.allocate();
+        Vector2 va_to_vc = vectors2Pool.allocate();
+
+        while(indexList.size > 3) {
+            for (int i = 0; i < indexList.size; i++) {
+                int a = indexList.get(i);
+                int b = indexList.getCyclic(i - 1);
+                int c = indexList.getCyclic(i + 1);
+
+                Vector2 va = polygonVertices.get(a);
+                Vector2 vb = polygonVertices.get(b);
+                Vector2 vc = polygonVertices.get(c);
+
+                va_to_vb.x = vb.x - va.x;
+                va_to_vb.y = vb.y - va.y;
+
+                va_to_vc.x = vc.x - va.x;
+                va_to_vc.y = vc.y - va.y;
+
+                // Is ear test vertex convex?
+                if (Vector2.crs(va_to_vb, va_to_vc) > 0f) {
+                    continue;
+                }
+
+                boolean isEar = true;
+
+                // Does test ear contain any polygon vertices?
+                for (int j = 0; j < polygonVertices.size; j++) {
+                    if (j == a || j == b || j == c) continue;
+                    Vector2 p = polygonVertices.get(j);
+                    if (pointInTriangle(p.x, p.y, vb.x, vb.y, va.x, va.y, vc.x, vc.y)) {
+                        isEar = false;
+                        break;
+                    }
+                }
+
+                if (isEar) {
+                    out.add(b);
+                    out.add(a);
+                    out.add(c);
+
+                    indexList.removeIndex(i);
+                    break;
+                }
+            }
+        }
+
+        out.add(indexList.get(0));
+        out.add(indexList.get(1));
+        out.add(indexList.get(2));
+
+        /* free resources */
+        vectors2Pool.free(prev);
+        vectors2Pool.free(current);
+        vectors2Pool.free(next);
+        vectors2Pool.free(va_to_vb);
+        vectors2Pool.free(va_to_vc);
+
+        //System.out.println(polygonVertices);
+
+        vectors2Pool.freeAll(polygonVertices);
+    }
+
+
+
+
+
+
+
+
+    /* TODO: remove old polygon triangulation. */
+
+
+
+
+
+
+
     /**
      * Triangulates the given polygon
      *
      * @param vertices is a flat array of vertice coordinates like [x0,y0, x1,y1, x2,y2, ...].
      * @return List containing groups of three vertice indices in the resulting array forms a triangle.
      */
-    public static int[] triangulate2DPolygon(float[] vertices) {
+    @Deprecated public static int[] triangulate2DPolygon(float[] vertices) {
         return triangulatePolygon(vertices, null, 2);
     }
 
@@ -484,7 +614,7 @@ public final class MathUtils {
      * @param dim  is the number of coordinates per vertice in the input array
      * @return List containing groups of three vertice indices in the resulting array forms a triangle.
      */
-    public static int[] triangulatePolygon(float[] data, int[] holeIndices, int dim) {
+    private static int[] triangulatePolygon(float[] data, int[] holeIndices, int dim) {
         boolean hasHoles = holeIndices != null && holeIndices.length > 0;
         int outerLen = hasHoles ? holeIndices[0] * dim : data.length;
         Node outerNode = linkedList(data, 0, outerLen, dim, true);
@@ -532,7 +662,7 @@ public final class MathUtils {
         return triangles.pack().items;
     }
 
-    private static void triangulateLinked(Node ear, ArrayInt triangles, int dim, float minX, float minY, float invSize, int pass) {
+    @Deprecated private static void triangulateLinked(Node ear, ArrayInt triangles, int dim, float minX, float minY, float invSize, int pass) {
         if (ear == null)
             return;
 
@@ -575,7 +705,7 @@ public final class MathUtils {
         }
     }
 
-    private static void splitPolygon(Node start, ArrayInt triangles, int dim, float minX, float minY, float size) {
+    @Deprecated private static void splitPolygon(Node start, ArrayInt triangles, int dim, float minX, float minY, float size) {
         // look for a valid diagonal that divides the polygon into two
         Node a = start;
         do {
@@ -596,14 +726,14 @@ public final class MathUtils {
         } while (a != start);
     }
 
-    private static boolean isValidDiagonal(Node a, Node b) {
+    @Deprecated private static boolean isValidDiagonal(Node a, Node b) {
         return a.next.i != b.i && a.prev.i != b.i && !intersectsPolygon(a, b) && // doesn't intersect other edges
                 (locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && // locally visible
                         (area(a.prev, a, b.prev) != 0 || area(a, b.prev, b) != 0) || // does not create opposite-facing sectors
                         equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
     }
 
-    private static boolean middleInside(Node a, Node b) {
+    @Deprecated private static boolean middleInside(Node a, Node b) {
         Node p = a;
         boolean inside = false;
         float px = (a.x + b.x) / 2;
@@ -617,7 +747,7 @@ public final class MathUtils {
         return inside;
     }
 
-    private static boolean intersectsPolygon(Node a, Node b) {
+    @Deprecated private static boolean intersectsPolygon(Node a, Node b) {
         Node p = a;
         do {
             if (p.i != a.i && p.next.i != a.i && p.i != b.i && p.next.i != b.i && intersects(p, p.next, a, b))
@@ -628,7 +758,7 @@ public final class MathUtils {
         return false;
     }
 
-    private static boolean intersects(Node p1, Node q1, Node p2, Node q2) {
+    @Deprecated private static boolean intersects(Node p1, Node q1, Node p2, Node q2) {
         if ((equals(p1, p2) && equals(q1, q2)) || (equals(p1, q2) && equals(p2, q1)))
             return true;
         float o1 = Math.signum(area(p1, q1, p2));
@@ -650,11 +780,11 @@ public final class MathUtils {
         return false;
     }
 
-    private static boolean onSegment(Node p, Node q, Node r) {
+    @Deprecated private static boolean onSegment(Node p, Node q, Node r) {
         return q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y);
     }
 
-    private static Node cureLocalIntersections(Node start, ArrayInt triangles, int dim) {
+    @Deprecated private static Node cureLocalIntersections(Node start, ArrayInt triangles, int dim) {
         Node p = start;
         do {
             Node a = p.prev, b = p.next.next;
@@ -673,7 +803,7 @@ public final class MathUtils {
         return filterPoints(p, null);
     }
 
-    private static boolean isEar(Node ear) {
+    @Deprecated private static boolean isEar(Node ear) {
         Node a = ear.prev, b = ear, c = ear.next;
 
         if (area(a, b, c) >= 0)
@@ -690,7 +820,7 @@ public final class MathUtils {
         return true;
     }
 
-    private static boolean isEarHashed(Node ear, float minX, float minY, float invSize) {
+    @Deprecated private static boolean isEarHashed(Node ear, float minX, float minY, float invSize) {
         Node a = ear.prev;
         Node b = ear;
         Node c = ear.next;
@@ -737,7 +867,7 @@ public final class MathUtils {
     }
 
     // z-order of a point given coords and inverse of the longer side of data bbox
-    private static float zOrder(float x, float y, float minX, float minY, float invSize) {
+    @Deprecated private static float zOrder(float x, float y, float minX, float minY, float invSize) {
         // coords are transformed into non-negative 15-bit integer range
         int lx = Float.valueOf(32767 * (x - minX) * invSize).intValue();
         int ly = Float.valueOf(32767 * (y - minY) * invSize).intValue();
@@ -755,7 +885,7 @@ public final class MathUtils {
         return lx | (ly << 1);
     }
 
-    private static void indexCurve(Node start, float minX, float minY, float invSize) {
+    @Deprecated private static void indexCurve(Node start, float minX, float minY, float invSize) {
         Node p = start;
         do {
             if (p.z == Float.MIN_VALUE)
@@ -771,7 +901,7 @@ public final class MathUtils {
         sortLinked(p);
     }
 
-    private static void sortLinked(Node list) {
+    @Deprecated private static void sortLinked(Node list) {
         int inSize = 1;
         int numMerges;
 
@@ -832,7 +962,7 @@ public final class MathUtils {
         } while (numMerges > 1);
     }
 
-    private static Node eliminateHoles(float[] data, int[] holeIndices, Node outerNode, int dim) {
+    @Deprecated private static Node eliminateHoles(float[] data, int[] holeIndices, Node outerNode, int dim) {
         List<Node> queue = new ArrayList<>();
 
         int len = holeIndices.length;
@@ -861,7 +991,7 @@ public final class MathUtils {
         return outerNode;
     }
 
-    private static Node filterPoints(Node start, Node end) {
+    @Deprecated private static Node filterPoints(Node start, Node end) {
         if (start == null)
             return null;
         if (end == null)
@@ -887,15 +1017,15 @@ public final class MathUtils {
         return end;
     }
 
-    private static boolean equals(Node p1, Node p2) {
+    @Deprecated private static boolean equals(Node p1, Node p2) {
         return p1.x == p2.x && p1.y == p2.y;
     }
 
-    private static float area(Node p, Node q, Node r) {
+    @Deprecated private static float area(Node p, Node q, Node r) {
         return (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
     }
 
-    private static void eliminateHole(Node hole, Node outerNode) {
+    @Deprecated private static void eliminateHole(Node hole, Node outerNode) {
         outerNode = findHoleBridge(hole, outerNode);
         if (outerNode != null) {
             Node b = splitPolygon(outerNode, hole);
@@ -904,7 +1034,7 @@ public final class MathUtils {
         }
     }
 
-    private static Node splitPolygon(Node a, Node b) {
+    @Deprecated private static Node splitPolygon(Node a, Node b) {
         Node a2 = new Node(a.i, a.x, a.y);
         Node b2 = new Node(b.i, b.x, b.y);
         Node an = a.next;
@@ -926,7 +1056,7 @@ public final class MathUtils {
     }
 
     // David Eberly's algorithm for finding a bridge between hole and outer polygon
-    private static Node findHoleBridge(Node hole, Node outerNode) {
+   @Deprecated private static Node findHoleBridge(Node hole, Node outerNode) {
         Node p = outerNode;
         float hx = hole.x;
         float hy = hole.y;
@@ -986,20 +1116,15 @@ public final class MathUtils {
         return m;
     }
 
-    private static boolean locallyInside(Node a, Node b) {
+    @Deprecated private static boolean locallyInside(Node a, Node b) {
         return area(a.prev, a, a.next) < 0 ? area(a, b, a.next) >= 0 && area(a, a.prev, b) >= 0 : area(a, b, a.prev) < 0 || area(a, a.next, b) < 0;
     }
 
-    private static boolean sectorContainsSector(Node m, Node p) {
+    @Deprecated private static boolean sectorContainsSector(Node m, Node p) {
         return area(m.prev, m, p.prev) < 0 && area(p.next, m, m.next) < 0;
     }
 
-    private static boolean pointInTriangle(float ax, float ay, float bx, float by, float cx, float cy, float px, float py) {
-        return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 && (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0
-                && (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;
-    }
-
-    private static Node getLeftmost(Node start) {
+    @Deprecated private static Node getLeftmost(Node start) {
         Node p = start;
         Node leftmost = start;
         do {
@@ -1010,7 +1135,7 @@ public final class MathUtils {
         return leftmost;
     }
 
-    private static Node linkedList(float[] data, int start, int end, int dim, boolean clockwise) {
+    @Deprecated private static Node linkedList(float[] data, int start, int end, int dim, boolean clockwise) {
         Node last = null;
         if (clockwise == (signedArea(data, start, end, dim) > 0)) {
             for (int i = start; i < end; i += dim) {
@@ -1029,7 +1154,7 @@ public final class MathUtils {
         return last;
     }
 
-    private static void removeNode(Node p) {
+    @Deprecated private static void removeNode(Node p) {
         p.next.prev = p.prev;
         p.prev.next = p.next;
 
@@ -1041,7 +1166,7 @@ public final class MathUtils {
         }
     }
 
-    private static Node insertNode(int i, float x, float y, Node last) {
+    @Deprecated private static Node insertNode(int i, float x, float y, Node last) {
         Node p = new Node(i, x, y);
 
         if (last == null) {
@@ -1056,21 +1181,21 @@ public final class MathUtils {
         return p;
     }
 
-    private static float getVertexX(int index, float[] vertices) {
+    @Deprecated private static float getVertexX(int index, float[] vertices) {
         int n2 = vertices.length / 2;
         if (index >= n2) return vertices[(index % n2) * 2];
         else if (index < 0) return vertices[(index % n2 + n2) * 2];
         return vertices[index * 2];
     }
 
-    private static float getVertexY(int index, float[] vertices) {
+    @Deprecated private static float getVertexY(int index, float[] vertices) {
         int n2 = vertices.length / 2;
         if (index >= n2) return vertices[(index % n2) * 2 + 1];
         else if (index < 0) return vertices[(index % n2 + n2) * 2 + 1];
         return vertices[index * 2 + 1];
     }
 
-    private static float signedArea(float[] data, int start, int end, int dim) {
+    @Deprecated private static float signedArea(float[] data, int start, int end, int dim) {
         float sum = 0;
         int j = end - dim;
         for (int i = start; i < end; i += dim) {
@@ -1080,7 +1205,7 @@ public final class MathUtils {
         return sum;
     }
 
-    private static class Node {
+    @Deprecated private static class Node {
 
         private int i; // vertex index in coordinates array
         private float x; // vertex x coordinate

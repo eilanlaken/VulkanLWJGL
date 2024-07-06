@@ -459,6 +459,11 @@ public class Vector2 implements MemoryPool.Reset {
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
+    public static boolean areColinear(Vector2 v1, Vector2 v2, Vector2 v3) {
+        float area = v1.x * (v2.y - v3.y) + v2.x * (v3.y - v1.y) + v3.x * (v1.y - v2.y);
+        return MathUtils.isZero(area);
+    }
+
     public static float dst(final Vector2 a, final Vector2 b) {
         final float dx = b.x - a.x;
         final float dy = b.y - a.y;
