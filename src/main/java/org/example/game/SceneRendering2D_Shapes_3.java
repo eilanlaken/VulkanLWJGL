@@ -69,7 +69,7 @@ public class SceneRendering2D_Shapes_3 extends ApplicationScreen {
         third.rotateAroundDeg(Vector2.Zero, dy * 25);
 
         // TODO: ***bug here*** when the refinement is too high and the segment is very narrow, narrower than the stroke, then we get problems.
-        Array<Vector2> a = renderer2D.drawCurveFilled(1,8, new Vector2(-4,0), new Vector2(0,0), third);
+        Array<Vector2> a = renderer2D.drawCurveFilled2(1,8, new Vector2(-4,0), new Vector2(0,0), third);
         for (int i = 0; i < a.size - 1; i += 2) {
             Vector2 v_up = a.get(i);
             Vector2 v_down = a.get(i + 1);
