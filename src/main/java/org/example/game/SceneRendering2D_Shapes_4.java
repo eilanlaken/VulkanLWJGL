@@ -71,11 +71,13 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
 
         //renderer2D.drawCurveFilled(1f, new Vector2(-4,0), new Vector2(0,0), new Vector2(4,4));
 
-        if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += GraphicsUtils.getDeltaTime();
-        if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= GraphicsUtils.getDeltaTime();
+        if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 1f;
+        if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 1f;
 
         renderer2D.setTint(new Color(1,0,0,1));
-        renderer2D.drawPolygonThin(new float[] {0,0, 1,0, 1,1, 0,1}, true, 0, 0, 0, 0, 0, 1, 1);
+        renderer2D.drawPolygonFilled(new float[] {1,4,   -5,2,  -2,-2, 0,0,  0,1, 2,2}, 0, 0, dy, 0, 30, 1, 1);
+        renderer2D.setTint(new Color(0,0,1,1));
+        renderer2D.drawPolygonThin(new float[] {1,4,   -5,2,  -2,-2, 0,0,  0,1, 2,2}, true, 0, 0, dy, 0, 30, 1, 1);
         renderer2D.drawPolygonThin(new float[] {-4,0, -5,0, -5,1, -4,1}, true, 0, 0, 0, 0, 0, 1, 1);
 
         //renderer2D.drawRectangleThin(4,2,0,0,0,0,0,1,1);
