@@ -6,9 +6,6 @@ import org.example.engine.core.graphics.GraphicsUtils;
 import org.example.engine.core.graphics.Renderer2D;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
-import org.example.engine.core.shape.Shape2DPolygon;
-import org.example.engine.core.shape.Shape2DSegment;
-import org.example.engine.core.shape.ShapeUtils;
 
 import java.util.Set;
 
@@ -17,12 +14,10 @@ public class WorldRenderer {
     private static final float TINT_STATIC     = new Color(1,1,0,1).toFloatBits();
     private static final float TINT_KINEMATIC  = new Color(1,0,1,1).toFloatBits();
     private static final float TINT_NEWTONIAN  = new Color(0,1,1,1).toFloatBits();
-    private static final float CONSTRAINT_TINT = new Color(0.9f, 0.1f, 0.3f, 1).toFloatBits();
-    private static final float RAY_TINT        = new Color(0.4f, 0.2f, 0.8f, 1).toFloatBits();
-
-    @Deprecated private final Shape2DSegment segment    = new Shape2DSegment(0,0,0,0);
-    @Deprecated private final Shape2DPolygon polyCircle = ShapeUtils.createPolygonCircleFilled(1, 10);
-    @Deprecated private final Shape2DPolygon polyRect   = ShapeUtils.createPolygonRectangleFilled(1, 1);
+    private static final float TINT_COM        = new Color(1,0.1f,0.2f,1).toFloatBits();
+    private static final float TINT_CONSTRAINT = new Color(0.9f, 0.1f, 0.3f, 1).toFloatBits();
+    private static final float TINT_RAY_HIT    = new Color(0.2f,1,1,1).toFloatBits();
+    private static final float TINT_RAY        = new Color(0.4f, 0.2f, 0.8f, 1).toFloatBits();
 
     private final World world;
 
@@ -54,8 +49,9 @@ public class WorldRenderer {
                         float y1 = worldCenter.y;
                         float x2 = x1 + r * MathUtils.cosRad(angleRad);
                         float y2 = y1 + r * MathUtils.sinRad(angleRad);
-                        renderer.pushThinCircle(r, x1, y1, tint);
-                        renderer.pushThinLineSegment(x1,y1,x2,y2,tint);
+                        renderer.setTint(tint);
+                        renderer.drawCircleThin(r, 15, x1, y1, 0, 0, body.aRad * MathUtils.radiansToDegrees, 1, 1);
+                        renderer.drawLineThin(x1,y1,x2,y2);
                         continue;
                     }
 
@@ -72,27 +68,27 @@ public class WorldRenderer {
                         float y2 = rectangle.c2.y;
                         float x3 = rectangle.c3.x;
                         float y3 = rectangle.c3.y;
-
-                        renderer.pushThinRectangle_old(x0,y0, x1,y1, x2,y2, x3,y3, tint);
-                        renderer.pushThinLineSegment(
+                        renderer.setTint(tint);
+                        renderer.drawRectangleThin(x0,y0, x1,y1, x2,y2, x3,y3);
+                        renderer.drawLineThin(
                                 rectangle.worldCenter().x,
                                 rectangle.worldCenter().y,
                                 rectangle.worldCenter().x + 0.5f * rectangle.width * MathUtils.cosRad(angleRad + collider.offsetAngleRad),
-                                rectangle.worldCenter().y + 0.5f * rectangle.width * MathUtils.sinRad(angleRad + collider.offsetAngleRad),
-                                tint);
+                                rectangle.worldCenter().y + 0.5f * rectangle.width * MathUtils.sinRad(angleRad + collider.offsetAngleRad));
                         continue;
                     }
 
-                    /* render a rectangle */
+                    /* render a polygon */
                     if (collider instanceof BodyColliderPolygon) {
                         BodyColliderPolygon polygon = (BodyColliderPolygon) collider;
                         float tint = body.motionType == Body.MotionType.STATIC ? TINT_STATIC : body.motionType == Body.MotionType.KINEMATIC ? TINT_KINEMATIC : TINT_NEWTONIAN;
-                        renderer.pushThinPolygon(polygon.worldVertices(), polygon.indices, tint);
+                        renderer.setTint(tint);
+                        renderer.drawPolygonThin(polygon.vertices, true, body.x, body.y, 0, 0, body.aRad * MathUtils.radiansToDegrees, 1, 1);
                         continue;
                     }
                 }
-                renderer.pushPolygon(polyCircle, new Color(0.2f,1,1,1), body.x, body.y, 0,0,0, scaleX, scaleY,null,null);
-                renderer.pushPolygon(polyCircle, new Color(1,0.1f,0.2f,1), body.cmX, body.cmY, 0,0,0, scaleX, scaleY,null,null);
+                renderer.setTint(TINT_COM);
+                renderer.drawCircleFilled(1, 10, body.cmX, body.cmY, 0,0, body.aRad * MathUtils.radiansToDegrees, scaleX, scaleY);
             }
         }
 
@@ -116,13 +112,15 @@ public class WorldRenderer {
             Set<RayCastingRay> rays = world.allRays.keySet();
             for (RayCastingRay ray : rays) {
                 float scl = ray.dst == Float.POSITIVE_INFINITY || Float.isNaN(ray.dst) ? 100 : ray.dst;
-                renderer.pushThinLineSegment(ray.originX, ray.originY, ray.originX + scl * ray.dirX, ray.originY + scl * ray.dirY, RAY_TINT);
+                renderer.setTint(TINT_RAY);
+                renderer.drawLineThin(ray.originX, ray.originY, ray.originX + scl * ray.dirX, ray.originY + scl * ray.dirY);
             }
 
             Array<RayCastingIntersection> intersections = world.intersections;
             for (RayCastingIntersection intersection : intersections) {
                 Vector2 point = intersection.point;
-                renderer.pushPolygon(polyCircle, new Color(0.2f,1,1,1), point.x, point.y, 0,0,0, scaleX, scaleY,null,null);
+                renderer.setTint(TINT_RAY_HIT);
+                renderer.drawCircleFilled(1, 10, point.x, point.y, 0,0, 0, scaleX, scaleY);
             }
         }
 
