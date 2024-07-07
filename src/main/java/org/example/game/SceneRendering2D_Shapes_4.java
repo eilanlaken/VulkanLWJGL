@@ -75,8 +75,8 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
         if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= GraphicsUtils.getDeltaTime();
 
         renderer2D.setTint(new Color(1,0,0,1));
-        renderer2D.drawPolygonThin(new float[] {0,0, 1,0, 1,1, 0,1}, false, 0, 0, 0, 0, 0, 1, 1);
-        renderer2D.drawPolygonThin(new float[] {-4,0, -5,0, -5,1, -4,1}, false, 0, 0, 0, 0, 0, 1, 1);
+        renderer2D.drawPolygonThin(new float[] {0,0, 1,0, 1,1, 0,1}, true, 0, 0, 0, 0, 0, 1, 1);
+        renderer2D.drawPolygonThin(new float[] {-4,0, -5,0, -5,1, -4,1}, true, 0, 0, 0, 0, 0, 1, 1);
 
         //renderer2D.drawRectangleThin(4,2,0,0,0,0,0,1,1);
         //renderer2D.drawPolygonThin(new float[] {0-4,0, 1-4,0, 1-4,1, 0-4,1}, false, 0, 0, 0, 0, 0, 1, 1);

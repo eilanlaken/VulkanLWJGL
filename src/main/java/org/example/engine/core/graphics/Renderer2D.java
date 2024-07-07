@@ -987,6 +987,18 @@ public class Renderer2D implements MemoryResourceHolder {
             }
             indicesBuffer.put(startVertex + count - 1);
             indicesBuffer.put(startVertex + 0);
+        } else {
+            MathUtils.triangulatePolygon(polygon, indices);
+            for (int i = 0; i < indices.size - 2; i += 3) {
+                indicesBuffer.put(startVertex + indices.get(i));
+                indicesBuffer.put(startVertex + indices.get(i + 1));
+
+                indicesBuffer.put(startVertex + indices.get(i + 1));
+                indicesBuffer.put(startVertex + indices.get(i + 2));
+
+                indicesBuffer.put(startVertex + indices.get(i + 2));
+                indicesBuffer.put(startVertex + indices.get(i));
+            }
         }
 
         vertexIndex += count;

@@ -559,13 +559,17 @@ class MathUtilsTest {
         ArrayInt indices = new ArrayInt();
         float[] poly_1 = new float[] {0,0,  1,0,  1,1,  0,1};
         MathUtils.triangulatePolygon(poly_1, indices);
-        System.out.println(indices);
 
         float[] poly_2 = new float[] {0,1,  1,1,  1,0,  0,0};
         MathUtils.triangulatePolygon(poly_2, indices);
 
         float[] poly_3 = new float[] {0,0,  1,0,  1,1, 0.5f,1f,  0,1};
         MathUtils.triangulatePolygon(poly_3, indices);
+
+        float[] poly_4 = new float[] {1,4,   -5,2,  -2,-2, 0,0,  0,1, 2,2};
+        MathUtils.triangulatePolygon(poly_4, indices);
+
+        System.out.println(indices);
     }
 
     @Test
@@ -576,6 +580,9 @@ class MathUtilsTest {
 
         float[] vertices_2 = new float[] {0,0,   1,0,   0.25f,0.25f,   0,1};
         Assertions.assertFalse(MathUtils.isPolygonConvex(vertices_2));
+
+        float[] vertices_3 = new float[] {1,4,   -5,2,  -2,-2, 0,0,  0,1, 2,2};
+        Assertions.assertFalse(MathUtils.isPolygonConvex(vertices_3));
     }
 
     // TODO: remove
