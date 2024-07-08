@@ -77,11 +77,12 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
 
         renderer2D.setTint(new Color(1,0,0,0.2f));
 
-        renderer2D.drawCurveFilled_final(1f, 2, new Vector2(-3,0), new Vector2(0,0), new Vector2(-3,0));
+        Vector2 last = new Vector2(0.8f,0);
+        last.rotateDeg(dy);
 
         // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
-        if (false) {
-            Array<Vector2> vertices = renderer2D.drawCurveFilled_new(1f, 2, new Vector2(-3,0), new Vector2(0,0), new Vector2(-3,0));
+        if (true) {
+            Array<Vector2> vertices = renderer2D.drawCurveFilled_new(1f, 2, new Vector2(-3,0), new Vector2(0,0), last);
 
             for (int i = 0; i < vertices.size - 1; i += 2) {
                 Vector2 v_up = vertices.get(i);
@@ -91,6 +92,15 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
                 renderer2D.setTint(Color.BLUE);
                 renderer2D.drawCircleFilled(0.1f, 10, v_down.x, v_down.y, 0,0,0,1,1);
             }
+
+            for (int i = 0; i < Renderer2D.dots.size; i ++) {
+                Vector2 dot = Renderer2D.dots.get(i);
+                renderer2D.setTint(Color.BLACK);
+                renderer2D.drawCircleFilled(0.1f, 10, dot.x, dot.y, 0,0,0,1,1);
+            }
+
+        } else {
+            renderer2D.drawCurveFilled_final(1f, 2, new Vector2(-3,0), new Vector2(0,0), new Vector2(-3,0));
         }
 
         renderer2D.end();
