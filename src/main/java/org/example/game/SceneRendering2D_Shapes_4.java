@@ -77,17 +77,20 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
 
         renderer2D.setTint(new Color(1,0,0,0.2f));
 
+        renderer2D.drawCurveFilled_final(1f, 2, new Vector2(-3,0), new Vector2(0,0), new Vector2(-3,0));
 
         // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
-        Array<Vector2> vertices = renderer2D.drawCurveFilled_new(1f, 2, new Vector2(-3,0), new Vector2(3,0));
+        if (false) {
+            Array<Vector2> vertices = renderer2D.drawCurveFilled_new(1f, 2, new Vector2(-3,0), new Vector2(0,0), new Vector2(-3,0));
 
-        for (int i = 0; i < vertices.size - 1; i += 2) {
-            Vector2 v_up = vertices.get(i);
-            Vector2 v_down = vertices.get(i + 1);
-            renderer2D.setTint(Color.RED);
-            renderer2D.drawCircleFilled(0.04f, 10, v_up.x, v_up.y, 0,0,0,1,1);
-            renderer2D.setTint(Color.BLUE);
-            renderer2D.drawCircleFilled(0.04f, 10, v_down.x, v_down.y, 0,0,0,1,1);
+            for (int i = 0; i < vertices.size - 1; i += 2) {
+                Vector2 v_up = vertices.get(i);
+                Vector2 v_down = vertices.get(i + 1);
+                renderer2D.setTint(Color.RED);
+                renderer2D.drawCircleFilled(0.1f, 10, v_up.x, v_up.y, 0,0,0,1,1);
+                renderer2D.setTint(Color.BLUE);
+                renderer2D.drawCircleFilled(0.1f, 10, v_down.x, v_down.y, 0,0,0,1,1);
+            }
         }
 
         renderer2D.end();
