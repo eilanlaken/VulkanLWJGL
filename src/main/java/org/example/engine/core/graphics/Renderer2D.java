@@ -824,7 +824,6 @@ public class Renderer2D implements MemoryResourceHolder {
         scaleY *= MathUtils.cosDeg(angleX);
         for (int i = 0; i < vertices.size; i++) {
             Vector2 vertex = vertices.get(i).scl(scaleX, scaleY).rotateDeg(angleZ).add(x, y);
-            // TODO: use proper UV.
             verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
         }
 
@@ -1634,10 +1633,6 @@ public class Renderer2D implements MemoryResourceHolder {
         vectorsPool.free(p_1);
     }
 
-
-    /**
-     * Renders the current batch, if not empty.
-     */
     private void flush() {
         if (verticesBuffer.position() == 0) return;
 
@@ -1666,9 +1661,6 @@ public class Renderer2D implements MemoryResourceHolder {
         drawCalls++;
     }
 
-    /**
-     * Must be called after every call to begin().
-     */
     public void end() {
         if (!drawing) throw new GraphicsException("Called " + Renderer2D.class.getSimpleName() + ".end() without calling " + Renderer2D.class.getSimpleName() + ".begin() first.");
         flush();
@@ -1771,7 +1763,6 @@ public class Renderer2D implements MemoryResourceHolder {
     private static Camera createDefaultCamera() {
         return new Camera(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight(), 1);
     }
-
 
     // TODO: delete this after taking care of textures.
 
