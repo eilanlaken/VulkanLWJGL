@@ -1224,6 +1224,97 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += refinement;
     }
 
+    // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
+    public Array<Vector2> drawCurveFilled_new(float stroke, int smoothness, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values.length < 2) return null;
+        smoothness = Math.max(1, smoothness);
+        if ((vertexIndex + 2 + (values.length - 2) * (smoothness + 1) * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_TRIANGLES);
+        final float s2 = 0.5f * stroke;
+
+        /* put vertices */
+        Array<Vector2> vertices = new Array<>(true, values.length);
+
+        /* first 2 vertices */
+        Vector2 normal = vectorsPool.allocate();
+        normal.x = values[1].x - values[0].x;
+        normal.y = values[1].y - values[0].y;
+        normal.nor();
+        normal.rotate90(1);
+        Vector2 up_first = vectorsPool.allocate();
+        up_first.x = values[0].x + s2 * normal.x;
+        up_first.y = values[0].y + s2 * normal.y;
+        Vector2 down_first = vectorsPool.allocate();
+        down_first.x = values[0].x - s2 * normal.x;
+        down_first.y = values[0].y - s2 * normal.y;
+        vertices.add(up_first);
+        vertices.add(down_first);
+
+        Vector2 dir_prev = vectorsPool.allocate();
+        Vector2 dir_next = vectorsPool.allocate();
+        /* add vertices for internal corners */
+        for (int i = 1; i < values.length - 1; i++) {
+            Vector2 corner = values[i];
+
+            dir_prev.x = values[i - 1].x - values[i].x;
+            dir_prev.y = values[i - 1].y - values[i].y;
+
+            dir_next.x = values[i + 1].x - values[i].x;
+            dir_next.y = values[i + 1].y - values[i].y;
+
+            /* simple edge case: if the segments are collinear, we simply add the top and bottom points */
+            float cross = Vector2.crs(dir_prev, dir_next);
+            if (MathUtils.isZero(cross)) {
+                Vector2 v_up = vectorsPool.allocate();
+                v_up.set(dir_prev).rotate90(-1).nor().scl(s2);
+
+                Vector2 v_down = vectorsPool.allocate();
+                v_down.set(v_up).flip().nor().scl(s2);
+
+                vertices.add(v_up);
+                vertices.add(v_down);
+            }
+
+        }
+
+        /* last 2 vertices */
+        normal.x = values[values.length - 1].x - values[values.length - 2].x;
+        normal.y = values[values.length - 1].y - values[values.length - 2].y;
+        normal.nor();
+        normal.rotate90(1);
+        Vector2 up_last = vectorsPool.allocate();
+        up_last.x = values[values.length - 1].x + s2 * normal.x;
+        up_last.y = values[values.length - 1].y + s2 * normal.y;
+        Vector2 down_last = vectorsPool.allocate();
+        down_last.x = values[values.length - 1].x - s2 * normal.x;
+        down_last.y = values[values.length - 1].y - s2 * normal.y;
+        vertices.add(up_last);
+        vertices.add(down_last);
+
+        final int curveEndIndex = vertices.size;
+
+        for (int i = 0; i < vertices.size; i++) {
+            //verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
+        }
+
+        /* put indices ("connect the dots") */
+        final int startVertex = this.vertexIndex;
+        for (int i = 0; i < curveEndIndex - 2; i += 2) { // curve +  rounded corners
+//            indicesBuffer.put(startVertex + i);
+//            indicesBuffer.put(startVertex + i + 1);
+//            indicesBuffer.put(startVertex + i + 2);
+//            indicesBuffer.put(startVertex + i + 2);
+//            indicesBuffer.put(startVertex + i + 1);
+//            indicesBuffer.put(startVertex + i + 3);
+        }
+
+        //vertexIndex += vertices.size;
+
+        return vertices;
+    }
+
     public Array<Vector2> drawCurveFilled2(float stroke, int smoothness, final Vector2... values) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (values == null || values.length < 2) return null;

@@ -180,6 +180,16 @@ class Vector2Test {
 
     @Test
     void crs() {
+        Vector2 v1 = new Vector2();
+        Vector2 v2 = new Vector2();
+        Vector2 v3 = new Vector2();
+
+        v1.set(-1, 0);
+        v2.set(1, 0);
+        Assertions.assertEquals(0, Vector2.crs(v1, v2), MathUtils.FLOAT_ROUNDING_ERROR);
+
+        v3.set(-4,0);
+        Assertions.assertEquals(0, Vector2.crs(v1, v3), MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test

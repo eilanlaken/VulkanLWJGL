@@ -2,6 +2,7 @@ package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.assets.AssetStore;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
@@ -64,7 +65,7 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
         }
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glClearColor(0f,0f,0f,1);
+        GL11.glClearColor(1f,1f,0f,1);
 
         renderer2D.begin(camera);
         renderer2D.setTint(blue);
@@ -74,14 +75,20 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
         if (Keyboard.isKeyPressed(Keyboard.Key.W)) dy += 1f;
         if (Keyboard.isKeyPressed(Keyboard.Key.S)) dy -= 1f;
 
-        renderer2D.setTint(new Color(1,0,0,1));
-        renderer2D.drawPolygonFilled(new float[] {1,4,   -5,2,  -2,-2, 0,0,  0,1, 2,2}, 0, 0, dy, 0, 30, 1, 1);
-        renderer2D.setTint(new Color(0,0,1,1));
-        renderer2D.drawPolygonThin(new float[] {1,4,   -5,2,  -2,-2, 0,0,  0,1, 2,2}, true, 0, 0, dy, 0, 30, 1, 1);
-        renderer2D.drawPolygonThin(new float[] {-4,0, -5,0, -5,1, -4,1}, true, 0, 0, 0, 0, 0, 1, 1);
+        renderer2D.setTint(new Color(1,0,0,0.2f));
 
-        //renderer2D.drawRectangleThin(4,2,0,0,0,0,0,1,1);
-        //renderer2D.drawPolygonThin(new float[] {0-4,0, 1-4,0, 1-4,1, 0-4,1}, false, 0, 0, 0, 0, 0, 1, 1);
+
+        // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
+        Array<Vector2> vertices = renderer2D.drawCurveFilled_new(1f, 2, new Vector2(-3,0), new Vector2(3,0));
+
+        for (int i = 0; i < vertices.size - 1; i += 2) {
+            Vector2 v_up = vertices.get(i);
+            Vector2 v_down = vertices.get(i + 1);
+            renderer2D.setTint(Color.RED);
+            renderer2D.drawCircleFilled(0.04f, 10, v_up.x, v_up.y, 0,0,0,1,1);
+            renderer2D.setTint(Color.BLUE);
+            renderer2D.drawCircleFilled(0.04f, 10, v_down.x, v_down.y, 0,0,0,1,1);
+        }
 
         renderer2D.end();
     }
