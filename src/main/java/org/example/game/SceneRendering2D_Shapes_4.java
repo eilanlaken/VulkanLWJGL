@@ -77,12 +77,13 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
 
         renderer2D.setTint(new Color(1,0,0,0.2f));
 
-        Vector2 last = new Vector2(0.8f,0);
-        last.rotateDeg(dy);
+        Vector2 last1 = new Vector2(0.8f,0);
+        Vector2 last2 = new Vector2(3f,0);
+        last1.rotateDeg(dy);
 
         // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
         if (true) {
-            Array<Vector2> vertices = renderer2D.drawCurveFilled_new(1f, 10, new Vector2(-3,0), new Vector2(0,0), last);
+            Array<Vector2> vertices = renderer2D.drawCurveFilled_new(1f, 10, new Vector2(-3,0), new Vector2(0,0), last1, last2);
 
             for (int i = 0; i < vertices.size - 1; i += 2) {
                 Vector2 v_up = vertices.get(i);
