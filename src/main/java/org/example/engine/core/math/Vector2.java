@@ -489,6 +489,12 @@ public class Vector2 implements MemoryPool.Reset {
         return (float) Math.acos(Vector2.dot(a, b) / (aL * bL)) * MathUtils.radiansToDegrees;
     }
 
+    public static float angleBetweenDeg(float ax, float ay, float bx, float by) {
+        float aL = Vector2.len(ax, ay);
+        float bL = Vector2.len(bx, by);
+        return (float) Math.acos(Vector2.dot(ax, ay, bx, by) / (aL * bL)) * MathUtils.radiansToDegrees;
+    }
+
     // TODO: test
     public static float angleBetweenRad(final Vector2 a, final Vector2 b) {
         float aL = a.len();

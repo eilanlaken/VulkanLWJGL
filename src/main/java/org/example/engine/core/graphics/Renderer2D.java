@@ -1417,41 +1417,57 @@ public class Renderer2D implements MemoryResourceHolder {
 
             boolean up_intersect = MathUtils.segmentsIntersection(Rp_c0, Rp_c2, Rn_c0, Rn_c2, intersection);
             if (up_intersect) {
-                dots.add(intersection);
-                Vector2 ci = vectorsPool.allocate().set(corner_this).add(-nor_prev.x * s2, -nor_prev.y * s2);
-                Vector2 cf = vectorsPool.allocate().set(corner_this).add(nor_next.x * s2, nor_next.y * s2);
-                ends.add(ci);
-                ends.add(cf);
+                /* get the angle between the two normals at the corner */
+                float angle = Vector2.angleBetweenDeg(-nor_prev.x, -nor_prev.y, nor_next.x, nor_next.y);
+                float step = angle / smoothness;
+                for (int j = 0; j < smoothness; j++) {
+                    Vector2 inter = vectorsPool.allocate().set(intersection);
+                    Vector2 point = vectorsPool.allocate().set(-nor_prev.x * s2, -nor_prev.y * s2).rotateDeg(-step * j).add(corner_this);
+                    vertices.add(point);
+                    vertices.add(inter);
+                }
                 continue;
             }
 
             boolean down_intersect = MathUtils.segmentsIntersection(Rp_c1, Rp_c3, Rn_c1, Rn_c3, intersection);
             if (down_intersect) {
-                dots.add(intersection);
-                Vector2 ci = vectorsPool.allocate().set(corner_this).add(nor_prev.x * s2, nor_prev.y * s2);
-                Vector2 cf = vectorsPool.allocate().set(corner_this).add(-nor_next.x * s2, -nor_next.y * s2);
-                ends.add(ci);
-                ends.add(cf);
+                /* get the angle between the two normals at the corner */
+                float angle = Vector2.angleBetweenDeg(nor_prev.x, nor_prev.y, -nor_next.x, -nor_next.y);
+                float step = angle / smoothness;
+                for (int j = 0; j < smoothness; j++) {
+                    Vector2 inter = vectorsPool.allocate().set(intersection);
+                    Vector2 point = vectorsPool.allocate().set(nor_prev.x * s2, nor_prev.y * s2).rotateDeg(step * j).add(corner_this);
+                    vertices.add(inter);
+                    vertices.add(point);
+                }
                 continue;
             }
 
             boolean far_intersect_up = MathUtils.segmentsIntersection(Rp_c1, Rp_c3, Rn_c2, Rn_c3, intersection);
             if (far_intersect_up) {
-                dots.add(intersection);
-                Vector2 ci = vectorsPool.allocate().set(corner_this).add(nor_prev.x * s2, nor_prev.y * s2);
-                Vector2 cf = vectorsPool.allocate().set(corner_this).add(-nor_next.x * s2, -nor_next.y * s2);
-                ends.add(ci);
-                ends.add(cf);
+                /* get the angle between the two normals at the corner */
+                float angle = Vector2.angleBetweenDeg(nor_prev.x, nor_prev.y, -nor_next.x, -nor_next.y);
+                float step = angle / smoothness;
+                for (int j = 0; j < smoothness; j++) {
+                    Vector2 inter = vectorsPool.allocate().set(intersection);
+                    Vector2 point = vectorsPool.allocate().set(nor_prev.x * s2, nor_prev.y * s2).rotateDeg(step * j).add(corner_this);
+                    vertices.add(inter);
+                    vertices.add(point);
+                }
                 continue;
             }
 
             boolean far_intersect_down = MathUtils.segmentsIntersection(Rp_c0, Rp_c2, Rn_c2, Rn_c3, intersection);
             if (far_intersect_down) {
-                dots.add(intersection);
-                Vector2 ci = vectorsPool.allocate().set(corner_this).add(-nor_prev.x * s2, -nor_prev.y * s2);
-                Vector2 cf = vectorsPool.allocate().set(corner_this).add(nor_next.x * s2, nor_next.y * s2);
-                ends.add(ci);
-                ends.add(cf);
+                /* get the angle between the two normals at the corner */
+                float angle = Vector2.angleBetweenDeg(-nor_prev.x, -nor_prev.y, nor_next.x, nor_next.y);
+                float step = angle / smoothness;
+                for (int j = 0; j < smoothness; j++) {
+                    Vector2 inter = vectorsPool.allocate().set(intersection);
+                    Vector2 point = vectorsPool.allocate().set(-nor_prev.x * s2, -nor_prev.y * s2).rotateDeg(-step * j).add(corner_this);
+                    vertices.add(point);
+                    vertices.add(inter);
+                }
                 continue;
             }
         }
