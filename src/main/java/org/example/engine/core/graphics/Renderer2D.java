@@ -1413,41 +1413,46 @@ public class Renderer2D implements MemoryResourceHolder {
             Vector2 Rn_c3 = vectorsPool.allocate().set(corner_next).add(nor_next.x * s2, nor_next.y * s2);
 
             /* find intersections */
-            Vector2 intersection_up = vectorsPool.allocate();
-            Vector2 intersection_down = vectorsPool.allocate();
-            Vector2 intersection_far_up = vectorsPool.allocate();
-            Vector2 intersection_far_down = vectorsPool.allocate();
+            Vector2 intersection = vectorsPool.allocate();
 
-            boolean up_intersect = MathUtils.segmentsIntersection(Rp_c0, Rp_c2, Rn_c0, Rn_c2, intersection_up);
-            boolean down_intersect = MathUtils.segmentsIntersection(Rp_c1, Rp_c3, Rn_c1, Rn_c3, intersection_down);
-
-            boolean far_intersect_up = MathUtils.segmentsIntersection(Rp_c1, Rp_c3, Rn_c2, Rn_c3, intersection_far_up);
-            boolean far_intersect_down = MathUtils.segmentsIntersection(Rp_c0, Rp_c2, Rn_c2, Rn_c3, intersection_far_down);
-
+            boolean up_intersect = MathUtils.segmentsIntersection(Rp_c0, Rp_c2, Rn_c0, Rn_c2, intersection);
             if (up_intersect) {
-                dots.add(intersection_up);
+                dots.add(intersection);
                 Vector2 ci = vectorsPool.allocate().set(corner_this).add(-nor_prev.x * s2, -nor_prev.y * s2);
                 Vector2 cf = vectorsPool.allocate().set(corner_this).add(nor_next.x * s2, nor_next.y * s2);
                 ends.add(ci);
                 ends.add(cf);
-            } else if (down_intersect) {
-                dots.add(intersection_down);
+                continue;
+            }
+
+            boolean down_intersect = MathUtils.segmentsIntersection(Rp_c1, Rp_c3, Rn_c1, Rn_c3, intersection);
+            if (down_intersect) {
+                dots.add(intersection);
                 Vector2 ci = vectorsPool.allocate().set(corner_this).add(nor_prev.x * s2, nor_prev.y * s2);
                 Vector2 cf = vectorsPool.allocate().set(corner_this).add(-nor_next.x * s2, -nor_next.y * s2);
                 ends.add(ci);
                 ends.add(cf);
-            } else if (far_intersect_up) {
-                dots.add(intersection_far_up);
+                continue;
+            }
+
+            boolean far_intersect_up = MathUtils.segmentsIntersection(Rp_c1, Rp_c3, Rn_c2, Rn_c3, intersection);
+            if (far_intersect_up) {
+                dots.add(intersection);
                 Vector2 ci = vectorsPool.allocate().set(corner_this).add(nor_prev.x * s2, nor_prev.y * s2);
                 Vector2 cf = vectorsPool.allocate().set(corner_this).add(-nor_next.x * s2, -nor_next.y * s2);
                 ends.add(ci);
                 ends.add(cf);
-            } else if (far_intersect_down) {
-                dots.add(intersection_far_down);
+                continue;
+            }
+
+            boolean far_intersect_down = MathUtils.segmentsIntersection(Rp_c0, Rp_c2, Rn_c2, Rn_c3, intersection);
+            if (far_intersect_down) {
+                dots.add(intersection);
                 Vector2 ci = vectorsPool.allocate().set(corner_this).add(-nor_prev.x * s2, -nor_prev.y * s2);
                 Vector2 cf = vectorsPool.allocate().set(corner_this).add(nor_next.x * s2, nor_next.y * s2);
                 ends.add(ci);
                 ends.add(cf);
+                continue;
             }
         }
 
