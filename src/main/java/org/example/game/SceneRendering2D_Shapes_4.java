@@ -77,34 +77,52 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
 
         renderer2D.setTint(new Color(1,0,0,0.2f));
 
-        Vector2 last1 = new Vector2(0.8f,0);
-        Vector2 last2 = new Vector2(3f,0);
+        Vector2 last1 = new Vector2(0.4f,-3);
+        Vector2 last2 = new Vector2(2f,0);
+        Vector2 last3 = new Vector2(0.4f,0);
         last1.rotateDeg(dy);
+        last2.rotateDeg(dy);
+        last3.rotateDeg(dy);
+
+        Vector2[] draw1 = {new Vector2(-3,-3), new Vector2(0,-3), last1};
+        Vector2[] draw2 = {new Vector2(-3,0), new Vector2(0,0), last2};
+        Vector2[] draw3 = {new Vector2(-3,0), new Vector2(0,0), last3};
 
         // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
         if (true) {
-            Array<Vector2> vertices = renderer2D.drawCurveFilled_new(1f, 10, new Vector2(-3,0), new Vector2(0,0), last1, last2);
+            Array<Vector2> vertices1 = renderer2D.drawCurveFilled_new(1f, 10, draw3);
+            //Array<Vector2> vertices = renderer2D.drawCurveFilled_new(1f, 10, draw2);
 
-            for (int i = 0; i < vertices.size - 1; i += 2) {
-                Vector2 v_up = vertices.get(i);
-                Vector2 v_down = vertices.get(i + 1);
+
+            for (int i = 0; i < vertices1.size - 1; i += 2) {
+                Vector2 v_up = vertices1.get(i);
+                Vector2 v_down = vertices1.get(i + 1);
                 renderer2D.setTint(Color.RED);
                 renderer2D.drawCircleFilled(0.05f, 10, v_up.x, v_up.y, 0,0,0,1,1);
                 renderer2D.setTint(Color.BLUE);
                 renderer2D.drawCircleFilled(0.05f, 10, v_down.x, v_down.y, 0,0,0,1,1);
             }
 
-            for (int i = 0; i < Renderer2D.dots.size; i ++) {
-                Vector2 dot = Renderer2D.dots.get(i);
-                renderer2D.setTint(Color.BLACK);
-                //renderer2D.drawCircleFilled(0.1f, 10, dot.x, dot.y, 0,0,0,1,1);
+            renderer2D.setTint(Color.BLACK);
+            for (Vector2 v : draw3) {
+                renderer2D.drawCircleFilled(0.05f, 10, v.x, v.y, 0,0,0,1,1);
+                renderer2D.drawCircleFilled(0.05f, 10, v.x, v.y, 0,0,0,1,1);
+                renderer2D.drawCircleFilled(0.05f, 10, v.x, v.y, 0,0,0,1,1);
+                renderer2D.drawCircleFilled(0.05f, 10, v.x, v.y, 0,0,0,1,1);
             }
 
-            for (int i = 0; i < Renderer2D.ends.size; i++) {
-                Vector2 end = Renderer2D.ends.get(i);
-                renderer2D.setTint(new Color(0,1,0, 1f / i));
-                //renderer2D.drawCircleFilled(0.1f, 10, end.x, end.y, 0,0,0,1,1);
-            }
+
+//            for (int i = 0; i < Renderer2D.dots.size; i ++) {
+//                Vector2 dot = Renderer2D.dots.get(i);
+//                renderer2D.setTint(Color.BLACK);
+//                //renderer2D.drawCircleFilled(0.1f, 10, dot.x, dot.y, 0,0,0,1,1);
+//            }
+//
+//            for (int i = 0; i < Renderer2D.ends.size; i++) {
+//                Vector2 end = Renderer2D.ends.get(i);
+//                renderer2D.setTint(new Color(0,1,0, 1f / i));
+//                //renderer2D.drawCircleFilled(0.1f, 10, end.x, end.y, 0,0,0,1,1);
+//            }
 
         } else {
             renderer2D.drawCurveFilled_final(1f, 2, new Vector2(-3,0), new Vector2(0,0), new Vector2(-3,0));

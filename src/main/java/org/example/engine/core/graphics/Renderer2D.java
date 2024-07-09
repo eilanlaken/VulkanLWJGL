@@ -1415,6 +1415,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
             boolean up_intersect = MathUtils.segmentsIntersection(Rp_c0, Rp_c2, Rn_c0, Rn_c2, intersection);
             if (up_intersect) {
+                System.out.println("1");
                 /* get the angle between the two normals at the corner */
                 float angle = Vector2.angleBetweenDeg(-nor_prev.x, -nor_prev.y, nor_next.x, nor_next.y);
                 float step = angle / smoothness;
@@ -1429,6 +1430,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
             boolean down_intersect = MathUtils.segmentsIntersection(Rp_c1, Rp_c3, Rn_c1, Rn_c3, intersection);
             if (down_intersect) {
+                System.out.println("2");
                 /* get the angle between the two normals at the corner */
                 float angle = Vector2.angleBetweenDeg(nor_prev.x, nor_prev.y, -nor_next.x, -nor_next.y);
                 float step = angle / smoothness;
@@ -1443,6 +1445,8 @@ public class Renderer2D implements MemoryResourceHolder {
 
             boolean far_intersect_up = MathUtils.segmentsIntersection(Rp_c1, Rp_c3, Rn_c2, Rn_c3, intersection);
             if (far_intersect_up) {
+                System.out.println("3");
+
                 /* get the angle between the two normals at the corner */
                 float angle = Vector2.angleBetweenDeg(nor_prev.x, nor_prev.y, -nor_next.x, -nor_next.y);
                 float step = angle / smoothness;
@@ -1457,6 +1461,8 @@ public class Renderer2D implements MemoryResourceHolder {
 
             boolean far_intersect_down = MathUtils.segmentsIntersection(Rp_c0, Rp_c2, Rn_c2, Rn_c3, intersection);
             if (far_intersect_down) {
+                System.out.println("4");
+
                 /* get the angle between the two normals at the corner */
                 float angle = Vector2.angleBetweenDeg(-nor_prev.x, -nor_prev.y, nor_next.x, nor_next.y);
                 float step = angle / smoothness;
@@ -1487,21 +1493,21 @@ public class Renderer2D implements MemoryResourceHolder {
         final int curveEndIndex = vertices.size;
 
         for (int i = 0; i < vertices.size; i++) {
-            //verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
+            verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
         }
 
         /* put indices ("connect the dots") */
         final int startVertex = this.vertexIndex;
         for (int i = 0; i < curveEndIndex - 2; i += 2) { // curve +  rounded corners
-//            indicesBuffer.put(startVertex + i + 0);
-//            indicesBuffer.put(startVertex + i + 1);
-//            indicesBuffer.put(startVertex + i + 2);
-//            indicesBuffer.put(startVertex + i + 2);
-//            indicesBuffer.put(startVertex + i + 1);
-//            indicesBuffer.put(startVertex + i + 3);
+            indicesBuffer.put(startVertex + i + 0);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 3);
         }
 
-        //vertexIndex += vertices.size;
+        vertexIndex += vertices.size;
 
         return vertices;
     }
