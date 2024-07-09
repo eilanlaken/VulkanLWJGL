@@ -1376,13 +1376,10 @@ public class Renderer2D implements MemoryResourceHolder {
             if (MathUtils.isZero(cross)) {
                 Vector2 v_up = vectorsPool.allocate();
                 v_up.set(dir_prev).rotate90(-1).nor().scl(s2);
-
                 Vector2 v_down = vectorsPool.allocate();
                 v_down.set(v_up).flip().nor().scl(s2);
-
                 vertices.add(v_up);
                 vertices.add(v_down);
-
                 continue;
             }
 
