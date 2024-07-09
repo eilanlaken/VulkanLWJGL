@@ -1358,6 +1358,7 @@ public class Renderer2D implements MemoryResourceHolder {
         Vector2 nor_next = vectorsPool.allocate();
         /* add vertices for internal corners */
         for (int i = 1; i < values.length - 1; i++) {
+            // maybe we should consider the last 2 ADDED vertices instead
             Vector2 corner_prev = values[i - 1];
             Vector2 corner_this = values[i];
             Vector2 corner_next = values[i + 1];
