@@ -254,6 +254,70 @@ public final class MathUtils {
      * where S1 is the line segment between (a1, a2)
      * and   S2 is the line between (b1, b2).
      * Stores the result in out.
+     * @returns 0 if lines are parallel
+     * @returns 1 if lines intersect at a unique point
+     * @returns 2 if lines coincide
+     * @returns 3 if the intersection lies outside segment 1
+     * @returns 4 if the intersection lies outside segment 2
+     * @returns 5 if the intersection lies outside both segments
+     * @param P1
+     * @param P2
+     * @param P3
+     * @param P4
+     * @param out
+     */
+    public static int segmentsIntersection_copied(Vector2 P1, Vector2 P2, Vector2 P3, Vector2 P4, Vector2 out) {
+        float denom  = (P4.y-P3.y) * (P2.x-P1.x) - (P4.x-P3.x) * (P2.y-P1.y);
+        float numera = (P4.x-P3.x) * (P1.y-P3.y) - (P4.y-P3.y) * (P1.x-P3.x);
+        float numerb = (P2.x-P1.x) * (P1.y-P3.y) - (P2.y-P1.y) * (P1.x-P3.x);
+
+        if (Math.abs(numera) < FLOAT_ROUNDING_ERROR && Math.abs(numerb) < FLOAT_ROUNDING_ERROR && Math.abs(denom) < FLOAT_ROUNDING_ERROR) {
+            /* Segments are parallel - they are either completely separate, or have some overlap. */
+            /* It is still possible that they have a unique intersection - if segment b "continues" a; i.e.:
+                a1 == b1 or a1 == b2, or a2 == b1 or a2 == b2.
+             */
+            if (P1.equals(P3) || P1.equals(P4)) {
+                out.set(P1);
+                return 1;
+            } else if (P2.equals(P3) || P2.equals(P4)) {
+                out.set(P2);
+                return 1;
+            }
+
+            out.set(Float.NaN, Float.NaN);
+            return 2; //meaning the lines coincide
+        }
+
+        if (Math.abs(denom) < FLOAT_ROUNDING_ERROR) {
+            out.x = Float.NaN;
+            out.y = Float.NaN;
+            return 0; //meaning lines are parallel
+        }
+
+        float mua = numera / denom;
+        float mub = numerb / denom;
+        out.x = P1.x + mua * (P2.x - P1.x);
+        out.y = P1.y + mua * (P2.y - P1.y);
+        boolean out1 = mua < 0 || mua > 1;
+        boolean out2 = mub < 0 || mub > 1;
+
+        if (out1 & out2) return 5; //the intersection lies outside both segments
+        else if (out1) return 3; //the intersection lies outside segment 1
+        else if (out2) return 4; //the intersection lies outside segment 2
+        else return 1; //the intersection lies inside both segments
+    }
+
+    /**
+     * Finds the intersection of two line segments: S1 & S2
+     * where S1 is the line segment between (a1, a2)
+     * and   S2 is the line between (b1, b2).
+     * Stores the result in out.
+     * @returns 0 if lines are parallel
+     * @returns 1 if lines intersect at a unique point
+     * @returns 2 if lines coincide
+     * @returns 3 if the intersection lies outside segment 1
+     * @returns 4 if the intersection lies outside segment 2
+     * @returns 5 if the intersection lies outside both segments
      * @param a1
      * @param a2
      * @param b1
@@ -261,7 +325,88 @@ public final class MathUtils {
      * @param out
      * @throws MathException
      */
-    public static boolean segmentsIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) {
+    public static int segmentsIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) {
+        float Ax = a2.x - a1.x;
+        float Ay = a2.y - a1.y;
+        float Bx = b2.x - b1.x;
+        float By = b2.y - b1.y;
+        float Cx = b1.x - a1.x;
+        float Cy = b1.y - a1.y;
+
+        float det = Ax * By - Ay * Bx;
+        float t = (Cx * By - Cy * Bx) / det;
+        float u = (Ay * Cx - Ax * Cy) / det;
+
+        /* handle degenerate cases */
+        if (isZero(det)) {
+            /* a1 == a2 , b1 == b2 */
+            if (a1.equals(a2) && b1.equals(b2)) {
+                if (a1.equals(b2)) {
+                    out.set(a1);
+                    return 2;
+                } else {
+                    out.set(Float.NaN, Float.NaN);
+                    return 0;
+                }
+            }
+
+            /* a1 == a2 */
+            if (a1.equals(a2) && pointOnSegment(a1,b1,b2)) {
+                out.set(a1);
+                return 1;
+            }
+
+            /* b1 == b2 */
+            if (b1.equals(b2) && pointOnSegment(b1,a1,a2)) {
+                out.set(b1);
+                return 1;
+            }
+
+            /* Segments are parallel or coincide. */
+            /* It is still possible that they have a unique intersection - if segment b "continues" a; i.e.:
+                a1 == b1 or a1 == b2, or a2 == b1 or a2 == b2.
+             */
+            if (a1.equals(b1) || a1.equals(b2)) {
+                out.set(a1);
+                return 1;
+            }
+
+            if (a2.equals(b1) || a2.equals(b2)) {
+                out.set(a2);
+                return 1;
+            }
+
+            out.set(Float.NaN, Float.NaN);
+            if (areCollinear(a1, a2, b1) && areCollinear(a1, a2, b2)) return 2;
+
+            return 0;
+        }
+
+        out.x = a1.x + t * (a2.x - a1.x);
+        out.y = a1.y + t * (a2.y - a1.y);
+
+        boolean onSegment1 = t >= 0 && t <= 1;
+        boolean onSegment2 = u >= 0 && u <= 1;
+        if (onSegment1 && onSegment2) return 1;
+        if (onSegment1) return 3;
+        if (onSegment2) return 4;
+        return 5;
+    }
+
+    /**
+     * Finds the intersection of two line segments: S1 & S2
+     * where S1 is the line segment between (a1, a2)
+     * and   S2 is the line between (b1, b2).
+     * Stores the result in out.
+     * @param a1
+     * @param a2
+     * @param b1
+     * @param b2
+     * @param out
+     * @throws MathException
+     */
+    // TODO: remove
+    @Deprecated public static boolean segmentsIntersection_old(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) {
         float Ax = a2.x - a1.x;
         float Ay = a2.y - a1.y;
         float Bx = b2.x - b1.x;
@@ -330,13 +475,10 @@ public final class MathUtils {
      * @param a2 second point on the line segment
     */
     public static boolean pointOnSegment(Vector2 p, Vector2 a1, Vector2 a2) {
-        Vector2 v1 = new Vector2().set(p).sub(a1);
-        Vector2 v2 = new Vector2().set(a2).sub(p);
-
         /* check co-linearity */
-        float crs = Vector2.crs(v1, v2);
+        float crs = Vector2.crs(p.x - a1.x, p.y - a1.y, a2.x - p.x, a2.y - p.y);
+        /* handle degenerate cases */
         if (Float.isNaN(crs)) {
-            /* handle degenerate cases */
             if (p.x == a1.x && p.y == a1.y) return true;
             if (p.x == a2.x && p.y == a2.y) return true;
         } else if (!isZero(crs)) return false;
@@ -348,6 +490,14 @@ public final class MathUtils {
         if (p.y < Math.min(a1.y, a2.y)) return false;
 
         return true;
+    }
+
+    public static boolean areCollinear(Vector2 p1, Vector2 p2, Vector2 p3) {
+        return floatsEqual (
+                (p2.x - p1.x) * (p3.y - p1.y)
+                    ,
+                (p3.x - p1.x) * (p2.y - p1.y))
+                ;
     }
 
     public static boolean isZero(float value) {
@@ -506,7 +656,7 @@ public final class MathUtils {
             polygonVertices.add(vertex);
         }
 
-        if (polygonVertices.size < 3) throw new MathException("Polygon contains 1 or more colinear vertices; When removed, that total vertex count is: " + polygonVertices.size + ". Must have at least 3 non-colinear vertices.");
+        if (polygonVertices.size < 3) throw new MathException("Polygon contains 1 or more collinear vertices; When removed, that total vertex count is: " + polygonVertices.size + ". Must have at least 3 non-colinear vertices.");
 
         int windingOrder = MathUtils.polygonWindingOrder(polygon);
         if (windingOrder > 0) polygonVertices.reverse();

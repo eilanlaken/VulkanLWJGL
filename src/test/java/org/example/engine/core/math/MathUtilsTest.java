@@ -1,8 +1,6 @@
 package org.example.engine.core.math;
 
-import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayInt;
-import org.example.engine.core.collections.CollectionsUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -257,7 +255,7 @@ class MathUtilsTest {
     }
 
     @Test
-    void testSegmentsIntersection() {
+    void segmentsIntersection() {
         Vector2 a1 = new Vector2();
         Vector2 a2 = new Vector2();
         Vector2 b1 = new Vector2();
@@ -268,8 +266,8 @@ class MathUtilsTest {
         a2.set(1, 1);
         b1.set(0, 1);
         b2.set(1, 0);
-        boolean i1 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertTrue(i1);
+        int i1 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(1, i1);
         Assertions.assertEquals(0.5f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(0.5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
@@ -277,8 +275,8 @@ class MathUtilsTest {
         a2.set(0, 2);
         b1.set(-4, 1);
         b2.set(5, 1);
-        boolean i2 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertTrue(i2);
+        int i2 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(1, i2);
         Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(1f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
@@ -286,35 +284,26 @@ class MathUtilsTest {
         a2.set(0, 0);
         b1.set(-4, 0);
         b2.set(5, 0);
-        boolean i3 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertTrue(i3);
-        Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+        int i3 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(1, i3);
+        Assertions.assertEquals(0, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
         a1.set(0, 0);
         a2.set(1, 0);
         b1.set(0, 1);
         b2.set(1, 1);
-        boolean i4 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertFalse(i4);
+        int i4 = MathUtils.segmentsIntersection_copied(a1, a2, b1, b2, out);
+        Assertions.assertEquals(0, i4);
         Assertions.assertEquals(Float.NaN, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(Float.NaN, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
-
-        a1.set(0, 0);
-        a2.set(0, 0);
-        b1.set(-4, 0);
-        b2.set(5, 0);
-        boolean i5 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertTrue(i5);
-        Assertions.assertEquals(0, out.x);
-        Assertions.assertEquals(0, out.y);
 
         a1.set(0, 0);
         a2.set(1, 0);
         b1.set(4, 0);
         b2.set(5, 0);
-        boolean i6 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertFalse(i6);
+        int i5 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(2, i5);
         Assertions.assertEquals(Float.NaN, out.x);
         Assertions.assertEquals(Float.NaN, out.y);
 
@@ -322,8 +311,8 @@ class MathUtilsTest {
         a2.set(2, 0);
         b1.set(1, 0);
         b2.set(5, 0);
-        boolean i7 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertTrue(i7);
+        int i6 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(2, i6);
         Assertions.assertEquals(Float.NaN, out.x);
         Assertions.assertEquals(Float.NaN, out.y);
 
@@ -331,10 +320,19 @@ class MathUtilsTest {
         a2.set(2, 0);
         b1.set(2, 0);
         b2.set(4, 0);
-        boolean i8 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertTrue(i8);
+        int i7 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(1, i7);
         Assertions.assertEquals(2, out.x);
         Assertions.assertEquals(0, out.y);
+
+        a1.set(0, 10);
+        a2.set(0, 5);
+        b1.set(-8, 0);
+        b2.set(-4, 0);
+        int i8 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(5, i8);
+        Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test
