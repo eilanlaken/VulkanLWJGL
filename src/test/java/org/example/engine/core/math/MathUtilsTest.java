@@ -333,6 +333,24 @@ class MathUtilsTest {
         Assertions.assertEquals(5, i8);
         Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        a1.set(0, 0);
+        a2.set(0, 5);
+        b1.set(0, 5);
+        b2.set(0, 10);
+        int i9 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(1, i9);
+        Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        a1.set(0, 0);
+        a2.set(0, 5);
+        b1.set(0, 10);
+        b2.set(0, 5);
+        int i10 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(1, i10);
+        Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test

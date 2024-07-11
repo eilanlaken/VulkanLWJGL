@@ -1235,18 +1235,92 @@ public class Renderer2D implements MemoryResourceHolder {
         /* put vertices */
         Array<Vector2> vertices = new Array<>(true, values.length);
 
+        anchor.clear();
+        v1.clear();
+        v2.clear();
+        v3.clear();
+
+        Vector2 p0 = vectorsPool.allocate();
+        Vector2 p1 = vectorsPool.allocate();
+        Vector2 p2 = vectorsPool.allocate();
+        Vector2 t0 = vectorsPool.allocate();
+        Vector2 t1a = vectorsPool.allocate();
+        Vector2 t1b = vectorsPool.allocate();
+        Vector2 t2 = vectorsPool.allocate();
+        Vector2 intersection = vectorsPool.allocate();
         /* iterate over all the anchors */
         for (int i = 1; i < values.length - 1; i++) {
-            Vector2 pi_0 = vectorsPool.allocate().set(values[i - 1]).add(values[i]).scl(0.5f);
-            Vector2 pi_1 = vectorsPool.allocate().set(values[i]);
-            Vector2 pi_2 = vectorsPool.allocate().set(values[i]).add(values[i + 1]).scl(0.5f);
-            if (i == 1) pi_0.set(values[0]);
-            if (i == values.length - 2) pi_2.set(values[values.length - 1]);
-            /* the tuple (pi_0, pi_1, pi_2) constitutes the anchor that we will render */
+            /* the tuple (pi_0, pi_1, pi_2) constitutes the anchor that we will extrude, triangulate and render */
+            p0.set(values[i - 1]).add(values[i]).scl(0.5f);
+            p1.set(values[i]);
+            p2.set(values[i]).add(values[i + 1]).scl(0.5f);
+            if (i == 1) p0.set(values[0]);
+            if (i == values.length - 2) p2.set(values[values.length - 1]);
+
+            float sign = MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) > 0 ? 1 : -1;
+
+            t0.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
+            t1a.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
+            t1b.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
+            t2.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
+
+            int result = MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p1).add(t1b), new Vector2(p2).add(t2), intersection);
+            v2.add(new Vector2(intersection));
+            float angle = Vector2.angleBetweenDeg(t1a, t1b);
+            float da = angle / smoothness;
+
+            vertices.add(vectorsPool.allocate().set(p0).add(t0));
+            vertices.add(vectorsPool.allocate().set(p0).sub(t0));
+            anchor.add(new Vector2(p0).add(t0));
+            anchor.add(new Vector2(p0).sub(t0));
+
+            for (int j = 0; j < smoothness + 1; j++) {
+                v1.add(new Vector2(intersection));
+                v1.add(new Vector2(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                //v1.add(new Vector2(-t1b.x, -t1b.y).rotateDeg(da * j).add(p1));
+            }
+
+            anchor.add(new Vector2(p1).add(t1a));
+            anchor.add(new Vector2(p1).sub(t1a));
+
+            anchor.add(new Vector2(p1).add(t1b));
+            anchor.add(new Vector2(p1).sub(t1b));
+
+            anchor.add(new Vector2(p2).add(t2));
+            anchor.add(new Vector2(p2).sub(t2));
+
 
         }
 
+        final int curveEndIndex = vertices.size;
+
+        /* put indices ("connect the dots") */
+        final int startVertex = this.vertexIndex;
+        for (int i = 0; i < curveEndIndex - 2; i += 2) { // curve +  rounded corners
+            indicesBuffer.put(startVertex + i);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 3);
+        }
+
+        vectorsPool.free(p0);
+        vectorsPool.free(p1);
+        vectorsPool.free(p2);
+        vectorsPool.free(t0);
+        vectorsPool.free(t1a);
+        vectorsPool.free(t1b);
+        vectorsPool.free(t2);
+        vectorsPool.free(intersection);
+        vectorsPool.freeAll(vertices);
+
     }
+
+    public static final Array<Vector2> anchor = new Array<>(true, 10);
+    public static final Array<Vector2> v1 = new Array<>(true, 10);
+    public static final Array<Vector2> v2 = new Array<>(true, 10);
+    public static final Array<Vector2> v3 = new Array<>(true, 10);
 
     // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
     @Deprecated public Array<Vector2> drawCurveFilled_new(float stroke, int smoothness, final Vector2... values) {

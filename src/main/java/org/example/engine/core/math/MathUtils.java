@@ -124,6 +124,8 @@ public final class MathUtils {
 
     public static float areaTriangle(float x1, float y1, float x2, float y2, float x3, float y3) { return 0.5f * Math.abs(x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2)); }
 
+    public static float areaTriangleSigned(float x1, float y1, float x2, float y2, float x3, float y3) { return 0.5f * (x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2)); }
+
     public static float max(float a, float b, float c) {
         return Math.max(a, Math.max(b, c));
     }
