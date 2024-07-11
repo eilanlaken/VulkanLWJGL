@@ -1277,7 +1277,6 @@ public class Renderer2D implements MemoryResourceHolder {
             for (int j = 0; j < smoothness + 1; j++) {
                 v1.add(new Vector2(intersection));
                 v1.add(new Vector2(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
-                //v1.add(new Vector2(-t1b.x, -t1b.y).rotateDeg(da * j).add(p1));
             }
 
             anchor.add(new Vector2(p1).add(t1a));
