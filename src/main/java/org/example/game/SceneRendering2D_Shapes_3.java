@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL11;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SceneRendering2D_Shapes_5 extends ApplicationScreen {
+public class SceneRendering2D_Shapes_3 extends ApplicationScreen {
 
     private Renderer2D renderer2D;
     private Camera camera;
@@ -29,7 +29,7 @@ public class SceneRendering2D_Shapes_5 extends ApplicationScreen {
 
     private ShaderProgram shaderYellow;
 
-    public SceneRendering2D_Shapes_5() {
+    public SceneRendering2D_Shapes_3() {
         renderer2D = new Renderer2D();
     }
 
@@ -83,8 +83,8 @@ public class SceneRendering2D_Shapes_5 extends ApplicationScreen {
         Vector2 last = new Vector2(1f,0);
         last.rotateDeg(dy);
 
-        Vector2[] verts = new Vector2[] {new Vector2(-6,0), new Vector2(0,0), last};
-        renderer2D.drawCurveFilled(1.2f, 10, verts);
+        Vector2[] verts = new Vector2[] {new Vector2(-6,0), new Vector2(0,0), last, new Vector2(3,3)};
+        renderer2D.drawCurveFilled_2(0.4f, 1, verts);
 
         for (int i = 0; i < Renderer2D.anchor.size; i += 2) {
             Vector2 v_up = Renderer2D.anchor.get(i);
