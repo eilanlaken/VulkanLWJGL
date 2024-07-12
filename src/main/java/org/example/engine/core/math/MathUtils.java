@@ -309,6 +309,74 @@ public final class MathUtils {
         else return 1; //the intersection lies inside both segments
     }
 
+    public static int segmentsIntersection(float a1x, float a1y, float a2x, float a2y, float b1x, float b1y, float b2x, float b2y, Vector2 out) {
+        float Ax = a2x - a1x;
+        float Ay = a2y - a1y;
+        float Bx = b2x - b1x;
+        float By = b2y - b1y;
+        float Cx = b1x - a1x;
+        float Cy = b1y - a1y;
+
+        float det = Ax * By - Ay * Bx;
+        float t = (Cx * By - Cy * Bx) / det;
+        float u = (Ay * Cx - Ax * Cy) / det;
+
+        /* handle degenerate cases */
+        if (isZero(det)) {
+            /* a1 == a2 , b1 == b2 */
+            if (floatsEqual(a1x, a2x) && floatsEqual(a1y, a2y) && floatsEqual(b1x, b2x) && floatsEqual(b1y, b2y)) {
+                if (floatsEqual(a1x, b2x) && floatsEqual(a1y, b2y)) {
+                    out.set(a1x, a1y);
+                    return 2;
+                } else {
+                    out.set(Float.NaN, Float.NaN);
+                    return 0;
+                }
+            }
+
+            /* a1 == a2 */
+            if (floatsEqual(a1x, a2x) && floatsEqual(a1y, a2y) && pointOnSegment(a1x, a1y,b1x, b1y,b2x, b2y)) {
+                out.set(a1x, a1y);
+                return 1;
+            }
+
+            /* b1 == b2 */
+            if (floatsEqual(b1x, b2x) && floatsEqual(b1y, b2y) && pointOnSegment(b1x, b1y,a1x, a1y,a2x, a2y)) {
+                out.set(b1x, b1y);
+                return 1;
+            }
+
+            /* Segments are parallel or coincide. */
+            /* It is still possible that they have a unique intersection - if segment b "continues" a; i.e.:
+                a1 == b1 or a1 == b2, or a2 == b1 or a2 == b2.
+             */
+            if ((floatsEqual(a1x, b1x) && floatsEqual(a1y, b1y)) || ((floatsEqual(a1x, b2x) && floatsEqual(a1y, b2y)))) {
+                out.set(a1x, a1y);
+                return 1;
+            }
+
+            if ((floatsEqual(a2x, b1x) && floatsEqual(a2y, b1y)) || ((floatsEqual(a2x, b2x) && floatsEqual(a2y, b2y)))) {
+                out.set(a2x, a2y);
+                return 1;
+            }
+
+            out.set(Float.NaN, Float.NaN);
+            if (areCollinear(a1x, a1y, a2x, a2y, b1x, b1y) && areCollinear(a1x, a1y, a2x, a2y, b2x, b2y)) return 2;
+
+            return 0;
+        }
+
+        out.x = a1x + t * (a2x - a1x);
+        out.y = a1y + t * (a2y - a1y);
+
+        boolean onSegment1 = t >= 0 && t <= 1;
+        boolean onSegment2 = u >= 0 && u <= 1;
+        if (onSegment1 && onSegment2) return 1;
+        if (onSegment1) return 3;
+        if (onSegment2) return 4;
+        return 5;
+    }
+
     /**
      * Finds the intersection of two line segments: S1 & S2
      * where S1 is the line segment between (a1, a2)
@@ -481,6 +549,8 @@ public final class MathUtils {
         float crs = Vector2.crs(p.x - a1.x, p.y - a1.y, a2.x - p.x, a2.y - p.y);
         /* handle degenerate cases */
         if (Float.isNaN(crs)) {
+            if (floatsEqual(p.x, a1.x) && floatsEqual(p.y, a1.y)) return true;
+            if (floatsEqual(p.x,a2.x) && floatsEqual(p.y, a2.y)) return true;
             if (p.x == a1.x && p.y == a1.y) return true;
             if (p.x == a2.x && p.y == a2.y) return true;
         } else if (!isZero(crs)) return false;
@@ -492,6 +562,32 @@ public final class MathUtils {
         if (p.y < Math.min(a1.y, a2.y)) return false;
 
         return true;
+    }
+
+    public static boolean pointOnSegment(float px, float py, float a1x, float a1y, float a2x, float a2y) {
+        /* check co-linearity */
+        float crs = Vector2.crs(px - a1x, py - a1y, a2x - px, a2y - py);
+        /* handle degenerate cases */
+        if (Float.isNaN(crs)) {
+            if (floatsEqual(px, a1x) && floatsEqual(py, a1y)) return true;
+            if (floatsEqual(px,a2x) && floatsEqual(py, a2y)) return true;
+        } else if (!isZero(crs)) return false;
+
+        /* check if point within bounding box */
+        if (px > Math.max(a1x, a2x)) return false;
+        if (px < Math.min(a1x, a2x)) return false;
+        if (py > Math.max(a1y, a2y)) return false;
+        if (py < Math.min(a1y, a2y)) return false;
+
+        return true;
+    }
+
+    public static boolean areCollinear(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
+        return floatsEqual (
+                (p2x - p1x) * (p3y - p1y)
+                ,
+                (p3x - p1x) * (p2y - p1y))
+                ;
     }
 
     public static boolean areCollinear(Vector2 p1, Vector2 p2, Vector2 p3) {

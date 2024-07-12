@@ -1248,6 +1248,7 @@ public class Renderer2D implements MemoryResourceHolder {
         Vector2 t1b = vectorsPool.allocate();
         Vector2 t2 = vectorsPool.allocate();
         Vector2 intersection = vectorsPool.allocate();
+
         /* iterate over all the anchors */
         for (int i = 1; i < values.length - 1; i++) {
             /* the tuple (pi_0, pi_1, pi_2) constitutes the anchor that we will extrude, triangulate and render */
@@ -1264,31 +1265,58 @@ public class Renderer2D implements MemoryResourceHolder {
             t1b.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
             t2.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
 
-            int result = MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p1).add(t1b), new Vector2(p2).add(t2), intersection);
-            v2.add(new Vector2(intersection));
+            //int result = MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p1).add(t1b), new Vector2(p2).add(t2), intersection);
+            int result = MathUtils.segmentsIntersection(p0.x + t0.x, p0.y + t0.y, p1.x + t1a.x, p1.y + t1a.y,p1.x + t1b.x, p1.y + t1b.y, p2.x + t2.x, p2.y + t2.y, intersection);
+
+            System.out.println(result);
+
             float angle = Vector2.angleBetweenDeg(t1a, t1b);
             float da = angle / smoothness;
 
-            vertices.add(vectorsPool.allocate().set(p0).add(t0));
-            vertices.add(vectorsPool.allocate().set(p0).sub(t0));
-            anchor.add(new Vector2(p0).add(t0));
-            anchor.add(new Vector2(p0).sub(t0));
+            /* unique intersection */
+            if (result == 1) {
+                vertices.add(vectorsPool.allocate().set(p0).add(t0));
+                vertices.add(vectorsPool.allocate().set(p0).sub(t0));
+                for (int j = 0; j < smoothness + 1; j++) {
+                    vertices.add(vectorsPool.allocate().set(intersection));
+                    vertices.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                    v1.add(new Vector2(intersection));// TODO: delete
+                    v1.add(new Vector2(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));// TODO: delete
+                }
+                vertices.add(vectorsPool.allocate().set(p2).add(t2));
+                vertices.add(vectorsPool.allocate().set(p2).sub(t2));
 
-            for (int j = 0; j < smoothness + 1; j++) {
-                v1.add(new Vector2(intersection));
-                v1.add(new Vector2(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                {
+                    anchor.add(new Vector2(p0).add(t0));
+                    anchor.add(new Vector2(p0).sub(t0));
+                    anchor.add(new Vector2(p1).add(t1a));
+                    anchor.add(new Vector2(p1).sub(t1a));
+                    anchor.add(new Vector2(p1).add(t1b));
+                    anchor.add(new Vector2(p1).sub(t1b));
+                    anchor.add(new Vector2(p2).add(t2));
+                    anchor.add(new Vector2(p2).sub(t2));
+                } // TODO: delete
+            } else if (result == 0 || result == 3 || result == 5) {
+                MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p2).add(t2), new Vector2(p2).sub(t1b), intersection);
+
+                vertices.add(vectorsPool.allocate().set(p0).add(t0));
+                vertices.add(vectorsPool.allocate().set(p0).sub(t0));
+                for (int j = 0; j < smoothness + 1; j++) {
+                    vertices.add(vectorsPool.allocate().set(intersection));
+                    vertices.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                    v1.add(new Vector2(intersection));// TODO: delete
+                    v1.add(new Vector2(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));// TODO: delete
+                }
+                vertices.add(vectorsPool.allocate().set(intersection));
+                vertices.add(vectorsPool.allocate().set(p2).sub(t2));
             }
 
-            anchor.add(new Vector2(p1).add(t1a));
-            anchor.add(new Vector2(p1).sub(t1a));
+            v2.add(new Vector2(intersection));
+        }
 
-            anchor.add(new Vector2(p1).add(t1b));
-            anchor.add(new Vector2(p1).sub(t1b));
-
-            anchor.add(new Vector2(p2).add(t2));
-            anchor.add(new Vector2(p2).sub(t2));
-
-
+        /* put vertices */
+        for (Vector2 value : vertices) {
+            verticesBuffer.put(value.x).put(value.y).put(currentTint).put(0.5f).put(0.5f);
         }
 
         final int curveEndIndex = vertices.size;
@@ -1303,6 +1331,8 @@ public class Renderer2D implements MemoryResourceHolder {
             indicesBuffer.put(startVertex + i + 1);
             indicesBuffer.put(startVertex + i + 3);
         }
+        vertexIndex += curveEndIndex;
+
 
         vectorsPool.free(p0);
         vectorsPool.free(p1);
@@ -1313,13 +1343,13 @@ public class Renderer2D implements MemoryResourceHolder {
         vectorsPool.free(t2);
         vectorsPool.free(intersection);
         vectorsPool.freeAll(vertices);
-
     }
 
     public static final Array<Vector2> anchor = new Array<>(true, 10);
     public static final Array<Vector2> v1 = new Array<>(true, 10);
     public static final Array<Vector2> v2 = new Array<>(true, 10);
     public static final Array<Vector2> v3 = new Array<>(true, 10);
+    public static final Array<Vector2> v4 = new Array<>(true, 10);
 
     // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
     @Deprecated public Array<Vector2> drawCurveFilled_new(float stroke, int smoothness, final Vector2... values) {
