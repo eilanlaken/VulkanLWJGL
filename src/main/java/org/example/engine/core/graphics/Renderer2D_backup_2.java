@@ -991,7 +991,7 @@ public class Renderer2D_backup_2 implements MemoryResourceHolder {
             indicesBuffer.put(startVertex + count - 1);
             indicesBuffer.put(startVertex + 0);
         } else {
-            MathUtils.triangulatePolygon(polygon, indices);
+            MathUtils.triangulatePolygon_old(polygon, indices);
             for (int i = 0; i < indices.size - 2; i += 3) {
                 indicesBuffer.put(startVertex + indices.get(i));
                 indicesBuffer.put(startVertex + indices.get(i + 1));
@@ -1034,7 +1034,7 @@ public class Renderer2D_backup_2 implements MemoryResourceHolder {
         }
         vectorsPool.free(vertex);
 
-        MathUtils.triangulatePolygon(polygon, indices);
+        MathUtils.triangulatePolygon_old(polygon, indices);
         int startVertex = this.vertexIndex;
         for (int i = 0; i < indices.size; i ++) {
             indicesBuffer.put(startVertex + indices.get(i));

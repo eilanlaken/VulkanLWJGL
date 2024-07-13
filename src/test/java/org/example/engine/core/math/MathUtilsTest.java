@@ -667,22 +667,34 @@ class MathUtilsTest {
         Assertions.assertFalse(Vector2.areColinear(v1,v2,v3));
     }
 
+    @Test
+    void pointInTriangle() {
+        Vector2 p = new Vector2();
+        Vector2 a = new Vector2();
+        Vector2 b = new Vector2();
+        Vector2 c = new Vector2();
+        // TODO: continue
+    }
 
+    @Test
+    void removeCollinearVertices() {
+        // TODO: implement.
+    }
 
     @Test
     void triangulatePolygon() {
         ArrayInt indices = new ArrayInt();
         float[] poly_1 = new float[] {0,0,  1,0,  1,1,  0,1};
-        MathUtils.triangulatePolygon(poly_1, indices);
+        MathUtils.triangulatePolygon_old(poly_1, indices);
 
         float[] poly_2 = new float[] {0,1,  1,1,  1,0,  0,0};
-        MathUtils.triangulatePolygon(poly_2, indices);
+        MathUtils.triangulatePolygon_old(poly_2, indices);
 
         float[] poly_3 = new float[] {0,0,  1,0,  1,1, 0.5f,1f,  0,1};
-        MathUtils.triangulatePolygon(poly_3, indices);
+        MathUtils.triangulatePolygon_old(poly_3, indices);
 
         float[] poly_4 = new float[] {1,4,   -5,2,  -2,-2, 0,0,  0,1, 2,2};
-        MathUtils.triangulatePolygon(poly_4, indices);
+        MathUtils.triangulatePolygon_old(poly_4, indices);
 
         System.out.println(indices);
     }

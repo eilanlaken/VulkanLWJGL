@@ -83,8 +83,9 @@ public class SceneRendering2D_Shapes_3 extends ApplicationScreen {
         Vector2 last = new Vector2(1f,0);
         last.rotateDeg(dy);
 
-        Vector2[] verts = new Vector2[] {new Vector2(-6,0), new Vector2(0,0), last, new Vector2(3,3)};
-        renderer2D.drawCurveFilled_2(0.4f, 1, verts);
+        Vector2[] verts = new Vector2[] {new Vector2(-6,0), new Vector2(0,0), last};
+        //Vector2[] verts = new Vector2[] {new Vector2(-6,0), new Vector2(0,0), last};
+        renderer2D.drawCurveFilled_3(1.4f, 10, verts);
 
         for (int i = 0; i < Renderer2D.anchor.size; i += 2) {
             Vector2 v_up = Renderer2D.anchor.get(i);

@@ -1,6 +1,7 @@
 package org.example.engine.core.math;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.ArrayFloat;
 import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.memory.MemoryPool;
@@ -33,7 +34,10 @@ public final class MathUtils {
     private static final MemoryPool<Vector2>   vectors2Pool  = new MemoryPool<>(Vector2.class, 5);
     private static final MemoryPool<Matrix2x2> matrix2x2Pool = new MemoryPool<>(Matrix2x2.class, 2);
 
+    /* polygon triangulation */
     private static final Array<Vector2> polygonVertices = new Array<>(false, 10);
+    private static final ArrayInt       indexList       = new ArrayInt();
+
 
     private MathUtils() {}
 
@@ -669,9 +673,13 @@ public final class MathUtils {
         return 0.5f * Math.abs((bx - ax) * (cy - ay) - (by - ay) * (cx - ax));
     }
 
-    public static boolean pointInTriangle(float px, float py, float ax, float ay, float bx, float by, float cx, float cy) {
-        return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 && (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0
-                && (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;
+    // TODO: TEST
+    public static boolean pointInTriangle(float x, float y, float ax, float ay, float bx, float by, float cx, float cy) {
+        float side_1 = (x - bx) * (ay - by) - (ax - bx) * (y - by); // Segment A to B
+        float side_2 = (x - cx) * (by - cy) - (bx - cx) * (y - cy); // Segment B to C
+        float side_3 = (x - ax) * (cy - ay) - (cx - ax) * (y - ay); // Segment C to A
+        // All the signs must be positive or all negative
+        return (side_1 < 0.0) == (side_2 < 0.0) == (side_3 < 0.0);
     }
 
     /**
@@ -686,6 +694,42 @@ public final class MathUtils {
 
             float x2 = CollectionsUtils.getCyclic(vertices, i+2);
             float y2 = CollectionsUtils.getCyclic(vertices, i+3);
+
+            sum += (x2 - x1) * (y2 + y1);
+        }
+        if (sum > 0) return 1;
+        return -1;
+    }
+
+    /**
+     * Returns the winding order of a polygon.
+     * @return int 1 if clockwise, -1 if counter-clockwise
+     */
+    public static int polygonWindingOrder(final Array<Vector2> vertices) {
+        int n = vertices.size;
+        float sum = 0;
+
+        for (int i = 0; i < n; i++) {
+            Vector2 current = vertices.get(i);
+            Vector2 next = vertices.get((i + 1) % n);
+            sum += (next.x - current.x) * (next.y + current.y);
+        }
+
+        return sum > 0 ? -1 : 1; // Counter-clockwise: -1, Clockwise: 1
+    }
+
+    /**
+     * Returns the winding order of a polygon.
+     * @return int 1 if clockwise, -1 if counter-clockwise
+     */
+    public static int polygonWindingOrder(final ArrayFloat vertices) {
+        float sum = 0;
+        for (int i = 0; i < vertices.size - 1; i += 2) {
+            float x1 = vertices.getCyclic(i);
+            float y1 = vertices.getCyclic(i+1);
+
+            float x2 = vertices.getCyclic(i+2);
+            float y2 = vertices.getCyclic(i+3);
 
             sum += (x2 - x1) * (y2 + y1);
         }
@@ -727,7 +771,282 @@ public final class MathUtils {
         return true;
     }
 
-    public static void triangulatePolygon(@NotNull float[] polygon, @NotNull ArrayInt out) {
+    // TODO: test.
+    public static void removeCollinearVertices(@NotNull Array<Vector2> polygon) {
+        if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.size);
+
+        Vector2 prev = vectors2Pool.allocate();
+        Vector2 curr = vectors2Pool.allocate();
+        Vector2 next = vectors2Pool.allocate();
+
+        Array<Vector2> collinearVertices = new Array<>();
+
+        for (int i = 0; i < polygon.size; i++) {
+
+            prev.x = polygon.getCyclic(i - 1).x;
+            prev.y = polygon.getCyclic(i - 1).y;
+
+            curr.x = polygon.get(i).x;
+            curr.y = polygon.get(i).y;
+
+            next.x = polygon.getCyclic(i + 1).x;
+            next.y = polygon.getCyclic(i + 1).y;
+
+            if (Vector2.areColinear(prev, curr, next)) {
+                collinearVertices.add(curr);
+            }
+        }
+
+        polygon.ordered = true;
+        polygon.removeAll(collinearVertices, true);
+
+        vectors2Pool.free(prev);
+        vectors2Pool.free(curr);
+        vectors2Pool.free(next);
+    }
+
+    // TODO: test
+    public static void triangulatePolygon(@NotNull Array<Vector2> polygon, @NotNull ArrayInt outIndices) {
+        if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.size);
+
+        polygon.clear();
+        outIndices.clear();
+
+        Vector2 prev    = vectors2Pool.allocate();
+        Vector2 current = vectors2Pool.allocate();
+        Vector2 next    = vectors2Pool.allocate();
+        for (int i = 0; i < polygon.size; i++) {
+
+            prev.x = polygon.getCyclic(i - 1).x;
+            prev.y = polygon.getCyclic(i - 1).y;
+
+            current.x = polygon.get(i).x;
+            current.y = polygon.get(i).y;
+
+            next.x = polygon.getCyclic(i + 1).x;
+            next.y = polygon.getCyclic(i + 1).y;
+
+            Vector2 vertex = vectors2Pool.allocate();
+
+            if (Vector2.areColinear(prev, current, next)) {
+                continue;
+            }
+
+            vertex.x = current.x;
+            vertex.y = current.y;
+
+            polygon.add(vertex);
+        }
+
+        if (polygon.size < 3) throw new MathException("Polygon contains 1 or more collinear vertices; When removed, that total vertex count is: " + polygon.size + ". Must have at least 3 non-colinear vertices.");
+
+        int windingOrder = MathUtils.polygonWindingOrder(polygon);
+        if (windingOrder > 0) polygon.reverse();
+
+        indexList.clear();
+        for (int i = 0; i < polygon.size; i++) {
+            indexList.add(i);
+        }
+
+        int totalTriangleCount = polygon.size - 2;
+        int totalTriangleIndexCount = totalTriangleCount * 3;
+
+        outIndices.clear();
+        outIndices.ensureCapacity(totalTriangleIndexCount);
+
+        Vector2 va_to_vb = vectors2Pool.allocate();
+        Vector2 va_to_vc = vectors2Pool.allocate();
+
+        while (indexList.size > 3) {
+            for (int i = 0; i < indexList.size; i++) {
+                int a = indexList.get(i);
+                int b = indexList.getCyclic(i - 1);
+                int c = indexList.getCyclic(i + 1);
+
+                Vector2 va = polygon.get(a);
+                Vector2 vb = polygon.get(b);
+                Vector2 vc = polygon.get(c);
+
+                va_to_vb.x = vb.x - va.x;
+                va_to_vb.y = vb.y - va.y;
+
+                va_to_vc.x = vc.x - va.x;
+                va_to_vc.y = vc.y - va.y;
+
+                // Is ear test vertex convex?
+                if (Vector2.crs(va_to_vb, va_to_vc) > 0f) {
+                    System.out.println("cros > 0.");
+                    continue;
+                }
+
+                boolean isEar = true;
+
+                // Test: does ear contain any polygon vertices?
+                for (int j = 0; j < polygon.size; j++) {
+                    if (j == a || j == b || j == c) continue;
+                    Vector2 p = polygon.get(j);
+                    if (pointInTriangle(p.x, p.y, vb.x, vb.y, va.x, va.y, vc.x, vc.y)) {
+
+                        System.out.println("inside: p " + p);
+                        System.out.println("inside: vb " + vb);
+                        System.out.println("inside: va " + va);
+                        System.out.println("inside: vc " + vc);
+                        isEar = false;
+                        break;
+                    }
+                }
+
+                if (isEar) {
+                    outIndices.add(b);
+                    outIndices.add(a);
+                    outIndices.add(c);
+
+                    indexList.removeIndex(i);
+                    break;
+                }
+            }
+        }
+
+        outIndices.add(indexList.get(0));
+        outIndices.add(indexList.get(1));
+        outIndices.add(indexList.get(2));
+
+        /* free resources */
+        vectors2Pool.free(prev);
+        vectors2Pool.free(current);
+        vectors2Pool.free(next);
+        vectors2Pool.free(va_to_vb);
+        vectors2Pool.free(va_to_vc);
+    }
+
+
+
+    // TODO: test
+    public static void triangulatePolygon_broken(@NotNull ArrayFloat polygon, @NotNull ArrayInt out) {
+        if (polygon.size < 6) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.size);
+        if (polygon.size % 2 != 0) throw new MathException("Polygon must be represented as a flat array of vertices, each vertex must have x and y coordinates: [x0,y0,  x1,y1, ...]. Therefore, polygon array length must be even.");
+
+        polygonVertices.clear();
+        Vector2 prev    = vectors2Pool.allocate();
+        Vector2 current = vectors2Pool.allocate();
+        Vector2 next    = vectors2Pool.allocate();
+        for (int i = 0; i < polygon.size; i += 2) {
+
+            prev.x = polygon.getCyclic(i - 2);
+            prev.y = polygon.getCyclic(i - 1);
+
+            current.x = polygon.get(i);
+            current.y = polygon.get(i + 1);
+
+            next.x = polygon.getCyclic(i + 2);
+            next.y = polygon.getCyclic(i + 3);
+
+            Vector2 vertex = vectors2Pool.allocate();
+
+            if (!Vector2.areColinear(prev, current, next)) {
+                vertex.x = current.x;
+                vertex.y = current.y;
+            } else { /* this is a very unfortunate degenerate case that we handle using an estimate */
+                Vector2 perturb = vectors2Pool.allocate();
+                perturb.x = next.x - current.x;
+                perturb.y = next.y - current.y;
+                perturb.rotate90(1);
+                perturb.nor().scl(FLOAT_ROUNDING_ERROR);
+
+                vertex.x = current.x + perturb.x;
+                vertex.y = current.y + perturb.y;
+                vectors2Pool.free(perturb);
+            }
+
+            polygonVertices.add(vertex);
+        }
+
+        if (polygonVertices.size < 3) throw new MathException("Polygon contains 1 or more collinear vertices; When removed, that total vertex count is: " + polygonVertices.size + ". Must have at least 3 non-colinear vertices.");
+
+        int windingOrder = MathUtils.polygonWindingOrder(polygon);
+        if (windingOrder > 0) polygonVertices.reverse();
+
+        out.clear();
+
+        indexList.clear();
+        for (int i = 0; i < polygonVertices.size; i++) {
+            indexList.add(i);
+        }
+
+        int totalTriangleCount = polygonVertices.size - 2;
+        int totalTriangleIndexCount = totalTriangleCount * 3;
+
+        out.clear();
+        out.ensureCapacity(totalTriangleIndexCount);
+
+        Vector2 va_to_vb = vectors2Pool.allocate();
+        Vector2 va_to_vc = vectors2Pool.allocate();
+
+        while (indexList.size > 3) {
+            for (int i = 0; i < indexList.size; i++) {
+                int a = indexList.get(i);
+                int b = indexList.getCyclic(i - 1);
+                int c = indexList.getCyclic(i + 1);
+
+                Vector2 va = polygonVertices.get(a);
+                Vector2 vb = polygonVertices.get(b);
+                Vector2 vc = polygonVertices.get(c);
+
+                va_to_vb.x = vb.x - va.x;
+                va_to_vb.y = vb.y - va.y;
+
+                va_to_vc.x = vc.x - va.x;
+                va_to_vc.y = vc.y - va.y;
+
+                // Is ear test vertex convex?
+                if (Vector2.crs(va_to_vb, va_to_vc) > 0f) {
+                    System.out.println("cros > 0.");
+                    continue;
+                }
+
+                boolean isEar = true;
+
+                // Test: does ear contain any polygon vertices?
+                for (int j = 0; j < polygonVertices.size; j++) {
+                    if (j == a || j == b || j == c) continue;
+                    Vector2 p = polygonVertices.get(j);
+                    if (pointInTriangle(p.x, p.y, vb.x, vb.y, va.x, va.y, vc.x, vc.y)) {
+
+                        System.out.println("inside: p " + p);
+                        System.out.println("inside: vb " + vb);
+                        System.out.println("inside: va " + va);
+                        System.out.println("inside: vc " + vc);
+                        isEar = false;
+                        break;
+                    }
+                }
+
+                if (isEar) {
+                    out.add(b);
+                    out.add(a);
+                    out.add(c);
+
+                    indexList.removeIndex(i);
+                    break;
+                }
+            }
+        }
+
+        out.add(indexList.get(0));
+        out.add(indexList.get(1));
+        out.add(indexList.get(2));
+
+        /* free resources */
+        vectors2Pool.free(prev);
+        vectors2Pool.free(current);
+        vectors2Pool.free(next);
+        vectors2Pool.free(va_to_vb);
+        vectors2Pool.free(va_to_vc);
+        vectors2Pool.freeAll(polygonVertices);
+    }
+
+    // TODO: test
+    public static void triangulatePolygon_old(@NotNull float[] polygon, @NotNull ArrayInt out) {
         if (polygon.length < 6) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.length);
         if (polygon.length % 2 != 0) throw new MathException("Polygon must be represented as a flat array of vertices, each vertex must have x and y coordinates: [x0,y0,  x1,y1, ...]. Therefore, polygon array length must be even.");
 
@@ -746,11 +1065,22 @@ public final class MathUtils {
             next.x = CollectionsUtils.getCyclic(polygon, i + 2);
             next.y = CollectionsUtils.getCyclic(polygon, i + 3);
 
-            if (Vector2.areColinear(prev, current, next)) continue;
-
             Vector2 vertex = vectors2Pool.allocate();
-            vertex.x = current.x;
-            vertex.y = current.y;
+            if (!Vector2.areColinear(prev, current, next)) {
+                vertex.x = current.x;
+                vertex.y = current.y;
+            } else { /* this is a very unfortunate degenerate case that we handle using an estimate */
+                Vector2 perturb = vectors2Pool.allocate();
+                perturb.x = next.x - current.x;
+                perturb.y = next.y - current.y;
+                perturb.rotate90(1);
+                perturb.nor().scl(FLOAT_ROUNDING_ERROR);
+
+                vertex.x = current.x + perturb.x;
+                vertex.y = current.y + perturb.y;
+                vectors2Pool.free(perturb);
+            }
+
             polygonVertices.add(vertex);
         }
 
@@ -761,7 +1091,7 @@ public final class MathUtils {
 
         out.clear();
 
-        ArrayInt indexList = new ArrayInt();
+        indexList.clear();
         for (int i = 0; i < polygonVertices.size; i++) {
             indexList.add(i);
         }

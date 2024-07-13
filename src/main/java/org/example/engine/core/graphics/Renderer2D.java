@@ -1,6 +1,7 @@
 package org.example.engine.core.graphics;
 
 import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.ArrayFloat;
 import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
@@ -991,7 +992,7 @@ public class Renderer2D implements MemoryResourceHolder {
             indicesBuffer.put(startVertex + count - 1);
             indicesBuffer.put(startVertex + 0);
         } else {
-            MathUtils.triangulatePolygon(polygon, indices);
+            MathUtils.triangulatePolygon_old(polygon, indices);
             for (int i = 0; i < indices.size - 2; i += 3) {
                 indicesBuffer.put(startVertex + indices.get(i));
                 indicesBuffer.put(startVertex + indices.get(i + 1));
@@ -1034,7 +1035,7 @@ public class Renderer2D implements MemoryResourceHolder {
         }
         vectorsPool.free(vertex);
 
-        MathUtils.triangulatePolygon(polygon, indices);
+        MathUtils.triangulatePolygon_old(polygon, indices);
         int startVertex = this.vertexIndex;
         for (int i = 0; i < indices.size; i ++) {
             indicesBuffer.put(startVertex + indices.get(i));
@@ -1226,6 +1227,145 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += refinement;
     }
 
+    public void drawCurveFilled_3(float stroke, int smoothness, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values.length < 2) return;
+        setMode(GL11.GL_TRIANGLES);
+        final float s2 = 0.5f * stroke;
+        /* put vertices */
+        //Array<Vector2> vertices = new Array<>(true, values.length);
+
+        Vector2 p0 = vectorsPool.allocate();
+        Vector2 p1 = vectorsPool.allocate();
+        Vector2 p2 = vectorsPool.allocate();
+        Vector2 t0 = vectorsPool.allocate();
+        Vector2 t1a = vectorsPool.allocate();
+        Vector2 t1b = vectorsPool.allocate();
+        Vector2 t2 = vectorsPool.allocate();
+        Vector2 intersection = vectorsPool.allocate();
+
+        v1.clear();
+
+        /* iterate over all the anchors */
+        for (int i = 1; i < values.length - 1; i++) {
+            /* the tuple (pi_0, pi_1, pi_2) constitutes the anchor that we will extrude, triangulate and render */
+
+            if (i == 1) p0.set(values[0]);
+            else p0.set(values[i - 1]).add(values[i]).scl(0.5f);
+            p1.set(values[i]);
+            if (i == values.length - 2) p2.set(values[values.length - 1]);
+            else p2.set(values[i]).add(values[i + 1]).scl(0.5f);
+
+            indices.clear();
+            vertices.clear();
+            float area = MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y);
+            /* collinear vertices */
+            if (MathUtils.isZero(area)) {
+                System.out.println("zero");
+                continue;
+            }
+
+            float sign = MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) >= 0 ? 1 : -1;
+
+            t0.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
+            t1a.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
+            t1b.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
+            t2.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
+
+            int result = MathUtils.segmentsIntersection(p0.x + t0.x, p0.y + t0.y, p1.x + t1a.x, p1.y + t1a.y,p1.x + t1b.x, p1.y + t1b.y, p2.x + t2.x, p2.y + t2.y, intersection);
+
+            float angle = Vector2.angleBetweenDeg(t1a, t1b);
+            float da = angle / smoothness;
+
+
+
+
+            if (result == 1) {
+                System.out.println("ani");
+                vertices.add(vectorsPool.allocate().set(p0).add(t0));
+                v1.add(vectorsPool.allocate().set(p0).add(t0));
+                vertices.add(vectorsPool.allocate().set(p0).sub(t0));
+                v1.add(vectorsPool.allocate().set(p0).sub(t0));
+                for (int j = 0; j < smoothness + 1; j++) {
+                    vertices.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                    v1.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                }
+                vertices.add(vectorsPool.allocate().set(p2).sub(t2));
+                v1.add(vectorsPool.allocate().set(p2).sub(t2));
+                vertices.add(vectorsPool.allocate().set(p2).add(t2));
+                v1.add(vectorsPool.allocate().set(p2).add(t2));
+                vertices.add(vectorsPool.allocate().set(intersection));
+                v1.add(vectorsPool.allocate().set(intersection));
+
+            } else if (result == 3) {
+                MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p2).add(t2), new Vector2(p2).sub(t1b), intersection);
+                vertices.add(vectorsPool.allocate().set(p0).add(t0));
+                vertices.add(vectorsPool.allocate().set(p0).sub(t0));
+                for (int j = 0; j < smoothness + 1; j++) {
+                    vertices.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                }
+                vertices.add(vectorsPool.allocate().set(p2).sub(t2));
+                vertices.add(vectorsPool.allocate().set(intersection));
+            }
+
+
+
+            /* put vertices */
+            for (Vector2 value : vertices) {
+                verticesBuffer.put(value.x).put(value.y).put(currentTint).put(0.5f).put(0.5f);
+            }
+
+            ArrayFloat v = new ArrayFloat();
+            for (Vector2 vert : vertices) {
+                v.add(vert.x);
+                v.add(vert.y);
+            }
+
+            System.out.println("right before trian");
+            //MathUtils.triangulatePolygon_old(v, indices);
+            System.out.println("right after trian");
+
+            System.out.println(indices);
+            int startVertex = this.vertexIndex;
+            for (int j = 0; j < indices.size; j++) {
+                indicesBuffer.put(startVertex + indices.get(j));
+            }
+
+            vertexIndex += vertices.size;
+
+        }
+
+//        /* put vertices */
+//        for (Vector2 value : vertices) {
+//            verticesBuffer.put(value.x).put(value.y).put(currentTint).put(0.5f).put(0.5f);
+//        }
+
+        final int curveEndIndex = vertices.size;
+
+        /* put indices ("connect the dots") */
+//        final int startVertex = this.vertexIndex;
+//        for (int i = 0; i < curveEndIndex - 2; i += 2) { // curve +  rounded corners
+//            indicesBuffer.put(startVertex + i + 0);
+//            indicesBuffer.put(startVertex + i + 1);
+//            indicesBuffer.put(startVertex + i + 2);
+//            indicesBuffer.put(startVertex + i + 2);
+//            indicesBuffer.put(startVertex + i + 1);
+//            indicesBuffer.put(startVertex + i + 3);
+//        }
+//        vertexIndex += curveEndIndex;
+
+
+        vectorsPool.free(p0);
+        vectorsPool.free(p1);
+        vectorsPool.free(p2);
+        vectorsPool.free(t0);
+        vectorsPool.free(t1a);
+        vectorsPool.free(t1b);
+        vectorsPool.free(t2);
+        vectorsPool.free(intersection);
+        vectorsPool.freeAll(vertices);
+    }
+
     public void drawCurveFilled_2(float stroke, int smoothness, final Vector2... values) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (values.length < 2) return;
@@ -1253,7 +1393,7 @@ public class Renderer2D implements MemoryResourceHolder {
             if (i == values.length - 2) p2.set(values[values.length - 1]);
             else p2.set(values[i]).add(values[i + 1]).scl(0.5f);
 
-            float sign = MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) > 0 ? 1 : -1;
+            float sign = MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) >= 0 ? 1 : -1;
 
             t0.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
             t1a.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
