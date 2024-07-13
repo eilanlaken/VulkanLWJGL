@@ -463,8 +463,13 @@ public class Vector2 implements MemoryPool.Reset {
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
-    public static boolean areColinear(Vector2 v1, Vector2 v2, Vector2 v3) {
+    public static boolean areCollinear(Vector2 v1, Vector2 v2, Vector2 v3) {
         float area = v1.x * (v2.y - v3.y) + v2.x * (v3.y - v1.y) + v3.x * (v1.y - v2.y);
+        return MathUtils.isZero(area);
+    }
+
+    public static boolean areCollinear(float v1x, float v1y, float v2x, float v2y, float v3x, float v3y) {
+        float area = v1x * (v2y - v3y) + v2x * (v3y - v1y) + v3x * (v1y - v2y);
         return MathUtils.isZero(area);
     }
 

@@ -8,8 +8,6 @@ import org.example.engine.core.memory.MemoryPool;
 import org.example.engine.core.shape.Shape2D;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 // TODO: implement init() block that will take care of configuration.
@@ -647,39 +645,39 @@ public final class MathUtils {
 
     }
 
-    /**
-     * Returns the relative angle between the two bodies given the reference angle.
-     * @return double
-     */
-    public static float getRelativeRotationRad(final Shape2D shape_1, final Shape2D shape_2) {
-        float rr = (shape_1.angle() - shape_2.angle()) * MathUtils.degreesToRadians;
-        if (rr < -MathUtils.PI) rr += MathUtils.PI_TWO;
-        if (rr >  MathUtils.PI) rr -= MathUtils.PI_TWO;
-        return rr;
-    }
-
-    /**
-     * Returns the relative angle between the two bodies given the reference angle.
-     * @return double
-     */
-    public static float getRelativeRotationDeg(final Shape2D shape_1, final Shape2D shape_2) {
-        float rr = shape_1.angle() - shape_2.angle();
-        if (rr < -180) rr += 360;
-        if (rr >  180) rr -= 360;
-        return rr;
-    }
-
-    public static float getAreaTriangle(float ax, float ay, float bx, float by, float cx, float cy) {
+    @Deprecated public static float getAreaTriangle_old(float ax, float ay, float bx, float by, float cx, float cy) {
         return 0.5f * Math.abs((bx - ax) * (cy - ay) - (by - ay) * (cx - ax));
     }
 
-    // TODO: TEST
-    public static boolean pointInTriangle(float x, float y, float ax, float ay, float bx, float by, float cx, float cy) {
-        float side_1 = (x - bx) * (ay - by) - (ax - bx) * (y - by); // Segment A to B
-        float side_2 = (x - cx) * (by - cy) - (bx - cx) * (y - cy); // Segment B to C
-        float side_3 = (x - ax) * (cy - ay) - (cx - ax) * (y - ay); // Segment C to A
-        // All the signs must be positive or all negative
-        return (side_1 < 0.0) == (side_2 < 0.0) == (side_3 < 0.0);
+    // TODO: test
+    public static float getAreaTriangle(float ax, float ay, float bx, float by, float cx, float cy) {
+        return 0.5f * Math.abs((ax * (by - cy) + bx * (cy - ay) + cx * (ay - by)));
+    }
+
+    // TODO: test
+    public static float getAreaTriangle(Vector2 A, Vector2 B, Vector2 C) {
+        return 0.5f * Math.abs((A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y)));
+    }
+
+    public static boolean pointInTriangle(Vector2 P, Vector2 A, Vector2 B, Vector2 C) {
+        float areaABC = getAreaTriangle(A, B, C);
+        float areaPAB = getAreaTriangle(P, A, B);
+        float areaPBC = getAreaTriangle(P, B, C);
+        float areaPCA = getAreaTriangle(P, C, A);
+
+        // Check if the sum of the areas of PAB, PBC, and PCA is the same as the area of ABC
+        return floatsEqual(areaPAB + areaPBC + areaPCA, areaABC);
+    }
+
+    // FIXME
+    public static boolean pointInTriangle(float px, float py, float ax, float ay, float bx, float by, float cx, float cy) {
+        float areaABC = getAreaTriangle(ax, ay, bx, by, cx, cy);
+        float areaPAB = getAreaTriangle(px, py, ax, ay, bx, by);
+        float areaPBC = getAreaTriangle(px, py, bx, by, cx, cy);
+        float areaPCA = getAreaTriangle(px, py, cx, cy, ax, ay);
+
+        // Check if the sum of the areas of PAB, PBC, and PCA is the same as the area of ABC
+        return floatsEqual(areaPAB + areaPBC + areaPCA, areaABC);
     }
 
     /**
@@ -771,42 +769,56 @@ public final class MathUtils {
         return true;
     }
 
-    // TODO: test.
-    public static void removeCollinearVertices(@NotNull Array<Vector2> polygon) {
-        if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.size);
+    public static void removeCollinearVertices(@NotNull Array<Vector2> polygon, @NotNull Array<Vector2> outVertices) {
+        if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices. Got: " + polygon.size);
 
-        Vector2 prev = vectors2Pool.allocate();
-        Vector2 curr = vectors2Pool.allocate();
-        Vector2 next = vectors2Pool.allocate();
-
-        Array<Vector2> collinearVertices = new Array<>();
-
+        outVertices.clear();
         for (int i = 0; i < polygon.size; i++) {
 
-            prev.x = polygon.getCyclic(i - 1).x;
-            prev.y = polygon.getCyclic(i - 1).y;
+            Vector2 prev = polygon.getCyclic(i - 1);
+            Vector2 curr = polygon.getCyclic(i);
+            Vector2 next = polygon.getCyclic(i + 1);
 
-            curr.x = polygon.get(i).x;
-            curr.y = polygon.get(i).y;
-
-            next.x = polygon.getCyclic(i + 1).x;
-            next.y = polygon.getCyclic(i + 1).y;
-
-            if (Vector2.areColinear(prev, curr, next)) {
-                collinearVertices.add(curr);
+            if (!Vector2.areCollinear(prev, curr, next)) {
+                outVertices.add(curr);
             }
         }
+    }
 
-        polygon.ordered = true;
-        polygon.removeAll(collinearVertices, true);
+    public static void removeCollinearVertices(@NotNull float[] polygon, @NotNull ArrayFloat outVertices) {
+        if (polygon.length < 6) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.length);
 
-        vectors2Pool.free(prev);
-        vectors2Pool.free(curr);
-        vectors2Pool.free(next);
+        outVertices.clear();
+        for (int i = 0; i < polygon.length - 1; i += 2) {
+
+            float prev_x = CollectionsUtils.getCyclic(polygon, i - 2);
+            float prev_y = CollectionsUtils.getCyclic(polygon, i - 1);
+
+            float curr_x = polygon[i];
+            float curr_y = polygon[i + 1];
+
+            float next_x = CollectionsUtils.getCyclic(polygon, i + 2);
+            float next_y = CollectionsUtils.getCyclic(polygon, i + 3);
+
+            if (!Vector2.areCollinear(prev_x, prev_y, curr_x, curr_y, next_x, next_y)) {
+                outVertices.add(curr_x);
+                outVertices.add(curr_y);
+            }
+        }
+    }
+
+    // TODO: implement
+    public static void triangulatePolygon(@NotNull Array<Vector2> polygon, @NotNull Array<Vector2> outVertices, @NotNull ArrayInt outIndices) {
+
+    }
+
+    // TODO: implement
+    public static void triangulatePolygon(@NotNull float polygon, @NotNull ArrayFloat outVertices, @NotNull ArrayInt outIndices) {
+
     }
 
     // TODO: test
-    public static void triangulatePolygon(@NotNull Array<Vector2> polygon, @NotNull ArrayInt outIndices) {
+    @Deprecated public static void triangulatePolygon(@NotNull Array<Vector2> polygon, @NotNull ArrayInt outIndices) {
         if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.size);
 
         polygon.clear();
@@ -828,7 +840,7 @@ public final class MathUtils {
 
             Vector2 vertex = vectors2Pool.allocate();
 
-            if (Vector2.areColinear(prev, current, next)) {
+            if (Vector2.areCollinear(prev, current, next)) {
                 continue;
             }
 
@@ -838,7 +850,7 @@ public final class MathUtils {
             polygon.add(vertex);
         }
 
-        if (polygon.size < 3) throw new MathException("Polygon contains 1 or more collinear vertices; When removed, that total vertex count is: " + polygon.size + ". Must have at least 3 non-colinear vertices.");
+        if (polygon.size < 3) throw new MathException("Polygon contains 1 or more collinear vertices; When removed, that total vertex count is: " + polygon.size + ". Must have at least 3 non-collinear vertices.");
 
         int windingOrder = MathUtils.polygonWindingOrder(polygon);
         if (windingOrder > 0) polygon.reverse();
@@ -919,10 +931,8 @@ public final class MathUtils {
         vectors2Pool.free(va_to_vc);
     }
 
-
-
     // TODO: test
-    public static void triangulatePolygon_broken(@NotNull ArrayFloat polygon, @NotNull ArrayInt out) {
+    @Deprecated public static void triangulatePolygon_broken(@NotNull ArrayFloat polygon, @NotNull ArrayInt out) {
         if (polygon.size < 6) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.size);
         if (polygon.size % 2 != 0) throw new MathException("Polygon must be represented as a flat array of vertices, each vertex must have x and y coordinates: [x0,y0,  x1,y1, ...]. Therefore, polygon array length must be even.");
 
@@ -943,7 +953,7 @@ public final class MathUtils {
 
             Vector2 vertex = vectors2Pool.allocate();
 
-            if (!Vector2.areColinear(prev, current, next)) {
+            if (!Vector2.areCollinear(prev, current, next)) {
                 vertex.x = current.x;
                 vertex.y = current.y;
             } else { /* this is a very unfortunate degenerate case that we handle using an estimate */
@@ -961,7 +971,7 @@ public final class MathUtils {
             polygonVertices.add(vertex);
         }
 
-        if (polygonVertices.size < 3) throw new MathException("Polygon contains 1 or more collinear vertices; When removed, that total vertex count is: " + polygonVertices.size + ". Must have at least 3 non-colinear vertices.");
+        if (polygonVertices.size < 3) throw new MathException("Polygon contains 1 or more collinear vertices; When removed, that total vertex count is: " + polygonVertices.size + ". Must have at least 3 non-collinear vertices.");
 
         int windingOrder = MathUtils.polygonWindingOrder(polygon);
         if (windingOrder > 0) polygonVertices.reverse();
@@ -1046,7 +1056,7 @@ public final class MathUtils {
     }
 
     // TODO: test
-    public static void triangulatePolygon_old(@NotNull float[] polygon, @NotNull ArrayInt out) {
+    @Deprecated public static void triangulatePolygon_old(@NotNull float[] polygon, @NotNull ArrayInt out) {
         if (polygon.length < 6) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.length);
         if (polygon.length % 2 != 0) throw new MathException("Polygon must be represented as a flat array of vertices, each vertex must have x and y coordinates: [x0,y0,  x1,y1, ...]. Therefore, polygon array length must be even.");
 
@@ -1066,7 +1076,7 @@ public final class MathUtils {
             next.y = CollectionsUtils.getCyclic(polygon, i + 3);
 
             Vector2 vertex = vectors2Pool.allocate();
-            if (!Vector2.areColinear(prev, current, next)) {
+            if (!Vector2.areCollinear(prev, current, next)) {
                 vertex.x = current.x;
                 vertex.y = current.y;
             } else { /* this is a very unfortunate degenerate case that we handle using an estimate */
@@ -1084,7 +1094,7 @@ public final class MathUtils {
             polygonVertices.add(vertex);
         }
 
-        if (polygonVertices.size < 3) throw new MathException("Polygon contains 1 or more collinear vertices; When removed, that total vertex count is: " + polygonVertices.size + ". Must have at least 3 non-colinear vertices.");
+        if (polygonVertices.size < 3) throw new MathException("Polygon contains 1 or more collinear vertices; When removed, that total vertex count is: " + polygonVertices.size + ". Must have at least 3 non-collinear vertices.");
 
         int windingOrder = MathUtils.polygonWindingOrder(polygon);
         if (windingOrder > 0) polygonVertices.reverse();

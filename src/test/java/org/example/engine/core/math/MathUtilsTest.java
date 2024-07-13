@@ -26,8 +26,30 @@ class MathUtilsTest {
 
     @Test
     void getAreaTriangle() {
-        Assertions.assertEquals(0.5f, MathUtils.getAreaTriangle(0.0f,0.0f,1.0f,0.0f,0.0f,1.0f), MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0.5f, MathUtils.getAreaTriangle(1.0f,0.0f,0.0f,1.0f,1.0f,1.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.5f, MathUtils.getAreaTriangle_old(0.0f,0.0f,1.0f,0.0f,0.0f,1.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.5f, MathUtils.getAreaTriangle_old(1.0f,0.0f,0.0f,1.0f,1.0f,1.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+    }
+
+    @Test
+    void getAreaTriangle2() {
+        Vector2 A = new Vector2();
+        Vector2 B = new Vector2();
+        Vector2 C = new Vector2();
+
+        A.set(0, 0);
+        B.set(4, 0);
+        C.set(0, 3);
+        Assertions.assertEquals(6.0f, MathUtils.getAreaTriangle(A,B,C), MathUtils.FLOAT_ROUNDING_ERROR);
+
+        A.set(-1,-1);
+        B.set(3,-1);
+        C.set(-1, 2);
+        Assertions.assertEquals(6.0f, MathUtils.getAreaTriangle(A,B,C), MathUtils.FLOAT_ROUNDING_ERROR);
+
+        A.set(0,0);
+        B.set(2,2);
+        C.set(4,4);
+        Assertions.assertEquals(0.0f, MathUtils.getAreaTriangle(A,B,C), MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test
@@ -621,7 +643,7 @@ class MathUtilsTest {
     }
 
     @Test
-    void areColinear() {
+    void areCollinear() {
         Vector2 v1 = new Vector2();
         Vector2 v2 = new Vector2();
         Vector2 v3 = new Vector2();
@@ -629,42 +651,42 @@ class MathUtilsTest {
         v1.set(0,0);
         v2.set(1,0);
         v3.set(2,0);
-        Assertions.assertTrue(Vector2.areColinear(v1,v2,v3));
+        Assertions.assertTrue(Vector2.areCollinear(v1,v2,v3));
 
         v1.set(0,1);
         v2.set(0,2);
         v3.set(0,3);
-        Assertions.assertTrue(Vector2.areColinear(v1,v2,v3));
+        Assertions.assertTrue(Vector2.areCollinear(v1,v2,v3));
 
         v1.set(0,0);
         v2.set(1,1);
         v3.set(2,2);
-        Assertions.assertTrue(Vector2.areColinear(v1,v2,v3));
+        Assertions.assertTrue(Vector2.areCollinear(v1,v2,v3));
 
         v1.set(0,0);
         v2.set(1,1);
         v3.set(-5,-5);
-        Assertions.assertTrue(Vector2.areColinear(v1,v2,v3));
+        Assertions.assertTrue(Vector2.areCollinear(v1,v2,v3));
 
         v1.set(0,0);
         v2.set(1,1);
         v3.set(2,0);
-        Assertions.assertFalse(Vector2.areColinear(v1,v2,v3));
+        Assertions.assertFalse(Vector2.areCollinear(v1,v2,v3));
 
         v1.set(-1,-1);
         v2.set(2,-2);
         v3.set(4,3);
-        Assertions.assertFalse(Vector2.areColinear(v1,v2,v3));
+        Assertions.assertFalse(Vector2.areCollinear(v1,v2,v3));
 
         v1.set(0,0);
         v2.set(0,-6);
         v3.set(2,5);
-        Assertions.assertFalse(Vector2.areColinear(v1,v2,v3));
+        Assertions.assertFalse(Vector2.areCollinear(v1,v2,v3));
 
         v1.set(10,-10);
         v2.set(100,100);
         v3.set(-555,-555);
-        Assertions.assertFalse(Vector2.areColinear(v1,v2,v3));
+        Assertions.assertFalse(Vector2.areCollinear(v1,v2,v3));
     }
 
     @Test
@@ -673,7 +695,46 @@ class MathUtilsTest {
         Vector2 a = new Vector2();
         Vector2 b = new Vector2();
         Vector2 c = new Vector2();
-        // TODO: continue
+
+        p.set(0,0);
+        a.set(-1,-1);
+        b.set(1,-1);
+        c.set(1,1);
+        Assertions.assertTrue(MathUtils.pointInTriangle(p, a, b, c));
+        Assertions.assertTrue(MathUtils.pointInTriangle(p, c, a, b));
+        Assertions.assertTrue(MathUtils.pointInTriangle(p, b, a, c));
+
+        p.set(10,0);
+        a.set(-1,-1);
+        b.set(1,-1);
+        c.set(1,1);
+        Assertions.assertFalse(MathUtils.pointInTriangle(p, a, b, c));
+        Assertions.assertFalse(MathUtils.pointInTriangle(p, c, a, b));
+        Assertions.assertFalse(MathUtils.pointInTriangle(p, b, a, c));
+
+        p.set(3,3);
+        a.set(-1,-1);
+        b.set(10,-1);
+        c.set(10,10);
+        Assertions.assertTrue(MathUtils.pointInTriangle(p, a, b, c));
+        Assertions.assertTrue(MathUtils.pointInTriangle(p, c, a, b));
+        Assertions.assertTrue(MathUtils.pointInTriangle(p, b, a, c));
+    }
+
+    @Test
+    void pointInTriangle2() {
+        Vector2 p = new Vector2();
+        Vector2 a = new Vector2();
+        Vector2 b = new Vector2();
+        Vector2 c = new Vector2();
+
+        p.set(0,0);
+        a.set(-1,-1);
+        b.set(1,-1);
+        c.set(1,1);
+        Assertions.assertTrue(MathUtils.pointInTriangle(p.x, p.y, a.x, a.y, b.x, b.y, c.x, c.y));
+        Assertions.assertTrue(MathUtils.pointInTriangle(p.x, p.y, c.x, c.y, a.x, a.y, b.x, b.y));
+        Assertions.assertTrue(MathUtils.pointInTriangle(p.x, p.y, b.x, b.y, a.x, a.y, c.x, c.y));
     }
 
     @Test
