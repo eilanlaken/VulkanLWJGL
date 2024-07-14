@@ -1,5 +1,7 @@
 package org.example.engine.core.math;
 
+import org.example.engine.core.collections.Array;
+import org.example.engine.core.collections.ArrayFloat;
 import org.example.engine.core.collections.ArrayInt;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -738,9 +740,148 @@ class MathUtilsTest {
     }
 
     @Test
-    void removeCollinearVertices() {
+    void windingOrder() {
+        Array<Vector2> vertices = new Array<>();
+
+        vertices.clear();
+        vertices.add(new Vector2(0, 0));
+        vertices.add(new Vector2(1, 0));
+        vertices.add(new Vector2(1, 1));
+        vertices.add(new Vector2(0, 1));
+
+        Assertions.assertEquals(1, MathUtils.polygonWindingOrder(vertices));
+        int windingOrder = MathUtils.polygonWindingOrder(vertices);
         // TODO: implement.
     }
+
+    @Test
+    void removeCollinearVertices() {
+        Array<Vector2> polygon = new Array<>();
+        Array<Vector2> outVertices = new Array<>();
+
+        polygon.clear();
+        polygon.add(new Vector2(0,0));
+        polygon.add(new Vector2(1,0));
+        polygon.add(new Vector2(1,1));
+        polygon.add(new Vector2(0.5f,1));
+        polygon.add(new Vector2(0,1));
+        MathUtils.removeCollinearVertices(polygon, outVertices);
+        Assertions.assertEquals(4, outVertices.size);
+        Assertions.assertEquals(new Vector2(0,0), outVertices.get(0));
+        Assertions.assertEquals(new Vector2(1,0), outVertices.get(1));
+        Assertions.assertEquals(new Vector2(1,1), outVertices.get(2));
+        Assertions.assertEquals(new Vector2(0,1), outVertices.get(3));
+
+        polygon.clear();
+        polygon.add(new Vector2(0,0));
+        polygon.add(new Vector2(1,0));
+        polygon.add(new Vector2(1,1));
+        polygon.add(new Vector2(0.5f,1));
+        polygon.add(new Vector2(0.5f,1));
+        polygon.add(new Vector2(0.5f,1));
+        polygon.add(new Vector2(0,1));
+        MathUtils.removeCollinearVertices(polygon, outVertices);
+        Assertions.assertEquals(4, outVertices.size);
+        Assertions.assertEquals(new Vector2(0,0), outVertices.get(0));
+        Assertions.assertEquals(new Vector2(1,0), outVertices.get(1));
+        Assertions.assertEquals(new Vector2(1,1), outVertices.get(2));
+        Assertions.assertEquals(new Vector2(0,1), outVertices.get(3));
+
+        polygon.clear();
+        polygon.add(new Vector2(0,0));
+        polygon.add(new Vector2(1,0));
+        polygon.add(new Vector2(2,0));
+        polygon.add(new Vector2(2,1));
+        polygon.add(new Vector2(2,2));
+        polygon.add(new Vector2(2,4));
+        polygon.add(new Vector2(1,4));
+        polygon.add(new Vector2(0,4));
+        MathUtils.removeCollinearVertices(polygon, outVertices);
+        Assertions.assertEquals(4, outVertices.size);
+        Assertions.assertEquals(new Vector2(0,0), outVertices.get(0));
+        Assertions.assertEquals(new Vector2(2,0), outVertices.get(1));
+        Assertions.assertEquals(new Vector2(2,4), outVertices.get(2));
+        Assertions.assertEquals(new Vector2(0,4), outVertices.get(3));
+    }
+
+    @Test
+    void removeCollinearVertices_flat() {
+        ArrayFloat outVertices = new ArrayFloat();
+
+        float[] polygon_1 = {0,0, 1,0, 1,1, 0.5f,1, 0,1};
+        MathUtils.removeCollinearVertices(polygon_1, outVertices);
+        Assertions.assertEquals(8, outVertices.size);
+        {
+            Assertions.assertEquals(0, outVertices.get(0));
+            Assertions.assertEquals(0, outVertices.get(1));
+            Assertions.assertEquals(1, outVertices.get(2));
+            Assertions.assertEquals(0, outVertices.get(3));
+            Assertions.assertEquals(1, outVertices.get(4));
+            Assertions.assertEquals(1, outVertices.get(5));
+            Assertions.assertEquals(0, outVertices.get(6));
+            Assertions.assertEquals(1, outVertices.get(7));
+        }
+
+        float[] polygon_2 = {0,0, 1,0, 1,1, 0.5f,1, 0.5f,1, 0.5f,1, 0.5f,1, 0.5f,1, 0,1};
+        MathUtils.removeCollinearVertices(polygon_2, outVertices);
+        Assertions.assertEquals(8, outVertices.size);
+        {
+            Assertions.assertEquals(0, outVertices.get(0));
+            Assertions.assertEquals(0, outVertices.get(1));
+            Assertions.assertEquals(1, outVertices.get(2));
+            Assertions.assertEquals(0, outVertices.get(3));
+            Assertions.assertEquals(1, outVertices.get(4));
+            Assertions.assertEquals(1, outVertices.get(5));
+            Assertions.assertEquals(0, outVertices.get(6));
+            Assertions.assertEquals(1, outVertices.get(7));
+        }
+
+        float[] polygon_3 = {0,0, 1,0, 2,0, 2,1, 2,2, 2,4, 1,4, 0,4};
+        MathUtils.removeCollinearVertices(polygon_3, outVertices);
+        Assertions.assertEquals(8, outVertices.size);
+        {
+            Assertions.assertEquals(0, outVertices.get(0));
+            Assertions.assertEquals(0, outVertices.get(1));
+            Assertions.assertEquals(2, outVertices.get(2));
+            Assertions.assertEquals(0, outVertices.get(3));
+            Assertions.assertEquals(2, outVertices.get(4));
+            Assertions.assertEquals(4, outVertices.get(5));
+            Assertions.assertEquals(0, outVertices.get(6));
+            Assertions.assertEquals(4, outVertices.get(7));
+        }
+    }
+
+    @Test
+    void triangulatePolygon_1() {
+        Array<Vector2> polygon = new Array<>();
+        Array<Vector2> outVertices = new Array<>();
+        ArrayInt outIndices = new ArrayInt();
+
+        polygon.clear();
+        polygon.add(new Vector2(0,0), new Vector2(1,0), new Vector2(1,1), new Vector2(0,1));
+        polygon.reverse();
+        MathUtils.triangulatePolygon(polygon, outVertices, outIndices);
+    }
+
+    @Test
+    void triangulatePolygon_flat() {
+        ArrayInt indices = new ArrayInt();
+        ArrayFloat vertices = new ArrayFloat();
+        float[] poly_1 = new float[] {0,0,  1,0,  1,1,  0,1};
+        MathUtils.triangulatePolygon(poly_1, vertices, indices);
+
+//        float[] poly_2 = new float[] {0,1,  1,1,  1,0,  0,0};
+//        MathUtils.triangulatePolygon_old(poly_2, indices);
+//
+//        float[] poly_3 = new float[] {0,0,  1,0,  1,1, 0.5f,1f,  0,1};
+//        MathUtils.triangulatePolygon_old(poly_3, indices);
+//
+//        float[] poly_4 = new float[] {1,4,   -5,2,  -2,-2, 0,0,  0,1, 2,2};
+//        MathUtils.triangulatePolygon_old(poly_4, indices);
+
+        System.out.println(indices);
+    }
+
 
     @Test
     void triangulatePolygon() {

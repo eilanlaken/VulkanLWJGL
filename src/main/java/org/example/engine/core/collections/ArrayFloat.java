@@ -325,6 +325,20 @@ public class ArrayFloat {
         }
     }
 
+    public void reverseInPairs() {
+        if (items.length % 2 != 0) throw new CollectionsException("ArrayFloat size must be even.");
+        int n = this.size;
+        for (int i = 0; i < n / 2; i += 2) {
+            int j = n - i - 2;
+            float temp1 = items[i];
+            float temp2 = items[i + 1];
+            items[i] = items[j];
+            items[i + 1] = items[j + 1];
+            items[j] = temp1;
+            items[j + 1] = temp2;
+        }
+    }
+
     public void shuffle() {
         float[] items = this.items;
         for (int i = size - 1; i >= 0; i--) {
