@@ -5,9 +5,9 @@ import org.example.engine.core.collections.ArrayFloat;
 import org.example.engine.core.collections.ArrayInt;
 import org.example.engine.core.collections.CollectionsUtils;
 import org.example.engine.core.memory.MemoryPool;
-import org.example.engine.core.shape.Shape2D;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Random;
 
 // TODO: implement init() block that will take care of configuration.
@@ -29,12 +29,16 @@ public final class MathUtils {
     private static final float   DEGREES_TO_INDEX     = SIN_COUNT / DEGREES_FULL;
     private static final Random  random               = new Random();
 
-    private static final MemoryPool<Vector2>   vectors2Pool  = new MemoryPool<>(Vector2.class, 5);
-    private static final MemoryPool<Matrix2x2> matrix2x2Pool = new MemoryPool<>(Matrix2x2.class, 2);
+    //private static final MemoryPool<Array> array = new MemoryPool<>(Array.class, 5); // TODO: see what's up
+    private static final MemoryPool<ArrayFloat> floatArrayPool = new MemoryPool<>(ArrayFloat.class, 5);
+    private static final MemoryPool<ArrayInt>   intArrayPool   = new MemoryPool<>(ArrayInt.class, 5);
+    private static final MemoryPool<Vector2>    vectors2Pool   = new MemoryPool<>(Vector2.class, 5);
+    private static final MemoryPool<Matrix2x2>  matrix2x2Pool  = new MemoryPool<>(Matrix2x2.class, 2);
+
 
     /* polygon triangulation */
     private static final Array<Vector2> polygonVertices = new Array<>(false, 10);
-    private static final ArrayInt       indexList       = new ArrayInt();
+    @Deprecated private static final ArrayInt       indexList       = new ArrayInt(); // TODO: use pool
 
 
     private MathUtils() {}
@@ -765,8 +769,104 @@ public final class MathUtils {
         return true;
     }
 
-    public static void removeCollinearVertices(@NotNull Array<Vector2> polygon, @NotNull Array<Vector2> outVertices) {
+    // TODO: test.
+    public static void polygonRemoveDegenerateVertices(@NotNull Array<Vector2> polygon, @NotNull Array<Vector2> outPolygon) {
         if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices. Got: " + polygon.size);
+        if (polygon == outPolygon) throw new IllegalArgumentException("Argument outPolygon cannot be == polygon.");
+
+        /* remove sequential duplicates: [A, B, B, B, C, D, D] -> [A, B, C, D] */
+        polygonVertices.clear();
+        Vector2 previous = polygon.get(0);
+        polygonVertices.add(previous);
+        for (int i = 1; i < polygon.size; i++) {
+            Vector2 curr = polygon.get(i);
+            if (!curr.equals(previous)) {
+                polygonVertices.add(curr);
+                previous = curr;
+            }
+        }
+        Vector2 first = polygonVertices.first();
+        Vector2 last = polygonVertices.last();
+        if (last.equals(first) && last != first) {
+            polygonVertices.pop();
+        }
+
+        /* remove collinear vertices */
+        outPolygon.clear();
+        for (int i = 0; i < polygonVertices.size; i++) {
+
+            Vector2 prev = polygonVertices.getCyclic(i - 1);
+            Vector2 curr = polygonVertices.get(i);
+            Vector2 next = polygonVertices.getCyclic(i + 1);
+
+            if (!Vector2.areCollinear(prev, curr, next)) {
+                outPolygon.add(curr);
+            }
+        }
+    }
+
+    // TODO: test.
+    public static void polygonRemoveDegenerateVertices(@NotNull Array<Vector2> polygon) {
+        if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices. Got: " + polygon.size);
+
+        /* remove sequential duplicates: [A, B, B, B, C, D, D] -> [A, B, C, D] */
+        ArrayFloat compact = floatArrayPool.allocate();
+        Vector2 previous = polygon.get(0);
+        compact.add(previous.x);
+        compact.add(previous.y);
+        for (int i = 1; i < polygon.size; i++) {
+            Vector2 curr = polygon.get(i);
+            if (!curr.equals(previous)) {
+                compact.add(curr.x);
+                compact.add(curr.y);
+                previous = curr;
+            }
+        }
+        float first_x = compact.get(0);
+        float first_y = compact.get(1);
+        float last_x  = compact.get(compact.size - 2);
+        float last_y  = compact.get(compact.size - 1);
+        if (floatsEqual(first_x, last_x) && floatsEqual(first_y, last_y) && compact.size != 1) {
+            compact.pop();
+            compact.pop();
+        }
+
+        /* remove collinear vertices */
+        ArrayFloat cleanPolygon = floatArrayPool.allocate();
+        for (int i = 0; i < compact.size - 1; i += 2) {
+
+            float prev_x = compact.getCyclic(i - 2);
+            float prev_y = compact.getCyclic(i - 1);
+
+            float curr_x = compact.get(i);
+            float curr_y = compact.get(i + 1);
+
+            float next_x = compact.getCyclic(i + 2);
+            float next_y = compact.getCyclic(i + 3);
+
+            if (!Vector2.areCollinear(prev_x, prev_y, curr_x, curr_y, next_x, next_y)) {
+                cleanPolygon.add(curr_x);
+                cleanPolygon.add(curr_y);
+            }
+        }
+
+        /* copy back everything to the original polygon */
+        for (int i = 0; i < cleanPolygon.size / 2; i++) {
+            Vector2 vertex = polygon.get(i);
+            float vx = cleanPolygon.get(2 * i);
+            float vy = cleanPolygon.get(2 * i + 1);
+            vertex.set(vx, vy);
+        }
+        polygon.setSize(cleanPolygon.size / 2);
+
+        floatArrayPool.free(compact);
+        floatArrayPool.free(cleanPolygon);
+    }
+
+    // TODO: FIXME: consider "ultra" degenerate cases where there are duplicates of vertices in a row
+    @Deprecated public static void removeCollinearVertices(@NotNull Array<Vector2> polygon, @NotNull Array<Vector2> outVertices) {
+        if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices. Got: " + polygon.size);
+        if (polygon == outVertices) throw new IllegalArgumentException("Argument outVertices must not be equal to polygon.");
 
         outVertices.clear();
         for (int i = 0; i < polygon.size; i++) {
@@ -781,7 +881,8 @@ public final class MathUtils {
         }
     }
 
-    public static void removeCollinearVertices(@NotNull float[] polygon, @NotNull ArrayFloat outVertices) {
+    // TODO: FIXME: consider "ultra" degenerate cases where there are duplicates of vertices in a row
+    @Deprecated public static void removeCollinearVertices(@NotNull float[] polygon, @NotNull ArrayFloat outVertices) {
         if (polygon.length < 6) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.length);
 
         outVertices.clear();
@@ -803,7 +904,7 @@ public final class MathUtils {
         }
     }
 
-    public static void triangulatePolygon(@NotNull Array<Vector2> polygon, @NotNull Array<Vector2> outVertices, @NotNull ArrayInt outIndices) {
+    public static void polygonTriangulate(@NotNull Array<Vector2> polygon, @NotNull Array<Vector2> outVertices, @NotNull ArrayInt outIndices) {
         if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.size);
         removeCollinearVertices(polygon, outVertices);
         if (outVertices.size < 3) throw new MathException("Polygon contains " + (polygon.size - outVertices.size) + " collinear vertices; When removed, that total vertex count is: " + outVertices.size + "< 3.");
@@ -878,11 +979,13 @@ public final class MathUtils {
         vectors2Pool.free(va_to_vc);
     }
 
-    public static void triangulatePolygon(@NotNull float[] polygon, @NotNull ArrayFloat outVertices, @NotNull ArrayInt outIndices) {
+    public static void polygonTriangulate(@NotNull float[] polygon, @NotNull ArrayFloat outVertices, @NotNull ArrayInt outIndices) {
         if (polygon.length < 6) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.length);
         if (polygon.length % 2 != 0) throw new MathException("Polygon must be represented as a flat array of vertices, each vertex must have x and y coordinates: [x0,y0,  x1,y1, ...]. Therefore, polygon array length must be even. Got: " + polygon.length);
 
+        System.out.println("poly " + Arrays.toString(polygon));
         removeCollinearVertices(polygon, outVertices);
+        System.out.println(outVertices);
         if (outVertices.size < 6) throw new MathException("Polygon contains " + (polygon.length - outVertices.size) / 2 + " collinear vertices; When removed, that total vertex count is: " + outVertices.size / 2 + ". Must have at least 3 non-collinear vertices.");
 
         int windingOrder = MathUtils.polygonWindingOrder(outVertices);

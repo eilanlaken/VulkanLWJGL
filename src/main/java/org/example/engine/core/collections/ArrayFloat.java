@@ -1,10 +1,11 @@
 package org.example.engine.core.collections;
 
 import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.memory.MemoryPool;
 
 import java.util.Arrays;
 
-public class ArrayFloat {
+public class ArrayFloat implements MemoryPool.Reset {
 
     public float[] items;
     public int size;
@@ -367,6 +368,13 @@ public class ArrayFloat {
         return array;
     }
 
+    @Override
+    public void reset() {
+        clear();
+        this.ordered = true;
+    }
+
+    @Override
     public int hashCode() {
         if (!ordered) return super.hashCode();
         float[] items = this.items;
@@ -377,6 +385,7 @@ public class ArrayFloat {
     }
 
     /** Returns false if either array is unordered. */
+    @Override
     public boolean equals (Object object) {
         if (object == this) return true;
         if (!ordered) return false;
@@ -406,6 +415,7 @@ public class ArrayFloat {
         return true;
     }
 
+    @Override
     public String toString() {
         if (size == 0) return "[]";
         float[] items = this.items;

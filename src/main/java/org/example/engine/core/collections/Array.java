@@ -5,7 +5,7 @@ import org.example.engine.core.memory.MemoryPool;
 
 import java.util.*;
 
-public class Array<T> implements Iterable<T>, MemoryPool.Reset {
+public class Array<T> implements Iterable<T> {
 
     public  int              size;
     public  T[]              items;
@@ -307,7 +307,7 @@ public class Array<T> implements Iterable<T>, MemoryPool.Reset {
         return item;
     }
 
-    public T peek() {
+    public T last() {
         if (size == 0) throw new IllegalStateException("Array is empty.");
         return items[size - 1];
     }
@@ -464,12 +464,6 @@ public class Array<T> implements Iterable<T>, MemoryPool.Reset {
         for (int i = 0; i < n; i++)
             if (items1[i] != items2[i]) return false;
         return true;
-    }
-
-    @Override
-    public void reset() {
-        clear();
-        this.ordered = true;
     }
 
     @Override

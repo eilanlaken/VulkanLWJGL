@@ -167,7 +167,7 @@ public class GlyphLayout implements MemoryPool.Reset {
                     setLastGlyphXAdvance(fontData, lineRun);
                     lastGlyph = null;
                 } else
-                    lastGlyph = lineRun.glyphs.peek();
+                    lastGlyph = lineRun.glyphs.last();
 
                 if (!wrapOrTruncate || lineRun.glyphs.size == 0) break runEnded; // No wrap or truncate, or no glyphs.
 
@@ -403,7 +403,7 @@ public class GlyphLayout implements MemoryPool.Reset {
 
     /** Sets the xadvance of the last glyph to use its width instead of xadvance. */
     private void setLastGlyphXAdvance (BitmapFont.BitmapFontData fontData, GlyphRun run) {
-        Glyph last = run.glyphs.peek();
+        Glyph last = run.glyphs.last();
         if (!last.fixedWidth) run.xAdvances.items[run.xAdvances.size - 1] = getGlyphWidth(last, fontData);
     }
 

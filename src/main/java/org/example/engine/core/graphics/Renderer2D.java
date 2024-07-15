@@ -60,8 +60,9 @@ public class Renderer2D implements MemoryResourceHolder {
     private int           drawCalls      = 0;
 
     /* caches */
-    private final Array<Vector2> vertices = new Array<>(true, 100);
-    private final ArrayInt       indices  = new ArrayInt(true, 100);
+    private final Array<Vector2> vertices        = new Array<>(true, 100);
+    private final ArrayFloat     polygonVertices = new ArrayFloat(true, 100);
+    private final ArrayInt       polygonIndices  = new ArrayInt(true, 100);
 
     // debug, DELETE THIS
     public static final Array<Vector2> dots = new Array<>(true, 100);
@@ -963,49 +964,77 @@ public class Renderer2D implements MemoryResourceHolder {
 
         int count = polygon.length / 2;
         if ((vertexIndex + count) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+        int startVertex = this.vertexIndex;
 
         setMode(GL11.GL_LINES);
 
         scaleX *= MathUtils.cosDeg(angleY);
         scaleY *= MathUtils.cosDeg(angleX);
 
-        Vector2 vertex = vectorsPool.allocate();
-        for (int i = 0; i < polygon.length; i += 2) {
-            float poly_x = polygon[i];
-            float poly_y = polygon[i + 1];
+        if (MathUtils.isZero(scaleX) || MathUtils.isZero(scaleY)) return;
 
-            vertex.set(poly_x, poly_y);
-            vertex.scl(scaleX, scaleY);
-            vertex.rotateDeg(angleZ);
-            vertex.add(x, y);
-
-            verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
-        }
-        vectorsPool.free(vertex);
-
-        int startVertex = this.vertexIndex;
         if (!triangulated) {
+            Vector2 vertex = vectorsPool.allocate();
+            for (int i = 0; i < polygon.length; i += 2) {
+                float poly_x = polygon[i];
+                float poly_y = polygon[i + 1];
+
+                vertex.set(poly_x, poly_y);
+                vertex.scl(scaleX, scaleY);
+                vertex.rotateDeg(angleZ);
+                vertex.add(x, y);
+
+                verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
+            }
+            vectorsPool.free(vertex);
+
             for (int i = 0; i < count - 1; i++) {
                 indicesBuffer.put(startVertex + i);
                 indicesBuffer.put(startVertex + i + 1);
             }
             indicesBuffer.put(startVertex + count - 1);
             indicesBuffer.put(startVertex + 0);
+            vertexIndex += count;
         } else {
-            MathUtils.triangulatePolygon_old(polygon, indices);
-            for (int i = 0; i < indices.size - 2; i += 3) {
-                indicesBuffer.put(startVertex + indices.get(i));
-                indicesBuffer.put(startVertex + indices.get(i + 1));
-
-                indicesBuffer.put(startVertex + indices.get(i + 1));
-                indicesBuffer.put(startVertex + indices.get(i + 2));
-
-                indicesBuffer.put(startVertex + indices.get(i + 2));
-                indicesBuffer.put(startVertex + indices.get(i));
+            polygonVertices.clear();
+            /* try to triangulate the polygon. We might have a polygon that is degenerate and the triangulation fails. In that case, it is okay to not render anything.*/
+            try {
+                MathUtils.polygonTriangulate(polygon, polygonVertices, polygonIndices);
+            } catch (Exception e) {
+                /* Probably the polygon has collapsed into a single point. */
+                return;
             }
+
+            Vector2 vertex = vectorsPool.allocate();
+            for (int i = 0; i < polygonVertices.size; i += 2) {
+                float poly_x = polygonVertices.get(i);
+                float poly_y = polygonVertices.get(i + 1);
+
+                vertex.set(poly_x, poly_y);
+                vertex.scl(scaleX, scaleY);
+                vertex.rotateDeg(angleZ);
+                vertex.add(x, y);
+
+                verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
+            }
+            vectorsPool.free(vertex);
+
+            for (int i = 0; i < polygonIndices.size - 2; i += 3) {
+                indicesBuffer.put(startVertex + polygonIndices.get(i));
+                indicesBuffer.put(startVertex + polygonIndices.get(i + 1));
+
+                indicesBuffer.put(startVertex + polygonIndices.get(i + 1));
+                indicesBuffer.put(startVertex + polygonIndices.get(i + 2));
+
+                indicesBuffer.put(startVertex + polygonIndices.get(i + 2));
+                indicesBuffer.put(startVertex + polygonIndices.get(i));
+            }
+
+            vertexIndex += polygonVertices.size / 2;
         }
 
-        vertexIndex += count;
+        polygonVertices.clear();
+        polygonIndices.clear();
     }
 
     public void drawPolygonFilled(float[] polygon, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
@@ -1035,10 +1064,10 @@ public class Renderer2D implements MemoryResourceHolder {
         }
         vectorsPool.free(vertex);
 
-        MathUtils.triangulatePolygon_old(polygon, indices);
+        MathUtils.triangulatePolygon_old(polygon, polygonIndices);
         int startVertex = this.vertexIndex;
-        for (int i = 0; i < indices.size; i ++) {
-            indicesBuffer.put(startVertex + indices.get(i));
+        for (int i = 0; i < polygonIndices.size; i ++) {
+            indicesBuffer.put(startVertex + polygonIndices.get(i));
         }
 
         vertexIndex += count;
@@ -1256,7 +1285,7 @@ public class Renderer2D implements MemoryResourceHolder {
             if (i == values.length - 2) p2.set(values[values.length - 1]);
             else p2.set(values[i]).add(values[i + 1]).scl(0.5f);
 
-            indices.clear();
+            polygonIndices.clear();
             vertices.clear();
             float area = MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y);
             /* collinear vertices */
@@ -1325,10 +1354,10 @@ public class Renderer2D implements MemoryResourceHolder {
             //MathUtils.triangulatePolygon_old(v, indices);
             System.out.println("right after trian");
 
-            System.out.println(indices);
+            System.out.println(polygonIndices);
             int startVertex = this.vertexIndex;
-            for (int j = 0; j < indices.size; j++) {
-                indicesBuffer.put(startVertex + indices.get(j));
+            for (int j = 0; j < polygonIndices.size; j++) {
+                indicesBuffer.put(startVertex + polygonIndices.get(j));
             }
 
             vertexIndex += vertices.size;

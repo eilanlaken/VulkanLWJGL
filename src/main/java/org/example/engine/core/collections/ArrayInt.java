@@ -1,10 +1,11 @@
 package org.example.engine.core.collections;
 
 import org.example.engine.core.math.MathUtils;
+import org.example.engine.core.memory.MemoryPool;
 
 import java.util.Arrays;
 
-public class ArrayInt {
+public class ArrayInt implements MemoryPool.Reset {
 
     public int[] items;
     public int size;
@@ -162,6 +163,12 @@ public class ArrayInt {
     }
 
     @Override
+    public void reset() {
+        clear();
+        this.ordered = true;
+    }
+
+    @Override
     public int hashCode() {
         if (!ordered) return super.hashCode();
         int[] items = this.items;
@@ -172,6 +179,7 @@ public class ArrayInt {
         return h;
     }
 
+    @Override
     public boolean equals(Object object) {
         if (object == this) return true;
         if (!ordered) return false;
