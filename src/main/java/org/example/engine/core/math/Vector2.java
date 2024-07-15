@@ -271,6 +271,10 @@ public class Vector2 implements MemoryPool.Reset {
         return a.x * b.y - a.y * b.x;
     }
 
+    public static float crs(float ax, float ay, float bx, float by) {
+        return ax * by - ay * bx;
+    }
+
     public float angleDeg() {
         float angle = (float)Math.atan2(y, x) * MathUtils.radiansToDegrees;
         if (angle < 0) angle += 360;

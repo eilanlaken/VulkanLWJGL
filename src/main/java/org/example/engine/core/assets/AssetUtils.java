@@ -31,17 +31,13 @@ import java.util.Set;
 // TODO: change whole package from Asset to File
 public final class AssetUtils {
 
-    private static boolean           initialized = false;
     private static ApplicationWindow window      = null;
-    public  static Yaml              yaml        = null;
-    public  static Gson              gson        = null;
+    private static boolean           initialized = false;
 
-    private AssetUtils() {}
+    public  static Yaml yaml;
+    public  static Gson gson;
 
-    public static void init(final ApplicationWindow window) {
-        if (initialized) return;
-        AssetUtils.window = window;
-
+    static {
         DumperOptions dumperOptions = new DumperOptions();
         dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         Representer representer = new Representer(dumperOptions) {
@@ -53,7 +49,13 @@ public final class AssetUtils {
         };
         yaml = new Yaml(representer);
         gson = new Gson();
+    }
 
+    private AssetUtils() {}
+
+    public static void init(final ApplicationWindow window) {
+        if (initialized) return;
+        AssetUtils.window = window;
         initialized = true;
     }
 
@@ -95,12 +97,22 @@ public final class AssetUtils {
         return Files.size(filePath);
     }
 
-    public static synchronized Date getLastModifiedDate(final String filepath) {
+    public static synchronized Date lastModified(final String filepath) {
+        File file = new File(filepath);
+        // Get the last modified time in milliseconds since the epoch (Jan 1, 1970)
+        long lastModifiedMillis = file.lastModified();
+
+        // Convert to a Date object
+        Date lastModifiedDate = new Date(lastModifiedMillis);
+        return lastModifiedDate;
+    }
+
+    @Deprecated public static synchronized Date getLastModifiedDate(final String filepath) {
         Path p = Paths.get(filepath);
         BasicFileAttributes view;
         try {
             view = Files.getFileAttributeView(p, BasicFileAttributeView.class)
-            .readAttributes();
+                    .readAttributes();
         } catch (IOException e) {
             return null; // file does not exist or whatever
         }
@@ -155,9 +167,9 @@ public final class AssetUtils {
         return false;
     }
 
-    public static boolean saveFile(final String directory, final String filename, final String content) throws IOException {
-        if (!directoryExists(directory)) throw new AssetsException("Directory: " + directory + " does not exist.");
-        String filePath = directory + File.separator + filename;
+    public static boolean saveFile(final String dirpath, final String filename, final String content) throws IOException {
+        if (!directoryExists(dirpath)) throw new IOException("Directory " + dirpath + " does not exist.");
+        String filePath = dirpath + File.separator + filename;
         File file = new File(filePath);
         boolean fileExists = file.exists();
         try {

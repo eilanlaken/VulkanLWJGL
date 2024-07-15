@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Renderer2D implements MemoryResourceHolder {
+public class Renderer2D_backup_2 implements MemoryResourceHolder {
 
     /* constants */
     private static final int   VERTEX_SIZE       = 5;    // A vertex is composed of 5 floats: x,y: position, t: color (as float bits) and u,v: texture coordinates.
@@ -66,7 +66,7 @@ public class Renderer2D implements MemoryResourceHolder {
     public static final Array<Vector2> dots = new Array<>(true, 100);
     public static final Array<Vector2> ends = new Array<>(true, 100);
 
-    public Renderer2D() {
+    public Renderer2D_backup_2() {
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
         {
@@ -100,7 +100,7 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     public void begin(Camera camera) {
-        if (drawing) throw new GraphicsException("Already in a drawing state; Must call " + Renderer2D.class.getSimpleName() + ".end() before calling begin().");
+        if (drawing) throw new GraphicsException("Already in a drawing state; Must call " + Renderer2D_backup_2.class.getSimpleName() + ".end() before calling begin().");
         GL20.glDepthMask(false);
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND);
@@ -1226,194 +1226,83 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += refinement;
     }
 
-    public void drawCurveFilled_2(float stroke, int smoothness, final Vector2... values) {
-        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (values.length < 2) return;
-        setMode(GL11.GL_TRIANGLES);
-        final float s2 = 0.5f * stroke;
-        /* put vertices */
-        Array<Vector2> vertices = new Array<>(true, values.length);
-
-        Vector2 p0 = vectorsPool.allocate();
-        Vector2 p1 = vectorsPool.allocate();
-        Vector2 p2 = vectorsPool.allocate();
-        Vector2 t0 = vectorsPool.allocate();
-        Vector2 t1a = vectorsPool.allocate();
-        Vector2 t1b = vectorsPool.allocate();
-        Vector2 t2 = vectorsPool.allocate();
-        Vector2 intersection = vectorsPool.allocate();
-
-        /* iterate over all the anchors */
-        for (int i = 1; i < values.length - 1; i++) {
-            /* the tuple (pi_0, pi_1, pi_2) constitutes the anchor that we will extrude, triangulate and render */
-
-            if (i == 1) p0.set(values[0]);
-            else p0.set(values[i - 1]).add(values[i]).scl(0.5f);
-            p1.set(values[i]);
-            if (i == values.length - 2) p2.set(values[values.length - 1]);
-            else p2.set(values[i]).add(values[i + 1]).scl(0.5f);
-
-            float sign = MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) > 0 ? 1 : -1;
-
-            t0.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
-            t1a.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
-            t1b.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
-            t2.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
-
-            int result = MathUtils.segmentsIntersection(p0.x + t0.x, p0.y + t0.y, p1.x + t1a.x, p1.y + t1a.y,p1.x + t1b.x, p1.y + t1b.y, p2.x + t2.x, p2.y + t2.y, intersection);
-
-            float angle = Vector2.angleBetweenDeg(t1a, t1b);
-            float da = angle / smoothness;
-
-            /* unique intersection */
-            if (result == 1 || result == 4 || result == 3) {
-                vertices.add(vectorsPool.allocate().set(p0).add(t0));
-                vertices.add(vectorsPool.allocate().set(p0).sub(t0));
-                for (int j = 0; j < smoothness + 1; j++) {
-                    vertices.add(vectorsPool.allocate().set(intersection));
-                    vertices.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
-                }
-                vertices.add(vectorsPool.allocate().set(p2).add(t2));
-                vertices.add(vectorsPool.allocate().set(p2).sub(t2));
-            } else if (result == 0 || result == 5) {
-                MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p2).add(t2), new Vector2(p2).sub(t1b), intersection);
-                vertices.add(vectorsPool.allocate().set(p0).add(t0));
-                vertices.add(vectorsPool.allocate().set(p0).sub(t0));
-                for (int j = 0; j < smoothness + 1; j++) {
-                    vertices.add(vectorsPool.allocate().set(intersection));
-                    vertices.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
-                }
-                vertices.add(vectorsPool.allocate().set(intersection));
-                vertices.add(vectorsPool.allocate().set(p2).sub(t2));
-            }
-        }
-
-        /* put vertices */
-        for (Vector2 value : vertices) {
-            verticesBuffer.put(value.x).put(value.y).put(currentTint).put(0.5f).put(0.5f);
-        }
-
-        final int curveEndIndex = vertices.size;
-
-        /* put indices ("connect the dots") */
-        final int startVertex = this.vertexIndex;
-        for (int i = 0; i < curveEndIndex - 2; i += 2) { // curve +  rounded corners
-            indicesBuffer.put(startVertex + i);
-            indicesBuffer.put(startVertex + i + 1);
-            indicesBuffer.put(startVertex + i + 2);
-            indicesBuffer.put(startVertex + i + 2);
-            indicesBuffer.put(startVertex + i + 1);
-            indicesBuffer.put(startVertex + i + 3);
-        }
-        vertexIndex += curveEndIndex;
-
-
-        vectorsPool.free(p0);
-        vectorsPool.free(p1);
-        vectorsPool.free(p2);
-        vectorsPool.free(t0);
-        vectorsPool.free(t1a);
-        vectorsPool.free(t1b);
-        vectorsPool.free(t2);
-        vectorsPool.free(intersection);
-        vectorsPool.freeAll(vertices);
-    }
-
-    // https://www.codeproject.com/Articles/226569/Drawing-polylines-by-tessellation
     // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
-    public void drawCurveFilled(float stroke, int smoothness, final Vector2... values) {
+    public void drawCurveFilled_final(float stroke, int smoothness, final Vector2... values) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (values.length < 2) return;
+        smoothness = Math.max(1, smoothness);
+        if ((vertexIndex + 2 + (values.length - 2) * (smoothness + 1) * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
         setMode(GL11.GL_TRIANGLES);
         final float s2 = 0.5f * stroke;
+
         /* put vertices */
         Array<Vector2> vertices = new Array<>(true, values.length);
 
-        anchor.clear();
-        v1.clear();
-        v2.clear();
-        v3.clear();
+        /* first 2 vertices */
+        Vector2 normal = vectorsPool.allocate();
+        normal.x = values[1].x - values[0].x;
+        normal.y = values[1].y - values[0].y;
+        normal.nor();
+        normal.rotate90(1);
+        Vector2 up_first = vectorsPool.allocate();
+        up_first.x = values[0].x + s2 * normal.x;
+        up_first.y = values[0].y + s2 * normal.y;
+        Vector2 down_first = vectorsPool.allocate();
+        down_first.x = values[0].x - s2 * normal.x;
+        down_first.y = values[0].y - s2 * normal.y;
+        vertices.add(up_first);
+        vertices.add(down_first);
 
-        Vector2 p0 = vectorsPool.allocate();
-        Vector2 p1 = vectorsPool.allocate();
-        Vector2 p2 = vectorsPool.allocate();
-        Vector2 t0 = vectorsPool.allocate();
-        Vector2 t1a = vectorsPool.allocate();
-        Vector2 t1b = vectorsPool.allocate();
-        Vector2 t2 = vectorsPool.allocate();
-        Vector2 intersection = vectorsPool.allocate();
-
-        /* iterate over all the anchors */
+        Vector2 dir_prev = vectorsPool.allocate();
+        Vector2 dir_next = vectorsPool.allocate();
+        /* add vertices for internal corners */
+        boolean flipped_up_down = false;
         for (int i = 1; i < values.length - 1; i++) {
-            /* the tuple (pi_0, pi_1, pi_2) constitutes the anchor that we will extrude, triangulate and render */
-            p0.set(values[i - 1]).add(values[i]).scl(0.5f);
-            p1.set(values[i]);
-            p2.set(values[i]).add(values[i + 1]).scl(0.5f);
-            if (i == 1) p0.set(values[0]);
-            if (i == values.length - 2) p2.set(values[values.length - 1]);
+            Vector2 corner = values[i];
 
-            float sign = MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) > 0 ? 1 : -1;
+            dir_prev.x = values[i - 1].x - values[i].x;
+            dir_prev.y = values[i - 1].y - values[i].y;
 
-            t0.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
-            t1a.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
-            t1b.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
-            t2.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
+            dir_next.x = values[i + 1].x - values[i].x;
+            dir_next.y = values[i + 1].y - values[i].y;
 
-            //int result = MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p1).add(t1b), new Vector2(p2).add(t2), intersection);
-            int result = MathUtils.segmentsIntersection(p0.x + t0.x, p0.y + t0.y, p1.x + t1a.x, p1.y + t1a.y,p1.x + t1b.x, p1.y + t1b.y, p2.x + t2.x, p2.y + t2.y, intersection);
+            /* simple edge case: if the segments are collinear, we simply add the top and bottom points */
+            float cross = Vector2.crs(dir_prev, dir_next);
+            if (MathUtils.isZero(cross)) {
+                Vector2 v_up = vectorsPool.allocate();
+                v_up.set(dir_prev).rotate90(-1).nor().scl(s2);
 
-            System.out.println(result);
+                Vector2 v_down = vectorsPool.allocate();
+                v_down.set(v_up).flip().nor().scl(s2);
 
-            float angle = Vector2.angleBetweenDeg(t1a, t1b);
-            float da = angle / smoothness;
+                vertices.add(v_up);
+                vertices.add(v_down);
+            } else {
 
-            /* unique intersection */
-            if (result == 1 || result == 4 || result == 3) {
-                vertices.add(vectorsPool.allocate().set(p0).add(t0));
-                vertices.add(vectorsPool.allocate().set(p0).sub(t0));
-                for (int j = 0; j < smoothness + 1; j++) {
-                    vertices.add(vectorsPool.allocate().set(intersection));
-                    vertices.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
-                    v1.add(new Vector2(intersection));// TODO: delete
-                    v1.add(new Vector2(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));// TODO: delete
-                }
-                vertices.add(vectorsPool.allocate().set(p2).add(t2));
-                vertices.add(vectorsPool.allocate().set(p2).sub(t2));
-
-                {
-                    anchor.add(new Vector2(p0).add(t0));
-                    anchor.add(new Vector2(p0).sub(t0));
-                    anchor.add(new Vector2(p1).add(t1a));
-                    anchor.add(new Vector2(p1).sub(t1a));
-                    anchor.add(new Vector2(p1).add(t1b));
-                    anchor.add(new Vector2(p1).sub(t1b));
-                    anchor.add(new Vector2(p2).add(t2));
-                    anchor.add(new Vector2(p2).sub(t2));
-                } // TODO: delete
-            } else if (result == 0 || result == 5) {
-                MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p2).add(t2), new Vector2(p2).sub(t1b), intersection);
-
-                vertices.add(vectorsPool.allocate().set(p0).add(t0));
-                vertices.add(vectorsPool.allocate().set(p0).sub(t0));
-                for (int j = 0; j < smoothness + 1; j++) {
-                    vertices.add(vectorsPool.allocate().set(intersection));
-                    vertices.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
-                    v1.add(new Vector2(intersection));// TODO: delete
-                    v1.add(new Vector2(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));// TODO: delete
-                }
-                vertices.add(vectorsPool.allocate().set(intersection));
-                vertices.add(vectorsPool.allocate().set(p2).sub(t2));
             }
 
-            v2.add(new Vector2(intersection));
         }
 
-        /* put vertices */
-        for (Vector2 value : vertices) {
-            verticesBuffer.put(value.x).put(value.y).put(currentTint).put(0.5f).put(0.5f);
-        }
+        /* last 2 vertices */
+        normal.x = values[values.length - 1].x - values[values.length - 2].x;
+        normal.y = values[values.length - 1].y - values[values.length - 2].y;
+        normal.nor();
+        normal.rotate90(1);
+        Vector2 up_last = vectorsPool.allocate();
+        up_last.x = values[values.length - 1].x + s2 * normal.x;
+        up_last.y = values[values.length - 1].y + s2 * normal.y;
+        Vector2 down_last = vectorsPool.allocate();
+        down_last.x = values[values.length - 1].x - s2 * normal.x;
+        down_last.y = values[values.length - 1].y - s2 * normal.y;
+        vertices.add(up_last);
+        vertices.add(down_last);
 
         final int curveEndIndex = vertices.size;
+
+        for (int i = 0; i < vertices.size; i++) {
+            verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
+        }
 
         /* put indices ("connect the dots") */
         final int startVertex = this.vertexIndex;
@@ -1425,26 +1314,604 @@ public class Renderer2D implements MemoryResourceHolder {
             indicesBuffer.put(startVertex + i + 1);
             indicesBuffer.put(startVertex + i + 3);
         }
-        vertexIndex += curveEndIndex;
 
+        vertexIndex += vertices.size;
 
-        vectorsPool.free(p0);
-        vectorsPool.free(p1);
-        vectorsPool.free(p2);
-        vectorsPool.free(t0);
-        vectorsPool.free(t1a);
-        vectorsPool.free(t1b);
-        vectorsPool.free(t2);
-        vectorsPool.free(intersection);
-        vectorsPool.freeAll(vertices);
     }
 
-    public static final Array<Vector2> anchor = new Array<>(true, 10);
-    public static final Array<Vector2> v1 = new Array<>(true, 10);
-    public static final Array<Vector2> v2 = new Array<>(true, 10);
-    public static final Array<Vector2> v3 = new Array<>(true, 10);
-    public static final Array<Vector2> v4 = new Array<>(true, 10);
+    // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
+    public Array<Vector2> drawCurveFilled_new(float stroke, int smoothness, final Vector2... values) {
+        dots.clear(); // TODO: remove
+        ends.clear();
 
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values.length < 2) return null;
+        smoothness = Math.max(1, smoothness);
+        if ((vertexIndex + 2 + (values.length - 2) * (smoothness + 1) * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_TRIANGLES);
+        final float s2 = 0.5f * stroke;
+
+        /* put vertices */
+        Array<Vector2> vertices = new Array<>(true, values.length);
+
+        /* first 2 vertices */
+        Vector2 normal = vectorsPool.allocate();
+        normal.x = values[1].x - values[0].x;
+        normal.y = values[1].y - values[0].y;
+        normal.nor();
+        normal.rotate90(1);
+        Vector2 up_first = vectorsPool.allocate();
+        up_first.x = values[0].x + s2 * normal.x;
+        up_first.y = values[0].y + s2 * normal.y;
+        Vector2 down_first = vectorsPool.allocate();
+        down_first.x = values[0].x - s2 * normal.x;
+        down_first.y = values[0].y - s2 * normal.y;
+        vertices.add(up_first);
+        vertices.add(down_first);
+
+        Vector2 dir_prev = vectorsPool.allocate();
+        Vector2 nor_prev = vectorsPool.allocate();
+        Vector2 dir_next = vectorsPool.allocate();
+        Vector2 nor_next = vectorsPool.allocate();
+        /* add vertices for internal corners */
+        for (int i = 1; i < values.length - 1; i++) {
+            // maybe we should consider the last 2 ADDED vertices instead
+            Vector2 corner_prev = values[i - 1];
+            Vector2 corner_this = values[i];
+            Vector2 corner_next = values[i + 1];
+
+            dir_prev.x = values[i - 1].x - values[i].x;
+            dir_prev.y = values[i - 1].y - values[i].y;
+
+            dir_next.x = values[i + 1].x - values[i].x;
+            dir_next.y = values[i + 1].y - values[i].y;
+
+            nor_prev.set(dir_prev).nor().rotate90(1);
+            nor_next.set(dir_next).nor().rotate90(1);
+
+            /* simple edge case: if the segments are collinear, we simply add the top and bottom points */
+            float cross = Vector2.crs(dir_prev, dir_next);
+            if (MathUtils.isZero(cross)) {
+                Vector2 v_up = vectorsPool.allocate();
+                v_up.set(dir_prev).rotate90(-1).nor().scl(s2);
+                Vector2 v_down = vectorsPool.allocate();
+                v_down.set(v_up).flip().nor().scl(s2);
+                vertices.add(v_up);
+                vertices.add(v_down);
+                continue;
+            }
+
+            /*
+              Compute all 8 segments of the two rectangles - to the left and to the right of the corner.
+              A segment S: (a,b) is the line segment between the point a and b.
+              For rectangles prev and next:
+
+                   s1
+              ------------
+              |          |
+           s2 |          | s4
+              |          |
+              ------------
+                   s3
+             */
+
+            /* previous rectangle "Rp" */
+            Vector2 Rp_c0 = vectorsPool.allocate().set(corner_prev).add( nor_prev.x * s2,  nor_prev.y * s2);
+            Vector2 Rp_c1 = vectorsPool.allocate().set(corner_prev).add(-nor_prev.x * s2, -nor_prev.y * s2);
+            Vector2 Rp_c2 = vectorsPool.allocate().set(corner_this).add( nor_prev.x * s2,  nor_prev.y * s2);
+            Vector2 Rp_c3 = vectorsPool.allocate().set(corner_this).add(-nor_prev.x * s2, -nor_prev.y * s2);
+
+            /* next rectangle "Rn" */
+            Vector2 Rn_c0 = vectorsPool.allocate().set(corner_this).add( -nor_next.x * s2,  -nor_next.y * s2);
+            Vector2 Rn_c1 = vectorsPool.allocate().set(corner_this).add(nor_next.x * s2, nor_next.y * s2);
+            Vector2 Rn_c2 = vectorsPool.allocate().set(corner_next).add( -nor_next.x * s2,  -nor_next.y * s2);
+            Vector2 Rn_c3 = vectorsPool.allocate().set(corner_next).add(nor_next.x * s2, nor_next.y * s2);
+
+            /* find intersections */
+            Vector2 intersection = vectorsPool.allocate();
+
+            boolean up_intersect = MathUtils.segmentsIntersection_old(Rp_c0, Rp_c2, Rn_c0, Rn_c2, intersection);
+            if (up_intersect) {
+                /* get the angle between the two normals at the corner */
+                float angle = Vector2.angleBetweenDeg(-nor_prev.x, -nor_prev.y, nor_next.x, nor_next.y);
+                float step = angle / smoothness;
+                for (int j = 0; j < smoothness; j++) {
+                    Vector2 inter = vectorsPool.allocate().set(intersection);
+                    Vector2 point = vectorsPool.allocate().set(-nor_prev.x * s2, -nor_prev.y * s2).rotateDeg(-step * j).add(corner_this);
+                    vertices.add(point);
+                    vertices.add(inter);
+                }
+                continue;
+            }
+
+            boolean down_intersect = MathUtils.segmentsIntersection_old(Rp_c1, Rp_c3, Rn_c1, Rn_c3, intersection);
+            if (down_intersect) {
+                /* get the angle between the two normals at the corner */
+                float angle = Vector2.angleBetweenDeg(nor_prev.x, nor_prev.y, -nor_next.x, -nor_next.y);
+                float step = angle / smoothness;
+                for (int j = 0; j < smoothness; j++) {
+                    Vector2 inter = vectorsPool.allocate().set(intersection);
+                    Vector2 point = vectorsPool.allocate().set(nor_prev.x * s2, nor_prev.y * s2).rotateDeg(step * j).add(corner_this);
+                    vertices.add(inter);
+                    vertices.add(point);
+                }
+                continue;
+            }
+
+            boolean far_intersect_up = MathUtils.segmentsIntersection_old(Rp_c1, Rp_c3, Rn_c2, Rn_c3, intersection);
+            if (far_intersect_up) {
+                /* get the angle between the two normals at the corner */
+                float angle = Vector2.angleBetweenDeg(nor_prev.x, nor_prev.y, -nor_next.x, -nor_next.y);
+                float step = angle / smoothness;
+                for (int j = 0; j < smoothness; j++) {
+                    Vector2 inter = vectorsPool.allocate().set(intersection);
+                    Vector2 point = vectorsPool.allocate().set(nor_prev.x * s2, nor_prev.y * s2).rotateDeg(step * j).add(corner_this);
+                    vertices.add(inter);
+                    vertices.add(point);
+                }
+                continue;
+            }
+
+            boolean far_intersect_down = MathUtils.segmentsIntersection_old(Rp_c0, Rp_c2, Rn_c2, Rn_c3, intersection);
+            if (far_intersect_down) {
+                /* get the angle between the two normals at the corner */
+                float angle = Vector2.angleBetweenDeg(-nor_prev.x, -nor_prev.y, nor_next.x, nor_next.y);
+                float step = angle / smoothness;
+                for (int j = 0; j < smoothness; j++) {
+                    Vector2 inter = vectorsPool.allocate().set(intersection);
+                    Vector2 point = vectorsPool.allocate().set(-nor_prev.x * s2, -nor_prev.y * s2).rotateDeg(-step * j).add(corner_this);
+                    vertices.add(point);
+                    vertices.add(inter);
+                }
+                continue;
+            }
+        }
+
+        /* last 2 vertices */
+        normal.x = values[values.length - 1].x - values[values.length - 2].x;
+        normal.y = values[values.length - 1].y - values[values.length - 2].y;
+        normal.nor();
+        normal.rotate90(1);
+        Vector2 up_last = vectorsPool.allocate();
+        up_last.x = values[values.length - 1].x + s2 * normal.x;
+        up_last.y = values[values.length - 1].y + s2 * normal.y;
+        Vector2 down_last = vectorsPool.allocate();
+        down_last.x = values[values.length - 1].x - s2 * normal.x;
+        down_last.y = values[values.length - 1].y - s2 * normal.y;
+        vertices.add(up_last);
+        vertices.add(down_last);
+
+        final int curveEndIndex = vertices.size;
+
+        for (int i = 0; i < vertices.size; i++) {
+            //verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
+        }
+
+        /* put indices ("connect the dots") */
+        final int startVertex = this.vertexIndex;
+        for (int i = 0; i < curveEndIndex - 2; i += 2) { // curve +  rounded corners
+//            indicesBuffer.put(startVertex + i + 0);
+//            indicesBuffer.put(startVertex + i + 1);
+//            indicesBuffer.put(startVertex + i + 2);
+//            indicesBuffer.put(startVertex + i + 2);
+//            indicesBuffer.put(startVertex + i + 1);
+//            indicesBuffer.put(startVertex + i + 3);
+        }
+
+        //vertexIndex += vertices.size;
+
+        return vertices;
+    }
+
+    public Array<Vector2> drawCurveFilled2(float stroke, int smoothness, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values == null || values.length < 2) return null;
+
+        final int maxVertices = 2 + 2 + (values.length - 2) * (smoothness + 1) * 2; // 2 vertices first point, 2 vertices last point
+        // and for every internal corner we add (smoothness + 1) * 2 vertices. We have values.length - 2 internal corners.
+        if ((vertexIndex + maxVertices) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_TRIANGLES);
+
+        final float s2 = 0.5f * stroke;
+
+        /* compute segment directions */
+        Array<Vector2> dirs = new Array<>(true, values.length - 1);
+        for (int i = 0; i < values.length - 1; i++) {
+            Vector2 dir = vectorsPool.allocate();
+            dir.x = values[i + 1].x - values[i].x;
+            dir.y = values[i + 1].y - values[i].y;
+            dir.nor();
+            dir.scl(s2);
+            dirs.add(dir);
+        }
+
+        /* compute vertices */
+        Array<Vector2> vertices = new Array<>(true, maxVertices);
+
+        /* first 2 vertices */
+        Vector2 first_up = vectorsPool.allocate().set(dirs.get(0)).rotate90(1).add(values[0]);
+        Vector2 first_down = vectorsPool.allocate().set(dirs.get(0)).rotate90(-1).add(values[0]);
+        vertices.add(first_up);
+        vertices.add(first_down);
+
+        /* compute the vertices for all internal corners (ci):  c---ci---ci----ci----c */
+        for (int i = 1; i < values.length - 1; i++) {
+
+            /*  */
+            Vector2 corner_prev = values[i - 1];
+            Vector2 corner = values[i];
+            Vector2 corner_next = values[i + 1];
+
+            /*
+              Compute all 8 segments of the two rectangles - to the left and to the right of the corner.
+              A segment S: (a,b) is the line segment between the point a and b.
+              For rectangles prev and next:
+                   s1
+              ------------
+              |          |
+           s2 |          | s4
+              |          |
+              ------------
+                   s3
+             */
+
+            Vector2 corner_prev_up = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(1).add(corner_prev);
+            Vector2 corner_prev_down = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(-1).add(corner_prev);
+            Vector2 corner_left_up = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(1).add(corner);
+            Vector2 corner_left_down = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(-1).add(corner);
+
+            Vector2 corner_right_up = vectorsPool.allocate().set(dirs.get(i)).rotate90(1).add(corner);
+            Vector2 corner_right_down = vectorsPool.allocate().set(dirs.get(i)).rotate90(-1).add(corner);
+            Vector2 corner_next_up = vectorsPool.allocate().set(dirs.get(i)).rotate90(1).add(corner_next);
+            Vector2 corner_next_down = vectorsPool.allocate().set(dirs.get(i)).rotate90(-1).add(corner_next);
+
+            Vector2 intersection_up   = vectorsPool.allocate();
+            Vector2 intersection_down = vectorsPool.allocate();
+
+            boolean up_intersect   = MathUtils.segmentsIntersection_old(corner_prev_up, corner_left_up, corner_right_up, corner_next_up, intersection_up);
+            boolean down_intersect = MathUtils.segmentsIntersection_old(corner_prev_down, corner_left_down, corner_right_down, corner_next_down, intersection_down);
+
+            if (up_intersect && down_intersect) {
+                vertices.add(intersection_up);
+                vertices.add(intersection_down);
+            } else if (up_intersect) {
+                System.out.println("hi");
+                vertices.add(intersection_up);
+                vertices.add(corner_left_down);
+                vertices.add(intersection_up);
+                vertices.add(corner_right_down);
+            } else if (down_intersect) {
+                System.out.println("bye");
+                vertices.add(corner_left_up);
+                vertices.add(intersection_down);
+                vertices.add(corner_right_up);
+                vertices.add(intersection_down);
+            } else {
+                /* a very oblique angle - up-up and down-down are not intersecting. Try: up-down */
+                boolean b1 = MathUtils.segmentsIntersection_old(corner_prev_up, corner_left_up, corner_right_down, corner_next_down, intersection_up);
+                boolean b2 = MathUtils.segmentsIntersection_old(corner_prev_down, corner_left_down, corner_right_up, corner_next_up, intersection_down);
+                if (b1) System.out.println("b1");
+                if (b2) System.out.println("b2");
+            }
+
+//            vertices.add(corner_prev_up);
+//            vertices.add(corner_prev_down);
+//
+//            vertices.add(corner_next_up);
+//            vertices.add(corner_next_down);
+        }
+
+        /* last 2 vertices */
+        Vector2 last_up = vectorsPool.allocate().set(dirs.get(dirs.size - 1)).rotate90(1).add(values[values.length - 1]);
+        Vector2 last_down = vectorsPool.allocate().set(dirs.get(dirs.size - 1)).rotate90(-1).add(values[values.length - 1]);
+        vertices.add(last_up);
+        vertices.add(last_down);
+
+        //vectorsPool.freeAll(vertices);
+
+        return vertices;
+
+    }
+
+    public Array<Vector2> drawCurveFilled(float stroke, int smoothness, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values == null || values.length < 2) return null;
+
+        final int maxVertices = 2 + 2 + (values.length - 2) * (smoothness + 1) * 2; // 2 vertices first point, 2 vertices last point
+        // and for every internal corner we add (smoothness + 1) * 2 vertices. We have values.length - 2 internal corners.
+        if ((vertexIndex + maxVertices) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_TRIANGLES);
+
+        final float s2 = 0.5f * stroke;
+
+        /* compute segment directions */
+        Array<Vector2> dirs = new Array<>(true, values.length - 1);
+        for (int i = 0; i < values.length - 1; i++) {
+            Vector2 dir = vectorsPool.allocate();
+            dir.x = values[i + 1].x - values[i].x;
+            dir.y = values[i + 1].y - values[i].y;
+            dir.nor();
+            dir.scl(s2);
+            dirs.add(dir);
+        }
+
+        /* compute vertices */
+        Array<Vector2> vertices = new Array<>(true, maxVertices);
+
+        /* first 2 vertices */
+        Vector2 first_up = vectorsPool.allocate().set(dirs.get(0)).rotate90(1).add(values[0]);
+        Vector2 first_down = vectorsPool.allocate().set(dirs.get(0)).rotate90(-1).add(values[0]);
+        vertices.add(first_up);
+        vertices.add(first_down);
+
+        /* compute the vertices for all internal corners (ci):  c---ci---ci----ci----c */
+        for (int i = 1; i < values.length - 1; i++) {
+
+            /*  */
+            Vector2 corner_prev = values[i - 1];
+            Vector2 corner = values[i];
+            Vector2 corner_next = values[i + 1];
+
+            /*
+              Compute all 8 segments of the two rectangles - to the left and to the right of the corner.
+              A segment S: (a,b) is the line segment between the point a and b.
+              For rectangles prev and next:
+                   s1
+              ------------
+              |          |
+           s2 |          | s4
+              |          |
+              ------------
+                   s3
+             */
+
+            Vector2 corner_prev_up = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(1).add(corner_prev);
+            Vector2 corner_prev_down = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(-1).add(corner_prev);
+            Vector2 corner_left_up = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(1).add(corner);
+            Vector2 corner_left_down = vectorsPool.allocate().set(dirs.get(i-1)).rotate90(-1).add(corner);
+
+            Vector2 corner_right_up = vectorsPool.allocate().set(dirs.get(i)).rotate90(1).add(corner);
+            Vector2 corner_right_down = vectorsPool.allocate().set(dirs.get(i)).rotate90(-1).add(corner);
+            Vector2 corner_next_up = vectorsPool.allocate().set(dirs.get(i)).rotate90(1).add(corner_next);
+            Vector2 corner_next_down = vectorsPool.allocate().set(dirs.get(i)).rotate90(-1).add(corner_next);
+
+            Vector2 intersection_up   = vectorsPool.allocate();
+            Vector2 intersection_down = vectorsPool.allocate();
+
+            boolean up_intersect   = MathUtils.segmentsIntersection_old(corner_prev_up, corner_left_up, corner_right_up, corner_next_up, intersection_up);
+            boolean down_intersect = MathUtils.segmentsIntersection_old(corner_prev_down, corner_left_down, corner_right_down, corner_next_down, intersection_down);
+
+            if (up_intersect && down_intersect) {
+                vertices.add(intersection_up);
+                vertices.add(intersection_down);
+            } else if (up_intersect) {
+                System.out.println("hi");
+                vertices.add(intersection_up);
+                vertices.add(corner_left_down);
+                vertices.add(intersection_up);
+                vertices.add(corner_right_down);
+            } else if (down_intersect) {
+                System.out.println("bye");
+                vertices.add(corner_left_up);
+                vertices.add(intersection_down);
+                vertices.add(corner_right_up);
+                vertices.add(intersection_down);
+            } else {
+                /* a very oblique angle - up-up and down-down are not intersecting. Try: up-down */
+                boolean b1 = MathUtils.segmentsIntersection_old(corner_prev_up, corner_left_up, corner_right_down, corner_next_down, intersection_up);
+                boolean b2 = MathUtils.segmentsIntersection_old(corner_prev_down, corner_left_down, corner_right_up, corner_next_up, intersection_down);
+                if (b1) System.out.println("b1");
+                if (b2) System.out.println("b2");
+            }
+
+//            vertices.add(corner_prev_up);
+//            vertices.add(corner_prev_down);
+//
+//            vertices.add(corner_next_up);
+//            vertices.add(corner_next_down);
+        }
+
+        /* last 2 vertices */
+        Vector2 last_up = vectorsPool.allocate().set(dirs.get(dirs.size - 1)).rotate90(1).add(values[values.length - 1]);
+        Vector2 last_down = vectorsPool.allocate().set(dirs.get(dirs.size - 1)).rotate90(-1).add(values[values.length - 1]);
+        vertices.add(last_up);
+        vertices.add(last_down);
+
+        //vectorsPool.freeAll(vertices);
+
+        return vertices;
+
+    }
+
+    public void drawCurveFilled_old(float stroke, int smoothness, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values == null || values.length < 2) return;
+        if ((vertexIndex + 2 + (values.length - 2) * (smoothness + 1) * 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+
+        setMode(GL11.GL_TRIANGLES);
+
+        smoothness = Math.max(1, smoothness);
+        final float s2 = 0.5f * stroke;
+
+        Array<Vector2> vertices = new Array<>(true, values.length);
+        /* put vertices */
+
+        /* allocate required memory */
+        Vector2 edgeNormal = vectorsPool.allocate();
+        Vector2 norm = vectorsPool.allocate();
+        Vector2 dir_prev = vectorsPool.allocate();
+        Vector2 dir_next = vectorsPool.allocate();
+        Vector2 normal_prev = vectorsPool.allocate();
+        Vector2 normal_next = vectorsPool.allocate();
+
+        /* first 2 vertices */
+        edgeNormal.x = values[1].x - values[0].x;
+        edgeNormal.y = values[1].y - values[0].y;
+        edgeNormal.nor();
+        edgeNormal.rotate90(1);
+        Vector2 up_first = vectorsPool.allocate();
+        up_first.x = values[0].x + s2 * edgeNormal.x;
+        up_first.y = values[0].y + s2 * edgeNormal.y;
+        Vector2 down_first = vectorsPool.allocate();
+        down_first.x = values[0].x - s2 * edgeNormal.x;
+        down_first.y = values[0].y - s2 * edgeNormal.y;
+        vertices.add(down_first);
+        vertices.add(up_first);
+
+        /* compute circular corner vertices */
+        /* iterate over all internal corners */
+        for (int i = 1; i < values.length - 1; i++) {
+            Vector2 corner = values[i];
+            dir_prev.x = values[i].x - values[i-1].x;
+            dir_prev.y = values[i].y - values[i-1].y;
+            dir_prev.flip();
+            dir_next.x = values[i+1].x - values[i].x;
+            dir_next.y = values[i+1].y - values[i].y;
+
+            float cross = Vector2.crs(dir_prev, dir_next);
+            if (MathUtils.isZero(cross)) continue; // Skip co-linear corners.
+
+            dir_prev.nor();
+            dir_next.nor();
+
+            normal_prev.set(dir_prev);
+            normal_prev.rotate90(-1);
+
+            normal_next.set(dir_next);
+            normal_next.rotate90(1);
+
+            float av = Vector2.angleBetweenDeg(dir_prev, dir_next); // angle between normals
+            float an = Vector2.angleBetweenDeg(normal_prev, normal_next); // angle between normals
+            float da = an / smoothness;
+
+            //norm.set(normal_prev).add(normal_next).nor().scl(2*t / MathUtils.sinDeg(av / 2));
+            norm.set(normal_prev).add(normal_next).nor().scl(s2 / MathUtils.sinDeg(av / 2)); // <- looks better
+            float sign = Math.signum(cross);
+
+            for (int j = 0; j < smoothness + 1; j++) {
+                Vector2 v1 = vectorsPool.allocate();
+                Vector2 v2 = vectorsPool.allocate();
+                if (sign < 0) {
+                    v1.set(sign * normal_prev.x * s2, sign * normal_prev.y * s2).rotateDeg(da * j).add(corner);
+                    //v2.set(v1).add(norm.x, norm.y);
+                    v2.set(corner).add(norm.x, norm.y); // <- looks better
+                    vertices.add(v1);
+                    vertices.add(v2);
+                } else {
+                    v1.set(sign * normal_prev.x * s2, sign * normal_prev.y * s2).rotateDeg(-da * j).add(corner);
+                    //v2.set(v1).add(-norm.x, -norm.y);
+                    v2.set(corner).add(-norm.x, -norm.y); // <- looks better
+                    vertices.add(v2);
+                    vertices.add(v1);
+                }
+            }
+        }
+
+        /* last 2 vertices */
+        edgeNormal.x = values[values.length - 1].x - values[values.length - 2].x;
+        edgeNormal.y = values[values.length - 1].y - values[values.length - 2].y;
+        edgeNormal.nor();
+        edgeNormal.rotate90(1);
+        Vector2 up_last = vectorsPool.allocate();
+        up_last.x = values[values.length - 1].x + s2 * edgeNormal.x;
+        up_last.y = values[values.length - 1].y + s2 * edgeNormal.y;
+        Vector2 down_last = vectorsPool.allocate();
+        down_last.x = values[values.length - 1].x - s2 * edgeNormal.x;
+        down_last.y = values[values.length - 1].y - s2 * edgeNormal.y;
+        vertices.add(down_last);
+        vertices.add(up_last);
+
+        final int curveEndIndex = vertices.size;
+
+        /* add far edges half circles */
+        final float da = 180.0f / (smoothness);
+
+        Vector2 p_0 = vectorsPool.allocate();
+        p_0.x = vertices.get(1).x - vertices.get(0).x;
+        p_0.y = vertices.get(1).y - vertices.get(0).y;
+        p_0.nor();
+        p_0.scl(s2);
+        Vector2 p_1 = vectorsPool.allocate();
+        p_1.x = vertices.get(vertices.size - 1).x - vertices.get(vertices.size - 2).x;
+        p_1.y = vertices.get(vertices.size - 1).y - vertices.get(vertices.size - 2).y;
+        p_1.nor();
+        p_1.scl(s2);
+
+        /* add center 0 */
+        Vector2 center_0 = vectorsPool.allocate();
+        center_0.x = values[0].x;
+        center_0.y = values[0].y;
+        vertices.add(center_0);
+        /* add half circle 0: */
+        for (int i = 0; i < smoothness + 1; i++) {
+            Vector2 vertex = vectorsPool.allocate();
+            vertex.set(p_0);
+            vertex.rotateDeg(da * i).add(center_0);
+            vertices.add(vertex);
+        }
+
+        /* add center 1 */
+        Vector2 center_1 = vectorsPool.allocate();
+        center_1.x = values[values.length - 1].x;
+        center_1.y = values[values.length - 1].y;
+        vertices.add(center_1);
+        /* add half circle 1: */
+        for (int i = 0; i < smoothness + 2; i++) {
+            Vector2 vertex = vectorsPool.allocate();
+            vertex.set(p_1);
+            vertex.rotateDeg(-da * i).add(center_1);
+            vertices.add(vertex);
+        }
+
+
+        for (int i = 0; i < vertices.size; i++) {
+            verticesBuffer.put(vertices.get(i).x).put(vertices.get(i).y).put(currentTint).put(0.5f).put(0.5f);
+        }
+
+        /* put indices ("connect the dots") */
+        final int startVertex = this.vertexIndex;
+        for (int i = 0; i < curveEndIndex - 2; i += 2) { // curve +  rounded corners
+            indicesBuffer.put(startVertex + i);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 2);
+            indicesBuffer.put(startVertex + i + 1);
+            indicesBuffer.put(startVertex + i + 3);
+        }
+
+        // put indices for half-circle 0
+        for (int i = 0; i < smoothness - 1; i++) {
+            indicesBuffer.put(startVertex + curveEndIndex + 1 + 0);
+            indicesBuffer.put(startVertex + curveEndIndex + 1 + i + 1);
+            indicesBuffer.put(startVertex + curveEndIndex + 1 + i + 2);
+        }
+
+        // put indices for circle 1
+        for (int i = 0; i < smoothness; i++) {
+            indicesBuffer.put(startVertex + curveEndIndex + smoothness + 2 + 0);
+            indicesBuffer.put(startVertex + curveEndIndex + smoothness + 2 + i + 1);
+            indicesBuffer.put(startVertex + curveEndIndex + smoothness + 2 + i + 2);
+        }
+
+        vertexIndex += vertices.size;
+
+        /* free memory */
+        vectorsPool.free(up_first);
+        vectorsPool.free(down_first);
+        vectorsPool.free(up_last);
+        vectorsPool.free(down_last);
+        vectorsPool.free(edgeNormal);
+        vectorsPool.free(norm);
+        vectorsPool.free(dir_prev);
+        vectorsPool.free(dir_next);
+        vectorsPool.free(normal_prev);
+        vectorsPool.free(normal_next);
+        vectorsPool.free(p_0);
+        vectorsPool.free(p_1);
+    }
 
     private void flush() {
         if (verticesBuffer.position() == 0) return;
@@ -1475,7 +1942,7 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     public void end() {
-        if (!drawing) throw new GraphicsException("Called " + Renderer2D.class.getSimpleName() + ".end() without calling " + Renderer2D.class.getSimpleName() + ".begin() first.");
+        if (!drawing) throw new GraphicsException("Called " + Renderer2D_backup_2.class.getSimpleName() + ".end() without calling " + Renderer2D_backup_2.class.getSimpleName() + ".begin() first.");
         flush();
         GL20.glDepthMask(true);
         GL11.glEnable(GL11.GL_CULL_FACE);
@@ -1496,9 +1963,9 @@ public class Renderer2D implements MemoryResourceHolder {
     /* Create defaults: shader, texture (single white pixel), camera */
 
     private static ShaderProgram createDefaultShaderProgram() {
-        try (InputStream vertexShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
+        try (InputStream vertexShaderInputStream = Renderer2D_backup_2.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.vert");
              BufferedReader vertexShaderBufferedReader = new BufferedReader(new InputStreamReader(vertexShaderInputStream, StandardCharsets.UTF_8));
-             InputStream fragmentShaderInputStream = Renderer2D.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
+             InputStream fragmentShaderInputStream = Renderer2D_backup_2.class.getClassLoader().getResourceAsStream("graphics-2d-default-shader.frag");
              BufferedReader fragmentShaderBufferedReader = new BufferedReader(new InputStreamReader(fragmentShaderInputStream, StandardCharsets.UTF_8))) {
 
             String vertexShader = vertexShaderBufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
