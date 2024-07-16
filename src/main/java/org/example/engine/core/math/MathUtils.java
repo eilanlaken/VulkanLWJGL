@@ -740,7 +740,7 @@ public final class MathUtils {
      * @param vertices is a flat array of vertex coordinates: [x0,y0, x1,y1, x2,y2, ...].
      * @return boolean
      */
-    public static boolean isPolygonConvex(final float[] vertices) {
+    public static boolean polygonIsConvex(final float[] vertices) {
         if (vertices.length == 6) return true;
         Vector2 tmp1 = vectors2Pool.allocate();
         Vector2 tmp2 = vectors2Pool.allocate();
@@ -769,7 +769,6 @@ public final class MathUtils {
         return true;
     }
 
-    // TODO: test.
     public static void polygonRemoveDegenerateVertices(@NotNull Array<Vector2> polygon, @NotNull Array<Vector2> outPolygon) {
         if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices. Got: " + polygon.size);
         if (polygon == outPolygon) throw new IllegalArgumentException("Argument outPolygon cannot be == polygon.");
@@ -805,7 +804,57 @@ public final class MathUtils {
         }
     }
 
-    // TODO: test.
+    public static void polygonRemoveDegenerateVertices(@NotNull float[] polygon, @NotNull ArrayFloat outPolygon) {
+        if (polygon.length < 6) throw new MathException("A polygon requires a minimum of 3 vertices. Got: " + polygon.length);
+        if (polygon.length % 2 != 0) throw new MathException("Polygon must be represented as a flat array of vertices, each vertex must have x and y coordinates: [x0,y0,  x1,y1, ...]. Therefore, polygon array length must be even. Got: " + polygon.length);
+        outPolygon.clear();
+
+        /* remove sequential duplicates: [A, B, B, B, C, D, D] -> [A, B, C, D]. Stores the result in a "compact" polygon (ArrayFloat). */
+        ArrayFloat compact = floatArrayPool.allocate();
+        float v_x = polygon[0];
+        float v_y = polygon[1];
+        compact.add(v_x);
+        compact.add(v_y);
+        for (int i = 2; i < polygon.length; i += 2) {
+            float curr_x = polygon[i];
+            float curr_y = polygon[i + 1];
+            if (!floatsEqual(curr_x, v_x) || !floatsEqual(curr_y, v_y)) {
+                compact.add(curr_x);
+                compact.add(curr_y);
+                v_x = curr_x;
+                v_y = curr_y;
+            }
+        }
+        float first_x = compact.get(0);
+        float first_y = compact.get(1);
+        float last_x  = compact.get(compact.size - 2);
+        float last_y  = compact.get(compact.size - 1);
+        if (floatsEqual(first_x, last_x) && floatsEqual(first_y, last_y) && compact.size != 2) {
+            compact.pop();
+            compact.pop();
+        }
+
+        /* remove collinear vertices */
+        for (int i = 0; i < compact.size - 1; i += 2) {
+
+            float prev_x = compact.getCyclic(i - 2);
+            float prev_y = compact.getCyclic(i - 1);
+
+            float curr_x = compact.get(i);
+            float curr_y = compact.get(i + 1);
+
+            float next_x = compact.getCyclic(i + 2);
+            float next_y = compact.getCyclic(i + 3);
+
+            if (!Vector2.areCollinear(prev_x, prev_y, curr_x, curr_y, next_x, next_y)) {
+                outPolygon.add(curr_x);
+                outPolygon.add(curr_y);
+            }
+        }
+
+        floatArrayPool.free(compact);
+    }
+
     public static void polygonRemoveDegenerateVertices(@NotNull Array<Vector2> polygon) {
         if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices. Got: " + polygon.size);
 
@@ -863,50 +912,9 @@ public final class MathUtils {
         floatArrayPool.free(cleanPolygon);
     }
 
-    // TODO: FIXME: consider "ultra" degenerate cases where there are duplicates of vertices in a row
-    @Deprecated public static void removeCollinearVertices(@NotNull Array<Vector2> polygon, @NotNull Array<Vector2> outVertices) {
-        if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices. Got: " + polygon.size);
-        if (polygon == outVertices) throw new IllegalArgumentException("Argument outVertices must not be equal to polygon.");
-
-        outVertices.clear();
-        for (int i = 0; i < polygon.size; i++) {
-
-            Vector2 prev = polygon.getCyclic(i - 1);
-            Vector2 curr = polygon.getCyclic(i);
-            Vector2 next = polygon.getCyclic(i + 1);
-
-            if (!Vector2.areCollinear(prev, curr, next)) {
-                outVertices.add(curr);
-            }
-        }
-    }
-
-    // TODO: FIXME: consider "ultra" degenerate cases where there are duplicates of vertices in a row
-    @Deprecated public static void removeCollinearVertices(@NotNull float[] polygon, @NotNull ArrayFloat outVertices) {
-        if (polygon.length < 6) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.length);
-
-        outVertices.clear();
-        for (int i = 0; i < polygon.length - 1; i += 2) {
-
-            float prev_x = CollectionsUtils.getCyclic(polygon, i - 2);
-            float prev_y = CollectionsUtils.getCyclic(polygon, i - 1);
-
-            float curr_x = polygon[i];
-            float curr_y = polygon[i + 1];
-
-            float next_x = CollectionsUtils.getCyclic(polygon, i + 2);
-            float next_y = CollectionsUtils.getCyclic(polygon, i + 3);
-
-            if (!Vector2.areCollinear(prev_x, prev_y, curr_x, curr_y, next_x, next_y)) {
-                outVertices.add(curr_x);
-                outVertices.add(curr_y);
-            }
-        }
-    }
-
     public static void polygonTriangulate(@NotNull Array<Vector2> polygon, @NotNull Array<Vector2> outVertices, @NotNull ArrayInt outIndices) {
         if (polygon.size < 3) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.size);
-        removeCollinearVertices(polygon, outVertices);
+        polygonRemoveDegenerateVertices(polygon, outVertices);
         if (outVertices.size < 3) throw new MathException("Polygon contains " + (polygon.size - outVertices.size) + " collinear vertices; When removed, that total vertex count is: " + outVertices.size + "< 3.");
 
         int windingOrder = MathUtils.polygonWindingOrder(outVertices);
@@ -982,10 +990,7 @@ public final class MathUtils {
     public static void polygonTriangulate(@NotNull float[] polygon, @NotNull ArrayFloat outVertices, @NotNull ArrayInt outIndices) {
         if (polygon.length < 6) throw new MathException("A polygon requires a minimum of 3 vertices, so the polygon array must be of length > 6. Got: " + polygon.length);
         if (polygon.length % 2 != 0) throw new MathException("Polygon must be represented as a flat array of vertices, each vertex must have x and y coordinates: [x0,y0,  x1,y1, ...]. Therefore, polygon array length must be even. Got: " + polygon.length);
-
-        System.out.println("poly " + Arrays.toString(polygon));
-        removeCollinearVertices(polygon, outVertices);
-        System.out.println(outVertices);
+        polygonRemoveDegenerateVertices(polygon, outVertices);
         if (outVertices.size < 6) throw new MathException("Polygon contains " + (polygon.length - outVertices.size) / 2 + " collinear vertices; When removed, that total vertex count is: " + outVertices.size / 2 + ". Must have at least 3 non-collinear vertices.");
 
         int windingOrder = MathUtils.polygonWindingOrder(outVertices);

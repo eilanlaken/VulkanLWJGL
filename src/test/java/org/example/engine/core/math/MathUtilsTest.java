@@ -755,74 +755,6 @@ class MathUtilsTest {
     }
 
     @Test
-    void removeCollinearVertices() {
-        Array<Vector2> polygon = new Array<>();
-        Array<Vector2> outVertices = new Array<>();
-
-        polygon.clear();
-        polygon.add(new Vector2(0,0));
-        polygon.add(new Vector2(1,0));
-        polygon.add(new Vector2(1,1));
-        polygon.add(new Vector2(0.5f,1));
-        polygon.add(new Vector2(0,1));
-        MathUtils.removeCollinearVertices(polygon, outVertices);
-        Assertions.assertEquals(4, outVertices.size);
-        Assertions.assertEquals(new Vector2(0,0), outVertices.get(0));
-        Assertions.assertEquals(new Vector2(1,0), outVertices.get(1));
-        Assertions.assertEquals(new Vector2(1,1), outVertices.get(2));
-        Assertions.assertEquals(new Vector2(0,1), outVertices.get(3));
-
-        polygon.clear();
-        polygon.add(new Vector2(0,0));
-        polygon.add(new Vector2(1,0));
-        polygon.add(new Vector2(1,1));
-        polygon.add(new Vector2(0.5f,1));
-        polygon.add(new Vector2(0.5f,1));
-        polygon.add(new Vector2(0.5f,1));
-        polygon.add(new Vector2(0,1));
-        MathUtils.removeCollinearVertices(polygon, outVertices);
-        Assertions.assertEquals(4, outVertices.size);
-        Assertions.assertEquals(new Vector2(0,0), outVertices.get(0));
-        Assertions.assertEquals(new Vector2(1,0), outVertices.get(1));
-        Assertions.assertEquals(new Vector2(1,1), outVertices.get(2));
-        Assertions.assertEquals(new Vector2(0,1), outVertices.get(3));
-
-        polygon.clear();
-        polygon.add(new Vector2(0,0));
-        polygon.add(new Vector2(1,0));
-        polygon.add(new Vector2(2,0));
-        polygon.add(new Vector2(2,1));
-        polygon.add(new Vector2(2,2));
-        polygon.add(new Vector2(2,4));
-        polygon.add(new Vector2(1,4));
-        polygon.add(new Vector2(0,4));
-        MathUtils.removeCollinearVertices(polygon, outVertices);
-        Assertions.assertEquals(4, outVertices.size);
-        Assertions.assertEquals(new Vector2(0,0), outVertices.get(0));
-        Assertions.assertEquals(new Vector2(2,0), outVertices.get(1));
-        Assertions.assertEquals(new Vector2(2,4), outVertices.get(2));
-        Assertions.assertEquals(new Vector2(0,4), outVertices.get(3));
-
-        polygon.clear();
-        polygon.add(new Vector2(0,0));
-        polygon.add(new Vector2(1,0));
-        polygon.add(new Vector2(2,0));
-        polygon.add(new Vector2(2,1));
-        polygon.add(new Vector2(2,2));
-        polygon.add(new Vector2(2,4));
-        polygon.add(new Vector2(1,4));
-        polygon.add(new Vector2(0,4));
-        polygon.add(new Vector2(0,4));
-        polygon.add(new Vector2(0,4));
-        MathUtils.removeCollinearVertices(polygon, outVertices);
-        Assertions.assertEquals(4, outVertices.size);
-        Assertions.assertEquals(new Vector2(0,0), outVertices.get(0));
-        Assertions.assertEquals(new Vector2(2,0), outVertices.get(1));
-        Assertions.assertEquals(new Vector2(2,4), outVertices.get(2));
-        Assertions.assertEquals(new Vector2(0,4), outVertices.get(3));
-    }
-
-    @Test
     void polygonRemoveDegenerateVertices() {
         Array<Vector2> polygon = new Array<>();
 
@@ -958,6 +890,59 @@ class MathUtilsTest {
     }
 
     @Test
+    void polygonRemoveDegenerateVertices_3() {
+        ArrayFloat outPolygon = new ArrayFloat();
+
+        float[] polygon_1 = {0,0,   1,0,   1,1,   0.5f,1,   0,1};
+        MathUtils.polygonRemoveDegenerateVertices(polygon_1, outPolygon);
+        Assertions.assertEquals(8, outPolygon.size);
+        Assertions.assertEquals(0, outPolygon.get(0));
+        Assertions.assertEquals(0, outPolygon.get(1));
+        Assertions.assertEquals(1, outPolygon.get(2));
+        Assertions.assertEquals(0, outPolygon.get(3));
+        Assertions.assertEquals(1, outPolygon.get(4));
+        Assertions.assertEquals(1, outPolygon.get(5));
+        Assertions.assertEquals(0, outPolygon.get(6));
+        Assertions.assertEquals(1, outPolygon.get(7));
+
+        float[] polygon_2 = {0,0,   1,0,   1,1,   0.5f,1,0.5f,1,0.5f,1,   0,1};
+        MathUtils.polygonRemoveDegenerateVertices(polygon_2, outPolygon);
+        Assertions.assertEquals(8, outPolygon.size);
+        Assertions.assertEquals(0, outPolygon.get(0));
+        Assertions.assertEquals(0, outPolygon.get(1));
+        Assertions.assertEquals(1, outPolygon.get(2));
+        Assertions.assertEquals(0, outPolygon.get(3));
+        Assertions.assertEquals(1, outPolygon.get(4));
+        Assertions.assertEquals(1, outPolygon.get(5));
+        Assertions.assertEquals(0, outPolygon.get(6));
+        Assertions.assertEquals(1, outPolygon.get(7));
+
+        float[] polygon_3 = {0,0,   1,0,   2,0,   2,1, 2,2,  2,4,  1,4, 0,4};
+        MathUtils.polygonRemoveDegenerateVertices(polygon_3, outPolygon);
+        Assertions.assertEquals(8, outPolygon.size);
+        Assertions.assertEquals(0, outPolygon.get(0));
+        Assertions.assertEquals(0, outPolygon.get(1));
+        Assertions.assertEquals(2, outPolygon.get(2));
+        Assertions.assertEquals(0, outPolygon.get(3));
+        Assertions.assertEquals(2, outPolygon.get(4));
+        Assertions.assertEquals(4, outPolygon.get(5));
+        Assertions.assertEquals(0, outPolygon.get(6));
+        Assertions.assertEquals(4, outPolygon.get(7));
+
+        float[] polygon_4 = {0,0,   1,0,   2,0,   2,1,   2,2,   2,4,   1,4,   0,4,   0,4,   0,4};
+        MathUtils.polygonRemoveDegenerateVertices(polygon_4, outPolygon);
+        Assertions.assertEquals(8, outPolygon.size);
+        Assertions.assertEquals(0, outPolygon.get(0));
+        Assertions.assertEquals(0, outPolygon.get(1));
+        Assertions.assertEquals(2, outPolygon.get(2));
+        Assertions.assertEquals(0, outPolygon.get(3));
+        Assertions.assertEquals(2, outPolygon.get(4));
+        Assertions.assertEquals(4, outPolygon.get(5));
+        Assertions.assertEquals(0, outPolygon.get(6));
+        Assertions.assertEquals(4, outPolygon.get(7));
+    }
+
+    @Test
     void areCollinear2() {
         Vector2 a = new Vector2();
         Vector2 b = new Vector2();
@@ -975,67 +960,6 @@ class MathUtilsTest {
     }
 
     @Test
-    void removeCollinearVertices_flat() {
-        ArrayFloat outVertices = new ArrayFloat();
-
-        float[] polygon_1 = {0,0, 1,0, 1,1, 0.5f,1, 0,1};
-        MathUtils.removeCollinearVertices(polygon_1, outVertices);
-        Assertions.assertEquals(8, outVertices.size);
-        {
-            Assertions.assertEquals(0, outVertices.get(0));
-            Assertions.assertEquals(0, outVertices.get(1));
-            Assertions.assertEquals(1, outVertices.get(2));
-            Assertions.assertEquals(0, outVertices.get(3));
-            Assertions.assertEquals(1, outVertices.get(4));
-            Assertions.assertEquals(1, outVertices.get(5));
-            Assertions.assertEquals(0, outVertices.get(6));
-            Assertions.assertEquals(1, outVertices.get(7));
-        }
-
-        float[] polygon_2 = {0,0, 1,0, 1,1, 0.5f,1, 0.5f,1, 0.5f,1, 0.5f,1, 0.5f,1, 0,1};
-        MathUtils.removeCollinearVertices(polygon_2, outVertices);
-        Assertions.assertEquals(8, outVertices.size);
-        {
-            Assertions.assertEquals(0, outVertices.get(0));
-            Assertions.assertEquals(0, outVertices.get(1));
-            Assertions.assertEquals(1, outVertices.get(2));
-            Assertions.assertEquals(0, outVertices.get(3));
-            Assertions.assertEquals(1, outVertices.get(4));
-            Assertions.assertEquals(1, outVertices.get(5));
-            Assertions.assertEquals(0, outVertices.get(6));
-            Assertions.assertEquals(1, outVertices.get(7));
-        }
-
-        float[] polygon_3 = {0,0, 1,0, 2,0, 2,1, 2,2, 2,4, 1,4, 0,4};
-        MathUtils.removeCollinearVertices(polygon_3, outVertices);
-        Assertions.assertEquals(8, outVertices.size);
-        {
-            Assertions.assertEquals(0, outVertices.get(0));
-            Assertions.assertEquals(0, outVertices.get(1));
-            Assertions.assertEquals(2, outVertices.get(2));
-            Assertions.assertEquals(0, outVertices.get(3));
-            Assertions.assertEquals(2, outVertices.get(4));
-            Assertions.assertEquals(4, outVertices.get(5));
-            Assertions.assertEquals(0, outVertices.get(6));
-            Assertions.assertEquals(4, outVertices.get(7));
-        }
-
-        float[] polygon_4 = {0,0, 1,0, 2,0, 2,1, 2,2, 2,4, 1,4, 0,4, 0,4};
-        MathUtils.removeCollinearVertices(polygon_4, outVertices);
-        Assertions.assertEquals(8, outVertices.size);
-        {
-            Assertions.assertEquals(0, outVertices.get(0));
-            Assertions.assertEquals(0, outVertices.get(1));
-            Assertions.assertEquals(2, outVertices.get(2));
-            Assertions.assertEquals(0, outVertices.get(3));
-            Assertions.assertEquals(2, outVertices.get(4));
-            Assertions.assertEquals(4, outVertices.get(5));
-            Assertions.assertEquals(0, outVertices.get(6));
-            Assertions.assertEquals(4, outVertices.get(7));
-        }
-    }
-
-    @Test
     void triangulatePolygon_1() {
         Array<Vector2> polygon = new Array<>();
         Array<Vector2> outVertices = new Array<>();
@@ -1045,6 +969,8 @@ class MathUtilsTest {
         polygon.add(new Vector2(0,0), new Vector2(1,0), new Vector2(1,1), new Vector2(0,1));
         polygon.reverse();
         MathUtils.polygonTriangulate(polygon, outVertices, outIndices);
+        System.out.println(outVertices);
+        System.out.println(outIndices);
     }
 
     @Test
@@ -1088,14 +1014,14 @@ class MathUtilsTest {
     @Test
     void isConvex() {
         float[] vertices_1 = new float[] {0,0,   1,0,   1,1,   0,1};
-        Assertions.assertTrue(MathUtils.isPolygonConvex(vertices_1));
+        Assertions.assertTrue(MathUtils.polygonIsConvex(vertices_1));
 
 
         float[] vertices_2 = new float[] {0,0,   1,0,   0.25f,0.25f,   0,1};
-        Assertions.assertFalse(MathUtils.isPolygonConvex(vertices_2));
+        Assertions.assertFalse(MathUtils.polygonIsConvex(vertices_2));
 
         float[] vertices_3 = new float[] {1,4,   -5,2,  -2,-2, 0,0,  0,1, 2,2};
-        Assertions.assertFalse(MathUtils.isPolygonConvex(vertices_3));
+        Assertions.assertFalse(MathUtils.polygonIsConvex(vertices_3));
     }
 
     // TODO: remove
