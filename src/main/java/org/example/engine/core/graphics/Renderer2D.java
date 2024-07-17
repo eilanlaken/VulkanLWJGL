@@ -1004,6 +1004,8 @@ public class Renderer2D implements MemoryResourceHolder {
                 /* Probably the polygon has collapsed into a single point. */
                 return;
             }
+            System.out.println(polygonVertices);
+            System.out.println(polygonIndices);
 
             Vector2 vertex = vectorsPool.allocate();
             for (int i = 0; i < polygonVertices.size; i += 2) {

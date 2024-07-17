@@ -741,17 +741,25 @@ class MathUtilsTest {
 
     @Test
     void windingOrder() {
-        Array<Vector2> vertices = new Array<>();
+        Array<Vector2> vertices_flat = new Array<>();
 
-        vertices.clear();
-        vertices.add(new Vector2(0, 0));
-        vertices.add(new Vector2(1, 0));
-        vertices.add(new Vector2(1, 1));
-        vertices.add(new Vector2(0, 1));
+        vertices_flat.clear();
+        vertices_flat.add(new Vector2(0, 0));
+        vertices_flat.add(new Vector2(1, 0));
+        vertices_flat.add(new Vector2(1, 1));
+        vertices_flat.add(new Vector2(0, 1));
 
-        Assertions.assertEquals(1, MathUtils.polygonWindingOrder(vertices));
-        int windingOrder = MathUtils.polygonWindingOrder(vertices);
-        // TODO: implement.
+        Assertions.assertEquals(-1, MathUtils.polygonWindingOrder(vertices_flat));
+        vertices_flat.reverse();
+        Assertions.assertEquals(1, MathUtils.polygonWindingOrder(vertices_flat));
+
+        float[] vertices_array = {0,0,   1,0,   1,1,   0,1};
+        Assertions.assertEquals(-1, MathUtils.polygonWindingOrder(vertices_array));
+
+        ArrayFloat vertices_floats = ArrayFloat.with(0,0,   1,0,   1,1,   0,1);
+        Assertions.assertEquals(-1, MathUtils.polygonWindingOrder(vertices_floats));
+        vertices_floats.reverseInPairs();
+        Assertions.assertEquals(1, MathUtils.polygonWindingOrder(vertices_floats));
     }
 
     @Test

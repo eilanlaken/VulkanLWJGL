@@ -688,30 +688,16 @@ public final class MathUtils {
      * Returns the winding order of a polygon.
      * @return int 1 if clockwise, -1 if counter-clockwise
      */
-    public static int polygonWindingOrder(final float[] vertices) {
+    public static int polygonWindingOrder(final float[] polygon) {
         float sum = 0;
-        for (int i = 0; i < vertices.length - 1; i += 2) {
-            float x1 = CollectionsUtils.getCyclic(vertices, i);
-            float y1 = CollectionsUtils.getCyclic(vertices, i+1);
+        for (int i = 0; i < polygon.length - 1; i += 2) {
+            float x1 = CollectionsUtils.getCyclic(polygon, i);
+            float y1 = CollectionsUtils.getCyclic(polygon, i+1);
 
-            float x2 = CollectionsUtils.getCyclic(vertices, i+2);
-            float y2 = CollectionsUtils.getCyclic(vertices, i+3);
+            float x2 = CollectionsUtils.getCyclic(polygon, i+2);
+            float y2 = CollectionsUtils.getCyclic(polygon, i+3);
 
             sum += (x2 - x1) * (y2 + y1);
-        }
-        return sum > 0.0f ? 1 : -1; // Clockwise: 1, Counter-Clockwise: -1
-    }
-
-    /**
-     * Returns the winding order of a polygon.
-     * @return int 1 if clockwise, -1 if counter-clockwise
-     */
-    public static int polygonWindingOrder(Array<Vector2> vertices) {
-        float sum = 0.0f;
-        for (int i = 0; i < vertices.size; i++) {
-            Vector2 v1 = vertices.get(i);
-            Vector2 v2 = vertices.get((i + 1) % vertices.size);
-            sum += (v2.x - v1.x) * (v2.y + v1.y);
         }
         return sum > 0.0f ? 1 : -1; // Clockwise: 1, Counter-Clockwise: -1
     }
@@ -731,8 +717,21 @@ public final class MathUtils {
 
             sum += (x2 - x1) * (y2 + y1);
         }
-        if (sum > 0) return 1;
-        return -1;
+        return sum > 0.0f ? 1 : -1; // Clockwise: 1, Counter-Clockwise: -1
+    }
+
+    /**
+     * Returns the winding order of a polygon.
+     * @return int 1 if clockwise, -1 if counter-clockwise
+     */
+    public static int polygonWindingOrder(Array<Vector2> vertices) {
+        float sum = 0.0f;
+        for (int i = 0; i < vertices.size; i++) {
+            Vector2 v1 = vertices.get(i);
+            Vector2 v2 = vertices.get((i + 1) % vertices.size);
+            sum += (v2.x - v1.x) * (v2.y + v1.y);
+        }
+        return sum > 0.0f ? 1 : -1; // Clockwise: 1, Counter-Clockwise: -1
     }
 
     /**
