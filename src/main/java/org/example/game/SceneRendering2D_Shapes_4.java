@@ -75,6 +75,7 @@ public class SceneRendering2D_Shapes_4 extends ApplicationScreen {
         //renderer2D.drawPolygonThin(new float[]{0,0,   1,0,  1,1,   0,1}, true, 0,0,0,0,0,1,1);
         renderer2D.drawPolygonThin(new float[]{0,0, 0.4f,0,  1,0, 1,0,   0,1}, true, 0,0,0,0,0,1,1);
         renderer2D.drawPolygonThin(new float[]{1.0f, 0.0f, 0.4045085f, 0.29389262f, 0.30901697f, 0.95105654f, -0.1545085f, 0.47552827f, -0.80901706f, 0.58778524f, -0.5f, 6.123234E-17f, -0.80901706f, -0.58778524f, -0.1545085f, -0.47552827f, 0.30901697f, -0.95105654f, 0.4045085f, -0.29389262f}, false, 2,2,0,0,dy*10,1,1);
+        renderer2D.drawPolygonFilled(new float[]{1.0f, 0.0f, 0.4045085f, 0.29389262f, 0.30901697f, 0.95105654f, -0.1545085f, 0.47552827f, -0.80901706f, 0.58778524f, -0.5f, 6.123234E-17f, -0.80901706f, -0.58778524f, -0.1545085f, -0.47552827f, 0.30901697f, -0.95105654f, 0.4045085f, -0.29389262f}, 2,2,0,0,dy*10,1,1);
 
         renderer2D.end();
     }

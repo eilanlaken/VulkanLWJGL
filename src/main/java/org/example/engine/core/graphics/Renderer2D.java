@@ -45,7 +45,9 @@ public class Renderer2D implements MemoryResourceHolder {
     private final Camera        defaultCamera = createDefaultCamera();
 
     /* memory pools */
-    private final MemoryPool<Vector2> vectorsPool = new MemoryPool<>(Vector2.class, 10);
+    private final MemoryPool<Vector2>    vectorsPool    = new MemoryPool<>(Vector2.class, 10);
+    private final MemoryPool<ArrayFloat> arrayFloatPool = new MemoryPool<>(ArrayFloat.class, 20);
+    private final MemoryPool<ArrayInt>   arrayIntPool   = new MemoryPool<>(ArrayInt.class, 20);
 
     /* state */
     private Camera        currentCamera  = null;
@@ -60,13 +62,9 @@ public class Renderer2D implements MemoryResourceHolder {
     private int           drawCalls      = 0;
 
     /* caches */
-    private final Array<Vector2> vertices        = new Array<>(true, 100);
-    private final ArrayFloat     polygonVertices = new ArrayFloat(true, 100);
-    private final ArrayInt       polygonIndices  = new ArrayInt(true, 100);
-
-    // debug, DELETE THIS
-    public static final Array<Vector2> dots = new Array<>(true, 100);
-    public static final Array<Vector2> ends = new Array<>(true, 100);
+    private final Array<Vector2> vertices        = new Array<>(true, 100); // //  TODO: delete this shit.
+    private final ArrayFloat     polygonVertices = new ArrayFloat(true, 100); //  TODO: delete this shit.
+    private final ArrayInt       polygonIndices  = new ArrayInt(true, 100); // //  TODO: delete this shit.
 
     public Renderer2D() {
         this.vao = GL30.glGenVertexArrays();
@@ -996,21 +994,20 @@ public class Renderer2D implements MemoryResourceHolder {
             indicesBuffer.put(startVertex + 0);
             vertexIndex += count;
         } else {
-            polygonVertices.clear();
+            ArrayFloat vertices = arrayFloatPool.allocate();
+            ArrayInt indices    = arrayIntPool.allocate();
             /* try to triangulate the polygon. We might have a polygon that is degenerate and the triangulation fails. In that case, it is okay to not render anything.*/
             try {
-                MathUtils.polygonTriangulate(polygon, polygonVertices, polygonIndices);
+                MathUtils.polygonTriangulate(polygon, vertices, indices);
             } catch (Exception e) {
                 /* Probably the polygon has collapsed into a single point. */
                 return;
             }
-            System.out.println(polygonVertices);
-            System.out.println(polygonIndices);
 
             Vector2 vertex = vectorsPool.allocate();
-            for (int i = 0; i < polygonVertices.size; i += 2) {
-                float poly_x = polygonVertices.get(i);
-                float poly_y = polygonVertices.get(i + 1);
+            for (int i = 0; i < vertices.size; i += 2) {
+                float poly_x = vertices.get(i);
+                float poly_y = vertices.get(i + 1);
 
                 vertex.set(poly_x, poly_y);
                 vertex.scl(scaleX, scaleY);
@@ -1021,22 +1018,22 @@ public class Renderer2D implements MemoryResourceHolder {
             }
             vectorsPool.free(vertex);
 
-            for (int i = 0; i < polygonIndices.size - 2; i += 3) {
-                indicesBuffer.put(startVertex + polygonIndices.get(i));
-                indicesBuffer.put(startVertex + polygonIndices.get(i + 1));
+            for (int i = 0; i < indices.size - 2; i += 3) {
+                indicesBuffer.put(startVertex + indices.get(i));
+                indicesBuffer.put(startVertex + indices.get(i + 1));
 
-                indicesBuffer.put(startVertex + polygonIndices.get(i + 1));
-                indicesBuffer.put(startVertex + polygonIndices.get(i + 2));
+                indicesBuffer.put(startVertex + indices.get(i + 1));
+                indicesBuffer.put(startVertex + indices.get(i + 2));
 
-                indicesBuffer.put(startVertex + polygonIndices.get(i + 2));
-                indicesBuffer.put(startVertex + polygonIndices.get(i));
+                indicesBuffer.put(startVertex + indices.get(i + 2));
+                indicesBuffer.put(startVertex + indices.get(i));
             }
 
-            vertexIndex += polygonVertices.size / 2;
-        }
+            vertexIndex += vertices.size / 2;
 
-        polygonVertices.clear();
-        polygonIndices.clear();
+            arrayFloatPool.free(vertices);
+            arrayIntPool.free(indices);
+        }
     }
 
     public void drawPolygonFilled(float[] polygon, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
@@ -1052,10 +1049,13 @@ public class Renderer2D implements MemoryResourceHolder {
         scaleX *= MathUtils.cosDeg(angleY);
         scaleY *= MathUtils.cosDeg(angleX);
 
+        ArrayFloat vertices = arrayFloatPool.allocate();
+        ArrayInt indices = arrayIntPool.allocate();
+        MathUtils.polygonTriangulate(polygon, vertices, indices);
         Vector2 vertex = vectorsPool.allocate();
-        for (int i = 0; i < polygon.length; i += 2) {
-            float poly_x = polygon[i];
-            float poly_y = polygon[i + 1];
+        for (int i = 0; i < vertices.size; i += 2) {
+            float poly_x = vertices.get(i);
+            float poly_y = vertices.get(i + 1);
 
             vertex.set(poly_x, poly_y);
             vertex.scl(scaleX, scaleY);
@@ -1066,13 +1066,14 @@ public class Renderer2D implements MemoryResourceHolder {
         }
         vectorsPool.free(vertex);
 
-        MathUtils.triangulatePolygon_old(polygon, polygonIndices);
         int startVertex = this.vertexIndex;
-        for (int i = 0; i < polygonIndices.size; i ++) {
-            indicesBuffer.put(startVertex + polygonIndices.get(i));
+        for (int i = 0; i < indices.size; i ++) {
+            indicesBuffer.put(startVertex + indices.get(i));
         }
 
         vertexIndex += count;
+        arrayFloatPool.free(vertices);
+        arrayIntPool.free(indices);
     }
 
     /* Rendering 2D primitives - Lines */

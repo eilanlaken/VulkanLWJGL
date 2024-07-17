@@ -120,14 +120,6 @@ public class SceneRendering2D_Shapes_3 extends ApplicationScreen {
                 renderer2D.drawCircleFilled(0.05f, 10, v_down.x, v_down.y, 0,0,0,1,1);
             }
 
-
-
-            for (int i = 0; i < Renderer2D.ends.size; i++) {
-                Vector2 end = Renderer2D.ends.get(i);
-                renderer2D.setTint(new Color(0,1,0, 1f / i));
-                //renderer2D.drawCircleFilled(0.1f, 10, end.x, end.y, 0,0,0,1,1);
-            }
-
         } else {
             //renderer2D.drawCurveFilled_final(1f, 2, new Vector2(-3,0), new Vector2(0,0), new Vector2(-3,0));
         }
