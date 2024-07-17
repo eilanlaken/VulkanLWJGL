@@ -85,28 +85,7 @@ public class SceneRendering2D_Shapes_3 extends ApplicationScreen {
 
         Vector2[] verts = new Vector2[] {new Vector2(-6,0), new Vector2(0,0), last};
         //Vector2[] verts = new Vector2[] {new Vector2(-6,0), new Vector2(0,0), last};
-        renderer2D.drawCurveFilled_3(1.4f, 10, verts);
 
-        for (int i = 0; i < Renderer2D.anchor.size; i += 2) {
-            Vector2 v_up = Renderer2D.anchor.get(i);
-            Vector2 v_down = Renderer2D.anchor.get(i + 1);
-            renderer2D.setTint(Color.RED);
-            renderer2D.drawCircleFilled(0.05f, 10, v_up.x, v_up.y, 0,0,0,1,1);
-            renderer2D.setTint(Color.BLUE);
-            renderer2D.drawCircleFilled(0.05f, 10, v_down.x, v_down.y, 0,0,0,1,1);
-        }
-
-        renderer2D.setTint(Color.YELLOW);
-        for (int i = 0; i < Renderer2D.v1.size; i++) {
-            Vector2 v = Renderer2D.v1.get(i);
-            renderer2D.drawCircleFilled(0.05f, 10, v.x, v.y, 0,0,0,1,1);
-        }
-
-        renderer2D.setTint(Color.WHITE);
-        for (int i = 0; i < Renderer2D.v2.size; i++) {
-            Vector2 v = Renderer2D.v2.get(i);
-            renderer2D.drawCircleFilled(0.05f, 10, v.x, v.y, 0,0,0,1,1);
-        }
 
         // https://math.stackexchange.com/questions/15815/how-to-union-many-polygons-efficiently
         if (false) {
