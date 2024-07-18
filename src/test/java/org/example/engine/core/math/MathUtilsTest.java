@@ -501,6 +501,18 @@ class MathUtilsTest {
         Assertions.assertEquals(0, i16);
         Assertions.assertEquals(1.0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(1.0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        /*
+           .
+        */
+        a1.set(0,0);
+        a2.set(5,5);
+        b1.set(3,3);
+        b2.set(6,6);
+        int i17 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(-2, i17);
+        Assertions.assertEquals(3.5f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(3.5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test
