@@ -286,194 +286,221 @@ class MathUtilsTest {
         Vector2 b2 = new Vector2();
         Vector2 out = new Vector2();
 
+        /* X */
         a1.set(0, 0);
         a2.set(1, 1);
         b1.set(0, 1);
         b2.set(1, 0);
         int i1 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(1, i1);
+        Assertions.assertEquals(0, i1);
         Assertions.assertEquals(0.5f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(0.5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
+        /*  ---|--- */
         a1.set(0, 0);
         a2.set(0, 2);
         b1.set(-4, 1);
         b2.set(5, 1);
         int i2 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(1, i2);
+        Assertions.assertEquals(0, i2);
         Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(1f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
+        /*
+           |
+           |
+           .
+           |
+           |
+        */
         a1.set(0, 0);
         a2.set(0, 0);
         b1.set(-4, 0);
         b2.set(5, 0);
         int i3 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(1, i3);
+        Assertions.assertEquals(0, i3);
         Assertions.assertEquals(0, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(0, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
+        /*
+          ------
+
+          ------
+         */
         a1.set(0, 0);
         a2.set(1, 0);
         b1.set(0, 1);
         b2.set(1, 1);
         int i4 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(0, i4);
+        Assertions.assertEquals(-1, i4);
         Assertions.assertEquals(Float.NaN, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(Float.NaN, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
+        /*
+        --      --
+         */
         a1.set(0, 0);
         a2.set(1, 0);
         b1.set(4, 0);
         b2.set(5, 0);
         int i5 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(2, i5);
-        Assertions.assertEquals(Float.NaN, out.x);
-        Assertions.assertEquals(Float.NaN, out.y);
+        Assertions.assertEquals(-2, i5);
+        Assertions.assertEquals(2.5f, out.x);
+        Assertions.assertEquals(0, out.y);
 
+        /*
+        --~-~-~~~
+         */
         a1.set(0, 0);
         a2.set(2, 0);
         b1.set(1, 0);
         b2.set(5, 0);
         int i6 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(2, i6);
-        Assertions.assertEquals(Float.NaN, out.x);
-        Assertions.assertEquals(Float.NaN, out.y);
+        Assertions.assertEquals(-2, i6);
+        Assertions.assertEquals(2.0f, out.x);
+        Assertions.assertEquals(0.0f, out.y);
 
+        /*
+        ----~~~~
+         */
         a1.set(0, 0);
         a2.set(2, 0);
         b1.set(2, 0);
         b2.set(4, 0);
         int i7 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(1, i7);
+        Assertions.assertEquals(0, i7);
         Assertions.assertEquals(2, out.x);
         Assertions.assertEquals(0, out.y);
 
+        /*
+        |
+        |
+        |
+
+  -----
+        */
         a1.set(0, 10);
         a2.set(0, 5);
         b1.set(-8, 0);
         b2.set(-4, 0);
         int i8 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(5, i8);
+        Assertions.assertEquals(3, i8);
         Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
+        /*
+            |
+            |
+            |
+            |
+            |
+         */
         a1.set(0, 0);
         a2.set(0, 5);
         b1.set(0, 5);
         b2.set(0, 10);
         int i9 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(1, i9);
+        Assertions.assertEquals(0, i9);
         Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
+        /*
+            |
+            |
+            |
+            |
+            |
+         */
         a1.set(0, 0);
         a2.set(0, 5);
         b1.set(0, 10);
         b2.set(0, 5);
         int i10 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
-        Assertions.assertEquals(1, i10);
+        Assertions.assertEquals(0, i10);
         Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
-    }
 
-    @Test
-    void segmentsIntersection2() {
-        Vector2 a1 = new Vector2();
-        Vector2 a2 = new Vector2();
-        Vector2 b1 = new Vector2();
-        Vector2 b2 = new Vector2();
-        Vector2 out = new Vector2();
-
+        /*
+                /        \
+              /           \
+            /              \
+        */
         a1.set(0, 0);
-        a2.set(1, 1);
-        b1.set(0, 1);
-        b2.set(1, 0);
-        int i1 = MathUtils.segmentsIntersection(a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y, out);
-        Assertions.assertEquals(1, i1);
-        Assertions.assertEquals(0.5f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0.5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+        a2.set(5, 5);
+        b1.set(15, 5);
+        b2.set(20, 0);
+        int i11 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(3, i11);
+        Assertions.assertEquals(10f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(10f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
-        a1.set(0, 0);
-        a2.set(0, 2);
-        b1.set(-4, 1);
-        b2.set(5, 1);
-        int i2 = MathUtils.segmentsIntersection(a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y, out);
-        Assertions.assertEquals(1, i2);
-        Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(1f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+         /*
+                /
+              /
+            /
 
+   ---------------------
+        */
         a1.set(0, 0);
-        a2.set(0, 0);
-        b1.set(-4, 0);
-        b2.set(5, 0);
-        int i3 = MathUtils.segmentsIntersection(a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y, out);
-        Assertions.assertEquals(1, i3);
-        Assertions.assertEquals(0, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+        a2.set(5, 5);
+        b1.set(-15, -1);
+        b2.set(15, -1);
+        int i12 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(2, i12);
+        Assertions.assertEquals(-1.0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(-1.0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
-        a1.set(0, 0);
-        a2.set(1, 0);
-        b1.set(0, 1);
-        b2.set(1, 1);
-        int i4 = MathUtils.segmentsIntersection(a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y, out);
-        Assertions.assertEquals(0, i4);
+        /*
+                /
+              /
+            /
+
+   ---------------------
+        */
+        a1.set(-15, -1);
+        a2.set(15, -1);
+        b1.set(0,0);
+        b2.set(5,5);
+        int i13 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(1, i13);
+        Assertions.assertEquals(-1.0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(-1.0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+
+        /*
+           .  .
+        */
+        a1.set(1,1);
+        a2.set(1,1);
+        b1.set(2,2);
+        b2.set(2,2);
+        int i14 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(-1, i14);
         Assertions.assertEquals(Float.NaN, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
         Assertions.assertEquals(Float.NaN, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
-        a1.set(0, 0);
-        a2.set(1, 0);
-        b1.set(4, 0);
-        b2.set(5, 0);
-        int i5 = MathUtils.segmentsIntersection(a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y, out);
-        Assertions.assertEquals(2, i5);
-        Assertions.assertEquals(Float.NaN, out.x);
-        Assertions.assertEquals(Float.NaN, out.y);
+        /*
+           .-----
+        */
+        a1.set(1,1);
+        a2.set(1,1);
+        b1.set(1,1);
+        b2.set(1,2);
+        int i15 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(0, i15);
+        Assertions.assertEquals(1.0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(1.0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
 
-        a1.set(0, 0);
-        a2.set(2, 0);
-        b1.set(1, 0);
-        b2.set(5, 0);
-        int i6 = MathUtils.segmentsIntersection(a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y, out);
-        Assertions.assertEquals(2, i6);
-        Assertions.assertEquals(Float.NaN, out.x);
-        Assertions.assertEquals(Float.NaN, out.y);
-
-        a1.set(0, 0);
-        a2.set(2, 0);
-        b1.set(2, 0);
-        b2.set(4, 0);
-        int i7 = MathUtils.segmentsIntersection(a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y, out);
-        Assertions.assertEquals(1, i7);
-        Assertions.assertEquals(2, out.x);
-        Assertions.assertEquals(0, out.y);
-
-        a1.set(0, 10);
-        a2.set(0, 5);
-        b1.set(-8, 0);
-        b2.set(-4, 0);
-        int i8 = MathUtils.segmentsIntersection(a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y, out);
-        Assertions.assertEquals(5, i8);
-        Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
-
-        a1.set(0, 0);
-        a2.set(0, 5);
-        b1.set(0, 5);
-        b2.set(0, 10);
-        int i9 = MathUtils.segmentsIntersection(a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y, out);
-        Assertions.assertEquals(1, i9);
-        Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
-
-        a1.set(0, 0);
-        a2.set(0, 5);
-        b1.set(0, 10);
-        b2.set(0, 5);
-        int i10 = MathUtils.segmentsIntersection(a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y, out);
-        Assertions.assertEquals(1, i10);
-        Assertions.assertEquals(0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(5f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
+        /*
+           .
+        */
+        a1.set(1,1);
+        a2.set(1,1);
+        b1.set(1,1);
+        b2.set(1,1);
+        int i16 = MathUtils.segmentsIntersection(a1, a2, b1, b2, out);
+        Assertions.assertEquals(0, i16);
+        Assertions.assertEquals(1.0f, out.x, MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(1.0f, out.y, MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test

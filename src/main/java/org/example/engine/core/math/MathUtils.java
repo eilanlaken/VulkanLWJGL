@@ -257,72 +257,20 @@ public final class MathUtils {
         return rad;
     }
 
-    public static int segmentsIntersection(float a1x, float a1y, float a2x, float a2y, float b1x, float b1y, float b2x, float b2y, Vector2 out) {
-        float Ax = a2x - a1x;
-        float Ay = a2y - a1y;
-        float Bx = b2x - b1x;
-        float By = b2y - b1y;
-        float Cx = b1x - a1x;
-        float Cy = b1y - a1y;
+    public static int segmentsIntersection(float a1x, float a1y, float a2x, float a2y, float b1x, float b1y, float b2x, float b2y, @NotNull Vector2 out) {
+        Vector2 a1 = vectors2Pool.allocate().set(a1x, a1y);
+        Vector2 a2 = vectors2Pool.allocate().set(a2x, a2y);
+        Vector2 b1 = vectors2Pool.allocate().set(b1x, b1y);
+        Vector2 b2 = vectors2Pool.allocate().set(b2x, b2y);
 
-        float det = Ax * By - Ay * Bx;
-        float t = (Cx * By - Cy * Bx) / det;
-        float u = (Ay * Cx - Ax * Cy) / det;
+        int result = segmentsIntersection(a1, a2, b1, b2, out);
 
-        /* handle degenerate cases */
-        if (isZero(det)) {
-            /* a1 == a2 , b1 == b2 */
-            if (floatsEqual(a1x, a2x) && floatsEqual(a1y, a2y) && floatsEqual(b1x, b2x) && floatsEqual(b1y, b2y)) {
-                if (floatsEqual(a1x, b2x) && floatsEqual(a1y, b2y)) {
-                    out.set(a1x, a1y);
-                    return 2;
-                } else {
-                    out.set(Float.NaN, Float.NaN);
-                    return 0;
-                }
-            }
+        vectors2Pool.free(a1);
+        vectors2Pool.free(a2);
+        vectors2Pool.free(b1);
+        vectors2Pool.free(b2);
 
-            /* a1 == a2 */
-            if (floatsEqual(a1x, a2x) && floatsEqual(a1y, a2y) && pointOnSegment(a1x, a1y,b1x, b1y,b2x, b2y)) {
-                out.set(a1x, a1y);
-                return 1;
-            }
-
-            /* b1 == b2 */
-            if (floatsEqual(b1x, b2x) && floatsEqual(b1y, b2y) && pointOnSegment(b1x, b1y,a1x, a1y,a2x, a2y)) {
-                out.set(b1x, b1y);
-                return 1;
-            }
-
-            /* Segments are parallel or coincide. */
-            /* It is still possible that they have a unique intersection - if segment b "continues" a; i.e.:
-                a1 == b1 or a1 == b2, or a2 == b1 or a2 == b2.
-             */
-            if ((floatsEqual(a1x, b1x) && floatsEqual(a1y, b1y)) || ((floatsEqual(a1x, b2x) && floatsEqual(a1y, b2y)))) {
-                out.set(a1x, a1y);
-                return 1;
-            }
-
-            if ((floatsEqual(a2x, b1x) && floatsEqual(a2y, b1y)) || ((floatsEqual(a2x, b2x) && floatsEqual(a2y, b2y)))) {
-                out.set(a2x, a2y);
-                return 1;
-            }
-
-            out.set(Float.NaN, Float.NaN);
-            if (areCollinear(a1x, a1y, a2x, a2y, b1x, b1y) && areCollinear(a1x, a1y, a2x, a2y, b2x, b2y)) return 2;
-
-            return 0;
-        }
-
-        out.x = a1x + t * (a2x - a1x);
-        out.y = a1y + t * (a2y - a1y);
-
-        boolean onSegment1 = t >= 0 && t <= 1;
-        boolean onSegment2 = u >= 0 && u <= 1;
-        if (onSegment1 && onSegment2) return 1;
-        if (onSegment1) return 3;
-        if (onSegment2) return 4;
-        return 5;
+        return result;
     }
 
     /**
@@ -330,19 +278,19 @@ public final class MathUtils {
      * where S1 is the line segment between (a1, a2)
      * and   S2 is the line between (b1, b2).
      * Stores the result in out.
-     * @returns 0 if lines are parallel
-     * @returns 1 if lines intersect at a unique point
-     * @returns 2 if lines coincide
-     * @returns 3 if the intersection lies outside segment 1
-     * @returns 4 if the intersection lies outside segment 2
-     * @returns 5 if the intersection lies outside both segments
+     * @returns 0 if lines intersect at a unique point
+     * @returns 1 if the intersection lies on segment 1 alone
+     * @returns 2 if the intersection lies on segment 2 alone
+     * @returns 3 if the intersection lies outside both line segments
+     * @returns -1 if the lines are parallel (no intersection). {@param out} will store (NAN, NAN).
+     * @returns -2 if the lines coincide with infinitely many points of overlap. {@param out} will store the midpoint of the line overlap.
      * @param a1
      * @param a2
      * @param b1
      * @param b2
-     * @param out
+     * @param out the intersection is stored here.
      */
-    public static int segmentsIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) {
+    public static int segmentsIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, @NotNull Vector2 out) {
         float Ax = a2.x - a1.x;
         float Ay = a2.y - a1.y;
         float Bx = b2.x - b1.x;
@@ -360,43 +308,70 @@ public final class MathUtils {
             if (a1.equals(a2) && b1.equals(b2)) {
                 if (a1.equals(b2)) {
                     out.set(a1);
-                    return 2;
+                    return 0;
                 } else {
                     out.set(Float.NaN, Float.NaN);
-                    return 0;
+                    return -1;
                 }
             }
 
             /* a1 == a2 */
-            if (a1.equals(a2) && pointOnSegment(a1,b1,b2)) {
-                out.set(a1);
-                return 1;
+            if (a1.equals(a2)) {
+                if (pointOnSegment(a1, b1, b2)) {
+                    out.set(a1);
+                    return 0;
+                } else {
+                    out.set(Float.NaN, Float.NaN);
+                    return -1;
+                }
             }
 
             /* b1 == b2 */
-            if (b1.equals(b2) && pointOnSegment(b1,a1,a2)) {
-                out.set(b1);
-                return 1;
+            if (b1.equals(b2)) {
+                if (pointOnSegment(b1,a1,a2)) {
+                    out.set(b1);
+                    return 0;
+                } else {
+                    out.set(Float.NaN, Float.NaN);
+                    return -1;
+                }
             }
 
             /* Segments are parallel or coincide. */
-            /* It is still possible that they have a unique intersection - if segment b "continues" a; i.e.:
-                a1 == b1 or a1 == b2, or a2 == b1 or a2 == b2.
-             */
-            if (a1.equals(b1) || a1.equals(b2)) {
-                out.set(a1);
-                return 1;
-            }
 
-            if (a2.equals(b1) || a2.equals(b2)) {
+            /* segment S2 "continues" segment S1: a1--------a2b1---------b2 */
+            if (a2.equals(b1) && !pointOnSegment(b2, a1, a2) && !pointOnSegment(a1, b1, b2)) {
                 out.set(a2);
-                return 1;
+                return 0;
             }
 
-            out.set(Float.NaN, Float.NaN);
-            if (areCollinear(a1, a2, b1) && areCollinear(a1, a2, b2)) return 2;
+            /* segment S2 "continues" segment S1: a1--------a2b2---------b1 */
+            if (a2.equals(b2) && !pointOnSegment(b1, a1, a2) && !pointOnSegment(a1, b1, b2)) {
+                out.set(a2);
+                return 0;
+            }
 
-            return 0;
+            /* segment S2 "continues" segment S1: a2--------a1b1---------b2 */
+            if (a1.equals(b1) && !pointOnSegment(b2, a1, a2) && !pointOnSegment(a2, b1, b2)) {
+                out.set(a1);
+                return 0;
+            }
+
+            /* segment S2 "continues" segment S1: a2--------a1b2---------b1 */
+            if (a1.equals(b2) && !pointOnSegment(b1, a1, a2) && !pointOnSegment(a2, b1, b2)) {
+                out.set(a1);
+                return 0;
+            }
+
+            /* the lines coincide: either they are separate or they have an overlap. */
+            if (areCollinear(a1, a2, b1) && areCollinear(a1, a2, b2)) {
+                out.set((a1.x + a2.x + b1.x + b2.x) * 0.25f, (a1.y + a2.y + b1.y + b2.y) * 0.25f);
+                return -2;
+            }
+
+            /* the lines are parallel with no intersection*/
+            out.set(Float.NaN, Float.NaN);
+            return -1;
         }
 
         out.x = a1.x + t * (a2.x - a1.x);
@@ -404,10 +379,10 @@ public final class MathUtils {
 
         boolean onSegment1 = t >= 0 && t <= 1;
         boolean onSegment2 = u >= 0 && u <= 1;
-        if (onSegment1 && onSegment2) return 1;
-        if (onSegment1) return 3;
-        if (onSegment2) return 4;
-        return 5;
+        if (onSegment1 && onSegment2) return 0;
+        if (onSegment1) return 1;
+        if (onSegment2) return 2;
+        return 3;
     }
 
     /** Point p is on-line segment S: (a1, a2) if:
