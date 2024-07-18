@@ -257,64 +257,6 @@ public final class MathUtils {
         return rad;
     }
 
-    /**
-     * Finds the intersection of two line segments: S1 & S2
-     * where S1 is the line segment between (a1, a2)
-     * and   S2 is the line between (b1, b2).
-     * Stores the result in out.
-     * @returns 0 if lines are parallel
-     * @returns 1 if lines intersect at a unique point
-     * @returns 2 if lines coincide
-     * @returns 3 if the intersection lies outside segment 1
-     * @returns 4 if the intersection lies outside segment 2
-     * @returns 5 if the intersection lies outside both segments
-     * @param P1
-     * @param P2
-     * @param P3
-     * @param P4
-     * @param out
-     */
-    public static int segmentsIntersection_copied(Vector2 P1, Vector2 P2, Vector2 P3, Vector2 P4, Vector2 out) {
-        float denom  = (P4.y-P3.y) * (P2.x-P1.x) - (P4.x-P3.x) * (P2.y-P1.y);
-        float numera = (P4.x-P3.x) * (P1.y-P3.y) - (P4.y-P3.y) * (P1.x-P3.x);
-        float numerb = (P2.x-P1.x) * (P1.y-P3.y) - (P2.y-P1.y) * (P1.x-P3.x);
-
-        if (Math.abs(numera) < FLOAT_ROUNDING_ERROR && Math.abs(numerb) < FLOAT_ROUNDING_ERROR && Math.abs(denom) < FLOAT_ROUNDING_ERROR) {
-            /* Segments are parallel - they are either completely separate, or have some overlap. */
-            /* It is still possible that they have a unique intersection - if segment b "continues" a; i.e.:
-                a1 == b1 or a1 == b2, or a2 == b1 or a2 == b2.
-             */
-            if (P1.equals(P3) || P1.equals(P4)) {
-                out.set(P1);
-                return 1;
-            } else if (P2.equals(P3) || P2.equals(P4)) {
-                out.set(P2);
-                return 1;
-            }
-
-            out.set(Float.NaN, Float.NaN);
-            return 2; //meaning the lines coincide
-        }
-
-        if (Math.abs(denom) < FLOAT_ROUNDING_ERROR) {
-            out.x = Float.NaN;
-            out.y = Float.NaN;
-            return 0; //meaning lines are parallel
-        }
-
-        float mua = numera / denom;
-        float mub = numerb / denom;
-        out.x = P1.x + mua * (P2.x - P1.x);
-        out.y = P1.y + mua * (P2.y - P1.y);
-        boolean out1 = mua < 0 || mua > 1;
-        boolean out2 = mub < 0 || mub > 1;
-
-        if (out1 & out2) return 5; //the intersection lies outside both segments
-        else if (out1) return 3; //the intersection lies outside segment 1
-        else if (out2) return 4; //the intersection lies outside segment 2
-        else return 1; //the intersection lies inside both segments
-    }
-
     public static int segmentsIntersection(float a1x, float a1y, float a2x, float a2y, float b1x, float b1y, float b2x, float b2y, Vector2 out) {
         float Ax = a2x - a1x;
         float Ay = a2y - a1y;
@@ -399,7 +341,6 @@ public final class MathUtils {
      * @param b1
      * @param b2
      * @param out
-     * @throws MathException
      */
     public static int segmentsIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) {
         float Ax = a2.x - a1.x;
@@ -467,80 +408,6 @@ public final class MathUtils {
         if (onSegment1) return 3;
         if (onSegment2) return 4;
         return 5;
-    }
-
-    /**
-     * Finds the intersection of two line segments: S1 & S2
-     * where S1 is the line segment between (a1, a2)
-     * and   S2 is the line between (b1, b2).
-     * Stores the result in out.
-     * @param a1
-     * @param a2
-     * @param b1
-     * @param b2
-     * @param out
-     * @throws MathException
-     */
-    // TODO: remove
-    @Deprecated public static boolean segmentsIntersection_old(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, Vector2 out) {
-        float Ax = a2.x - a1.x;
-        float Ay = a2.y - a1.y;
-        float Bx = b2.x - b1.x;
-        float By = b2.y - b1.y;
-        float Cx = b1.x - a1.x;
-        float Cy = b1.y - a1.y;
-
-        float det = Ax * By - Ay * Bx;
-        float t = (Cx * By - Cy * Bx) / det;
-        float u = (Ay * Cx - Ax * Cy) / det;
-
-        /* handle degenerate cases */
-        if (isZero(det)) {
-            /* a1 == a2 == b1 == b2 */
-            if (a1.equals(a2) && b1.equals(b2) && a1.equals(b2)) {
-                out.set(a1);
-                return true;
-            }
-
-            /* a1 == a2 */
-            if (a1.equals(a2) && pointOnSegment(a1,b1,b2)) {
-                out.set(a1);
-                return true;
-            }
-
-            /* b1 == b2 */
-            if (b1.equals(b2) && pointOnSegment(b1,a1,a2)) {
-                out.set(b1);
-                return true;
-            }
-
-            /* Segments are parallel - they are either completely separate, or have some overlap. */
-            /* It is still possible that they have a unique intersection - if segment b "continues" a; i.e.:
-                a1 == b1 or a1 == b2, or a2 == b1 or a2 == b2.
-             */
-            if (a1.equals(b1) || a1.equals(b2)) {
-                out.set(a1);
-                return true;
-            }
-
-            if (a2.equals(b1) || a2.equals(b2)) {
-                out.set(a2);
-                return true;
-            }
-
-            out.set(Float.NaN, Float.NaN);
-            if (pointOnSegment(b1, a1, a2)) return true;
-            if (pointOnSegment(b2, a1, a2)) return true;
-            if (pointOnSegment(a1, b1, b2)) return true;
-            if (pointOnSegment(a2, b1, b2)) return true;
-
-            return false;
-        }
-
-        out.x = a1.x + t * (a2.x - a1.x);
-        out.y = a1.y + t * (a2.y - a1.y);
-
-        return t >= 0 && t <= 1 && u >= 0 && u <= 1;
     }
 
     /** Point p is on-line segment S: (a1, a2) if:
@@ -649,10 +516,6 @@ public final class MathUtils {
 
     }
 
-    @Deprecated public static float getAreaTriangle_old(float ax, float ay, float bx, float by, float cx, float cy) {
-        return 0.5f * Math.abs((bx - ax) * (cy - ay) - (by - ay) * (cx - ax));
-    }
-
     // TODO: test
     public static float getAreaTriangle(float ax, float ay, float bx, float by, float cx, float cy) {
         return 0.5f * Math.abs((ax * (by - cy) + bx * (cy - ay) + cx * (ay - by)));
@@ -673,7 +536,6 @@ public final class MathUtils {
         return floatsEqual(areaPAB + areaPBC + areaPCA, areaABC);
     }
 
-    // FIXME
     public static boolean pointInTriangle(float px, float py, float ax, float ay, float bx, float by, float cx, float cy) {
         float areaABC = getAreaTriangle(ax, ay, bx, by, cx, cy);
         float areaPAB = getAreaTriangle(px, py, ax, ay, bx, by);

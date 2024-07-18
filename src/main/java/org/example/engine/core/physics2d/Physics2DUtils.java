@@ -53,7 +53,7 @@ public final class Physics2DUtils {
                 float cx = CollectionsUtils.getCyclic(vertices, indexC);
                 float cy = CollectionsUtils.getCyclic(vertices,indexC + 1);
                 // calculate mass of the triangle
-                float tri_mass = MathUtils.getAreaTriangle_old(ax, ay, bx, by, cx, cy) * collider.density;
+                float tri_mass = MathUtils.getAreaTriangle(ax, ay, bx, by, cx, cy) * collider.density;
                 totalMass += tri_mass;
                 masses.add(tri_mass);
                 // calculate local centroid of the triangle

@@ -28,8 +28,8 @@ class MathUtilsTest {
 
     @Test
     void getAreaTriangle() {
-        Assertions.assertEquals(0.5f, MathUtils.getAreaTriangle_old(0.0f,0.0f,1.0f,0.0f,0.0f,1.0f), MathUtils.FLOAT_ROUNDING_ERROR);
-        Assertions.assertEquals(0.5f, MathUtils.getAreaTriangle_old(1.0f,0.0f,0.0f,1.0f,1.0f,1.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.5f, MathUtils.getAreaTriangle(0.0f,0.0f,1.0f,0.0f,0.0f,1.0f), MathUtils.FLOAT_ROUNDING_ERROR);
+        Assertions.assertEquals(0.5f, MathUtils.getAreaTriangle(1.0f,0.0f,0.0f,1.0f,1.0f,1.0f), MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
     @Test

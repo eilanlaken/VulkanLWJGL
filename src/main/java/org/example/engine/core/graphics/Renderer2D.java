@@ -1255,6 +1255,304 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += refinement;
     }
 
+    public void drawCurveFilled_3(float stroke, int smoothness, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values.length < 2) return;
+
+        setMode(GL11.GL_TRIANGLES);
+
+        final float s2 = 0.5f * stroke;
+
+        Vector2 p0 = vectorsPool.allocate();
+        Vector2 p1 = vectorsPool.allocate();
+        Vector2 p2 = vectorsPool.allocate();
+
+        Vector2 t0  = vectorsPool.allocate();
+        Vector2 t1a = vectorsPool.allocate();
+        Vector2 t1b = vectorsPool.allocate();
+        Vector2 t2  = vectorsPool.allocate();
+
+        Vector2 intersection = vectorsPool.allocate();
+        Vector2 arm          = vectorsPool.allocate();
+
+        /* iterate over all the anchors */
+        for (int i = 1; i < values.length - 1; i++) {
+            /* the tuple (pi_0, pi_1, pi_2) constitutes the anchor that we will extrude, triangulate and render */
+
+            if (i == 1) p0.set(values[0]);
+            else p0.set(values[i - 1]).add(values[i]).scl(0.5f);
+            p1.set(values[i]);
+            if (i == values.length - 2) p2.set(values[values.length - 1]);
+            else p2.set(values[i]).add(values[i + 1]).scl(0.5f);
+
+            float sign = MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) >= 0 ? 1 : -1;
+
+            t0.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
+            t1a.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
+            t1b.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
+            t2.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
+
+            int result = MathUtils.segmentsIntersection(p0.x + t0.x, p0.y + t0.y, p1.x + t1a.x, p1.y + t1a.y,p1.x + t1b.x, p1.y + t1b.y, p2.x + t2.x, p2.y + t2.y, intersection);
+
+            float angle = Vector2.angleBetweenDeg(t1a, t1b);
+            float da = angle / smoothness;
+
+            System.out.println(result);
+
+            ArrayFloat vertices = arrayFloatPool.allocate();
+            switch (result) {
+                case 1:
+                    vertices.add(p0.x + t0.x);
+                    vertices.add(p0.y + t0.y);
+                    vertices.add(p0.x - t0.x);
+                    vertices.add(p0.y - t0.y);
+                    for (int j = 0; j < smoothness + 1; j++) {
+                        vertices.add(intersection.x);
+                        vertices.add(intersection.y);
+                        arm.set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1);
+                        vertices.add(arm.x);
+                        vertices.add(arm.y);
+                    }
+                    vertices.add(p2.x + t2.x);
+                    vertices.add(p2.x + t2.y);
+                    vertices.add(p2.x - t2.x);
+                    vertices.add(p2.x - t2.y);
+                    break;
+                case 3:
+                case 5:
+                    MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p2).add(t2), new Vector2(p2).sub(t1b), intersection);
+                    vertices.add(p0.x + t0.x);
+                    vertices.add(p0.y + t0.y);
+                    vertices.add(p0.x - t0.x);
+                    vertices.add(p0.y - t0.y);
+                    for (int j = 0; j < smoothness + 1; j++) {
+                        vertices.add(intersection.x);
+                        vertices.add(intersection.y);
+                        arm.set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1);
+                        vertices.add(arm.x);
+                        vertices.add(arm.y);
+                    }
+                    vertices.add(intersection.x);
+                    vertices.add(intersection.y);
+                    vertices.add(p2.x - t2.x);
+                    vertices.add(p2.x - t2.y);
+                    break;
+            }
+
+            Array<Vector2> vertices2 = new Array<>();
+            switch (result) {
+                case 1:
+                    vertices2.add(vectorsPool.allocate().set(p0).add(t0));
+                    vertices2.add(vectorsPool.allocate().set(p0).sub(t0));
+                    for (int j = 0; j < smoothness + 1; j++) {
+                        vertices2.add(vectorsPool.allocate().set(intersection));
+                        vertices2.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                    }
+                    vertices2.add(vectorsPool.allocate().set(p2).add(t2));
+                    vertices2.add(vectorsPool.allocate().set(p2).sub(t2));
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p2).add(t2), new Vector2(p2).sub(t1b), intersection);
+                    vertices2.add(vectorsPool.allocate().set(p0).add(t0));
+                    vertices2.add(vectorsPool.allocate().set(p0).sub(t0));
+                    for (int j = 0; j < smoothness + 1; j++) {
+                        vertices2.add(vectorsPool.allocate().set(intersection));
+                        vertices2.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                    }
+                    vertices2.add(vectorsPool.allocate().set(intersection));
+                    vertices2.add(vectorsPool.allocate().set(p2).sub(t2));
+                    break;
+            }
+
+            /* put vertices */
+            for (int j = 0; j < vertices.size - 1; j += 2) {
+                float vx = vertices.get(j);
+                float vy = vertices.get(j + 1);
+                //verticesBuffer.put(vx).put(vy).put(currentTint).put(0.5f).put(0.5f);
+            }
+            vertices.clear();
+
+            for (Vector2 vertex : vertices2) {
+                verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
+            }
+
+            final int startVertex = this.vertexIndex;
+
+            for (int index = 0; index < vertices2.size - 2; index += 2) { // curve +  rounded corners
+                indicesBuffer.put(startVertex + index + 0);
+                indicesBuffer.put(startVertex + index + 1);
+                indicesBuffer.put(startVertex + index + 2);
+                indicesBuffer.put(startVertex + index + 2);
+                indicesBuffer.put(startVertex + index + 1);
+                indicesBuffer.put(startVertex + index + 3);
+            }
+            this.vertexIndex += vertices2.size;
+
+            arrayFloatPool.free(vertices);
+
+        }
+
+        vectorsPool.free(p0);
+        vectorsPool.free(p1);
+        vectorsPool.free(p2);
+        vectorsPool.free(t0);
+        vectorsPool.free(t1a);
+        vectorsPool.free(t1b);
+        vectorsPool.free(t2);
+        vectorsPool.free(arm);
+    }
+
+    public void drawCurveFilled_2(float stroke, int smoothness, final Vector2... values) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (values.length < 2) return;
+
+        setMode(GL11.GL_TRIANGLES);
+
+        final float s2 = 0.5f * stroke;
+
+        Vector2 p0 = vectorsPool.allocate();
+        Vector2 p1 = vectorsPool.allocate();
+        Vector2 p2 = vectorsPool.allocate();
+
+        Vector2 t0  = vectorsPool.allocate();
+        Vector2 t1a = vectorsPool.allocate();
+        Vector2 t1b = vectorsPool.allocate();
+        Vector2 t2  = vectorsPool.allocate();
+
+        Vector2 intersection = vectorsPool.allocate();
+        Vector2 arm          = vectorsPool.allocate();
+
+        /* iterate over all the anchors */
+        for (int i = 1; i < values.length - 1; i++) {
+            /* the tuple (pi_0, pi_1, pi_2) constitutes the anchor that we will extrude, triangulate and render */
+
+            if (i == 1) p0.set(values[0]);
+            else p0.set(values[i - 1]).add(values[i]).scl(0.5f);
+            p1.set(values[i]);
+            if (i == values.length - 2) p2.set(values[values.length - 1]);
+            else p2.set(values[i]).add(values[i + 1]).scl(0.5f);
+
+            float sign = MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) >= 0 ? 1 : -1;
+
+            t0.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
+            t1a.set(p1).sub(p0).rotate90(1).nor().scl(sign * s2);
+            t1b.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
+            t2.set(p2).sub(p1).rotate90(1).nor().scl(sign * s2);
+
+            int result = MathUtils.segmentsIntersection(p0.x + t0.x, p0.y + t0.y, p1.x + t1a.x, p1.y + t1a.y,p1.x + t1b.x, p1.y + t1b.y, p2.x + t2.x, p2.y + t2.y, intersection);
+
+            float angle = Vector2.angleBetweenDeg(t1a, t1b);
+            float da = angle / smoothness;
+
+            System.out.println(result);
+
+            ArrayFloat vertices = arrayFloatPool.allocate();
+            switch (result) {
+                case 1:
+                    vertices.add(p0.x + t0.x);
+                    vertices.add(p0.y + t0.y);
+                    vertices.add(p0.x - t0.x);
+                    vertices.add(p0.y - t0.y);
+                    for (int j = 0; j < smoothness + 1; j++) {
+                        vertices.add(intersection.x);
+                        vertices.add(intersection.y);
+                        arm.set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1);
+                        vertices.add(arm.x);
+                        vertices.add(arm.y);
+                    }
+                    vertices.add(p2.x + t2.x);
+                    vertices.add(p2.x + t2.y);
+                    vertices.add(p2.x - t2.x);
+                    vertices.add(p2.x - t2.y);
+                    break;
+                case 3:
+                case 5:
+                    MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p2).add(t2), new Vector2(p2).sub(t1b), intersection);
+                    vertices.add(p0.x + t0.x);
+                    vertices.add(p0.y + t0.y);
+                    vertices.add(p0.x - t0.x);
+                    vertices.add(p0.y - t0.y);
+                    for (int j = 0; j < smoothness + 1; j++) {
+                        vertices.add(intersection.x);
+                        vertices.add(intersection.y);
+                        arm.set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1);
+                        vertices.add(arm.x);
+                        vertices.add(arm.y);
+                    }
+                    vertices.add(intersection.x);
+                    vertices.add(intersection.y);
+                    vertices.add(p2.x - t2.x);
+                    vertices.add(p2.x - t2.y);
+                    break;
+            }
+
+            Array<Vector2> vertices2 = new Array<>();
+            switch (result) {
+                case 1:
+                    vertices2.add(vectorsPool.allocate().set(p0).add(t0));
+                    vertices2.add(vectorsPool.allocate().set(p0).sub(t0));
+                    for (int j = 0; j < smoothness + 1; j++) {
+                        vertices2.add(vectorsPool.allocate().set(intersection));
+                        vertices2.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                    }
+                    vertices2.add(vectorsPool.allocate().set(p2).add(t2));
+                    vertices2.add(vectorsPool.allocate().set(p2).sub(t2));
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    MathUtils.segmentsIntersection(new Vector2(p0).add(t0), new Vector2(p1).add(t1a), new Vector2(p2).add(t2), new Vector2(p2).sub(t1b), intersection);
+                    vertices2.add(vectorsPool.allocate().set(p0).add(t0));
+                    vertices2.add(vectorsPool.allocate().set(p0).sub(t0));
+                    for (int j = 0; j < smoothness + 1; j++) {
+                        vertices2.add(vectorsPool.allocate().set(intersection));
+                        vertices2.add(vectorsPool.allocate().set(-t1a.x, -t1a.y).rotateDeg(sign * da * j).add(p1));
+                    }
+                    vertices2.add(vectorsPool.allocate().set(intersection));
+                    vertices2.add(vectorsPool.allocate().set(p2).sub(t2));
+                    break;
+            }
+
+            /* put vertices */
+            for (int j = 0; j < vertices.size - 1; j += 2) {
+                float vx = vertices.get(j);
+                float vy = vertices.get(j + 1);
+                //verticesBuffer.put(vx).put(vy).put(currentTint).put(0.5f).put(0.5f);
+            }
+            vertices.clear();
+
+            for (Vector2 vertex : vertices2) {
+                verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
+            }
+
+            final int startVertex = this.vertexIndex;
+
+            for (int index = 0; index < vertices2.size - 2; index += 2) { // curve +  rounded corners
+                indicesBuffer.put(startVertex + index + 0);
+                indicesBuffer.put(startVertex + index + 1);
+                indicesBuffer.put(startVertex + index + 2);
+                indicesBuffer.put(startVertex + index + 2);
+                indicesBuffer.put(startVertex + index + 1);
+                indicesBuffer.put(startVertex + index + 3);
+            }
+            this.vertexIndex += vertices2.size;
+
+            arrayFloatPool.free(vertices);
+
+        }
+
+        vectorsPool.free(p0);
+        vectorsPool.free(p1);
+        vectorsPool.free(p2);
+        vectorsPool.free(t0);
+        vectorsPool.free(t1a);
+        vectorsPool.free(t1b);
+        vectorsPool.free(t2);
+        vectorsPool.free(arm);
+    }
+
     public void drawCurveFilled(float stroke, int smoothness, final Vector2... values) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (values.length < 2) return;
@@ -1389,7 +1687,7 @@ public class Renderer2D implements MemoryResourceHolder {
                 indicesBuffer.put(startVertex + index + 1);
                 indicesBuffer.put(startVertex + index + 3);
             }
-            this.vertexIndex += vertices.size / 2;
+            this.vertexIndex += vertices2.size;
 
             arrayFloatPool.free(vertices);
 
