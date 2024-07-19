@@ -1,6 +1,7 @@
 package org.example.engine.core.math;
 
 import org.example.engine.core.memory.MemoryPool;
+import org.jetbrains.annotations.NotNull;
 
 public class Vector2 implements MemoryPool.Reset {
 
@@ -491,6 +492,14 @@ public class Vector2 implements MemoryPool.Reset {
         return dx * dx + dy * dy;
     }
 
+    public static void midPoint(final Vector2 a, final Vector2 b, @NotNull final Vector2 out) {
+        out.set(a.x + b.x, a.y + b.y).scl(0.5f);
+    }
+
+    public static void midPoint(float ax, float ay, float bx, float by, @NotNull final Vector2 out) {
+        out.set(ax + bx, ay + by).scl(0.5f);
+    }
+
     // TODO: test
     public static float angleBetweenDeg(final Vector2 a, final Vector2 b) {
         float aL = a.len();
@@ -498,6 +507,7 @@ public class Vector2 implements MemoryPool.Reset {
         return (float) Math.acos(Vector2.dot(a, b) / (aL * bL)) * MathUtils.radiansToDegrees;
     }
 
+    // TODO: test
     public static float angleBetweenDeg(float ax, float ay, float bx, float by) {
         float aL = Vector2.len(ax, ay);
         float bL = Vector2.len(bx, by);

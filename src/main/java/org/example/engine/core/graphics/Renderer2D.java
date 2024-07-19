@@ -325,7 +325,7 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += refinement;
     }
 
-    public void drawCircleFilled(float r, float x, float y, float angle, int refinement, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
+    public void drawCircleFilled(float r, int refinement, float angle, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if ((vertexIndex + refinement + 2) * VERTEX_SIZE > VERTICES_CAPACITY * 4) flush(); // TODO: use floatBuffer.capacity()
 
@@ -1255,13 +1255,226 @@ public class Renderer2D implements MemoryResourceHolder {
         vertexIndex += refinement;
     }
 
-    public void drawCurveFilled(float stroke, int smoothness, final Vector2... values) {
+    // https://github.com/CrushedPixel/Polyline2D
+    // https://github.com/tyt2y3/vaserenderer
+    // https://www.codeproject.com/Articles/226569/Drawing-polylines-by-tessellation
+    // https://hypertolosana.github.io/efficient-webgl-stroking/index.html
+    // https://hypertolosana.github.io/efficient-webgl-stroking/stroking.js
+    public void drawCurveFilled(float stroke, int refinement, final Vector2... pointsInput) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if (values.length < 2) return;
+        if (pointsInput.length == 0) return;
+
+        stroke = Math.abs(stroke / 2);
+        refinement = Math.max(1, refinement);
+
+        if (pointsInput.length == 1) {
+            drawCircleFilled(stroke, refinement, pointsInput[0].x, pointsInput[0].y, 0, 0, 0, 1, 1);
+            return;
+        }
+
+        if (pointsInput.length == 2) { // handle separately
+
+        }
+
+        // TODO: ensure capacity.
 
         setMode(GL11.GL_TRIANGLES);
 
+        Array<Vector2> points = new Array<>(); // TODO: change to ArrayFloat
+        boolean closed = false;
+        /* if the path is closed */
+        if (pointsInput[0].equals(pointsInput[pointsInput.length - 1])) {
+            Vector2 midPoint = vectorsPool.allocate();
+            Vector2.midPoint(pointsInput[0], pointsInput[1], midPoint);
+            points.add(midPoint);
+            for (int i = 1; i < pointsInput.length; i++) {
+                Vector2 point = vectorsPool.allocate();
+                point.set(pointsInput[i]);
+                points.add(point);
+            }
+            points.add(midPoint);
+            closed = true;
+        } else {
+            for (int i = 0; i < pointsInput.length; i++) {
+                Vector2 point = vectorsPool.allocate();
+                point.set(pointsInput[i]);
+                points.add(point);
+            }
+        }
 
+        Array<Vector2> midPoints = new Array<>(); // TODO: change to ArrayFloat
+
+        for (int i = 0; i < points.size - 1; i++) {
+            Vector2 midPoint = vectorsPool.allocate();
+            if (i == 0) {
+                midPoint.set(points.first());
+            } else if (i == points.size - 2) {
+                midPoint.set(points.last());
+            } else {
+                Vector2.midPoint(points.get(i), points.get(i + 1), midPoint);
+            }
+            midPoints.add(midPoint);
+        }
+
+        for (int i = 1; i < midPoints.size; i++) {
+            Vector2 p0 = midPoints.get(i - 1);
+            Vector2 p1 = points.get(i);
+            Vector2 p2 = midPoints.get(i);
+            float width = stroke;
+
+            Vector2 t0 = vectorsPool.allocate().set(p1).sub(p0);
+            Vector2 t2 = vectorsPool.allocate().set(p2).sub(p1);
+
+            t0.rotate90(1);
+            t2.rotate90(1);
+
+            // triangle composed by the 3 points if clockwise or couterclockwise.
+            // if counterclockwise, we must invert the line threshold points, otherwise the intersection point
+            // could be erroneous and lead to odd results.
+            if (MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) > 0) {
+                t0.flip();
+                t2.flip();
+            }
+
+            t0.nor();
+            t2.nor();
+            t0.scl(width);
+            t2.scl(width);
+
+            Vector2 pIntersect = vectorsPool.allocate();
+            int result = MathUtils.segmentsIntersection(
+                    t0.x + p0.x, t0.y + p0.y,
+                    t0.x + p1.x, p0.y + p1.y,
+                    t2.x + p2.x, t2.y + p2.y,
+                    t2.x + p1.x, t2.y + p1.y,
+                    pIntersect);
+            //int pintersect = lineIntersection(Point.Add(t0, p0), Point.Add(t0, p1), Point.Add(t2, p2), Point.Add(t2, p1));
+
+            var anchor = vectorsPool.allocate();
+            var anchorLength= Float.MAX_VALUE;
+            if (result == 0  || result == 1  || result == 2  || result == 3) {
+                anchor.set(pIntersect).sub(p1);
+                anchorLength = anchor.len();
+            }
+
+            var p0p1= vectorsPool.allocate().set(p0).sub(p1);
+            var p0p1Length= p0p1.len();
+            var p1p2= vectorsPool.allocate().set(p1).sub(p2);
+            var p1p2Length= p1p2.len();
+
+            /**
+             * the cross point exceeds any of the segments dimension.
+             * do not use cross point as reference.
+             */
+            if (anchorLength > p0p1Length || anchorLength > p1p2Length) {
+                System.out.println("here");
+                verts.add(vectorsPool.allocate().set(p0).add(t0));
+                verts.add(vectorsPool.allocate().set(p0).sub(t0));
+                verts.add(vectorsPool.allocate().set(p1).add(t0));
+
+                verts.add(vectorsPool.allocate().set(p0).sub(t0));
+                verts.add(vectorsPool.allocate().set(p1).add(t0));
+                verts.add(vectorsPool.allocate().set(p1).sub(t0));
+
+                Vector2 pI = vectorsPool.allocate().set(p1).add(t0);
+                Vector2 pF = vectorsPool.allocate().set(p1).add(t2);
+                createRoundCap(p1, pI, pF, p2, verts);
+
+                verts.add(vectorsPool.allocate().set(p2).add(t2));
+                verts.add(vectorsPool.allocate().set(p1).sub(t2));
+                verts.add(vectorsPool.allocate().set(p1).add(t2));
+
+                verts.add(vectorsPool.allocate().set(p2).add(t2));
+                verts.add(vectorsPool.allocate().set(p1).sub(t2));
+                verts.add(vectorsPool.allocate().set(p2).sub(t2));
+
+
+
+            } else {
+
+                verts.add(vectorsPool.allocate().set(p0).add(t0));
+                verts.add(vectorsPool.allocate().set(p0).sub(t0));
+                verts.add(vectorsPool.allocate().set(p1).sub(anchor));
+
+                verts.add(vectorsPool.allocate().set(p0).add(t0));
+                verts.add(vectorsPool.allocate().set(p1).sub(anchor));
+                verts.add(vectorsPool.allocate().set(p1).add(t0));
+
+                var pI = vectorsPool.allocate().set(p0).add(t0);
+                var pF = vectorsPool.allocate().set(p1).add(t2);
+                var pNext = vectorsPool.allocate().set(p1).sub(anchor);
+
+                var center = p1;
+
+                verts.add(pI);
+                verts.add(center);
+                verts.add(pNext);
+                createRoundCap(center, pI, pF, pNext, verts);
+                verts.add(center);
+                verts.add(pF);
+                verts.add(pNext);
+
+                verts.add(vectorsPool.allocate().set(p2).add(t2));
+                verts.add(vectorsPool.allocate().set(p1).sub(anchor));
+                verts.add(vectorsPool.allocate().set(p1).add(t2));
+
+                verts.add(vectorsPool.allocate().set(p2).add(t2));
+                verts.add(vectorsPool.allocate().set(p1).sub(anchor));
+                verts.add(vectorsPool.allocate().set(p2).sub(t2));
+            }
+
+        }
+
+    }
+
+    public static Array<Vector2> verts = new Array<>(); // TODO: change to ArrayFloat
+
+
+    private void createRoundCap(Vector2 center, Vector2 pI, Vector2 pF, Vector2 pNext, Array<Vector2> verts) {
+
+        float radius = Vector2.len(center.x - pI.x, center.y - pI.y);
+
+        float angle0 = (float) Math.atan2((pF.y - center.y), (pF.x - center.x));
+        float angle1 = (float) Math.atan2((pI.y - center.y), (pI.x - center.x));
+
+        float orgAngle0 = angle0;
+
+        if (angle1 > angle0 && angle1-angle0 >= Math.PI - MathUtils.FLOAT_ROUNDING_ERROR) {
+            angle1 = angle1 - 2 * MathUtils.PI;
+        } else {
+            if (angle0 - angle1 >= Math.PI - MathUtils.FLOAT_ROUNDING_ERROR) {
+                angle0 = angle0 - 2 * MathUtils.PI;
+            }
+        }
+
+        var angleDiff = angle1-angle0;
+
+        if (Math.abs(angleDiff) >= Math.PI - MathUtils.FLOAT_ROUNDING_ERROR && Math.abs(angleDiff) <= Math.PI + MathUtils.FLOAT_ROUNDING_ERROR) {
+            Vector2 r1 = vectorsPool.allocate().set(center).sub(pNext);
+            if (r1.x == 0 && r1.y > 0) {
+                angleDiff = -angleDiff;
+            } else if (r1.x >= -MathUtils.FLOAT_ROUNDING_ERROR) {
+                angleDiff= -angleDiff;
+            }
+        }
+
+        int nSegments = (int) (Math.abs(angleDiff * radius) / 7);
+        nSegments++;
+
+        var angleInc = angleDiff / nSegments;
+
+        for (var i = 0; i < nSegments; i++) {
+
+            verts.add(vectorsPool.allocate().set(center.x, center.y));
+            verts.add(vectorsPool.allocate().set(
+                    center.x + radius * (float) Math.cos(orgAngle0 + angleInc * i),
+                    center.y + radius * (float) Math.sin(orgAngle0 + angleInc * i)
+            ));
+            verts.add(vectorsPool.allocate().set(
+                    center.x + radius * (float) Math.cos(orgAngle0 + angleInc * (1 + i)),
+                    center.y + radius * (float) Math.sin(orgAngle0 + angleInc * (1 + i))
+            ));
+        }
     }
 
     private void flush() {

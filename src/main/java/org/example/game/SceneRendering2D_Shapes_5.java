@@ -2,6 +2,7 @@ package org.example.game;
 
 import org.example.engine.core.application.ApplicationScreen;
 import org.example.engine.core.assets.AssetStore;
+import org.example.engine.core.collections.Array;
 import org.example.engine.core.graphics.*;
 import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
@@ -84,7 +85,11 @@ public class SceneRendering2D_Shapes_5 extends ApplicationScreen {
         last.rotateDeg(dy * 50);
         Vector2 last2 = new Vector2(3,0);
         //last2.rotateAroundDeg(last, dy * 50);
-        //renderer2D.drawCurveFilled_2(1.2f, 10, new Vector2(-3,0), new Vector2(0,0), last);
+        renderer2D.drawCurveFilled(1.2f, 10, new Vector2(-3,0), new Vector2(0,0), new Vector2(3,0));
+        Array<Vector2> verts = Renderer2D.verts;
+        for (Vector2 vert : verts) {
+            renderer2D.drawCircleFilled(0.05f, 10, vert.x, vert.y, 0,0,0,1,1);
+        }
 
         Vector2 first = new Vector2(-0.3f,0);
         first.rotateDeg(dy * 100);
