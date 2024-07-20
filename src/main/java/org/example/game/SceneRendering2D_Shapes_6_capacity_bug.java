@@ -88,10 +88,7 @@ public class SceneRendering2D_Shapes_6_capacity_bug extends ApplicationScreen {
         //renderer2D.drawCurveFilled(2f, 33, first, new Vector2(0,0), last); // works but only for small refinement values?!?!?!
         //renderer2D.drawCurveFilled(2f, 32, first, new Vector2(0,0), last); // works but only for small refinement values?!?!?!
 
-        Array<Vector2> verts = Renderer2D.verts;
-        for (Vector2 vert : verts) {
-            //renderer2D.drawCircleFilled(0.05f, 10, vert.x, vert.y, 0,0,0,1,1);
-        }
+
 
 
         renderer2D.setTint(yellow);
