@@ -3,6 +3,8 @@ package org.example.engine.core.graphics;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayFloat;
 import org.example.engine.core.collections.ArrayInt;
+import org.example.engine.core.input.Keyboard;
+import org.example.engine.core.input.Mouse;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
 import org.example.engine.core.memory.MemoryPool;
@@ -31,8 +33,9 @@ public class Renderer2D implements MemoryResourceHolder {
 
     /* constants */
     private static final int   VERTEX_SIZE       = 5;    // A vertex is composed of 5 floats: x,y: position, t: color (as float bits) and u,v: texture coordinates.
-    private static final int   VERTICES_CAPACITY = 6000; // The batch can render VERTICES_CAPACITY vertices (so wee need a float buffer of size: VERTICES_CAPACITY * VERTEX_SIZE)
-    private static final int   INDICES_CAPACITY  = VERTICES_CAPACITY * 2; // TODO
+    // TODO: increasing this somehow defers the problem.
+    private static final int   VERTICES_CAPACITY = GraphicsUtils.getMaxVerticesPerDrawCall(); // The batch can render VERTICES_CAPACITY vertices (so wee need a float buffer of size: VERTICES_CAPACITY * VERTEX_SIZE)
+    private static final int   INDICES_CAPACITY  = GraphicsUtils.getMaxIndicesPerDrawCall(); // TODO
     private static final float WHITE_TINT        = Color.WHITE.toFloatBits();
 
     /* buffers */
@@ -1463,6 +1466,12 @@ public class Renderer2D implements MemoryResourceHolder {
 
         verticesBuffer.flip();
         indicesBuffer.flip();
+
+        if (Mouse.isButtonClicked(Mouse.Button.LEFT)) {
+            System.out.println("i: " + indicesBuffer);
+            System.out.println("v: " + verticesBuffer);
+        }
+
         GL30.glBindVertexArray(vao);
         {
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);

@@ -132,6 +132,8 @@ public class Mouse {
         return mouseButtonsCurrentStates[button.glfwCode] == GLFW.GLFW_PRESS;
     }
 
+    // TODO: implement isButtonJustPressed
+
     public static boolean isButtonReleased(final Button button) {
         return mouseButtonsCurrentStates[button.glfwCode] == GLFW.GLFW_RELEASE;
     }

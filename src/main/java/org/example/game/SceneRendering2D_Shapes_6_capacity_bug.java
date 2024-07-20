@@ -41,8 +41,7 @@ public class SceneRendering2D_Shapes_6_capacity_bug extends ApplicationScreen {
     float ay = 0;
     @Override
     protected void refresh() {
-        Vector3 screen = new Vector3(Mouse.getCursorX(), Mouse.getCursorY(), 0);
-        camera.lens.unproject(screen);
+
 
         Vector2[] vs = new Vector2[3];
         vs[0] = new Vector2(-2,-2);
@@ -75,14 +74,21 @@ public class SceneRendering2D_Shapes_6_capacity_bug extends ApplicationScreen {
             dr--;
         }
 
+        Vector3 screen = new Vector3(Mouse.getCursorX(), Mouse.getCursorY(), 0);
+        if (Mouse.isButtonClicked(Mouse.Button.LEFT)) {
+            System.out.println(baseR + dr);
+            camera.lens.unproject(screen);
+            x = screen.x;
+            y = screen.y;
+        }
+
         renderer2D.begin(camera);
         renderer2D.setTint(red);
         //renderer2D.drawCircleFilled(1f, 1400, 0, 0, 0,0,0,1,1);
         //renderer2D.drawCircleFilled(1f, 1498, 0, 0, 0,0,0,1,1);
-        System.out.println(baseR + dr);
         //renderer2D.drawCircleFilled(1f, baseR + dr, 0, 0, 0,0,0,1,1);
-        renderer2D.drawCircleFilled(1f, 1490, 2, 0, 0,0,0,1,1);
-        renderer2D.drawCircleFilled(1f, 3, 2, 0, 0,0,0,1,1);
+        renderer2D.drawCircleFilled(1f, baseR + dr, x, y, 0,0,0,1,1);
+
         //renderer2D.drawCircleFilled(1f, 1498, -2, 0, 0,0,0,1,1);
         renderer2D.end();
     }
@@ -90,7 +96,8 @@ public class SceneRendering2D_Shapes_6_capacity_bug extends ApplicationScreen {
     float dx = 0;
     float dy = 0;
     int dr = 0;
-    int baseR = 1400;
+    int baseR = 2000;
+    float x, y;
 
     @Override
 
