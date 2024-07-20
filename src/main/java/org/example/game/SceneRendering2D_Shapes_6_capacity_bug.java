@@ -68,14 +68,25 @@ public class SceneRendering2D_Shapes_6_capacity_bug extends ApplicationScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0f,0f,0,1);
 
+        if (Keyboard.isKeyPressed(Keyboard.Key.R)) {
+            dr++;
+        }
+        if (Keyboard.isKeyPressed(Keyboard.Key.F)) {
+            dr--;
+        }
+        System.out.println(baseR + dr);
         renderer2D.begin(camera);
         renderer2D.setTint(red);
-        renderer2D.drawCircleFilled(1f, 400, 0, 0, 0,0,0,1,1);
+        //renderer2D.drawCircleFilled(1f, 1400, 0, 0, 0,0,0,1,1);
+        //renderer2D.drawCircleFilled(1f, 1498, 0, 0, 0,0,0,1,1);
+        renderer2D.drawCircleFilled(1f, 1499, 0, 0, 0,0,0,1,1);
         renderer2D.end();
     }
 
     float dx = 0;
     float dy = 0;
+    int dr = 0;
+    int baseR = 1000;
 
     @Override
 

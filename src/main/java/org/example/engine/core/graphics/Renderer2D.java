@@ -368,6 +368,24 @@ public class Renderer2D implements MemoryResourceHolder {
         refinement = Math.max(3, refinement);
         setMode(GL11.GL_TRIANGLES);
 
+        scaleX *= MathUtils.cosDeg(angleY);
+        scaleY *= MathUtils.cosDeg(angleX);
+        Vector2 arm = vectorsPool.allocate();
+        float da = 360f / refinement;
+
+        // put vertices
+        verticesBuffer.put(x).put(y).put(currentTint).put(0.5f).put(0.5f);
+        int j = 0;
+        while (j < refinement + 1) {
+            arm.x = r * scaleX * MathUtils.cosDeg(da * j);
+            arm.y = r * scaleY * MathUtils.sinDeg(da * j);
+            arm.rotateDeg(angleZ);
+            float pointX = x + arm.x;
+            float pointY = y + arm.y;
+            verticesBuffer.put(pointX).put(pointY).put(currentTint).put(0.5f).put(0.5f);
+            j++;
+        }
+
         int startVertex = this.vertexIndex;
         for (int i = 0; i < refinement; i++) {
             indicesBuffer.put(startVertex);
@@ -377,27 +395,9 @@ public class Renderer2D implements MemoryResourceHolder {
         indicesBuffer.put(startVertex);
         indicesBuffer.put(startVertex + refinement + 1);
         indicesBuffer.put(startVertex + 1);
-
-        scaleX *= MathUtils.cosDeg(angleY);
-        scaleY *= MathUtils.cosDeg(angleX);
-        Vector2 arm = vectorsPool.allocate();
-        float da = 360f / refinement;
-
-        // put vertices
-        verticesBuffer.put(x).put(y).put(currentTint).put(0.5f).put(0.5f);
-        int i = 0;
-        while (i < refinement + 1) {
-            arm.x = r * scaleX * MathUtils.cosDeg(da * i);
-            arm.y = r * scaleY * MathUtils.sinDeg(da * i);
-            arm.rotateDeg(angleZ);
-            float pointX = x + arm.x;
-            float pointY = y + arm.y;
-            verticesBuffer.put(pointX).put(pointY).put(currentTint).put(0.5f).put(0.5f);
-            i++;
-        }
+        vertexIndex += refinement + 2;
 
         vectorsPool.free(arm);
-        vertexIndex += refinement + 2;
     }
 
     public void drawCircleBorder(float r, float thickness, float angle, int refinement, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
@@ -1461,7 +1461,11 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     private void flush() {
-        if (verticesBuffer.position() == 0) return;
+        if (verticesBuffer.position() == 0) {
+            System.out.println("zero");
+            // FIXME.
+            return;
+        }
 
         verticesBuffer.flip();
         indicesBuffer.flip();
