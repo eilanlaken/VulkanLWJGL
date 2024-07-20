@@ -1280,6 +1280,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
         setMode(GL11.GL_TRIANGLES);
 
+        verts.clear();
         Array<Vector2> points = new Array<>(); // TODO: change to ArrayFloat
         boolean closed = false;
         /* if the path is closed */
@@ -1328,9 +1329,6 @@ public class Renderer2D implements MemoryResourceHolder {
             t0.rotate90(1);
             t2.rotate90(1);
 
-            // triangle composed by the 3 points if clockwise or couterclockwise.
-            // if counterclockwise, we must invert the line threshold points, otherwise the intersection point
-            // could be erroneous and lead to odd results.
             if (MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) > 0) {
                 t0.flip();
                 t2.flip();
@@ -1341,96 +1339,94 @@ public class Renderer2D implements MemoryResourceHolder {
             t0.scl(width);
             t2.scl(width);
 
-            Vector2 pIntersect = vectorsPool.allocate();
-            int result = MathUtils.segmentsIntersection(
-                    t0.x + p0.x, t0.y + p0.y,
-                    t0.x + p1.x, p0.y + p1.y,
-                    t2.x + p2.x, t2.y + p2.y,
-                    t2.x + p1.x, t2.y + p1.y,
-                    pIntersect);
-            //int pintersect = lineIntersection(Point.Add(t0, p0), Point.Add(t0, p1), Point.Add(t2, p2), Point.Add(t2, p1));
+            Vector2 intersection_1 = vectorsPool.allocate();
+            Vector2 intersection_2 = vectorsPool.allocate();
+            Vector2 intersection_3 = vectorsPool.allocate();
+            Vector2 intersection_4 = vectorsPool.allocate();
 
-            var anchor = vectorsPool.allocate();
-            var anchorLength= Float.MAX_VALUE;
-            if (result == 0  || result == 1  || result == 2  || result == 3) {
-                anchor.set(pIntersect).sub(p1);
-                anchorLength = anchor.len();
-            }
+            int result_1 = MathUtils.segmentsIntersection(
+                    p0.x - t0.x, p0.y - t0.y,
+                    p1.x - t0.x, p1.y - t0.y,
+                    p2.x - t2.x, p2.y - t2.y,
+                    p1.x - t2.x, p1.y - t2.y,
+                    intersection_1);
+            int result_2 = MathUtils.segmentsIntersection(
+                    p0.x - t0.x, p0.y - t0.y,
+                    p1.x - t0.x, p1.y - t0.y,
+                    p2.x - t2.x, p2.y - t2.y,
+                    p2.x + t2.x, p2.y + t2.y,
+                    intersection_2);
+            int result_3 = MathUtils.segmentsIntersection(
+                    p0.x - t0.x, p0.y - t0.y,
+                    p0.x + t0.x, p0.y + t0.y,
+                    p1.x - t2.x, p1.y - t2.y,
+                    p2.x - t2.x, p2.y - t2.y,
+                    intersection_3);
+            int result_4 = MathUtils.segmentsIntersection(
+                    p0.x - t0.x, p0.y - t0.y,
+                    p0.x + t0.x, p0.y + t0.y,
+                    p1.x - t2.x, p1.y - t2.y,
+                    p2.x - t2.x, p2.y - t2.y,
+                    intersection_3);
 
-            var p0p1= vectorsPool.allocate().set(p0).sub(p1);
-            var p0p1Length= p0p1.len();
-            var p1p2= vectorsPool.allocate().set(p1).sub(p2);
-            var p1p2Length= p1p2.len();
+            if      (result_1 == 0) inter.set(intersection_1);
+            else if (result_2 == 0) inter.set(intersection_2);
+            else if (result_3 == 0) inter.set(intersection_3);
+            System.out.println(result_1);
+            System.out.println(result_2);
+            System.out.println(result_3);
 
-            /**
-             * the cross point exceeds any of the segments dimension.
-             * do not use cross point as reference.
-             */
-            if (anchorLength > p0p1Length || anchorLength > p1p2Length) {
-                System.out.println("here");
-                verts.add(vectorsPool.allocate().set(p0).add(t0));
-                verts.add(vectorsPool.allocate().set(p0).sub(t0));
-                verts.add(vectorsPool.allocate().set(p1).add(t0));
+            i1.set(p0.x - t0.x, p0.y - t0.y);
+            i2.set(p1.x - t0.x, p1.y - t0.y);
+            i3.set(p1);
+            i4.set(p1.x - t0.x, p1.y - t0.y);
+            //inter.set(pIntersect_1);
 
-                verts.add(vectorsPool.allocate().set(p0).sub(t0));
-                verts.add(vectorsPool.allocate().set(p1).add(t0));
-                verts.add(vectorsPool.allocate().set(p1).sub(t0));
+            verts.add(vectorsPool.allocate().set(p0).add(t0));
+            verts.add(vectorsPool.allocate().set(p0).sub(t0));
+            verts.add(vectorsPool.allocate().set(p1).add(t0));
 
-                Vector2 pI = vectorsPool.allocate().set(p1).add(t0);
-                Vector2 pF = vectorsPool.allocate().set(p1).add(t2);
-                createRoundCap(p1, pI, pF, p2, verts);
+            verts.add(vectorsPool.allocate().set(p0).sub(t0));
+            verts.add(vectorsPool.allocate().set(p1).add(t0));
+            verts.add(vectorsPool.allocate().set(p1).sub(t0));
 
-                verts.add(vectorsPool.allocate().set(p2).add(t2));
-                verts.add(vectorsPool.allocate().set(p1).sub(t2));
-                verts.add(vectorsPool.allocate().set(p1).add(t2));
+            Vector2 pI = vectorsPool.allocate().set(p1).add(t0);
+            Vector2 pF = vectorsPool.allocate().set(p1).add(t2);
+            createRoundCap(p1, pI, pF, p2, refinement, verts);  // TODO: inline.
 
-                verts.add(vectorsPool.allocate().set(p2).add(t2));
-                verts.add(vectorsPool.allocate().set(p1).sub(t2));
-                verts.add(vectorsPool.allocate().set(p2).sub(t2));
+            verts.add(vectorsPool.allocate().set(p2).add(t2));
+            verts.add(vectorsPool.allocate().set(p1).sub(t2));
+            verts.add(vectorsPool.allocate().set(p1).add(t2));
 
-
-
-            } else {
-
-                verts.add(vectorsPool.allocate().set(p0).add(t0));
-                verts.add(vectorsPool.allocate().set(p0).sub(t0));
-                verts.add(vectorsPool.allocate().set(p1).sub(anchor));
-
-                verts.add(vectorsPool.allocate().set(p0).add(t0));
-                verts.add(vectorsPool.allocate().set(p1).sub(anchor));
-                verts.add(vectorsPool.allocate().set(p1).add(t0));
-
-                var pI = vectorsPool.allocate().set(p0).add(t0);
-                var pF = vectorsPool.allocate().set(p1).add(t2);
-                var pNext = vectorsPool.allocate().set(p1).sub(anchor);
-
-                var center = p1;
-
-                verts.add(pI);
-                verts.add(center);
-                verts.add(pNext);
-                createRoundCap(center, pI, pF, pNext, verts);
-                verts.add(center);
-                verts.add(pF);
-                verts.add(pNext);
-
-                verts.add(vectorsPool.allocate().set(p2).add(t2));
-                verts.add(vectorsPool.allocate().set(p1).sub(anchor));
-                verts.add(vectorsPool.allocate().set(p1).add(t2));
-
-                verts.add(vectorsPool.allocate().set(p2).add(t2));
-                verts.add(vectorsPool.allocate().set(p1).sub(anchor));
-                verts.add(vectorsPool.allocate().set(p2).sub(t2));
-            }
+            verts.add(vectorsPool.allocate().set(p2).add(t2));
+            verts.add(vectorsPool.allocate().set(p1).sub(t2));
+            verts.add(vectorsPool.allocate().set(p2).sub(t2));
 
         }
+
+
+        int startVertex = this.vertexIndex;
+        for (int i = 0; i < verts.size; i++) {
+            Vector2 vertex = verts.get(i);
+            verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
+            indicesBuffer.put(startVertex + i);
+        }
+
+
+        vertexIndex += verts.size;
 
     }
 
     public static Array<Vector2> verts = new Array<>(); // TODO: change to ArrayFloat
+    public static Vector2 inter = new Vector2();
+
+    public static Vector2 i1 = new Vector2();
+    public static Vector2 i2 = new Vector2();
+    public static Vector2 i3 = new Vector2();
+    public static Vector2 i4 = new Vector2();
 
 
-    private void createRoundCap(Vector2 center, Vector2 pI, Vector2 pF, Vector2 pNext, Array<Vector2> verts) {
+    private void createRoundCap(Vector2 center, Vector2 pI, Vector2 pF, Vector2 pNext, int refinement, Array<Vector2> verts) {
 
         float radius = Vector2.len(center.x - pI.x, center.y - pI.y);
 
@@ -1458,21 +1454,19 @@ public class Renderer2D implements MemoryResourceHolder {
             }
         }
 
-        int nSegments = (int) (Math.abs(angleDiff * radius) / 7);
-        nSegments++;
 
-        var angleInc = angleDiff / nSegments;
+        var da = angleDiff / refinement;
 
-        for (var i = 0; i < nSegments; i++) {
+        for (var i = 0; i < refinement; i++) {
 
             verts.add(vectorsPool.allocate().set(center.x, center.y));
             verts.add(vectorsPool.allocate().set(
-                    center.x + radius * (float) Math.cos(orgAngle0 + angleInc * i),
-                    center.y + radius * (float) Math.sin(orgAngle0 + angleInc * i)
+                    center.x + radius * MathUtils.cosRad(orgAngle0 + da * i),
+                    center.y + radius * MathUtils.sinRad(orgAngle0 + da * i)
             ));
             verts.add(vectorsPool.allocate().set(
-                    center.x + radius * (float) Math.cos(orgAngle0 + angleInc * (1 + i)),
-                    center.y + radius * (float) Math.sin(orgAngle0 + angleInc * (1 + i))
+                    center.x + radius * MathUtils.cosRad(orgAngle0 + da * (1 + i)),
+                    center.y + radius * MathUtils.sinRad(orgAngle0 + da * (1 + i))
             ));
         }
     }
@@ -1633,3 +1627,189 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
 }
+
+/*
+public void drawCurveFilled(float stroke, int refinement, final Vector2... pointsInput) {
+        if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
+        if (pointsInput.length == 0) return;
+
+        stroke = Math.abs(stroke / 2);
+        refinement = Math.max(1, refinement);
+
+        if (pointsInput.length == 1) {
+            drawCircleFilled(stroke, refinement, pointsInput[0].x, pointsInput[0].y, 0, 0, 0, 1, 1);
+            return;
+        }
+
+        if (pointsInput.length == 2) { // handle separately
+
+        }
+
+        // TODO: ensure capacity.
+
+        setMode(GL11.GL_TRIANGLES);
+
+        verts.clear();
+        Array<Vector2> points = new Array<>(); // TODO: change to ArrayFloat
+        boolean closed = false;
+        //if the path is closed
+        if (pointsInput[0].equals(pointsInput[pointsInput.length - 1])) {
+                Vector2 midPoint = vectorsPool.allocate();
+                Vector2.midPoint(pointsInput[0], pointsInput[1], midPoint);
+                points.add(midPoint);
+                for (int i = 1; i < pointsInput.length; i++) {
+        Vector2 point = vectorsPool.allocate();
+        point.set(pointsInput[i]);
+        points.add(point);
+        }
+        points.add(midPoint);
+        closed = true;
+        } else {
+        for (int i = 0; i < pointsInput.length; i++) {
+        Vector2 point = vectorsPool.allocate();
+        point.set(pointsInput[i]);
+        points.add(point);
+        }
+        }
+
+        Array<Vector2> midPoints = new Array<>(); // TODO: change to ArrayFloat
+
+        for (int i = 0; i < points.size - 1; i++) {
+        Vector2 midPoint = vectorsPool.allocate();
+        if (i == 0) {
+        midPoint.set(points.first());
+        } else if (i == points.size - 2) {
+        midPoint.set(points.last());
+        } else {
+        Vector2.midPoint(points.get(i), points.get(i + 1), midPoint);
+        }
+        midPoints.add(midPoint);
+        }
+
+        for (int i = 1; i < midPoints.size; i++) {
+        Vector2 p0 = midPoints.get(i - 1);
+        Vector2 p1 = points.get(i);
+        Vector2 p2 = midPoints.get(i);
+        float width = stroke;
+
+        Vector2 t0 = vectorsPool.allocate().set(p1).sub(p0);
+        Vector2 t2 = vectorsPool.allocate().set(p2).sub(p1);
+
+        t0.rotate90(1);
+        t2.rotate90(1);
+
+        // triangle composed by the 3 points if clockwise or couterclockwise.
+        // if counterclockwise, we must invert the line threshold points, otherwise the intersection point
+        // could be erroneous and lead to odd results.
+        if (MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) > 0) {
+        t0.flip();
+        t2.flip();
+        }
+
+        t0.nor();
+        t2.nor();
+        t0.scl(width);
+        t2.scl(width);
+
+        Vector2 pIntersect = vectorsPool.allocate();
+        int result = MathUtils.segmentsIntersection(
+        t0.x + p0.x, t0.y + p0.y,
+        t0.x + p1.x, p0.y + p1.y,
+        t2.x + p2.x, t2.y + p2.y,
+        t2.x + p1.x, t2.y + p1.y,
+        pIntersect);
+        //int pintersect = lineIntersection(Point.Add(t0, p0), Point.Add(t0, p1), Point.Add(t2, p2), Point.Add(t2, p1));
+
+        var anchor = vectorsPool.allocate();
+        var anchorLength= Float.MAX_VALUE;
+        if (result == 0  || result == 1  || result == 2  || result == 3) {
+        anchor.set(pIntersect).sub(p1);
+        anchorLength = anchor.len();
+        }
+
+        var p0p1= vectorsPool.allocate().set(p0).sub(p1);
+        var p0p1Length= p0p1.len();
+        var p1p2= vectorsPool.allocate().set(p1).sub(p2);
+        var p1p2Length= p1p2.len();
+
+
+        //the cross point exceeds any of the segments dimension.
+        //do not use cross point as reference.
+
+        if (true) {
+        //if (anchorLength > p0p1Length || anchorLength > p1p2Length) {
+        System.out.println("here");
+        verts.add(vectorsPool.allocate().set(p0).add(t0));
+        verts.add(vectorsPool.allocate().set(p0).sub(t0));
+        verts.add(vectorsPool.allocate().set(p1).add(t0));
+
+        verts.add(vectorsPool.allocate().set(p0).sub(t0));
+        verts.add(vectorsPool.allocate().set(p1).add(t0));
+        verts.add(vectorsPool.allocate().set(p1).sub(t0));
+
+        Vector2 pI = vectorsPool.allocate().set(p1).add(t0);
+        Vector2 pF = vectorsPool.allocate().set(p1).add(t2);
+        createRoundCap(p1, pI, pF, p2, refinement, verts);
+
+        verts.add(vectorsPool.allocate().set(p2).add(t2));
+        verts.add(vectorsPool.allocate().set(p1).sub(t2));
+        verts.add(vectorsPool.allocate().set(p1).add(t2));
+
+        verts.add(vectorsPool.allocate().set(p2).add(t2));
+        verts.add(vectorsPool.allocate().set(p1).sub(t2));
+        verts.add(vectorsPool.allocate().set(p2).sub(t2));
+
+        } else {
+
+        verts.add(vectorsPool.allocate().set(p0).add(t0));
+        verts.add(vectorsPool.allocate().set(p0).sub(t0));
+        verts.add(vectorsPool.allocate().set(p1).sub(anchor));
+
+        verts.add(vectorsPool.allocate().set(p0).add(t0));
+        verts.add(vectorsPool.allocate().set(p1).sub(anchor));
+        verts.add(vectorsPool.allocate().set(p1).add(t0));
+
+
+
+        Vector2 _p0 = vectorsPool.allocate().set(p1).add(t0);
+        Vector2 _p1 = vectorsPool.allocate().set(p1).add(t2);
+        Vector2 _p2 = vectorsPool.allocate().set(p1).sub(anchor);
+
+        Vector2 center = vectorsPool.allocate().set(p1);
+
+        verts.add(_p0);
+        verts.add(center);
+        verts.add(_p2);
+
+        createRoundCap(center, _p0, _p1, _p2, refinement, verts);
+
+        verts.add(center);
+        verts.add(_p1);
+        verts.add(_p2);
+
+        verts.add(vectorsPool.allocate().set(p2).add(t2));
+        verts.add(vectorsPool.allocate().set(p1).sub(anchor));
+        verts.add(vectorsPool.allocate().set(p1).add(t2));
+
+        verts.add(vectorsPool.allocate().set(p2).add(t2));
+        verts.add(vectorsPool.allocate().set(p1).sub(anchor));
+        verts.add(vectorsPool.allocate().set(p2).sub(t2));
+        }
+
+        }
+
+
+        int startVertex = this.vertexIndex;
+        for (int i = 0; i < verts.size; i++) {
+        Vector2 vertex = verts.get(i);
+        //verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
+        //indicesBuffer.put(startVertex + i);
+        }
+
+
+        //vertexIndex += verts.size;
+
+        }
+
+
+ */
