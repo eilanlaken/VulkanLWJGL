@@ -327,7 +327,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
     public void drawCircleFilled(float r, int refinement, float angle, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if ((vertexIndex + refinement + 2) * VERTEX_SIZE > VERTICES_CAPACITY * 4) flush(); // TODO: use floatBuffer.capacity()
+        if ((vertexIndex + refinement + 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush(); // TODO: use floatBuffer.capacity()
 
         refinement = Math.max(3, refinement);
         setMode(GL11.GL_TRIANGLES);
@@ -363,7 +363,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
     public void drawCircleFilled(float r, int refinement, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if ((vertexIndex + refinement + 2) * VERTEX_SIZE > VERTICES_CAPACITY * 4) flush(); // TODO: use floatBuffer.capacity()
+        if ((vertexIndex + refinement + 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush(); // TODO: use floatBuffer.capacity()
 
         refinement = Math.max(3, refinement);
         setMode(GL11.GL_TRIANGLES);
@@ -1264,11 +1264,11 @@ public class Renderer2D implements MemoryResourceHolder {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
         if (pointsInput.length == 0) return;
 
-        stroke = Math.abs(stroke / 2);
+        float width = Math.abs(stroke / 2);
         refinement = Math.max(1, refinement);
 
         if (pointsInput.length == 1) {
-            drawCircleFilled(stroke, refinement, pointsInput[0].x, pointsInput[0].y, 0, 0, 0, 1, 1);
+            drawCircleFilled(width, refinement, pointsInput[0].x, pointsInput[0].y, 0, 0, 0, 1, 1);
             return;
         }
 
@@ -1282,6 +1282,8 @@ public class Renderer2D implements MemoryResourceHolder {
 
         verts.clear();
         Array<Vector2> points = new Array<>(); // TODO: change to ArrayFloat
+        Array<Vector2> midPoints = new Array<>(); // TODO: change to ArrayFloat
+
         boolean closed = false;
         /* if the path is closed */
         if (pointsInput[0].equals(pointsInput[pointsInput.length - 1])) {
@@ -1303,7 +1305,6 @@ public class Renderer2D implements MemoryResourceHolder {
             }
         }
 
-        Array<Vector2> midPoints = new Array<>(); // TODO: change to ArrayFloat
 
         for (int i = 0; i < points.size - 1; i++) {
             Vector2 midPoint = vectorsPool.allocate();
@@ -1317,12 +1318,15 @@ public class Renderer2D implements MemoryResourceHolder {
             midPoints.add(midPoint);
         }
 
+        Vector2 intersection_1 = vectorsPool.allocate();
+        Vector2 intersection_2 = vectorsPool.allocate();
+        Vector2 intersection_3 = vectorsPool.allocate();
+        Vector2 intersection_4 = vectorsPool.allocate();
+
         for (int i = 1; i < midPoints.size; i++) {
             Vector2 p0 = midPoints.get(i - 1);
             Vector2 p1 = points.get(i);
             Vector2 p2 = midPoints.get(i);
-            float width = stroke;
-
             Vector2 t0 = vectorsPool.allocate().set(p1).sub(p0);
             Vector2 t2 = vectorsPool.allocate().set(p2).sub(p1);
 
@@ -1339,10 +1343,9 @@ public class Renderer2D implements MemoryResourceHolder {
             t0.scl(width);
             t2.scl(width);
 
-            Vector2 intersection_1 = vectorsPool.allocate();
-            Vector2 intersection_2 = vectorsPool.allocate();
-            Vector2 intersection_3 = vectorsPool.allocate();
-            Vector2 intersection_4 = vectorsPool.allocate();
+
+
+            Vector2 intersection = vectorsPool.allocate();
 
             int result_1 = MathUtils.segmentsIntersection(
                     p0.x - t0.x, p0.y - t0.y,
@@ -1366,21 +1369,19 @@ public class Renderer2D implements MemoryResourceHolder {
                     p0.x - t0.x, p0.y - t0.y,
                     p0.x + t0.x, p0.y + t0.y,
                     p1.x - t2.x, p1.y - t2.y,
-                    p2.x - t2.x, p2.y - t2.y,
-                    intersection_3);
+                    p1.x + t2.x, p1.y + t2.y,
+                    intersection_4);
 
-            if      (result_1 == 0) inter.set(intersection_1);
-            else if (result_2 == 0) inter.set(intersection_2);
-            else if (result_3 == 0) inter.set(intersection_3);
-            System.out.println(result_1);
-            System.out.println(result_2);
-            System.out.println(result_3);
+            if      (result_1 == 0) intersection.set(intersection_1);
+            else if (result_2 == 0) intersection.set(intersection_2);
+            else if (result_3 == 0) intersection.set(intersection_3);
+            else if (result_4 == 0) intersection.set(intersection_4);
+            inter.set(intersection);
 
             i1.set(p0.x - t0.x, p0.y - t0.y);
             i2.set(p1.x - t0.x, p1.y - t0.y);
             i3.set(p1);
             i4.set(p1.x - t0.x, p1.y - t0.y);
-            //inter.set(pIntersect_1);
 
             verts.add(vectorsPool.allocate().set(p0).add(t0));
             verts.add(vectorsPool.allocate().set(p0).sub(t0));
@@ -1392,7 +1393,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
             Vector2 pI = vectorsPool.allocate().set(p1).add(t0);
             Vector2 pF = vectorsPool.allocate().set(p1).add(t2);
-            createRoundCap(p1, pI, pF, p2, refinement, verts);  // TODO: inline.
+            createRoundCap(p1, pI, pF, p2, refinement, verts);  // TODO: inline?
 
             verts.add(vectorsPool.allocate().set(p2).add(t2));
             verts.add(vectorsPool.allocate().set(p1).sub(t2));
@@ -1404,6 +1405,16 @@ public class Renderer2D implements MemoryResourceHolder {
 
         }
 
+        if (!closed) {
+            var p00 = verts.get(0);
+            var p01 = verts.get(1);
+            var p02 = pointsInput[1];
+            var p10 = verts.last();
+            var p11 = verts.get(verts.size - 3);
+            var p12 = pointsInput[pointsInput.length - 2];
+            createRoundCap(pointsInput[0], p00, p01, p02, refinement, verts);
+            createRoundCap(pointsInput[pointsInput.length - 1], p10, p11, p12, refinement, verts);
+        }
 
         int startVertex = this.vertexIndex;
         for (int i = 0; i < verts.size; i++) {
@@ -1411,10 +1422,12 @@ public class Renderer2D implements MemoryResourceHolder {
             verticesBuffer.put(vertex.x).put(vertex.y).put(currentTint).put(0.5f).put(0.5f);
             indicesBuffer.put(startVertex + i);
         }
-
-
         vertexIndex += verts.size;
 
+        vectorsPool.free(intersection_1);
+        vectorsPool.free(intersection_2);
+        vectorsPool.free(intersection_3);
+        vectorsPool.free(intersection_4);
     }
 
     public static Array<Vector2> verts = new Array<>(); // TODO: change to ArrayFloat
@@ -1427,38 +1440,30 @@ public class Renderer2D implements MemoryResourceHolder {
 
 
     private void createRoundCap(Vector2 center, Vector2 pI, Vector2 pF, Vector2 pNext, int refinement, Array<Vector2> verts) {
-
         float radius = Vector2.len(center.x - pI.x, center.y - pI.y);
-
         float angle0 = (float) Math.atan2((pF.y - center.y), (pF.x - center.x));
         float angle1 = (float) Math.atan2((pI.y - center.y), (pI.x - center.x));
-
         float orgAngle0 = angle0;
 
-        if (angle1 > angle0 && angle1-angle0 >= Math.PI - MathUtils.FLOAT_ROUNDING_ERROR) {
+        if (angle1 > angle0 && angle1 - angle0 >= Math.PI - MathUtils.FLOAT_ROUNDING_ERROR) {
             angle1 = angle1 - 2 * MathUtils.PI;
-        } else {
-            if (angle0 - angle1 >= Math.PI - MathUtils.FLOAT_ROUNDING_ERROR) {
-                angle0 = angle0 - 2 * MathUtils.PI;
-            }
+        } else if (angle0 - angle1 >= Math.PI - MathUtils.FLOAT_ROUNDING_ERROR) {
+            angle0 = angle0 - 2 * MathUtils.PI;
         }
 
-        var angleDiff = angle1-angle0;
-
+        float angleDiff = angle1 - angle0;
         if (Math.abs(angleDiff) >= Math.PI - MathUtils.FLOAT_ROUNDING_ERROR && Math.abs(angleDiff) <= Math.PI + MathUtils.FLOAT_ROUNDING_ERROR) {
-            Vector2 r1 = vectorsPool.allocate().set(center).sub(pNext);
-            if (r1.x == 0 && r1.y > 0) {
+            float r1_x = center.x - pNext.x;
+            float r1_y = center.y - pNext.y;
+            if (MathUtils.isZero(r1_x) && r1_y > 0) {
                 angleDiff = -angleDiff;
-            } else if (r1.x >= -MathUtils.FLOAT_ROUNDING_ERROR) {
+            } else if (r1_x >= -MathUtils.FLOAT_ROUNDING_ERROR) {
                 angleDiff= -angleDiff;
             }
         }
 
-
-        var da = angleDiff / refinement;
-
+        float da = angleDiff / refinement;
         for (var i = 0; i < refinement; i++) {
-
             verts.add(vectorsPool.allocate().set(center.x, center.y));
             verts.add(vectorsPool.allocate().set(
                     center.x + radius * MathUtils.cosRad(orgAngle0 + da * i),

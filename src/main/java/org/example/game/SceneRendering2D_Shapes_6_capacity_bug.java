@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL11;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SceneRendering2D_Shapes_5 extends ApplicationScreen {
+public class SceneRendering2D_Shapes_6_capacity_bug extends ApplicationScreen {
 
     private Renderer2D renderer2D;
     private Camera camera;
@@ -26,7 +26,7 @@ public class SceneRendering2D_Shapes_5 extends ApplicationScreen {
 
     private ShaderProgram shaderYellow;
 
-    public SceneRendering2D_Shapes_5() {
+    public SceneRendering2D_Shapes_6_capacity_bug() {
         renderer2D = new Renderer2D();
     }
 
@@ -81,29 +81,30 @@ public class SceneRendering2D_Shapes_5 extends ApplicationScreen {
 
         //renderer2D.drawCurveFilled(1.2f, 10, new Vector2(-3,0), new Vector2(0,0), new Vector2(3,0), new Vector2(6,2));
         //Vector2 last = new Vector2(0.6f,0); // TODO: when stroke value / 2 is greater than the step, we get problems.
-        Vector2 last = new Vector2(3f,5);
+        Vector2 last = new Vector2(3f,0);
         last.rotateDeg(dy * 150);
         Vector2 first = new Vector2(-3f,0);
 
         //renderer2D.drawCurveFilled(2f, 33, first, new Vector2(0,0), last); // works but only for small refinement values?!?!?!
-        renderer2D.drawCurveFilled(2f, 5, first, new Vector2(0,0), last); // works but only for small refinement values?!?!?!
+        //renderer2D.drawCurveFilled(2f, 32, first, new Vector2(0,0), last); // works but only for small refinement values?!?!?!
 
         Array<Vector2> verts = Renderer2D.verts;
         for (Vector2 vert : verts) {
-            renderer2D.drawCircleFilled(0.05f, 10, vert.x, vert.y, 0,0,0,1,1);
+            //renderer2D.drawCircleFilled(0.05f, 10, vert.x, vert.y, 0,0,0,1,1);
         }
 
 
         renderer2D.setTint(yellow);
-        renderer2D.drawCircleFilled(0.05f, 10, Renderer2D.i1.x, Renderer2D.i1.y, 0,0,0,1,1);
-        renderer2D.drawCircleFilled(0.05f, 10, Renderer2D.i2.x, Renderer2D.i2.y, 0,0,0,1,1);
+        //renderer2D.drawCircleFilled(0.05f, 10, Renderer2D.i1.x, Renderer2D.i1.y, 0,0,0,1,1);
+        //renderer2D.drawCircleFilled(0.05f, 10, Renderer2D.i2.x, Renderer2D.i2.y, 0,0,0,1,1);
         renderer2D.setTint(green);
-        renderer2D.drawCircleFilled(0.05f, 10, Renderer2D.i3.x, Renderer2D.i3.y, 0,0,0,1,1);
-        renderer2D.drawCircleFilled(0.05f, 10, Renderer2D.i4.x, Renderer2D.i4.y, 0,0,0,1,1);
+        //renderer2D.drawCircleFilled(0.05f, 10, Renderer2D.i3.x, Renderer2D.i3.y, 0,0,0,1,1);
+        //renderer2D.drawCircleFilled(0.05f, 10, Renderer2D.i4.x, Renderer2D.i4.y, 0,0,0,1,1);
 
         renderer2D.setTint(red);
-        renderer2D.drawCircleFilled(0.05f, 10, Renderer2D.inter.x, Renderer2D.inter.y, 0,0,0,1,1);
+        //renderer2D.drawCircleFilled(0.05f, 10, Renderer2D.inter.x, Renderer2D.inter.y, 0,0,0,1,1);
 
+        renderer2D.drawCircleFilled(1f, 400, 0, 0, 0,0,0,1,1);
 
 
         renderer2D.end();
