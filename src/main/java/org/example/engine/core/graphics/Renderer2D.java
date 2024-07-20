@@ -363,7 +363,7 @@ public class Renderer2D implements MemoryResourceHolder {
 
     public void drawCircleFilled(float r, int refinement, float x, float y, float angleX, float angleY, float angleZ, float scaleX, float scaleY) {
         if (!drawing) throw new GraphicsException("Must call begin() before draw operations.");
-        if ((vertexIndex + refinement + 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush(); // TODO: use floatBuffer.capacity()
+        if ((vertexIndex + refinement + 2) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
 
         refinement = Math.max(3, refinement);
         setMode(GL11.GL_TRIANGLES);
@@ -375,15 +375,13 @@ public class Renderer2D implements MemoryResourceHolder {
 
         // put vertices
         verticesBuffer.put(x).put(y).put(currentTint).put(0.5f).put(0.5f);
-        int j = 0;
-        while (j < refinement + 1) {
-            arm.x = r * scaleX * MathUtils.cosDeg(da * j);
-            arm.y = r * scaleY * MathUtils.sinDeg(da * j);
+        for (int i = 0; i < refinement + 1; i++) {
+            arm.x = r * scaleX * MathUtils.cosDeg(da * i);
+            arm.y = r * scaleY * MathUtils.sinDeg(da * i);
             arm.rotateDeg(angleZ);
             float pointX = x + arm.x;
             float pointY = y + arm.y;
             verticesBuffer.put(pointX).put(pointY).put(currentTint).put(0.5f).put(0.5f);
-            j++;
         }
 
         int startVertex = this.vertexIndex;
@@ -1461,11 +1459,7 @@ public class Renderer2D implements MemoryResourceHolder {
     }
 
     private void flush() {
-        if (verticesBuffer.position() == 0) {
-            System.out.println("zero");
-            // FIXME.
-            return;
-        }
+        if (verticesBuffer.position() == 0) return;
 
         verticesBuffer.flip();
         indicesBuffer.flip();
@@ -1475,7 +1469,6 @@ public class Renderer2D implements MemoryResourceHolder {
             GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, verticesBuffer);
             GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
             GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 0, indicesBuffer);
-
             GL20.glEnableVertexAttribArray(0);
             GL20.glEnableVertexAttribArray(1);
             GL20.glEnableVertexAttribArray(2);

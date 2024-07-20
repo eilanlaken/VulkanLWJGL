@@ -113,7 +113,14 @@ public final class GraphicsUtils {
 
     public static float getMonitorAspectRatio() {
         return getMonitorWidth() / (float) getMonitorHeight();
+    }
 
+    public static int getMaxVerticesPerDrawCall() {
+        return GL11.glGetInteger(GL20.GL_MAX_ELEMENTS_VERTICES);
+    }
+
+    public static int getMaxIndicesPerDrawCall() {
+        return GL11.glGetInteger(GL20.GL_MAX_ELEMENTS_INDICES);
     }
 
     public static float getWindowAspectRatio() {
