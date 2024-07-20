@@ -5,21 +5,26 @@ import org.lwjgl.glfw.*;
 
 public class Mouse {
 
-    private static ApplicationWindow window;
-    private static boolean initialized = false;
-    private static float sensitivity = 1f; // goes from 0 to infinity. Default is 1.
-    private static int prevCursorX;
-    private static int prevCursorY;
-    private static int cursorX;
-    private static int cursorY;
-    private static int cursorDeltaX;
-    private static int cursorDeltaY;
-    private static boolean cursorHidden = false;
-    private static boolean cursorInWindow = true;
-    private static float verticalScroll = 0;
-    private static float horizontalScroll = 0;
-    private static int[] mouseButtonsPrevStates = new int[5];
-    private static int[] mouseButtonsCurrentStates = new int[5];
+    /* reference to the Window */
+    private static ApplicationWindow window = null;
+
+    /* mouse info */
+    private static boolean initialized      = false;
+    private static float   sensitivity      = 1f; // goes from 0 to infinity. Default is 1.
+    private static int     prevCursorX      = 0;
+    private static int     prevCursorY      = 0;
+    private static int     cursorX          = 0;
+    private static int     cursorY          = 0;
+    private static int     cursorDeltaX     = 0;
+    private static int     cursorDeltaY     = 0;
+    private static boolean cursorHidden     = false;
+    private static boolean cursorInWindow   = true;
+    private static float   verticalScroll   = 0;
+    private static float   horizontalScroll = 0;
+
+    /* mouse state */
+    private static int[]   mouseButtonsPrevStates    = new int[5];
+    private static int[]   mouseButtonsCurrentStates = new int[5];
 
     private Mouse() {}
 
@@ -132,7 +137,9 @@ public class Mouse {
         return mouseButtonsCurrentStates[button.glfwCode] == GLFW.GLFW_PRESS;
     }
 
-    // TODO: implement isButtonJustPressed
+    public static boolean isButtonJustPressed(final Button button) {
+        return mouseButtonsCurrentStates[button.glfwCode] == GLFW.GLFW_PRESS && mouseButtonsPrevStates[button.glfwCode] != GLFW.GLFW_PRESS;
+    }
 
     public static boolean isButtonReleased(final Button button) {
         return mouseButtonsCurrentStates[button.glfwCode] == GLFW.GLFW_RELEASE;
