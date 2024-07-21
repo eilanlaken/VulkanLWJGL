@@ -86,7 +86,8 @@ public class SceneRendering2D_Shapes_5 extends ApplicationScreen {
         Vector2 first = new Vector2(-3f,0);
 
         //renderer2D.drawCurveFilled(2f, 33, first, new Vector2(0,0), last); // works but only for small refinement values?!?!?!
-        renderer2D.drawCurveFilled(2f, 5, first, new Vector2(0,0), last); // works but only for small refinement values?!?!?!
+        //renderer2D.drawCurveFilled(2f, 5, first, new Vector2(0,0), last); // works but only for small refinement values?!?!?!
+        renderer2D.drawCurveFilled(2f, 5, first, new Vector2(0,0)); // works but only for small refinement values?!?!?!
 
 
 

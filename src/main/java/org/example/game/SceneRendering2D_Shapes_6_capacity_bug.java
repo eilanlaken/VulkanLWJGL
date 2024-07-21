@@ -96,7 +96,7 @@ public class SceneRendering2D_Shapes_6_capacity_bug extends ApplicationScreen {
     float dx = 0;
     float dy = 0;
     int dr = 0;
-    int baseR = 2000;
+    int baseR = 274;
     float x, y;
 
     @Override

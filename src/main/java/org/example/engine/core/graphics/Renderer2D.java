@@ -3,7 +3,6 @@ package org.example.engine.core.graphics;
 import org.example.engine.core.collections.Array;
 import org.example.engine.core.collections.ArrayFloat;
 import org.example.engine.core.collections.ArrayInt;
-import org.example.engine.core.input.Keyboard;
 import org.example.engine.core.input.Mouse;
 import org.example.engine.core.math.MathUtils;
 import org.example.engine.core.math.Vector2;
@@ -33,9 +32,11 @@ public class Renderer2D implements MemoryResourceHolder {
 
     /* constants */
     private static final int   VERTEX_SIZE       = 5;    // A vertex is composed of 5 floats: x,y: position, t: color (as float bits) and u,v: texture coordinates.
-    // TODO: increasing this somehow defers the problem.
+    // TODO: bug here. WTF. increasing this somehow defers the problem.
+    //private static final int   VERTICES_CAPACITY = 1000; // The batch can render VERTICES_CAPACITY vertices (so wee need a float buffer of size: VERTICES_CAPACITY * VERTEX_SIZE)
+    //private static final int   INDICES_CAPACITY  = VERTICES_CAPACITY * 2;
     private static final int   VERTICES_CAPACITY = GraphicsUtils.getMaxVerticesPerDrawCall(); // The batch can render VERTICES_CAPACITY vertices (so wee need a float buffer of size: VERTICES_CAPACITY * VERTEX_SIZE)
-    private static final int   INDICES_CAPACITY  = GraphicsUtils.getMaxIndicesPerDrawCall(); // TODO
+    private static final int   INDICES_CAPACITY  = GraphicsUtils.getMaxIndicesPerDrawCall();
     private static final float WHITE_TINT        = Color.WHITE.toFloatBits();
 
     /* buffers */
@@ -65,7 +66,7 @@ public class Renderer2D implements MemoryResourceHolder {
     private int           currentMode    = GL11.GL_TRIANGLES;
     private int           currentSFactor = GL11.GL_SRC_ALPHA;
     private int           currentDFactor = GL11.GL_ONE_MINUS_SRC_ALPHA;
-    private int           drawCalls      = 0;
+    private int frameDrawCalls = 0;
 
     public Renderer2D() {
         this.vao = GL30.glGenVertexArrays();
@@ -106,7 +107,7 @@ public class Renderer2D implements MemoryResourceHolder {
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        this.drawCalls = 0;
+        this.frameDrawCalls = 0;
         this.currentCamera = camera != null ? camera : defaultCamera.update(GraphicsUtils.getWindowWidth(), GraphicsUtils.getWindowHeight());
         setShader(defaultShader);
         setShaderAttributes(null);
@@ -1268,145 +1269,194 @@ public class Renderer2D implements MemoryResourceHolder {
         float width = Math.abs(stroke / 2);
         refinement = Math.max(1, refinement);
 
-        if (pointsInput.length == 1) {
+        if (pointsInput.length == 1 || (pointsInput.length == 2 && pointsInput[0].equals(pointsInput[1]))) {
             drawCircleFilled(width, refinement, pointsInput[0].x, pointsInput[0].y, 0, 0, 0, 1, 1);
             return;
         }
 
+        final int maxExpectedVertices = 12 * (pointsInput.length + 2) + refinement * 3 * (pointsInput.length + 1); // For every anchor, we expect to store 12 vertices
+        // (every anchor has 2 sides: left and right. Each side is made up of 2 triangles, each triangle is made up of 3 vertices). We have a maximum of pointInput.length + 2 anchors.
+        // So the first term in the sum is 12 * (pointsInput.length + 2).
+        // Additionally, for every anchor we have a round cap that will yield refinement * 3 vertices. We have pointInput.length + 1 corners at the maximum. So the second term is
+        // refinement * 3 * (pointInput.length + 1).
+        if ((vertexIndex + maxExpectedVertices) * VERTEX_SIZE > verticesBuffer.capacity()) flush();
+        setMode(GL11.GL_TRIANGLES);
+        Array<Vector2> vertices = new Array<>(true, maxExpectedVertices);
+
         if (pointsInput.length == 2) { // handle separately
 
-        }
+            Vector2 p0 = pointsInput[0];
+            Vector2 p2 = pointsInput[1];
 
-        // TODO: ensure capacity.
+            Vector2 t = vectorsPool.allocate();
+            t.set(p2).sub(p0);
+            t.rotate90(1);
+            t.nor();
+            t.scl(width);
 
-        setMode(GL11.GL_TRIANGLES);
-
-        Array<Vector2> vertices = new Array<>();
-        Array<Vector2> points = new Array<>(); // TODO: change to ArrayFloat
-        Array<Vector2> midPoints = new Array<>(); // TODO: change to ArrayFloat
-
-        boolean closed = false;
-        /* if the path is closed */
-        if (pointsInput[0].equals(pointsInput[pointsInput.length - 1])) {
-            Vector2 midPoint = vectorsPool.allocate();
-            Vector2.midPoint(pointsInput[0], pointsInput[1], midPoint);
-            points.add(midPoint);
-            for (int i = 1; i < pointsInput.length; i++) {
-                Vector2 point = vectorsPool.allocate();
-                point.set(pointsInput[i]);
-                points.add(point);
-            }
-            points.add(midPoint);
-            closed = true;
-        } else {
-            for (Vector2 vector2 : pointsInput) {
-                Vector2 point = vectorsPool.allocate();
-                point.set(vector2);
-                points.add(point);
-            }
-        }
-
-        for (int i = 0; i < points.size - 1; i++) {
-            Vector2 midPoint = vectorsPool.allocate();
-            if (i == 0) {
-                midPoint.set(points.first());
-            } else if (i == points.size - 2) {
-                midPoint.set(points.last());
-            } else {
-                Vector2.midPoint(points.get(i), points.get(i + 1), midPoint);
-            }
-            midPoints.add(midPoint);
-        }
-
-        Vector2 intersection_1 = vectorsPool.allocate();
-        Vector2 intersection_2 = vectorsPool.allocate();
-        Vector2 intersection_3 = vectorsPool.allocate();
-        Vector2 intersection_4 = vectorsPool.allocate();
-
-        for (int i = 1; i < midPoints.size; i++) {
-            Vector2 p0 = midPoints.get(i - 1);
-            Vector2 p1 = points.get(i);
-            Vector2 p2 = midPoints.get(i);
-            Vector2 t0 = vectorsPool.allocate().set(p1).sub(p0);
-            Vector2 t2 = vectorsPool.allocate().set(p2).sub(p1);
-
-            t0.rotate90(1);
-            t2.rotate90(1);
-
-            if (MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) > 0) {
-                t0.flip();
-                t2.flip();
-            }
-
-            t0.nor();
-            t2.nor();
-            t0.scl(width);
-            t2.scl(width);
-
-            Vector2 intersection = vectorsPool.allocate();
-            int result_1 = MathUtils.segmentsIntersection(
-                    p0.x - t0.x, p0.y - t0.y,
-                    p1.x - t0.x, p1.y - t0.y,
-                    p2.x - t2.x, p2.y - t2.y,
-                    p1.x - t2.x, p1.y - t2.y,
-                    intersection_1);
-            int result_2 = MathUtils.segmentsIntersection(
-                    p0.x - t0.x, p0.y - t0.y,
-                    p1.x - t0.x, p1.y - t0.y,
-                    p2.x - t2.x, p2.y - t2.y,
-                    p2.x + t2.x, p2.y + t2.y,
-                    intersection_2);
-            int result_3 = MathUtils.segmentsIntersection(
-                    p0.x - t0.x, p0.y - t0.y,
-                    p0.x + t0.x, p0.y + t0.y,
-                    p1.x - t2.x, p1.y - t2.y,
-                    p2.x - t2.x, p2.y - t2.y,
-                    intersection_3);
-            int result_4 = MathUtils.segmentsIntersection(
-                    p0.x - t0.x, p0.y - t0.y,
-                    p0.x + t0.x, p0.y + t0.y,
-                    p1.x - t2.x, p1.y - t2.y,
-                    p1.x + t2.x, p1.y + t2.y,
-                    intersection_4);
-
-            if      (result_1 == 0) intersection.set(intersection_1);
-            else if (result_2 == 0) intersection.set(intersection_2);
-            else if (result_3 == 0) intersection.set(intersection_3);
-            else if (result_4 == 0) intersection.set(intersection_4);
-
-            vertices.add(vectorsPool.allocate().set(p0).add(t0));
-            vertices.add(vectorsPool.allocate().set(p0).sub(t0));
-            vertices.add(vectorsPool.allocate().set(p1).add(t0));
-
-            vertices.add(vectorsPool.allocate().set(p0).sub(t0));
-            vertices.add(vectorsPool.allocate().set(p1).add(t0));
-            vertices.add(vectorsPool.allocate().set(p1).sub(t0));
-
-            Vector2 pI = vectorsPool.allocate().set(p1).add(t0);
-            Vector2 pF = vectorsPool.allocate().set(p1).add(t2);
-            createRoundCap(p1, pI, pF, p2, refinement, vertices);
-
-            vertices.add(vectorsPool.allocate().set(p2).add(t2));
-            vertices.add(vectorsPool.allocate().set(p1).sub(t2));
-            vertices.add(vectorsPool.allocate().set(p1).add(t2));
-
-            vertices.add(vectorsPool.allocate().set(p2).add(t2));
-            vertices.add(vectorsPool.allocate().set(p1).sub(t2));
-            vertices.add(vectorsPool.allocate().set(p2).sub(t2));
-
-        }
-
-        if (!closed) {
             var p00 = vertices.get(0);
             var p01 = vertices.get(1);
             var p02 = pointsInput[1];
-            var p10 = vertices.last();
-            var p11 = vertices.get(vertices.size - 3);
-            var p12 = pointsInput[pointsInput.length - 2];
+            var p10 = vertices.get(vertices.size - 3);
+            var p11 = vertices.get(vertices.size - 2);
+            var p12 = pointsInput[0];
+
+            vertices.add(vectorsPool.allocate().set(pointsInput[0]).add(t));
+            vertices.add(vectorsPool.allocate().set(pointsInput[0]).sub(t));
+            vertices.add(vectorsPool.allocate().set(pointsInput[1]).sub(t));
+            vertices.add(vectorsPool.allocate().set(pointsInput[1]).sub(t));
+            vertices.add(vectorsPool.allocate().set(pointsInput[1]).add(t));
+            vertices.add(vectorsPool.allocate().set(pointsInput[0]).add(t));
             createRoundCap(pointsInput[0], p00, p01, p02, refinement, vertices);
-            createRoundCap(pointsInput[pointsInput.length - 1], p10, p11, p12, refinement, vertices);
+            createRoundCap(pointsInput[1], p10, p11, p12, refinement, vertices);
+
+            vectorsPool.free(t);
+
+        } else {
+            Array<Vector2> points    = new Array<>(true, pointsInput.length + 2);
+            Array<Vector2> midPoints = new Array<>(true,pointsInput.length + 2);
+            /* handle closed path scenario */
+            boolean closed = false;
+            if (pointsInput[0].equals(pointsInput[pointsInput.length - 1])) { // path is closed
+                Vector2 midPoint = vectorsPool.allocate();
+                Vector2.midPoint(pointsInput[0], pointsInput[1], midPoint);
+                points.add(midPoint);
+                for (int i = 1; i < pointsInput.length; i++) {
+                    Vector2 point = vectorsPool.allocate();
+                    point.set(pointsInput[i]);
+                    points.add(point);
+                }
+                points.add(midPoint);
+                closed = true;
+            } else { // path is open
+                for (Vector2 vector2 : pointsInput) {
+                    Vector2 point = vectorsPool.allocate();
+                    point.set(vector2);
+                    points.add(point);
+                }
+            }
+
+            /* calculate mid-points of the path (between corner to corner) */
+            for (int i = 0; i < points.size - 1; i++) {
+                Vector2 midPoint = vectorsPool.allocate();
+                if (i == 0) {
+                    midPoint.set(points.first());
+                } else if (i == points.size - 2) {
+                    midPoint.set(points.last());
+                } else {
+                    Vector2.midPoint(points.get(i), points.get(i + 1), midPoint);
+                }
+                midPoints.add(midPoint);
+            }
+
+            Vector2 intersection_1 = vectorsPool.allocate();
+            Vector2 intersection_2 = vectorsPool.allocate();
+            Vector2 intersection_3 = vectorsPool.allocate();
+            Vector2 intersection_4 = vectorsPool.allocate();
+            Vector2 t0 = vectorsPool.allocate();
+            Vector2 t2 = vectorsPool.allocate();
+
+            /* iterate over all the anchors. Anchor = <Midpoint L, Corner, Midpoint R> */
+            for (int i = 1; i < midPoints.size; i++) {
+
+                Vector2 p0 = midPoints.get(i - 1);
+                Vector2 p1 = points.get(i);
+                Vector2 p2 = midPoints.get(i);
+
+                t0.set(p1).sub(p0);
+                t2.set(p2).sub(p1);
+                t0.rotate90(1);
+                t2.rotate90(1);
+                if (MathUtils.areaTriangleSigned(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y) > 0) {
+                    t0.flip();
+                    t2.flip();
+                }
+                t0.nor();
+                t2.nor();
+                t0.scl(width);
+                t2.scl(width);
+
+                /* calculate all possible intersection. */
+                int result_1 = MathUtils.segmentsIntersection(
+                        p0.x - t0.x, p0.y - t0.y,
+                        p1.x - t0.x, p1.y - t0.y,
+                        p2.x - t2.x, p2.y - t2.y,
+                        p1.x - t2.x, p1.y - t2.y,
+                        intersection_1);
+                int result_2 = MathUtils.segmentsIntersection(
+                        p0.x - t0.x, p0.y - t0.y,
+                        p1.x - t0.x, p1.y - t0.y,
+                        p2.x - t2.x, p2.y - t2.y,
+                        p2.x + t2.x, p2.y + t2.y,
+                        intersection_2);
+                int result_3 = MathUtils.segmentsIntersection(
+                        p0.x - t0.x, p0.y - t0.y,
+                        p0.x + t0.x, p0.y + t0.y,
+                        p1.x - t2.x, p1.y - t2.y,
+                        p2.x - t2.x, p2.y - t2.y,
+                        intersection_3);
+                int result_4 = MathUtils.segmentsIntersection(
+                        p0.x - t0.x, p0.y - t0.y,
+                        p0.x + t0.x, p0.y + t0.y,
+                        p1.x - t2.x, p1.y - t2.y,
+                        p1.x + t2.x, p1.y + t2.y,
+                        intersection_4);
+
+                /* Store the unique intersection in "intersection" */
+                Vector2 intersection = vectorsPool.allocate();
+                if      (result_1 == 0) intersection.set(intersection_1);
+                else if (result_2 == 0) intersection.set(intersection_2);
+                else if (result_3 == 0) intersection.set(intersection_3);
+                else if (result_4 == 0) intersection.set(intersection_4);
+
+                /* add the vertices for the current anchor. */
+                vertices.add(vectorsPool.allocate().set(p0).add(t0));
+                vertices.add(vectorsPool.allocate().set(p0).sub(t0));
+                vertices.add(vectorsPool.allocate().set(p1).add(t0));
+
+                vertices.add(vectorsPool.allocate().set(p0).sub(t0));
+                vertices.add(vectorsPool.allocate().set(p1).add(t0));
+                vertices.add(vectorsPool.allocate().set(p1).sub(t0));
+
+                Vector2 pI = vectorsPool.allocate().set(p1).add(t0);
+                Vector2 pF = vectorsPool.allocate().set(p1).add(t2);
+                createRoundCap(p1, pI, pF, p2, refinement, vertices);
+
+                vertices.add(vectorsPool.allocate().set(p2).add(t2));
+                vertices.add(vectorsPool.allocate().set(p1).sub(t2));
+                vertices.add(vectorsPool.allocate().set(p1).add(t2));
+
+                vertices.add(vectorsPool.allocate().set(p2).add(t2));
+                vertices.add(vectorsPool.allocate().set(p1).sub(t2));
+                vertices.add(vectorsPool.allocate().set(p2).sub(t2));
+
+            }
+
+            /* handle the case of closed paths */
+            if (!closed) {
+                var p00 = vertices.get(0);
+                var p01 = vertices.get(1);
+                var p02 = pointsInput[1];
+                var p10 = vertices.last();
+                var p11 = vertices.get(vertices.size - 3);
+                var p12 = pointsInput[pointsInput.length - 2];
+                createRoundCap(pointsInput[0], p00, p01, p02, refinement, vertices);
+                createRoundCap(pointsInput[pointsInput.length - 1], p10, p11, p12, refinement, vertices);
+            }
+
+            /* free resources allocated in this scope */
+            vectorsPool.free(intersection_1);
+            vectorsPool.free(intersection_2);
+            vectorsPool.free(intersection_3);
+            vectorsPool.free(intersection_4);
+            vectorsPool.free(t0);
+            vectorsPool.free(t2);
+            vectorsPool.freeAll(points);
+            vectorsPool.freeAll(midPoints);
         }
 
+
+        /* put vertices and indices. */
         int startVertex = this.vertexIndex;
         for (int i = 0; i < vertices.size; i++) {
             Vector2 vertex = vertices.get(i);
@@ -1415,12 +1465,7 @@ public class Renderer2D implements MemoryResourceHolder {
         }
         vertexIndex += vertices.size;
 
-        vectorsPool.free(intersection_1);
-        vectorsPool.free(intersection_2);
-        vectorsPool.free(intersection_3);
-        vectorsPool.free(intersection_4);
-        vectorsPool.freeAll(points);
-        vectorsPool.freeAll(midPoints);
+        /* free resources */
         vectorsPool.freeAll(vertices);
     }
 
@@ -1491,7 +1536,7 @@ public class Renderer2D implements MemoryResourceHolder {
         verticesBuffer.clear();
         indicesBuffer.clear();
         vertexIndex = 0;
-        drawCalls++;
+        frameDrawCalls++;
     }
 
     public void end() {
@@ -1577,7 +1622,7 @@ public class Renderer2D implements MemoryResourceHolder {
             ByteBuffer buffer = ByteBuffer.allocateDirect(4);
             buffer.put((byte) ((0xFFFFFFFF >> 16) & 0xFF));   // Red component
             buffer.put((byte) ((0xFFFFFFFF >> 8) & 0xFF));    // Green component
-            buffer.put((byte) (0xFF));           // Blue component
+            buffer.put((byte) (0xFF));                        // Blue component
             buffer.put((byte) ((0xFFFFFFFF >> 24) & 0xFF));   // Alpha component
             buffer.flip();
             int glHandle = GL11.glGenTextures();
