@@ -1317,7 +1317,7 @@ public class Renderer2D implements MemoryResourceHolder {
             Array<Vector2> midPoints = new Array<>(true,pointsInput.length + 2);
             /* handle closed path scenario */
             boolean closed = false;
-            if (pointsInput[0].equals(pointsInput[pointsInput.length - 1])) { // path is closed
+            if (pointsInput[0].equals(pointsInput[pointsInput.length - 1])) { // closed path
                 Vector2 midPoint = vectorsPool.allocate();
                 Vector2.midPoint(pointsInput[0], pointsInput[1], midPoint);
                 points.add(midPoint);
@@ -1328,7 +1328,7 @@ public class Renderer2D implements MemoryResourceHolder {
                 }
                 points.add(midPoint);
                 closed = true;
-            } else { // path is open
+            } else { // open path
                 for (Vector2 vector2 : pointsInput) {
                     Vector2 point = vectorsPool.allocate();
                     point.set(vector2);
@@ -1358,7 +1358,6 @@ public class Renderer2D implements MemoryResourceHolder {
 
             /* iterate over all the anchors. Anchor = <Midpoint L, Corner, Midpoint R> */
             for (int i = 1; i < midPoints.size; i++) {
-
                 Vector2 p0 = midPoints.get(i - 1);
                 Vector2 p1 = points.get(i);
                 Vector2 p2 = midPoints.get(i);
@@ -1429,7 +1428,6 @@ public class Renderer2D implements MemoryResourceHolder {
                 vertices.add(vectorsPool.allocate().set(p2).add(t2));
                 vertices.add(vectorsPool.allocate().set(p1).sub(t2));
                 vertices.add(vectorsPool.allocate().set(p2).sub(t2));
-
             }
 
             /* handle the case of closed paths */
@@ -1511,12 +1509,6 @@ public class Renderer2D implements MemoryResourceHolder {
 
         verticesBuffer.flip();
         indicesBuffer.flip();
-
-        if (Mouse.isButtonClicked(Mouse.Button.LEFT)) {
-            System.out.println("i: " + indicesBuffer);
-            System.out.println("v: " + verticesBuffer);
-        }
-
         GL30.glBindVertexArray(vao);
         {
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
@@ -1532,7 +1524,6 @@ public class Renderer2D implements MemoryResourceHolder {
             GL20.glDisableVertexAttribArray(0);
         }
         GL30.glBindVertexArray(0);
-
         verticesBuffer.clear();
         indicesBuffer.clear();
         vertexIndex = 0;

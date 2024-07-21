@@ -95,16 +95,14 @@ public final class AssetUtils {
         return Files.size(filePath);
     }
 
-    public static synchronized Date getLastModifiedDate(final String filepath) {
-        Path p = Paths.get(filepath);
-        BasicFileAttributes view;
-        try {
-            view = Files.getFileAttributeView(p, BasicFileAttributeView.class)
-            .readAttributes();
-        } catch (IOException e) {
-            return null; // file does not exist or whatever
-        }
-        return new Date(view.lastModifiedTime().toMillis());
+    public static synchronized Date lastModified(final String filepath) {
+        File file = new File(filepath);
+        // Get the last modified time in milliseconds since the epoch (Jan 1, 1970)
+        long lastModifiedMillis = file.lastModified();
+
+        // Convert to a Date object
+        Date lastModifiedDate = new Date(lastModifiedMillis);
+        return lastModifiedDate;
     }
 
     public static synchronized boolean filesExist(final String ...filePaths) {
