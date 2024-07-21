@@ -1294,6 +1294,13 @@ public class Renderer2D implements MemoryResourceHolder {
             t.nor();
             t.scl(width);
 
+            vertices.add(vectorsPool.allocate().set(pointsInput[0]).add(t));
+            vertices.add(vectorsPool.allocate().set(pointsInput[0]).sub(t));
+            vertices.add(vectorsPool.allocate().set(pointsInput[1]).sub(t));
+            vertices.add(vectorsPool.allocate().set(pointsInput[1]).sub(t));
+            vertices.add(vectorsPool.allocate().set(pointsInput[1]).add(t));
+            vertices.add(vectorsPool.allocate().set(pointsInput[0]).add(t));
+
             var p00 = vertices.get(0);
             var p01 = vertices.get(1);
             var p02 = pointsInput[1];
@@ -1301,12 +1308,6 @@ public class Renderer2D implements MemoryResourceHolder {
             var p11 = vertices.get(vertices.size - 2);
             var p12 = pointsInput[0];
 
-            vertices.add(vectorsPool.allocate().set(pointsInput[0]).add(t));
-            vertices.add(vectorsPool.allocate().set(pointsInput[0]).sub(t));
-            vertices.add(vectorsPool.allocate().set(pointsInput[1]).sub(t));
-            vertices.add(vectorsPool.allocate().set(pointsInput[1]).sub(t));
-            vertices.add(vectorsPool.allocate().set(pointsInput[1]).add(t));
-            vertices.add(vectorsPool.allocate().set(pointsInput[0]).add(t));
             createRoundCap(pointsInput[0], p00, p01, p02, refinement, vertices);
             createRoundCap(pointsInput[1], p10, p11, p12, refinement, vertices);
 
